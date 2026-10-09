@@ -6,10 +6,11 @@
  * Analyze itself is done on server, see PuzzleKatahexChecker.
  */
 
-import type { AnalysisEngine } from '../hexplorer.js';
+import type { Move } from '@playhex/move-notation';
+import { ANALYSIS_ENGINES } from '../hexplorer.js';
 import type { PuzzleDefinition, PuzzleError } from './puzzleTree.js';
 
-export type PuzzleKatahexWarningCode =
+export type PuzzleCheckWarningCode =
     /**
      * Player is not winning in initial position.
      */
@@ -51,13 +52,48 @@ export type PuzzleKatahexWarningCode =
      * Too many positions to analyze, only a part of the tree has been checked.
      */
     | 'katahex_too_many_positions'
+
+    /*
+     * Solver warnings are proven, see PuzzleSolverChecker.
+     * Params "pv" is the proof line, with context "pv" when not empty.
+     */
+
+    /**
+     * Player loses in initial position, whatever move.
+     */
+    | 'solver_initial_not_winning'
+
+    /**
+     * Player move that wins, but fails the puzzle.
+     */
+    | 'solver_winning_move_rejected'
+
+    /**
+     * Player move accepted by tree, but losing. pv: computer refutation.
+     */
+    | 'solver_accepted_move_not_winning'
+
+    /**
+     * Puzzle ends as solved, but player loses from there.
+     */
+    | 'solver_solved_not_won'
+
+    /**
+     * Some positions could not be solved within time limit, puzzle has been only partially checked.
+     */
+    | 'solver_unproven'
+
+    /**
+     * Too many positions to solve, only a part of the tree has been checked.
+     */
+    | 'solver_too_many_positions'
 ;
 
 /**
  * Same location as PuzzleError, to find node in tree.
  * Params are moves, and percentages (winrate, policy) as integers.
  */
-export type PuzzleKatahexWarning = PuzzleError<PuzzleKatahexWarningCode>;
+export type PuzzleCheckWarning = PuzzleError<PuzzleCheckWarningCode>;
 
 /**
  * Player winrate from which a position is considered won.
@@ -98,18 +134,46 @@ export const KATAHEX_COMPUTER_DELTA = 0.1;
  */
 export const KATAHEX_MAX_POSITIONS = 300;
 
-export type PuzzleKatahexCheckInput = {
+/**
+ * Max time of each solver search, in seconds.
+ */
+export const SOLVER_TIME_LIMIT_SECONDS = 10;
+
+/**
+ * Max time to solve all moves of a player choice, in seconds.
+ */
+export const SOLVER_CHILDREN_MAX_TIME_SECONDS = 120;
+
+/**
+ * Same as SOLVER_CHILDREN_MAX_TIME_SECONDS, when solving a position from editor, user waits for it.
+ */
+export const SOLVER_INTERACTIVE_CHILDREN_MAX_TIME_SECONDS = 30;
+
+/**
+ * Max solver jobs for a puzzle.
+ */
+export const SOLVER_MAX_JOBS = 100;
+
+/**
+ * Engines a puzzle can be checked with:
+ * katahex engines evaluate positions, mohex solver proves them.
+ */
+export const PUZZLE_CHECK_ENGINES = [...ANALYSIS_ENGINES, 'mohex-solver'] as const;
+
+export type PuzzleCheckEngine = typeof PUZZLE_CHECK_ENGINES[number];
+
+export type PuzzleCheckInput = {
     puzzle: PuzzleDefinition;
 
     /**
      * Engine used to evaluate positions. Defaults to katahex-intuition.
      */
-    engine?: AnalysisEngine;
+    engine?: PuzzleCheckEngine;
 };
 
-export type PuzzleKatahexCheckState = {
+export type PuzzleCheckState = {
     status: 'running' | 'done' | 'failed';
-    engine: AnalysisEngine;
+    engine: PuzzleCheckEngine;
 
     /**
      * Positions analyzed, and to analyze. Total increases while tree is explored.
@@ -117,10 +181,33 @@ export type PuzzleKatahexCheckState = {
     done: number;
     total: number;
 
-    warnings: PuzzleKatahexWarning[];
+    warnings: PuzzleCheckWarning[];
 
     /**
      * Set when status is failed.
      */
     error?: string;
+};
+
+/**
+ * Position to solve from puzzle editor, with player to move.
+ */
+export type PuzzleSolvePositionInput = {
+    size: number;
+    color: 'black' | 'white';
+    black: Move[];
+    white: Move[];
+    disabledCells?: Move[];
+};
+
+/**
+ * Proven winners, null when not proven, or depends on disabled cells.
+ */
+export type PuzzleSolvePositionOutput = {
+    winner: null | 'black' | 'white';
+
+    /**
+     * Winner after each empty, not disabled, cell is played.
+     */
+    moves: { [move: string]: null | 'black' | 'white' };
 };

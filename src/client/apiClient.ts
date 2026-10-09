@@ -23,7 +23,7 @@ import { LadderDto, LadderHallOfFameDto, LadderMeDto, LadderPlayerStatusDto } fr
 import { LadderChallenge, LadderEvent, LadderPlayer } from '../shared/app/models/index.js';
 import type TimeControlType from '../shared/time-control/TimeControlType.js';
 import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
-import type { PuzzleKatahexCheckInput, PuzzleKatahexCheckState } from '../shared/app/puzzles/puzzleKatahexCheck.js';
+import type { PuzzleCheckInput, PuzzleCheckState, PuzzleSolvePositionInput, PuzzleSolvePositionOutput } from '../shared/app/puzzles/puzzleCheck.js';
 import type { PuzzleCollectionInput } from '../shared/app/puzzles/puzzleCollection.js';
 import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.js';
 
@@ -1526,7 +1526,7 @@ export const apiPostPuzzle = async (input: PuzzleInput): Promise<Puzzle> => {
  * Starts katahex check of puzzle, or returns its current state.
  * Send same input again to poll until check is done.
  */
-export const apiPuzzleKatahexCheck = async (input: PuzzleKatahexCheckInput): Promise<PuzzleKatahexCheckState> => {
+export const apiPuzzleCheck = async (input: PuzzleCheckInput): Promise<PuzzleCheckState> => {
     const response = await fetch('/api/puzzles/katahex-check', {
         method: 'post',
         headers: {
@@ -1535,6 +1535,28 @@ export const apiPuzzleKatahexCheck = async (input: PuzzleKatahexCheckInput): Pro
         },
         body: JSON.stringify(input),
     });
+
+    await checkResponse(response);
+
+    return await response.json();
+};
+
+/**
+ * @throws {AnalysisEngineUnavailableError} If no worker can solve positions
+ */
+export const apiPuzzleSolvePosition = async (input: PuzzleSolvePositionInput): Promise<PuzzleSolvePositionOutput> => {
+    const response = await fetch('/api/puzzles/solve-position', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    if (response.status === 503) {
+        throw new AnalysisEngineUnavailableError('No worker online for mohex solver');
+    }
 
     await checkResponse(response);
 

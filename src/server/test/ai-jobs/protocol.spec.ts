@@ -6,6 +6,7 @@ describe('protocol', () => {
     it('gives engine of a job type', () => {
         assert.strictEqual(getAiJobTypeEngine('katahex-mcts-analyze-move'), 'katahex');
         assert.strictEqual(getAiJobTypeEngine('mohex'), 'mohex');
+        assert.strictEqual(getAiJobTypeEngine('mohex-solve-position'), 'mohex');
     });
 
     it('does not process opt-in job types by default', () => {
@@ -17,5 +18,6 @@ describe('protocol', () => {
 
         assert.ok(getEngineAiJobTypes('katahex').includes('katahex-mcts-move'));
         assert.deepStrictEqual(getEngineDefaultAiJobTypes('mohex'), ['mohex']);
+        assert.ok(getEngineAiJobTypes('mohex').includes('mohex-solve-position'));
     });
 });

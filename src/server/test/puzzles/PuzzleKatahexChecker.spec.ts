@@ -4,7 +4,7 @@ import { parseMove, type Move } from '@playhex/move-notation';
 import { checkPuzzleWithKatahex, type AnalysisPurpose } from '../../puzzles/PuzzleKatahexChecker.js';
 import type { AnalysisInput, AnalysisOutput } from '../../../shared/app/hexplorer.js';
 import type { PuzzleDefinition, PuzzleNode } from '../../../shared/app/puzzles/puzzleTree.js';
-import type { PuzzleKatahexWarning } from '../../../shared/app/puzzles/puzzleKatahexCheck.js';
+import type { PuzzleCheckWarning } from '../../../shared/app/puzzles/puzzleCheck.js';
 
 const BOARDSIZE = 5;
 
@@ -79,7 +79,7 @@ const createAnalyzer = ({ winrates = {}, policies = {} }: FakeKatahex) => {
     return { analyze, calls };
 };
 
-const check = (puzzle: PuzzleDefinition, katahex: FakeKatahex = {}): Promise<PuzzleKatahexWarning[]> =>
+const check = (puzzle: PuzzleDefinition, katahex: FakeKatahex = {}): Promise<PuzzleCheckWarning[]> =>
     checkPuzzleWithKatahex(puzzle, { analyze: createAnalyzer(katahex).analyze });
 
 /**

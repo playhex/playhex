@@ -7,7 +7,7 @@ import { useWindowFocus, whenever } from '@vueuse/core';
 import { t } from 'i18next';
 import { Game, Puzzle, PuzzleCollection } from '../../../../shared/app/models/index.js';
 import { isElseNode, PUZZLE_DESCRIPTION_MAX_LENGTH, PUZZLE_MESSAGE_MAX_LENGTH, PUZZLE_TITLE_MAX_LENGTH } from '../../../../shared/app/puzzles/puzzleTree.js';
-import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
+import { MAX_BOARDSIZE, MIN_BOARDSIZE, MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
 import { apiDeletePuzzle, apiGetMyPuzzleCollections, apiPostPuzzle, apiPutPuzzle } from '../../../apiClient.js';
 import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
@@ -17,7 +17,7 @@ import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRigh
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { createKatahexAnalyzers, useAnalysisEngines } from '../../hexplorer/composables/useAnalysisEngines.js';
-import type { AnalysisEngine } from '../../../../shared/app/hexplorer.js';
+import type { PuzzleCheckEngine } from '../../../../shared/app/puzzles/puzzleCheck.js';
 
 const props = defineProps<{
     /**
@@ -78,16 +78,19 @@ const {
     draftErrors,
     nodeErrors,
     selectErrorNode,
-    katahexCheck,
-    katahexCheckError,
-    katahexChecking,
-    runKatahexCheck,
+    puzzleCheck,
+    puzzleCheckError,
+    puzzleChecking,
+    runPuzzleCheck,
     redStones,
     blueStones,
     disabledCells,
     toInput,
     analyzer,
     setAnalyzer,
+    solverEnabled,
+    solverResult,
+    enableSolver,
     analysisLoading,
     analysisError,
 } = usePuzzleEditor(props.puzzle, props.sourceGame, props.collectionPublicId ?? null);
@@ -182,17 +185,23 @@ const treeZoomedOut = ref(false);
 const analyzers = createKatahexAnalyzers();
 
 /**
- * Index of selected engine in analyzers, -1 for none.
+ * Value of AI eval select for Mohex solver.
+ */
+const SOLVER_INDEX = -2;
+
+/**
+ * Index of selected engine in analyzers, -1 for none, SOLVER_INDEX for Mohex solver.
  */
 const selectedAnalyzerIndex = computed({
-    get: () => analyzers.findIndex(a => a === analyzer.value),
-    set: index => setAnalyzer(analyzers[index] ?? null),
+    get: () => solverEnabled.value ? SOLVER_INDEX : analyzers.findIndex(a => a === analyzer.value),
+    set: index => index === SOLVER_INDEX ? enableSolver() : setAnalyzer(analyzers[index] ?? null),
 });
 
-const { isAnalyzerAvailable } = useAnalysisEngines(analysisError);
+const { aiAvailability, isAnalyzerAvailable } = useAnalysisEngines(analysisError);
 
 const isAnalyzerUnavailable = computed(() => analysisError.value === 'engine_unavailable'
-    || (analyzer.value !== null && !isAnalyzerAvailable(analyzer.value)));
+    || (analyzer.value !== null && !isAnalyzerAvailable(analyzer.value))
+    || (solverEnabled.value && aiAvailability.value?.solverAvailable === false));
 
 watch(expertMode, enabled => {
     if (!enabled) {
@@ -201,14 +210,31 @@ watch(expertMode, enabled => {
 });
 
 /*
- * Katahex check, in publish tab
+ * Puzzle check with katahex or Mohex solver, in publish tab
  */
 
-const katahexCheckEngine = ref<AnalysisEngine>('katahex-intuition');
+const puzzleCheckEngine = ref<PuzzleCheckEngine>('katahex-intuition');
 
-const katahexCheckProgress = computed(() => katahexCheck.value === null || katahexCheck.value.total === 0
+/**
+ * Mohex solver proves positions, unlike katahex. Unknown availability is considered available.
+ */
+const isSolverAvailable = computed(() => aiAvailability.value?.solverAvailable !== false
+    && boardsize.value <= MOHEX_MAX_BOARDSIZE);
+
+/**
+ * Translation key of a check message depending on engine, e.g "puzzles.editor.solver_check_ok".
+ */
+const checkKey = (engine: PuzzleCheckEngine, suffix: '' | '_help' | '_progress' | '_ok' | '_warnings'): string =>
+    `puzzles.editor.${engine === 'mohex-solver' ? 'solver' : 'katahex'}_check${suffix}`;
+
+/**
+ * Warnings of last check, 0 if not checked. Check is reset when puzzle changes.
+ */
+const checkWarningsCount = computed(() => puzzleCheck.value?.status === 'done' ? puzzleCheck.value.warnings.length : 0);
+
+const puzzleCheckProgress = computed(() => puzzleCheck.value === null || puzzleCheck.value.total === 0
     ? 0
-    : Math.round(100 * katahexCheck.value.done / katahexCheck.value.total),
+    : Math.round(100 * puzzleCheck.value.done / puzzleCheck.value.total),
 );
 
 const changeElseAnswer = (): void => {
@@ -347,7 +373,19 @@ const deletePuzzle = async (): Promise<void> => {
                         <button class="nav-link" :class="{ active: 'tree' === step }" @click="setStep('tree')">2. {{ $t('puzzles.editor.tree') }}</button>
                     </li>
                     <li class="nav-item">
-                        <button class="nav-link" :class="{ active: 'publish' === step }" @click="setStep('publish')">3. {{ $t('puzzles.editor.publish_tab') }}</button>
+                        <button class="nav-link" :class="{ active: 'publish' === step }" @click="setStep('publish')">
+                            3. {{ $t('puzzles.editor.publish_tab') }}
+                            <span
+                                v-if="errors.length > 0"
+                                class="badge rounded-pill text-bg-danger"
+                                :title="$t('puzzles.editor.errors_badge', { count: errors.length })"
+                            >{{ errors.length }}</span>
+                            <span
+                                v-if="checkWarningsCount > 0"
+                                class="badge rounded-pill text-bg-warning"
+                                :title="$t('puzzles.editor.warnings_badge', { count: checkWarningsCount })"
+                            >{{ checkWarningsCount }}</span>
+                        </button>
                     </li>
                 </ul>
 
@@ -446,12 +484,21 @@ const deletePuzzle = async (): Promise<void> => {
                                     :value="index"
                                     :disabled="!isAnalyzerAvailable(a)"
                                 >{{ a.getName() }}</option>
+                                <option
+                                    :value="SOLVER_INDEX"
+                                    :disabled="!isSolverAvailable"
+                                >{{ $t('puzzles.editor.solver_check_engine') }}</option>
                             </select>
                             <span v-if="analysisLoading" class="spinner-border spinner-border-sm flex-shrink-0" aria-hidden="true"></span>
                         </div>
-                        <div class="form-text">{{ $t('puzzles.editor.ai_eval_help') }}</div>
+                        <div class="form-text">{{ $t(solverEnabled ? 'puzzles.editor.solver_eval_help' : 'puzzles.editor.ai_eval_help') }}</div>
 
-                        <div v-if="analyzer && isAnalyzerUnavailable" class="mt-1">
+                        <p v-if="solverEnabled && solverResult" class="small mt-1 mb-0">{{
+                            solverResult.winner === null
+                                ? $t('puzzles.editor.solver_eval_unproven')
+                                : $t(solverResult.winner === (nextColor === 0 ? 'black' : 'white') ? 'puzzles.editor.solver_eval_win' : 'puzzles.editor.solver_eval_loss')
+                        }}</p>
+                        <div v-if="(analyzer || solverEnabled) && isAnalyzerUnavailable" class="mt-1">
                             <p class="text-warning small mb-0"><IconExclamationTriangle /> {{ $t('hexplorer.engine_unavailable') }}</p>
                             <router-link :to="{ name: 'spawn-worker' }" class="small" target="_blank">{{ $t('workers.see_how_to_spawn_a_worker') }}</router-link>
                         </div>
@@ -557,21 +604,21 @@ const deletePuzzle = async (): Promise<void> => {
                     </div>
 
                     <div v-if="errors.length > 0" class="small mb-3">
-                        <p class="mb-1">{{ $t('puzzles.editor.fix_to_publish') }}</p>
+                        <p class="mb-1">{{ $t('puzzles.editor.fix_to_publish', { count: errors.length }) }}</p>
                         <ul class="mb-0 ps-3">
                             <li v-for="(error, index) in errors" :key="index">{{ translatePuzzleError(error) }}</li>
                         </ul>
                     </div>
 
-                    <!-- Katahex check -->
+                    <!-- Puzzle check -->
                     <div class="mb-3">
-                        <p class="form-text mt-0 mb-2"><IconInfoCircle /> {{ $t('puzzles.editor.katahex_check_realistic') }}</p>
+                        <p class="form-text mt-0 mb-2"><IconInfoCircle /> {{ $t(puzzleCheckEngine === 'mohex-solver' ? 'puzzles.editor.solver_check_any_position' : 'puzzles.editor.katahex_check_realistic') }}</p>
                         <div class="d-flex align-items-center gap-2">
                             <select
-                                v-model="katahexCheckEngine"
+                                v-model="puzzleCheckEngine"
                                 class="form-select form-select-sm w-auto"
                                 :aria-label="$t('puzzles.editor.ai_eval')"
-                                :disabled="katahexChecking"
+                                :disabled="puzzleChecking"
                             >
                                 <option
                                     v-for="a in analyzers"
@@ -579,32 +626,36 @@ const deletePuzzle = async (): Promise<void> => {
                                     :value="a.engine"
                                     :disabled="!isAnalyzerAvailable(a)"
                                 >{{ a.getName() }}</option>
+                                <option
+                                    value="mohex-solver"
+                                    :disabled="!isSolverAvailable"
+                                >{{ $t('puzzles.editor.solver_check_engine') }}</option>
                             </select>
                             <button
                                 type="button"
                                 class="btn btn-outline-primary btn-sm text-nowrap"
-                                :disabled="errors.length > 0 || katahexChecking"
-                                @click="runKatahexCheck(katahexCheckEngine)"
-                            ><IconRobot /> {{ $t('puzzles.editor.katahex_check') }}</button>
-                            <span v-if="katahexChecking" class="spinner-border spinner-border-sm flex-shrink-0" aria-hidden="true"></span>
+                                :disabled="errors.length > 0 || puzzleChecking"
+                                @click="runPuzzleCheck(puzzleCheckEngine)"
+                            ><IconRobot /> {{ $t(checkKey(puzzleCheckEngine, '')) }}</button>
+                            <span v-if="puzzleChecking" class="spinner-border spinner-border-sm flex-shrink-0" aria-hidden="true"></span>
                         </div>
-                        <div class="form-text">{{ $t('puzzles.editor.katahex_check_help') }}</div>
+                        <div class="form-text">{{ $t(checkKey(puzzleCheckEngine, '_help')) }}</div>
 
-                        <div v-if="katahexChecking && katahexCheck" class="mt-2">
-                            <div class="progress" role="progressbar" :aria-valuenow="katahexCheckProgress" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" :style="{ width: katahexCheckProgress + '%' }"></div>
+                        <div v-if="puzzleChecking && puzzleCheck" class="mt-2">
+                            <div class="progress" role="progressbar" :aria-valuenow="puzzleCheckProgress" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" :style="{ width: puzzleCheckProgress + '%' }"></div>
                             </div>
-                            <p class="small text-body-secondary mb-0">{{ $t('puzzles.editor.katahex_check_progress', { done: katahexCheck.done, total: katahexCheck.total }) }}</p>
+                            <p class="small text-body-secondary mb-0">{{ $t(checkKey(puzzleCheck.engine, '_progress'), { done: puzzleCheck.done, total: puzzleCheck.total }) }}</p>
                         </div>
 
-                        <p v-if="katahexCheckError" class="text-danger small mt-2 mb-0"><IconExclamationTriangle /> {{ katahexCheckError }}</p>
+                        <p v-if="puzzleCheckError" class="text-danger small mt-2 mb-0"><IconExclamationTriangle /> {{ puzzleCheckError }}</p>
 
-                        <template v-else-if="katahexCheck?.status === 'done'">
-                            <p v-if="katahexCheck.warnings.length === 0" class="text-success small mt-2 mb-0">{{ $t('puzzles.editor.katahex_check_ok') }}</p>
+                        <template v-else-if="puzzleCheck?.status === 'done'">
+                            <p v-if="puzzleCheck.warnings.length === 0" class="text-success small mt-2 mb-0">{{ $t(checkKey(puzzleCheck.engine, '_ok')) }}</p>
                             <div v-else class="small text-warning-emphasis mt-2">
-                                <p class="mb-1"><IconExclamationTriangle /> {{ $t('puzzles.editor.katahex_check_warnings') }}</p>
+                                <p class="mb-1"><IconExclamationTriangle /> {{ $t(checkKey(puzzleCheck.engine, '_warnings'), { count: puzzleCheck.warnings.length }) }}</p>
                                 <ul class="mb-0 ps-3">
-                                    <li v-for="(warning, index) in katahexCheck.warnings" :key="index">
+                                    <li v-for="(warning, index) in puzzleCheck.warnings" :key="index">
                                         <a
                                             v-if="warning.path !== undefined"
                                             href="#"

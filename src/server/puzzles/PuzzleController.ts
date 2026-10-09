@@ -13,13 +13,20 @@ import PuzzleCollectionRepository from './PuzzleCollectionRepository.js';
 import { serializePuzzleData } from './puzzleSerializer.js';
 import { mustBeCollectionAuthor, mustBePuzzleAuthor } from './puzzleGuards.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
-import { ANALYSIS_ENGINES, type AnalysisEngine } from '../../shared/app/hexplorer.js';
-import type { PuzzleKatahexCheckInput, PuzzleKatahexCheckState } from '../../shared/app/puzzles/puzzleKatahexCheck.js';
-import PuzzleKatahexCheckService, { getPuzzleKatahexCheckKey } from './PuzzleKatahexCheckService.js';
+import { ArrayMaxSize, IsArray, IsIn, IsInt, IsOptional, Max, Min, Validate } from 'class-validator';
+import type { Move } from '@playhex/move-notation';
+import { PUZZLE_CHECK_ENGINES, type PuzzleCheckEngine, type PuzzleCheckInput, type PuzzleCheckState, type PuzzleSolvePositionInput, type PuzzleSolvePositionOutput } from '../../shared/app/puzzles/puzzleCheck.js';
+import { MIN_BOARDSIZE, MOHEX_MAX_BOARDSIZE } from '../../shared/app/boardsizeLimits.js';
+import { IsHexCoordinate } from '../../shared/app/validator/IsHexCoordinate.js';
+import PositionSolveCache from '../ai-jobs/PositionSolveCache.js';
+import AiJobService, { SOLVE_POSITION_INTERACTIVE_TIMEOUT_MS } from '../ai-jobs/AiJobService.js';
+import { getPuzzleSolveInputs, solvePuzzlePosition } from './solvePuzzlePosition.js';
+import { fillDisabledCells, toColor } from './puzzleCheckUtils.js';
+import PuzzleCheckService, { getPuzzleCheckKey } from './PuzzleCheckService.js';
 import { SimilarPlayingPositionChecker } from '../services/anti-cheat/SimilarPlayingPositionChecker.js';
 import { SimilarPositionDetectedError, similarPositionDetectedToTranslatableHttpError } from '../services/anti-cheat/SimilarPositionDetectedError.js';
 import { InvalidPositionError } from '../../shared/position-comparator/position-comparator.js';
-import { rateLimiterConsumePuzzleKatahexCheck } from '../services/rate-limiters.js';
+import { rateLimiterConsumePuzzleCheck, rateLimiterConsumePuzzleSolvePosition } from '../services/rate-limiters.js';
 import { ROLE_ADMIN } from '../services/roles.js';
 
 /**
@@ -91,6 +98,35 @@ const applyPuzzleInput = (puzzle: Puzzle, input: PuzzleInput): void => {
     mustBeSavable(puzzle);
 };
 
+const SOLVE_MAX_STONES = MOHEX_MAX_BOARDSIZE * MOHEX_MAX_BOARDSIZE;
+
+class SolvePositionBody implements PuzzleSolvePositionInput
+{
+    @IsInt()
+    @Min(MIN_BOARDSIZE)
+    @Max(MOHEX_MAX_BOARDSIZE)
+    size: number;
+
+    @IsIn(['black', 'white'])
+    color: 'black' | 'white';
+
+    @IsArray()
+    @ArrayMaxSize(SOLVE_MAX_STONES)
+    @Validate(IsHexCoordinate, { each: true })
+    black: Move[];
+
+    @IsArray()
+    @ArrayMaxSize(SOLVE_MAX_STONES)
+    @Validate(IsHexCoordinate, { each: true })
+    white: Move[];
+
+    @IsOptional()
+    @IsArray()
+    @ArrayMaxSize(SOLVE_MAX_STONES)
+    @Validate(IsHexCoordinate, { each: true })
+    disabledCells?: Move[];
+}
+
 /**
  * Body size limit, as a tree with many nodes and messages can exceed default 100kb.
  */
@@ -105,8 +141,10 @@ export default class PuzzleController
         private puzzleCollectionRepository: PuzzleCollectionRepository,
         private gameStore: GameStore,
         private playerModerationActionRepository: PlayerModerationActionRepository,
-        private puzzleKatahexCheckService: PuzzleKatahexCheckService,
+        private puzzleCheckService: PuzzleCheckService,
         private similarPlayingPositionChecker: SimilarPlayingPositionChecker,
+        private positionSolveCache: PositionSolveCache,
+        private aiJobService: AiJobService,
     ) {}
 
     /**
@@ -118,11 +156,11 @@ export default class PuzzleController
      * @throws {BadRequestError} If puzzle is not valid
      * @throws {HttpError} 503 if engine is not available
      */
-    private async katahexCheck(input: PuzzleKatahexCheckInput, beforeStart: (engine: AnalysisEngine) => Promise<void>): Promise<PuzzleKatahexCheckState>
+    private async puzzleCheck(input: PuzzleCheckInput, beforeStart: (engine: PuzzleCheckEngine) => Promise<void>): Promise<PuzzleCheckState>
     {
         const engine = input.engine ?? 'katahex-intuition';
 
-        if (!ANALYSIS_ENGINES.includes(engine)) {
+        if (!PUZZLE_CHECK_ENGINES.includes(engine)) {
             throw new BadRequestError(`Invalid engine "${String(engine)}"`);
         }
 
@@ -132,19 +170,23 @@ export default class PuzzleController
             throw new BadRequestError(`Invalid puzzle: ${errors.map(puzzleErrorToString).join(', ')}`);
         }
 
-        const state = this.puzzleKatahexCheckService.getState(getPuzzleKatahexCheckKey(input.puzzle, engine));
+        if (engine === 'mohex-solver' && input.puzzle.boardsize > MOHEX_MAX_BOARDSIZE) {
+            throw new BadRequestError(`Solver supports boards up to ${MOHEX_MAX_BOARDSIZE}`);
+        }
+
+        const state = this.puzzleCheckService.getState(getPuzzleCheckKey(input.puzzle, engine));
 
         if (state !== null) {
             return state;
         }
 
-        if (!this.puzzleKatahexCheckService.isEngineAvailable(engine)) {
+        if (!this.puzzleCheckService.isEngineAvailable(engine)) {
             throw new HttpError(503, 'No AI worker can analyze positions right now');
         }
 
         await beforeStart(engine);
 
-        return this.puzzleKatahexCheckService.start(input.puzzle, engine);
+        return this.puzzleCheckService.start(input.puzzle, engine);
     }
 
     /**
@@ -320,52 +362,105 @@ export default class PuzzleController
     }
 
     /**
-     * Checks puzzle tree with katahex, see PuzzleKatahexChecker.
+     * Checks puzzle tree with katahex or Mohex solver, see PuzzleKatahexChecker and PuzzleSolverChecker.
      * Puzzle is sent, not saved, to check it while editing.
      */
     @Post('/api/puzzles/katahex-check')
-    async postKatahexCheck(
+    async postPuzzleCheck(
         @AuthenticatedPlayer() player: Player,
-        @Body(BODY_OPTIONS) input: PuzzleKatahexCheckInput,
+        @Body(BODY_OPTIONS) input: PuzzleCheckInput,
         @Req() request: Request,
-    ): Promise<PuzzleKatahexCheckState> {
-        return await this.katahexCheck(input, async () => {
-            const { boardsize, redStones, blueStones } = input.puzzle;
+    ): Promise<PuzzleCheckState> {
+        return await this.puzzleCheck(input, async engine => {
+            const { boardsize, redStones, blueStones, playerColor, disabledCells = [] } = input.puzzle;
 
-            // Prevent getting katahex help on a playing game position, like Hexplorer
-            try {
-                this.similarPlayingPositionChecker.checkPosition({ boardsize, black: redStones, white: blueStones });
-            } catch (e) {
-                if (e instanceof InvalidPositionError) {
-                    throw new BadRequestError(e.message);
-                }
+            // Solver sees disabled cells as stones, see fillDisabledCells(): check positions it actually solves
+            const positions = engine === 'mohex-solver'
+                ? [
+                    fillDisabledCells(redStones, blueStones, disabledCells, toColor(playerColor), 'win'),
+                    fillDisabledCells(redStones, blueStones, disabledCells, toColor(playerColor), 'notWin'),
+                ]
+                : [{ black: redStones, white: blueStones }]
+            ;
 
-                if (e instanceof SimilarPositionDetectedError) {
-                    void this.similarPlayingPositionChecker.flag(e, {
-                        context: 'puzzle_check',
-                        playerPublicId: player.publicId,
-                        ip: request.ip ?? null,
-                    });
+            this.mustNotBePlayingPositions(boardsize, positions, player, request);
 
-                    throw similarPositionDetectedToTranslatableHttpError(e);
-                }
-
-                throw e;
-            }
-
-            await rateLimiterConsumePuzzleKatahexCheck(player.publicId);
+            await rateLimiterConsumePuzzleCheck(player.publicId);
         });
     }
 
     /**
-     * Same as postKatahexCheck(), for admin, used by command "puzzle-validate".
+     * Prevent getting AI help on a playing game position, like Hexplorer.
+     * Positions must be the ones sent to AI.
+     *
+     * @throws {BadRequestError} If a position is invalid (cell occupied twice, out of board...)
+     * @throws {HttpError} If a position is similar to a playing game one
+     */
+    private mustNotBePlayingPositions(boardsize: number, positions: { black: Move[], white: Move[] }[], player: Player, request: Request): void
+    {
+        try {
+            for (const { black, white } of positions) {
+                this.similarPlayingPositionChecker.checkPosition({ boardsize, black, white });
+            }
+        } catch (e) {
+            if (e instanceof InvalidPositionError) {
+                throw new BadRequestError(e.message);
+            }
+
+            if (e instanceof SimilarPositionDetectedError) {
+                void this.similarPlayingPositionChecker.flag(e, {
+                    context: 'puzzle_check',
+                    playerPublicId: player.publicId,
+                    ip: request.ip ?? null,
+                });
+
+                throw similarPositionDetectedToTranslatableHttpError(e);
+            }
+
+            throw e;
+        }
+    }
+
+    /**
+     * Solves a position from puzzle editor with Mohex solver, and each move of player to move.
+     * Disabled cells are taken into account, see solvePuzzlePosition().
+     */
+    @Post('/api/puzzles/solve-position')
+    async postSolvePosition(
+        @AuthenticatedPlayer() player: Player,
+        @Body() body: SolvePositionBody,
+        @Req() request: Request,
+    ): Promise<PuzzleSolvePositionOutput> {
+        const inputs = getPuzzleSolveInputs(body);
+
+        // Disabled cells are filled with stones: checks positions actually solved, and validates all cells
+        this.mustNotBePlayingPositions(body.size, [inputs.win, inputs.notWin], player, request);
+
+        const cached = (await Promise.all([
+            this.positionSolveCache.isCached(inputs.win),
+            this.positionSolveCache.isCached(inputs.notWin),
+        ])).every(Boolean);
+
+        if (!cached) {
+            if (!this.aiJobService.isSolverAvailable()) {
+                throw new HttpError(503, 'No AI worker can solve positions right now');
+            }
+
+            await rateLimiterConsumePuzzleSolvePosition(player.publicId);
+        }
+
+        return await solvePuzzlePosition(body, input => this.positionSolveCache.solve(input, SOLVE_POSITION_INTERACTIVE_TIMEOUT_MS));
+    }
+
+    /**
+     * Same as postPuzzleCheck(), for admin, used by command "puzzle-validate".
      */
     @Authorized(ROLE_ADMIN)
     @Post('/api/admin/puzzles/katahex-check')
-    async postAdminKatahexCheck(
-        @Body(BODY_OPTIONS) input: PuzzleKatahexCheckInput,
-    ): Promise<PuzzleKatahexCheckState> {
-        return await this.katahexCheck(input, async () => {});
+    async postAdminPuzzleCheck(
+        @Body(BODY_OPTIONS) input: PuzzleCheckInput,
+    ): Promise<PuzzleCheckState> {
+        return await this.puzzleCheck(input, async () => {});
     }
 
     @Delete('/api/puzzles/:publicId')

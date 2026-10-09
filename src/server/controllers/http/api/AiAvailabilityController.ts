@@ -35,6 +35,7 @@ export default class AiAvailabilityController
                 .map(aiConfig => aiConfig.player!.publicId)
             ,
             availableAnalysisEngines: ANALYSIS_ENGINES.filter(engine => this.aiJobService.isAnalysisEngineAvailable(engine)),
+            solverAvailable: this.aiJobService.isSolverAvailable(),
         };
     }
 }

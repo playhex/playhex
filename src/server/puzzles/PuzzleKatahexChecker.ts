@@ -1,8 +1,8 @@
 import { coordsToMove, type Move } from '@playhex/move-notation';
-import Board from '../../shared/game-engine/Board.js';
 import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../shared/app/hexplorer.js';
 import { createNodeResolver, createParallelsFinder, findElseNode, findSolution, getComputerAnswer, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
-import { KATAHEX_COMPUTER_ALTERNATIVES, KATAHEX_COMPUTER_DELTA, KATAHEX_INITIAL_WIN_THRESHOLD, KATAHEX_MAX_PLAUSIBLE_MOVES, KATAHEX_MAX_POSITIONS, KATAHEX_PLAUSIBLE_POLICY_RATIO, KATAHEX_WIN_THRESHOLD, type PuzzleKatahexWarning, type PuzzleKatahexWarningCode } from '../../shared/app/puzzles/puzzleKatahexCheck.js';
+import { createLimiter, getWinner, play, type Position } from './puzzleCheckUtils.js';
+import { KATAHEX_COMPUTER_ALTERNATIVES, KATAHEX_COMPUTER_DELTA, KATAHEX_INITIAL_WIN_THRESHOLD, KATAHEX_MAX_PLAUSIBLE_MOVES, KATAHEX_MAX_POSITIONS, KATAHEX_PLAUSIBLE_POLICY_RATIO, KATAHEX_WIN_THRESHOLD, type PuzzleCheckWarning, type PuzzleCheckWarningCode } from '../../shared/app/puzzles/puzzleCheck.js';
 
 /**
  * What an analyze is used for:
@@ -30,42 +30,7 @@ export type PuzzleKatahexCheckerOptions = {
     concurrency?: number;
 };
 
-type Position = {
-    red: Move[];
-    blue: Move[];
-    toMove: 0 | 1;
-};
-
-const play = ({ red, blue, toMove }: Position, move: Move): Position => ({
-    red: toMove === 0 ? [...red, move] : red,
-    blue: toMove === 1 ? [...blue, move] : blue,
-    toMove: toMove === 0 ? 1 : 0,
-});
-
 const percent = (value: number): number => Math.round(value * 100);
-
-/**
- * Runs at most `concurrency` tasks at same time.
- */
-const createLimiter = (concurrency: number) => {
-    let running = 0;
-    const waiting: (() => void)[] = [];
-
-    return async <T>(task: () => Promise<T>): Promise<T> => {
-        if (running >= concurrency) {
-            await new Promise<void>(resolve => waiting.push(resolve));
-        }
-
-        ++running;
-
-        try {
-            return await task();
-        } finally {
-            --running;
-            waiting.shift()?.();
-        }
-    };
-};
 
 /**
  * Checks puzzle tree with katahex. Puzzle must be valid, see validatePuzzle().
@@ -78,7 +43,7 @@ const createLimiter = (concurrency: number) => {
  *
  * @throws Errors from analyze
  */
-export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: PuzzleKatahexCheckerOptions): Promise<PuzzleKatahexWarning[]> => {
+export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: PuzzleKatahexCheckerOptions): Promise<PuzzleCheckWarning[]> => {
     const { boardsize, playerColor, tree } = puzzle;
     const disabledCells = new Set(puzzle.disabledCells ?? []);
     const resolve: NodeResolver = createNodeResolver(tree);
@@ -136,20 +101,11 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
         return analysis;
     };
 
-    const getWinner = ({ red, blue }: Position): null | 0 | 1 => {
-        const board = new Board(boardsize);
-
-        red.forEach(move => board.setCell(move, 0));
-        blue.forEach(move => board.setCell(move, 1));
-
-        return board.calculateWinner();
-    };
-
     /**
      * Player winrate in this position, or null if not analyzed.
      */
     const playerWinrate = async (position: Position): Promise<null | number> => {
-        const winner = getWinner(position);
+        const winner = getWinner(boardsize, position);
 
         if (winner !== null) {
             return winner === playerColor ? 1 : 0;
@@ -199,7 +155,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
         ;
     };
 
-    const warn = (code: PuzzleKatahexWarningCode, path: Move[], params: PuzzleKatahexWarning['params'], child?: number): PuzzleKatahexWarning => ({
+    const warn = (code: PuzzleCheckWarningCode, path: Move[], params: PuzzleCheckWarning['params'], child?: number): PuzzleCheckWarning => ({
         code,
         path,
         ...(child === undefined ? {} : { child }),
@@ -248,7 +204,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     /**
      * Player to move, node is a player choice.
      */
-    const checkPlayerChoice = async (node: PuzzleNode, path: Move[], position: Position): Promise<PuzzleKatahexWarning[]> => {
+    const checkPlayerChoice = async (node: PuzzleNode, path: Move[], position: Position): Promise<PuzzleCheckWarning[]> => {
         const children = node.children ?? [];
         const childMoves = new Set(children.flatMap(child => isElseNode(child) || !child.move ? [] : [child.move]));
 
@@ -257,7 +213,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
         const elseNode = findElseNode(node);
         const hasElse = elseNode !== null;
 
-        const checkChild = async (child: PuzzleNode, index: number): Promise<PuzzleKatahexWarning[]> => {
+        const checkChild = async (child: PuzzleNode, index: number): Promise<PuzzleCheckWarning[]> => {
             const move = child.move!;
             const childPosition = play(position, move);
             const winrate = await playerWinrate(childPosition);
@@ -301,7 +257,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
             ];
         };
 
-        const checkPlausibleMove = async ({ move, policy }: { move: Move, policy: number }): Promise<PuzzleKatahexWarning[]> => {
+        const checkPlausibleMove = async ({ move, policy }: { move: Move, policy: number }): Promise<PuzzleCheckWarning[]> => {
             const winrate = await playerWinrate(play(position, move));
 
             if (winrate !== null && winrate >= KATAHEX_WIN_THRESHOLD) {
@@ -329,7 +285,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
         /**
          * "else" answer must be good against any move, checks it against most likely uncovered move.
          */
-        const checkElseAnswer = async (): Promise<PuzzleKatahexWarning[]> => {
+        const checkElseAnswer = async (): Promise<PuzzleCheckWarning[]> => {
             const playerMove = uncoveredMoves.find(candidate => candidate.move !== elseNode?.else)?.move;
 
             if (elseNode === null || playerMove === undefined) {
@@ -359,7 +315,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     /**
      * Computer to move, after player move node.
      */
-    const checkComputerAnswer = async (playerMoveNode: PuzzleNode, path: Move[], position: Position): Promise<PuzzleKatahexWarning[]> => {
+    const checkComputerAnswer = async (playerMoveNode: PuzzleNode, path: Move[], position: Position): Promise<PuzzleCheckWarning[]> => {
         // Transposition leaf: continues from another node, checked there
         const node = resolve(playerMoveNode);
 
@@ -377,7 +333,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
         const answerPosition = play(position, answer.move);
 
         const { answerWinrate, warning } = await checkComputerMove(position, answer.move);
-        const warnings: PuzzleKatahexWarning[] = warning === null
+        const warnings: PuzzleCheckWarning[] = warning === null
             ? []
             : [warn('katahex_computer_better_move', answerPath, warning)]
         ;
@@ -416,7 +372,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
      * to know progress total from start.
      */
     const planValue = (position: Position): void => {
-        if (getWinner(position) === null) {
+        if (getWinner(boardsize, position) === null) {
             knownKeys.add(analysisKey(position, 'value'));
         }
     };
@@ -464,7 +420,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
         checkPlayerChoice(tree, [], initialPosition),
     ]);
 
-    const warnings: PuzzleKatahexWarning[] = [];
+    const warnings: PuzzleCheckWarning[] = [];
 
     if (initialWinrate !== null && initialWinrate < KATAHEX_INITIAL_WIN_THRESHOLD) {
         warnings.push(warn('katahex_initial_not_winning', [], { winrate: percent(initialWinrate) }));

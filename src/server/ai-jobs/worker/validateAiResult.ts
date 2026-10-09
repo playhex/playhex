@@ -1,7 +1,7 @@
-import { isMoveValid, isSpecialHexMove, parseMove } from '@playhex/move-notation';
+import { coordsToMove, isMoveValid, isSpecialHexMove, parseMove } from '@playhex/move-notation';
 import { EngineGame } from '../../../shared/game-engine/index.js';
 import { splitToAnalyzeMoveInputs } from '../gameAnalyze.js';
-import type { AiTask, AnalyzeGameInput, AnalyzeGameOutput, AnalyzeMoveInput, AnalyzeMoveOutput, AnalyzePositionInput, AnalyzePositionOutput, GameInput, MoveAndValue, MoveOutput } from '../protocol.js';
+import type { AiTask, AnalyzeGameInput, AnalyzeGameOutput, AnalyzeMoveInput, AnalyzeMoveOutput, AnalyzePositionInput, AnalyzePositionOutput, GameInput, MoveAndValue, MoveOutput, SolvePositionInput, SolvePositionOutput, SolveResult } from '../protocol.js';
 
 /**
  * Results come from remote workers, which may be buggy or malicious.
@@ -132,6 +132,57 @@ const validateAnalyzePosition = (input: AnalyzePositionInput, result: unknown): 
     return result as AnalyzePositionOutput;
 };
 
+const getEmptyCells = ({ size, black, white }: SolvePositionInput): Set<string> => {
+    const occupied = new Set([...black, ...white]);
+    const cells = new Set<string>();
+
+    for (let row = 0; row < size; ++row) {
+        for (let col = 0; col < size; ++col) {
+            const cell = coordsToMove({ row, col });
+
+            if (!occupied.has(cell)) {
+                cells.add(cell);
+            }
+        }
+    }
+
+    return cells;
+};
+
+const validateSolveResult: (result: unknown, size: number) => asserts result is SolveResult = (result, size) => {
+    assert(isObject(result), 'Solve result must be an object');
+    assert(result.winner === null || result.winner === 'black' || result.winner === 'white', 'winner must be "black", "white" or null');
+    assert(Array.isArray(result.pv) && result.pv.length <= size * size, 'pv must be an array of moves');
+
+    for (const move of result.pv) {
+        assert(typeof move === 'string' && isMoveInBoard(move, size) && !isSpecialHexMove(move), `Invalid pv move: "${String(move)}"`);
+    }
+};
+
+const validateSolvePosition = (input: SolvePositionInput, result: unknown): SolvePositionOutput => {
+    validateSolveResult(result, input.size);
+
+    const { children } = result as { children?: unknown };
+
+    if (!input.children) {
+        assert(children === undefined, 'children must not be set when not requested');
+
+        return result;
+    }
+
+    const emptyCells = getEmptyCells(input);
+
+    assert(isObject(children), 'children must be an object');
+    assert(Object.keys(children).length === emptyCells.size, `children must contain all ${emptyCells.size} empty cells`);
+
+    for (const [move, child] of Object.entries(children)) {
+        assert(emptyCells.has(move), `children contains a move not on an empty cell: "${move}"`);
+        validateSolveResult(child, input.size);
+    }
+
+    return result;
+};
+
 /**
  * Checks worker result shape, and that moves are legal.
  *
@@ -154,5 +205,8 @@ export const validateAiResult = (task: AiTask, result: unknown): unknown => {
         case 'katahex-intuition-analyze-position':
         case 'katahex-mcts-analyze-position':
             return validateAnalyzePosition(task.data, result);
+
+        case 'mohex-solve-position':
+            return validateSolvePosition(task.data, result);
     }
 };

@@ -5,8 +5,9 @@ import InMemoryAiJobQueue from './queue/InMemoryAiJobQueue.js';
 import AiWorkersRegistry from './worker/AiWorkersRegistry.js';
 import { processDavies } from './queue/localProcessors.js';
 import { consolidateGameAnalyze, hasSwapMove, splitToAnalyzeMoveInputs, type AnalyzeGameRequest } from './gameAnalyze.js';
-import type { AiJobType, AiTask, AnalyzeGameOutput, AnalyzeMoveInput, AnalyzeMoveOutput, AnalyzePositionInput, AnalyzePositionOutput, MoveOutput, MoveTask } from './protocol.js';
+import type { AiJobType, AiTask, AnalyzeGameOutput, AnalyzeMoveInput, AnalyzeMoveOutput, AnalyzePositionInput, AnalyzePositionOutput, MoveOutput, MoveTask, SolvePositionInput, SolvePositionOutput } from './protocol.js';
 import { MCTS_PLAYOUTS } from '../../shared/app/mctsSettings.js';
+import { MOHEX_MAX_BOARDSIZE } from '../../shared/app/boardsizeLimits.js';
 import type { AnalysisEngine } from '../../shared/app/hexplorer.js';
 import type { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
 import logger from '../services/logger.js';
@@ -38,6 +39,19 @@ const ANALYZE_GAME_TIMEOUT_MS = 70 * 60_000;
 const ANALYZE_MOVE_MCTS_TIMEOUT_MS = 10 * 60_000;
 
 /**
+ * Max time to wait for a position solve.
+ * Background job for puzzle check, processed after all others,
+ * and children solves can take minutes (see SolvePositionInput.children.maxTimeSeconds).
+ */
+const SOLVE_POSITION_TIMEOUT_MS = 15 * 60_000;
+
+/**
+ * Same as SOLVE_POSITION_TIMEOUT_MS, when solving a position from puzzle editor:
+ * user waits for it, and a new solve is requested each time another position is selected.
+ */
+export const SOLVE_POSITION_INTERACTIVE_TIMEOUT_MS = 2 * 60_000;
+
+/**
  * Job type a worker must process to analyze Hexplorer positions with an engine.
  */
 const ANALYSIS_ENGINE_JOB_TYPES: { [engine in AnalysisEngine]: AiJobType } = {
@@ -58,8 +72,8 @@ export class AiJobError extends Error {}
 const checkTask = (task: MoveTask): void => {
     const { size } = task.data.game;
 
-    if (task.type === 'mohex' && size > 14) {
-        throw new AiJobError(`mohex cannot play on board size ${size}, max is 14`);
+    if (task.type === 'mohex' && size > MOHEX_MAX_BOARDSIZE) {
+        throw new AiJobError(`mohex cannot play on board size ${size}, max is ${MOHEX_MAX_BOARDSIZE}`);
     }
 
     if (task.type === 'davies' && size !== 11) {
@@ -178,6 +192,14 @@ export default class AiJobService
     }
 
     /**
+     * Whether positions can be solved now, see solvePosition().
+     */
+    isSolverAvailable(): boolean
+    {
+        return this.isJobTypeAvailable('mohex-solve-position');
+    }
+
+    /**
      * @param timeoutMs Max time to wait for a worker to process the move, i.e remaining time on bot clock.
      *
      * @throws {AiJobError}
@@ -202,6 +224,20 @@ export default class AiJobService
         ;
 
         return await this.submitAndWait(task, ANALYZE_POSITION_TIMEOUT_MS) as AnalyzePositionOutput;
+    }
+
+    /**
+     * Proves winner of a position, and of its children if requested, with Mohex solver.
+     *
+     * @throws {AiJobError}
+     */
+    async solvePosition(input: SolvePositionInput, timeoutMs = SOLVE_POSITION_TIMEOUT_MS): Promise<SolvePositionOutput>
+    {
+        if (input.size > MOHEX_MAX_BOARDSIZE) {
+            throw new AiJobError(`mohex cannot solve on board size ${input.size}, max is ${MOHEX_MAX_BOARDSIZE}`);
+        }
+
+        return await this.submitAndWait({ type: 'mohex-solve-position', data: input }, timeoutMs) as SolvePositionOutput;
     }
 
     /**

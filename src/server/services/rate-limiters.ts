@@ -115,9 +115,18 @@ const analyzePositionMctsLimiter = new RateLimiterMemory({
  * Limit puzzle katahex checks started by a player.
  * Only new checks count, polling a running check or a cached one does not.
  */
-const puzzleKatahexCheckLimiter = new RateLimiterMemory({
+const puzzleCheckLimiter = new RateLimiterMemory({
     keyPrefix: 'rate_limiter.puzzle_katahex_check',
     points: 20,
+    duration: 600,
+});
+
+/**
+ * Limit puzzle editor positions solved by a player, only when not cached.
+ */
+const puzzleSolvePositionLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.puzzle_solve_position',
+    points: 30,
     duration: 600,
 });
 
@@ -262,8 +271,12 @@ export const rateLimiterConsumeAnalyzeMoveMcts = async (playerPublicId: string) 
     await consume(analyzeMoveMctsLimiter, playerPublicId);
 };
 
-export const rateLimiterConsumePuzzleKatahexCheck = async (playerPublicId: string) => {
-    await consume(puzzleKatahexCheckLimiter, playerPublicId);
+export const rateLimiterConsumePuzzleCheck = async (playerPublicId: string) => {
+    await consume(puzzleCheckLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumePuzzleSolvePosition = async (playerPublicId: string) => {
+    await consume(puzzleSolvePositionLimiter, playerPublicId);
 };
 
 export const rateLimiterConsumeAiWorkerNextJob = async (aiWorkerKeyId: number) => {

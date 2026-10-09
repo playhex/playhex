@@ -2,10 +2,12 @@ import { createHash } from 'node:crypto';
 import { Service } from 'typedi';
 import type { AnalysisEngine } from '../../shared/app/hexplorer.js';
 import type { PuzzleDefinition } from '../../shared/app/puzzles/puzzleTree.js';
-import type { PuzzleKatahexCheckState } from '../../shared/app/puzzles/puzzleKatahexCheck.js';
+import type { PuzzleCheckEngine, PuzzleCheckState, PuzzleCheckWarning } from '../../shared/app/puzzles/puzzleCheck.js';
 import AiJobService from '../ai-jobs/AiJobService.js';
 import PositionAnalysisCache from '../ai-jobs/PositionAnalysisCache.js';
+import PositionSolveCache from '../ai-jobs/PositionSolveCache.js';
 import { checkPuzzleWithKatahex } from './PuzzleKatahexChecker.js';
+import { checkPuzzleWithSolver } from './PuzzleSolverChecker.js';
 import logger from '../services/logger.js';
 
 /**
@@ -18,7 +20,7 @@ const FINISHED_RUN_TTL_MS = 10 * 60_000;
  * Identifies a check: same puzzle position and tree, with same engine.
  * Messages and texts are ignored, they don't change the check.
  */
-export const getPuzzleKatahexCheckKey = (puzzle: PuzzleDefinition, engine: AnalysisEngine): string => {
+export const getPuzzleCheckKey = (puzzle: PuzzleDefinition, engine: PuzzleCheckEngine): string => {
     const definition = {
         boardsize: puzzle.boardsize,
         redStones: [...puzzle.redStones].sort(),
@@ -38,20 +40,21 @@ export const getPuzzleKatahexCheckKey = (puzzle: PuzzleDefinition, engine: Analy
  * and keeps their state in memory for client polling.
  */
 @Service()
-export default class PuzzleKatahexCheckService
+export default class PuzzleCheckService
 {
-    private runs = new Map<string, PuzzleKatahexCheckState>();
+    private runs = new Map<string, PuzzleCheckState>();
 
     constructor(
         private aiJobService: AiJobService,
         private positionAnalysisCache: PositionAnalysisCache,
+        private positionSolveCache: PositionSolveCache,
     ) {}
 
     /**
      * Current state of a check, or null if not started, or expired.
      * A failed check is returned once, then forgotten so it can be started again.
      */
-    getState(key: string): null | PuzzleKatahexCheckState
+    getState(key: string): null | PuzzleCheckState
     {
         const state = this.runs.get(key) ?? null;
 
@@ -65,8 +68,12 @@ export default class PuzzleKatahexCheckService
     /**
      * Whether a check can be run now with this engine.
      */
-    isEngineAvailable(engine: AnalysisEngine): boolean
+    isEngineAvailable(engine: PuzzleCheckEngine): boolean
     {
+        if (engine === 'mohex-solver') {
+            return this.aiJobService.isSolverAvailable();
+        }
+
         return this.aiJobService.isAnalysisEngineAvailable(engine);
     }
 
@@ -74,16 +81,16 @@ export default class PuzzleKatahexCheckService
      * Starts checking puzzle in background, or returns current check if already running.
      * Puzzle must be valid, see validatePuzzle().
      */
-    start(puzzle: PuzzleDefinition, engine: AnalysisEngine): PuzzleKatahexCheckState
+    start(puzzle: PuzzleDefinition, engine: PuzzleCheckEngine): PuzzleCheckState
     {
-        const key = getPuzzleKatahexCheckKey(puzzle, engine);
+        const key = getPuzzleCheckKey(puzzle, engine);
         const existing = this.getState(key);
 
         if (existing !== null) {
             return existing;
         }
 
-        const state: PuzzleKatahexCheckState = {
+        const state: PuzzleCheckState = {
             status: 'running',
             engine,
             done: 0,
@@ -93,19 +100,12 @@ export default class PuzzleKatahexCheckService
 
         this.runs.set(key, state);
 
-        // Raw policy is better to find plausible moves, fallback to chosen engine if not available
-        const policyEngine: AnalysisEngine = this.isEngineAvailable('katahex-intuition') ? 'katahex-intuition' : engine;
+        const onProgress = (done: number, total: number): void => {
+            state.done = done;
+            state.total = total;
+        };
 
-        checkPuzzleWithKatahex(puzzle, {
-            analyze: (input, purpose) => this.positionAnalysisCache.analyze({
-                ...input,
-                engine: purpose === 'policy' ? policyEngine : engine,
-            }),
-            onProgress: (done, total) => {
-                state.done = done;
-                state.total = total;
-            },
-        })
+        this.check(puzzle, engine, onProgress)
             .then(warnings => {
                 state.warnings = warnings;
                 state.status = 'done';
@@ -125,5 +125,26 @@ export default class PuzzleKatahexCheckService
         ;
 
         return state;
+    }
+
+    private check(puzzle: PuzzleDefinition, engine: PuzzleCheckEngine, onProgress: (done: number, total: number) => void): Promise<PuzzleCheckWarning[]>
+    {
+        if (engine === 'mohex-solver') {
+            return checkPuzzleWithSolver(puzzle, {
+                solve: input => this.positionSolveCache.solve(input),
+                onProgress,
+            });
+        }
+
+        // Raw policy is better to find plausible moves, fallback to chosen engine if not available
+        const policyEngine: AnalysisEngine = this.isEngineAvailable('katahex-intuition') ? 'katahex-intuition' : engine;
+
+        return checkPuzzleWithKatahex(puzzle, {
+            analyze: (input, purpose) => this.positionAnalysisCache.analyze({
+                ...input,
+                engine: purpose === 'policy' ? policyEngine : engine,
+            }),
+            onProgress,
+        });
     }
 }

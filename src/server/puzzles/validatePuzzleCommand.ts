@@ -4,9 +4,8 @@ import { Option } from '@commander-js/extra-typings';
 import hexProgram from '../commands/hexProgram.js';
 import { AppDataSource } from '../data-source.js';
 import { Puzzle } from '../../shared/app/models/index.js';
-import { ANALYSIS_ENGINES } from '../../shared/app/hexplorer.js';
 import { puzzleErrorToString, validatePuzzle, type PuzzleDefinition } from '../../shared/app/puzzles/puzzleTree.js';
-import type { PuzzleKatahexCheckInput, PuzzleKatahexCheckState } from '../../shared/app/puzzles/puzzleKatahexCheck.js';
+import { PUZZLE_CHECK_ENGINES, type PuzzleCheckInput, type PuzzleCheckState } from '../../shared/app/puzzles/puzzleCheck.js';
 import PuzzleRepository from './PuzzleRepository.js';
 import { PuzzleFileError, readPuzzleFile } from './puzzleFile.js';
 
@@ -49,7 +48,7 @@ const toDefinition = (puzzle: Puzzle): PuzzleDefinition => ({
  * Katahex check runs on server, as AI jobs results are only received by server process.
  * Polls until check is done.
  */
-const runKatahexCheck = async (server: string, input: PuzzleKatahexCheckInput): Promise<PuzzleKatahexCheckState> => {
+const runPuzzleCheck = async (server: string, input: PuzzleCheckInput): Promise<PuzzleCheckState> => {
     const { ADMIN_PASSWORD } = process.env;
 
     if (!ADMIN_PASSWORD) {
@@ -71,23 +70,23 @@ const runKatahexCheck = async (server: string, input: PuzzleKatahexCheckInput): 
             throw new Error(`Server responded ${response.status}: ${await response.text()}`);
         }
 
-        const state = await response.json() as PuzzleKatahexCheckState;
+        const state = await response.json() as PuzzleCheckState;
 
         if (state.status !== 'running') {
             process.stderr.write('\n');
             return state;
         }
 
-        process.stderr.write(`\rAnalyzing positions: ${state.done}/${state.total}`);
+        process.stderr.write(`\r${state.engine === 'mohex-solver' ? 'Solving' : 'Analyzing'} positions: ${state.done}/${state.total}`);
         await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL_MS));
     }
 };
 
 hexProgram
     .command('puzzle-validate')
-    .description('Validate puzzle tree, then check it with katahex on running server (needs ADMIN_PASSWORD)')
+    .description('Validate puzzle tree, then check it with katahex or mohex solver on running server (needs ADMIN_PASSWORD)')
     .argument('<publicIdOrFile>', 'Puzzle publicId, or path to puzzle json file, see src/server/puzzles/examples/')
-    .addOption(new Option('--engine <engine>', 'Engine to evaluate positions').choices(ANALYSIS_ENGINES).default('katahex-intuition' as const))
+    .addOption(new Option('--engine <engine>', 'Engine to evaluate positions, or mohex-solver to prove them').choices(PUZZLE_CHECK_ENGINES).default('katahex-intuition' as const))
     .option('--server <url>', 'Server running AI jobs, defaults to BASE_URL, or http://localhost:3000')
     .option('--no-katahex', 'Only validate tree')
     .action(async (publicIdOrFile, { engine, server, katahex }) => {
@@ -124,26 +123,26 @@ hexProgram
         }
 
         const serverUrl = (server ?? process.env.BASE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
-        let state: PuzzleKatahexCheckState;
+        let state: PuzzleCheckState;
 
         try {
-            state = await runKatahexCheck(serverUrl, { puzzle: definition, engine });
+            state = await runPuzzleCheck(serverUrl, { puzzle: definition, engine });
         } catch (e) {
             console.error(`Could not run katahex check on ${serverUrl}: ${(e as Error).message}`);
             process.exit(1);
         }
 
         if (state.status === 'failed') {
-            console.error(`Katahex check failed: ${state.error}`);
+            console.error(`Check failed: ${state.error}`);
             process.exit(1);
         }
 
         if (state.warnings.length === 0) {
-            console.log(`Katahex (${engine}) agrees with puzzle tree.`);
+            console.log(`${engine} agrees with puzzle tree.`);
             return;
         }
 
-        console.log(`Katahex (${engine}) warnings:`);
+        console.log(`${engine} warnings:`);
 
         for (const warning of state.warnings) {
             console.log(` - ${puzzleErrorToString(warning)}`);

@@ -1,4 +1,4 @@
-import { GameMarksFacade, GameView, PolicyOverlayFacade, TextMark } from '@playhex/pixi-board';
+import { CircleMark, GameMarksFacade, GameView, PolicyOverlayFacade, TextMark } from '@playhex/pixi-board';
 import { onKeyDown, useEventListener } from '@vueuse/core';
 import { coordsToMove, type Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue';
@@ -8,9 +8,10 @@ import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findEr
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterface.js';
-import { AnalysisEngineUnavailableError, type AnalysisEngine } from '../../../../shared/app/hexplorer.js';
-import type { PuzzleKatahexCheckState } from '../../../../shared/app/puzzles/puzzleKatahexCheck.js';
-import { apiPuzzleKatahexCheck } from '../../../apiClient.js';
+import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
+import type { PuzzleCheckEngine, PuzzleCheckState, PuzzleSolvePositionOutput } from '../../../../shared/app/puzzles/puzzleCheck.js';
+import { MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
+import { apiPuzzleCheck, apiPuzzleSolvePosition } from '../../../apiClient.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 export type EditorStep = 'position' | 'tree' | 'publish';
@@ -25,6 +26,7 @@ type EditorNode = PuzzleNode | PuzzleElseNode;
 const DEFAULT_BOARDSIZE = 11;
 
 const PLANNED_MOVES_GROUP = 'planned_moves';
+const SOLVER_MARKS_GROUP = 'solver_marks';
 const KATAHEX_CHECK_POLL_INTERVAL_MS = 2000;
 const AI_EVAL_COLOR = 0x22bb55;
 
@@ -625,6 +627,16 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const analysisError = ref<null | 'engine_unavailable' | 'failed'>(null);
 
     /**
+     * Whether AI eval uses Mohex solver instead of analyzer: shows proven winning moves.
+     */
+    const solverEnabled = ref(false);
+
+    /**
+     * Solver result of selected position, null when not solved.
+     */
+    const solverResult = ref<null | PuzzleSolvePositionOutput>(null);
+
+    /**
      * Next moves from selected node that are already in tree.
      * "else" node is not planned: a viable move falling into it is what we want to spot.
      */
@@ -694,13 +706,15 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
     const updateAnalysis = async (): Promise<void> => {
         policyOverlayFacade.clear();
+        gameView.removeEntitiesGroup(SOLVER_MARKS_GROUP);
+        solverResult.value = null;
 
         const requestId = ++analysisRequestId;
         const currentAnalyzer = analyzer.value;
 
         analysisError.value = null;
 
-        if (currentAnalyzer === null || !shouldAnalyze()) {
+        if ((currentAnalyzer === null && !solverEnabled.value) || !shouldAnalyze()) {
             analysisLoading.value = false;
             return;
         }
@@ -716,6 +730,11 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         const disabled = new Set(disabledCells.value);
 
         analysisLoading.value = true;
+
+        if (currentAnalyzer === null) {
+            await updateSolver(requestId, color, red, blue);
+            return;
+        }
 
         let policy: undefined | number[][];
 
@@ -751,13 +770,76 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         }
     };
 
+    /**
+     * Solves selected position, then marks proven winning moves, and moves not proven with "?".
+     */
+    const updateSolver = async (requestId: number, color: 'black' | 'white', red: Move[], blue: Move[]): Promise<void> => {
+        if (boardsize.value > MOHEX_MAX_BOARDSIZE) {
+            analysisLoading.value = false;
+            return;
+        }
+
+        let result: PuzzleSolvePositionOutput;
+
+        try {
+            result = await apiPuzzleSolvePosition({
+                size: boardsize.value,
+                color,
+                black: red,
+                white: blue,
+                disabledCells: [...disabledCells.value],
+            });
+        } catch (e) {
+            if (requestId !== analysisRequestId) {
+                return;
+            }
+
+            analysisLoading.value = false;
+            analysisError.value = e instanceof AnalysisEngineUnavailableError ? 'engine_unavailable' : 'failed';
+
+            // eslint-disable-next-line no-console
+            console.error('Error while solving position', e);
+            return;
+        }
+
+        if (requestId !== analysisRequestId) {
+            return;
+        }
+
+        analysisLoading.value = false;
+        solverResult.value = result;
+
+        for (const [move, winner] of Object.entries(result.moves) as [Move, null | 'black' | 'white'][]) {
+            if (winner === color) {
+                gameView.addEntity(new CircleMark(AI_EVAL_COLOR).setCoords(move), SOLVER_MARKS_GROUP);
+            } else if (winner === null) {
+                gameView.addEntity(new TextMark('?').setColor(AI_EVAL_COLOR).setSizeCoef(0.5).setCoords(move), SOLVER_MARKS_GROUP);
+            }
+        }
+    };
+
     const setAnalyzer = (newAnalyzer: null | AnalyzerInterface): void => {
-        if (newAnalyzer === analyzer.value) {
+        if (newAnalyzer === analyzer.value && !solverEnabled.value) {
             return;
         }
 
         analyzer.value?.persistCache?.();
         analyzer.value = newAnalyzer;
+        solverEnabled.value = false;
+        void updateAnalysis();
+    };
+
+    /**
+     * Uses Mohex solver for AI eval, instead of analyzer.
+     */
+    const enableSolver = (): void => {
+        if (solverEnabled.value) {
+            return;
+        }
+
+        analyzer.value?.persistCache?.();
+        analyzer.value = null;
+        solverEnabled.value = true;
         void updateAnalysis();
     };
 
@@ -858,7 +940,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     /**
      * Changes when position or tree changes, to invalidate katahex check results.
      */
-    const katahexCheckKey = computed(() => {
+    const puzzleCheckKey = computed(() => {
         const { boardsize, redStones, blueStones, disabledCells, playerColor, tree } = toDefinition();
 
         return JSON.stringify(
@@ -867,45 +949,45 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         );
     });
 
-    const katahexCheck = ref<null | PuzzleKatahexCheckState>(null);
-    const katahexCheckError = ref<null | string>(null);
-    const katahexChecking = ref(false);
+    const puzzleCheck = ref<null | PuzzleCheckState>(null);
+    const puzzleCheckError = ref<null | string>(null);
+    const puzzleChecking = ref(false);
 
     /**
      * Incremented to stop polling a previous check.
      */
-    let katahexCheckRun = 0;
+    let puzzleCheckRun = 0;
 
-    const resetKatahexCheck = (): void => {
-        ++katahexCheckRun;
-        katahexCheck.value = null;
-        katahexCheckError.value = null;
-        katahexChecking.value = false;
+    const resetPuzzleCheck = (): void => {
+        ++puzzleCheckRun;
+        puzzleCheck.value = null;
+        puzzleCheckError.value = null;
+        puzzleChecking.value = false;
     };
 
-    watch(katahexCheckKey, resetKatahexCheck);
+    watch(puzzleCheckKey, resetPuzzleCheck);
 
     /**
      * Runs katahex check on server, polls until done.
      * Fast when run again, as analyzes are cached on server.
      */
-    const runKatahexCheck = async (engine: AnalysisEngine): Promise<void> => {
-        resetKatahexCheck();
+    const runPuzzleCheck = async (engine: PuzzleCheckEngine): Promise<void> => {
+        resetPuzzleCheck();
 
-        const run = katahexCheckRun;
+        const run = puzzleCheckRun;
         const input = { puzzle: toDefinition(), engine };
 
-        katahexChecking.value = true;
+        puzzleChecking.value = true;
 
         try {
             for (;;) {
-                const state = await apiPuzzleKatahexCheck(input);
+                const state = await apiPuzzleCheck(input);
 
-                if (run !== katahexCheckRun) {
+                if (run !== puzzleCheckRun) {
                     return;
                 }
 
-                katahexCheck.value = state;
+                puzzleCheck.value = state;
 
                 if (state.status !== 'running') {
                     break;
@@ -913,21 +995,21 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
                 await new Promise(resolve => setTimeout(resolve, KATAHEX_CHECK_POLL_INTERVAL_MS));
 
-                if (run !== katahexCheckRun) {
+                if (run !== puzzleCheckRun) {
                     return;
                 }
             }
 
-            if (katahexCheck.value?.status === 'failed') {
-                katahexCheckError.value = katahexCheck.value.error ?? null;
+            if (puzzleCheck.value?.status === 'failed') {
+                puzzleCheckError.value = puzzleCheck.value.error ?? null;
             }
         } catch (e) {
-            if (run === katahexCheckRun) {
-                katahexCheckError.value = apiErrorMessage(e);
+            if (run === puzzleCheckRun) {
+                puzzleCheckError.value = apiErrorMessage(e);
             }
         } finally {
-            if (run === katahexCheckRun) {
-                katahexChecking.value = false;
+            if (run === puzzleCheckRun) {
+                puzzleChecking.value = false;
             }
         }
     };
@@ -981,7 +1063,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
     onUnmounted(() => {
         // Stop polling katahex check
-        ++katahexCheckRun;
+        ++puzzleCheckRun;
         analyzer.value?.persistCache?.();
         destroyGameView();
     });
@@ -1036,13 +1118,16 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         selectErrorNode,
         toInput,
 
-        katahexCheck,
-        katahexCheckError,
-        katahexChecking,
-        runKatahexCheck,
+        puzzleCheck,
+        puzzleCheckError,
+        puzzleChecking,
+        runPuzzleCheck,
 
         analyzer,
         setAnalyzer,
+        solverEnabled,
+        solverResult,
+        enableSolver,
         analysisLoading,
         analysisError,
     };

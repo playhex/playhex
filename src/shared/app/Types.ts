@@ -120,6 +120,11 @@ export type AiAvailabilityData = {
      * Other engines cannot analyze positions.
      */
     availableAnalysisEngines: AnalysisEngine[];
+
+    /**
+     * Whether a mohex worker is connected to solve positions, for puzzle check.
+     */
+    solverAvailable: boolean;
 };
 
 type TWebsocketActionError<Reason extends string = string, Payload = unknown> = {
