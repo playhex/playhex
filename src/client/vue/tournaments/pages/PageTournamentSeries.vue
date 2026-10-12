@@ -315,7 +315,7 @@ const formatStartDate = (date: Date): string => intlFormat(date, {
                 >
                     <div class="d-flex w-100 justify-content-between">
                         <h3 class="h5 mb-0">{{ tournament.title }}</h3>
-                        <span>{{ $t('n_participants', { count: tournament.participantsCount }) }}</span>
+                        <span>{{ $t('n_people_are_interested', { count: tournament.subscriptionsCount }) }}</span>
                     </div>
                     <small>{{ formatStartDate(new Date(tournament.startOfficialAt)) }}</small>
                 </router-link>

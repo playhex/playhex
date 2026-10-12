@@ -40,6 +40,13 @@ export class TournamentListItemDto
     @Expose()
     participantsCount: number;
 
+    /**
+     * Players interested in an upcoming tournament.
+     * Subscriptions are not always loaded (i.e ended tournaments from database), then 0.
+     */
+    @Expose()
+    subscriptionsCount: number;
+
     static fromTournament(tournament: Tournament): TournamentListItemDto
     {
         const dto = new TournamentListItemDto();
@@ -59,6 +66,7 @@ export class TournamentListItemDto
         };
 
         dto.participantsCount = tournament.participants.length;
+        dto.subscriptionsCount = tournament.subscriptions?.length ?? 0;
 
         return dto;
     }
