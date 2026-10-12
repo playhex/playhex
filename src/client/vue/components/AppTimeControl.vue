@@ -194,17 +194,44 @@ watch(suggestedTimeControls, (suggested) => {
     }
 });
 
+/**
+ * Time control that can be saved to player presets:
+ * the selected one if not yet saved (custom or "(last)"),
+ * else the custom one, else the "(last)" one if not yet saved.
+ */
+const timeControlToSave = computed((): null | TimeControlType => {
+    const base = getBaseForCadency(currentLobby.value);
+    const isUnsaved = (tc: TimeControlType) => !base.some(f => isSameTimeControlType(f.timeControlType, tc));
+
+    if (isUnsaved(timeControlType.value)) {
+        return timeControlType.value;
+    }
+
+    if (customTimeControl.value !== null) {
+        return customTimeControl.value.timeControl;
+    }
+
+    const last = currentLobby.value === 'live' ? lastCustomLive.value : lastCustomCorrespondence.value;
+
+    if (last !== null && isUnsaved(last.timeControlType)) {
+        return last.timeControlType;
+    }
+
+    return null;
+});
+
 const isSaving = ref(false);
 
 const handleSave = async (): Promise<void> => {
-    if (customTimeControl.value === null || isSaving.value) {
+    if (timeControlToSave.value === null || isSaving.value) {
         return;
     }
 
     isSaving.value = true;
 
     try {
-        await saveFavoriteTimeControl(currentLobby.value, customTimeControl.value.timeControl);
+        const { family, options } = timeControlToSave.value;
+        await saveFavoriteTimeControl(currentLobby.value, { family, options: { ...options } } as TimeControlType);
     } finally {
         isSaving.value = false;
     }
@@ -264,7 +291,7 @@ const handleEdit = async (): Promise<void> => {
     <!-- Save / Edit preset buttons -->
     <div class="d-flex gap-2 mb-2">
         <button
-            v-if="loggedInPlayer !== null && customTimeControl !== null"
+            v-if="loggedInPlayer !== null && timeControlToSave !== null"
             type="button"
             class="btn btn-sm btn-outline-primary"
             :disabled="isSaving"

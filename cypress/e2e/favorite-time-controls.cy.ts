@@ -48,4 +48,39 @@ describe('Favorite time controls', () => {
         cy.createAIGameWithRandom(false);
         modal().contains('Hex Monthly');
     });
+
+    it('can save an unsaved "(last)" custom time control', () => {
+        const pseudo = 'tc-' + (1E24 * Math.random()).toString(36).slice(0, 8);
+
+        cy.request('POST', '/api/auth/signup', { pseudo, password });
+        cy.visit('/');
+        cy.get('.menu-top').contains(pseudo);
+
+        // 1. Create a game with a custom TC, without saving it
+        cy.createAIGameWithRandom(false);
+        cy.slidePrimaryTimeControl(5, 'min');
+        cy.slideSecondaryTimeControl(30, 's');
+        modal().contains('button', 'Save');
+        cy.submitAIGame();
+
+        // 2. Go back: custom TC is shown as "(last)", and can be saved
+        cy.visit('/');
+        cy.get('.menu-top').contains(pseudo);
+
+        cy.createAIGameWithRandom(false);
+        modal().contains('5min + 30s (last)');
+        modal().contains('button', 'Save').click();
+        modal().contains('button', 'Save').should('not.exist');
+
+        // 3. Reload: "(last)" is now a saved preset
+        cy.reload();
+        cy.get('.menu-top').contains(pseudo);
+
+        cy.createAIGameWithRandom(false);
+        modal().contains('5min + 30s (last)');
+        modal().contains('button', 'Save').should('not.exist');
+
+        modal().contains('button', 'Reorganize').click();
+        editModal().find('input[placeholder="5min + 30s"]').should('exist');
+    });
 });
