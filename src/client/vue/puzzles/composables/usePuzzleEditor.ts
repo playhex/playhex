@@ -676,12 +676,34 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
             return;
         }
 
+        const plannedMoves = getPlannedMoves();
         let index = 0;
 
-        for (const move of getPlannedMoves()) {
+        for (const move of plannedMoves) {
             const letter = String.fromCharCode('A'.charCodeAt(0) + index++);
 
             gameView.addEntity(new TextMark(letter).setCoords(move), PLANNED_MOVES_GROUP);
+        }
+
+        // Any other empty cell falls into "else" node, if any
+        const node = selectedTransposition.value?.target ?? selectedNode.value;
+
+        if (isElseNode(node) || findElseNode(node) === null) {
+            return;
+        }
+
+        const disabled = new Set(disabledCells.value);
+
+        for (let row = 0; row < boardsize.value; ++row) {
+            for (let col = 0; col < boardsize.value; ++col) {
+                const move = coordsToMove({ row, col });
+
+                if (plannedMoves.has(move) || disabled.has(move) || gameView.getStone(move) !== null) {
+                    continue;
+                }
+
+                gameView.addEntity(new TextMark('*').setCoords(move), PLANNED_MOVES_GROUP);
+            }
         }
     };
 
