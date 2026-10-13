@@ -116,4 +116,23 @@ describe('Partial board visual regression', () => {
             cy.compareSnapshot('mask-removed');
         });
     });
+
+    it('displays only a ziggurat on bottom edge, with a stone on top', () => {
+        cy.window().then(async ({ mountGameView }) => {
+            const gameView = new GameView(9, {
+                orientation: GameView.ORIENTATION_FLAT,
+                cellsMask: CellsMask.showingOnly(9, [
+                    'e7', 'f7',
+                    'd8', 'e8', 'f8',
+                    'c9', 'd9', 'e9', 'f9',
+                ]),
+            });
+
+            gameView.setStone('e7', 0);
+
+            await mountGameView(gameView);
+
+            cy.compareSnapshot('ziggurat');
+        });
+    });
 });

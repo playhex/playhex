@@ -4,6 +4,11 @@ Hex board game renderer built on [PixiJS](https://pixijs.com/).
 
 Can show Red or Blue stones, can be rotated, last move played, mark swap move, show coords, add custom marks...
 
+<p>
+    <img src="cypress/screenshots-expected/game-view.cy.ts/game-11x11.png" width="200" alt="11x11 game with 4-4 anchors and last move mark">
+    <img src="cypress/screenshots-expected/goban-theme.cy.ts/stones.png" width="200" alt="goban theme">
+</p>
+
 ## Installation
 
 ```bash
@@ -29,6 +34,10 @@ await gameView.mount(document.getElementById('board'));
 gameView.setStone('d4', 0); // red stone
 gameView.setStone('e6', 1); // blue stone
 ```
+
+<p>
+    <img src="cypress/screenshots-expected/game-view.cy.ts/quick-start.png" width="200" alt="red stone on d4, blue stone on e6">
+</p>
 
 The container must have a fixed size (see below). The default theme is dark, see Theming below to use the light theme.
 
@@ -61,6 +70,10 @@ a1  b1  c1
   a2  b2  c2
     a3  b3  c3
 ```
+
+<p>
+    <img src="cypress/screenshots-expected/game-view.cy.ts/coords-flat.png" width="200" alt="3x3 board with coords, flat orientation">
+</p>
 
 #### Examples
 
@@ -111,6 +124,10 @@ gameView.setStone('e6', 1);
 
 red now has a stone on d4, blue has a stone on e6.
 
+<p>
+    <img src="cypress/screenshots-expected/game-view.cy.ts/quick-start.png" width="200" alt="red stone on d4, blue stone on e6">
+</p>
+
 - Show coords
 
 ``` ts
@@ -118,6 +135,10 @@ gameView.toggleDisplayCoords(); // hide/show coords
 gameView.setDisplayCoords(); // show coords
 gameView.setDisplayCoords(false); // hide coords
 ```
+
+<p>
+    <img src="cypress/screenshots-expected/hexworld-theme.cy.ts/framed-board.png" width="200" alt="hexworld theme, with coords">
+</p>
 
 - Rotate board
 
@@ -140,6 +161,13 @@ gameView.setOrientation(GameView.ORIENTATION_PORTRAIT_FLAT);
 gameView.setOrientation(1.6);
 ```
 
+Diamond and flat orientations:
+
+<p>
+    <img src="cypress/screenshots-expected/game-view.cy.ts/empty-board.png" width="200" alt="empty board, diamond orientation">
+    <img src="cypress/screenshots-expected/game-view.cy.ts/empty-board-flat.png" width="200" alt="empty board, flat orientation">
+</p>
+
 - Highlight sides
 
 It's possible to make sides faded. It is used to show who is currently playing.
@@ -151,7 +179,7 @@ gameView.highlightSides(false, false); // makes all sides faded
 gameView.highlightSideForPlayer(1); // highlight sides for blue, fade red sides
 ```
 
-- Partial board
+#### Partial board
 
 Some cells can be hidden, or only some cells displayed to show a partial board (i.e a puzzle on a corner of the board).
 Hidden cells are not drawn, nor stones and marks on them, and cannot be clicked.
@@ -171,7 +199,16 @@ new GameView(9, {
 });
 ```
 
-- Theming
+Some hidden cells, corners of a board displayed for a puzzle, and a ziggurat on bottom edge:
+
+<p>
+    <img src="cypress/screenshots-expected/partial-board.cy.ts/hidden-cells.png" width="200" alt="hidden cells">
+    <img src="cypress/screenshots-expected/partial-board.cy.ts/corner-with-coords.png" width="200" alt="corner with coords">
+    <img src="cypress/screenshots-expected/partial-board.cy.ts/goban-corner.png" width="200" alt="goban corner">
+    <img src="cypress/screenshots-expected/partial-board.cy.ts/ziggurat.png" width="200" alt="ziggurat">
+</p>
+
+#### Theming
 
 Board appearance is customizable with themes, created from json or in typescript.
 Default theme is PlayHex dark theme, others are builtin (`gobanTheme`, `hexworldTheme`, `polishNostalgiaTheme`):
@@ -181,6 +218,14 @@ import { GameView, gobanTheme, resolveTheme } from '@playhex/pixi-board';
 
 await gameView.setTheme(resolveTheme(gobanTheme, 'dark'));
 ```
+
+Goban, HexWorld and Polish nostalgia themes:
+
+<p>
+    <img src="cypress/screenshots-expected/goban-theme.cy.ts/last-move-white-stone.png" width="200" alt="goban theme">
+    <img src="cypress/screenshots-expected/hexworld-theme.cy.ts/framed-board.png" width="200" alt="hexworld theme, with coords">
+    <img src="cypress/screenshots-expected/polish-nostalgia-theme.cy.ts/board.png" width="200" alt="polish nostalgia theme">
+</p>
 
 See [THEMING.md](THEMING.md) to use, create and customize themes.
 
@@ -210,6 +255,13 @@ playingGameFacade.undoLastMove(); // undo last move, reset position to one move 
 playingGameFacade.destroy(); // when finished
 ```
 
+Swappable first move, then swapped:
+
+<p>
+    <img src="cypress/screenshots-expected/swap.cy.ts/swappable.png" width="200" alt="swappable">
+    <img src="cypress/screenshots-expected/swap.cy.ts/swapped.png" width="200" alt="swapped">
+</p>
+
 This facade also have a "view pause" feature to allow adding move without updating the view.
 
 Moves are kept in memory until the view is resumed: all moves played (or undone) while pause are added.
@@ -232,6 +284,10 @@ playingGameFacade.setPreviewedMove('a1', 0); // red preview their move at a1
 playingGameFacade.setPreviewedMove('d4', 1); // removes previous preview, now blue preview their move at a1
 ```
 
+<p>
+    <img src="cypress/screenshots-expected/preview-move.cy.ts/preview-move.png" width="200" alt="preview move">
+</p>
+
 Preview move also handles swap move preview.
 
 ``` ts
@@ -240,6 +296,10 @@ playingGameFacade.setPreviewedMove('swap-pieces', 1); // a2 is hidden, b1 is pre
 
 playingGameFacade.removePreviewedMove(); // cancels preview
 ```
+
+<p>
+    <img src="cypress/screenshots-expected/preview-move.cy.ts/preview-swap-move-b3.png" width="200" alt="preview swap move b3">
+</p>
 
 #### ConditionalMovesFacade
 
