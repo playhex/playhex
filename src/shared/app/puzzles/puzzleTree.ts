@@ -144,6 +144,11 @@ export type PuzzleInput = PuzzleDefinition & {
     published: boolean;
 
     /**
+     * Hide disabled cells to player instead of greying them out. Defaults to false.
+     */
+    hideDisabledCells?: boolean;
+
+    /**
      * Game this puzzle comes from. Only on creation.
      */
     gamePublicId?: null | string;

@@ -90,6 +90,7 @@ const applyPuzzleInput = (puzzle: Puzzle, input: PuzzleInput): void => {
     puzzle.redStones = input.redStones;
     puzzle.blueStones = input.blueStones;
     puzzle.disabledCells = input.disabledCells ?? [];
+    puzzle.hideDisabledCells = input.hideDisabledCells === true;
     puzzle.lastMove = input.lastMove ?? null;
     puzzle.playerColor = input.playerColor;
     puzzle.tree = input.tree;

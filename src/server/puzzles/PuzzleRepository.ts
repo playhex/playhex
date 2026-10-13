@@ -57,6 +57,7 @@ export default class PuzzleRepository
                 'puzzle.redStones',
                 'puzzle.blueStones',
                 'puzzle.disabledCells',
+                'puzzle.hideDisabledCells',
                 'puzzle.lastMove',
                 'puzzle.playerColor',
                 'puzzle.published',

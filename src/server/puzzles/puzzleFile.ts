@@ -16,6 +16,7 @@ type PuzzleFile = {
     redStones?: string;
     blueStones?: string;
     disabledCells?: string;
+    hideDisabledCells?: boolean;
     lastMove?: null | Move;
     playerColor: 'red' | 'blue';
     tree: Puzzle['tree'];
@@ -49,6 +50,7 @@ export const readPuzzleFile = async (file: string): Promise<Puzzle> => {
     puzzle.redStones = deserializeMoves(input.redStones);
     puzzle.blueStones = deserializeMoves(input.blueStones);
     puzzle.disabledCells = deserializeMoves(input.disabledCells);
+    puzzle.hideDisabledCells = input.hideDisabledCells ?? false;
     puzzle.lastMove = input.lastMove ?? null;
     puzzle.playerColor = input.playerColor === 'red' ? 0 : 1;
     puzzle.tree = input.tree;

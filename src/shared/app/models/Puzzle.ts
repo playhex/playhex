@@ -70,6 +70,14 @@ export default class Puzzle
     disabledCells: Move[];
 
     /**
+     * Whether disabled cells are hidden to player, showing a partial board, instead of greyed out.
+     * Still greyed out in editor.
+     */
+    @Column({ default: false })
+    @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
+    hideDisabledCells: boolean;
+
+    /**
      * Last move played to reach initial position, marked on board to give context.
      * Must be one of initial stones.
      */

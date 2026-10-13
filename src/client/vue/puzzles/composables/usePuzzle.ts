@@ -4,7 +4,7 @@ import { computed, onUnmounted, ref, shallowRef } from 'vue';
 import { Puzzle } from '../../../../shared/app/models/index.js';
 import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findSolution, getComputerAnswer, getNodeResult, getParallelNodeResult, isElseNode, type PuzzleElseNode, type PuzzleNode, type PuzzleResult } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
-import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
+import { createPuzzleCellsMask, drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 
 export type PuzzleStatus =
     'player_turn'
@@ -68,7 +68,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
      * GameView must not be a vue ref, see GameView.ts.
      * The shallowRef is only exposed for template.
      */
-    const gameView = new GameView(puzzle.boardsize);
+    const gameView = new GameView(puzzle.boardsize, { cellsMask: createPuzzleCellsMask(puzzle) });
     const gameViewRef = shallowRef(gameView);
     const gameMarksFacade = new GameMarksFacade(gameView);
 
