@@ -85,6 +85,7 @@ const {
     redStones,
     blueStones,
     disabledCells,
+    hideDisabledCells,
     toInput,
     analyzer,
     setAnalyzer,
@@ -420,11 +421,20 @@ const deletePuzzle = async (): Promise<void> => {
                         <div class="btn-group flex-wrap">
                             <button class="btn" :class="'red' === positionTool ? 'btn-danger' : 'btn-outline-danger'" @click="positionTool = 'red'"><IconCircleFill /> {{ $t('game.red') }}</button>
                             <button class="btn" :class="'blue' === positionTool ? 'btn-primary' : 'btn-outline-primary'" @click="positionTool = 'blue'"><IconCircleFill /> {{ $t('game.blue') }}</button>
+                            <button class="btn" :class="'disable' === positionTool ? 'btn-warning' : 'btn-outline-warning'" @click="positionTool = 'disable'"><IconHexagonFill /> {{ $t('puzzles.editor.disable_cell') }}</button>
                             <button class="btn" :class="'erase' === positionTool ? 'btn-secondary' : 'btn-outline-secondary'" @click="positionTool = 'erase'"><IconEraser /> {{ $t('puzzles.editor.erase') }}</button>
-                            <button class="btn" :class="'disable' === positionTool ? 'btn-secondary' : 'btn-outline-secondary'" @click="positionTool = 'disable'"><IconHexagonFill /> {{ $t('puzzles.editor.disable_cell') }}</button>
                         </div>
                         <div class="form-text">{{ $t('puzzles.editor.paint_help') }}</div>
                         <div v-if="'disable' === positionTool" class="form-text">{{ $t('puzzles.editor.disable_cell_help') }}</div>
+                    </div>
+
+                    <div v-if="'disable' === positionTool || disabledCells.length > 0" class="mb-3">
+                        <div class="form-label">{{ $t('puzzles.editor.disabled_cells_display') }}</div>
+                        <div class="btn-group">
+                            <button class="btn" :class="!hideDisabledCells ? 'btn-primary' : 'btn-outline-primary'" @click="hideDisabledCells = false">{{ $t('puzzles.editor.disabled_cells_greyed') }}</button>
+                            <button class="btn" :class="hideDisabledCells ? 'btn-primary' : 'btn-outline-primary'" @click="hideDisabledCells = true">{{ $t('puzzles.editor.disabled_cells_hidden') }}</button>
+                        </div>
+                        <div class="form-text">{{ $t(hideDisabledCells ? 'puzzles.editor.disabled_cells_hidden_help' : 'puzzles.editor.disabled_cells_greyed_help') }}</div>
                     </div>
 
                     <div class="mb-3">

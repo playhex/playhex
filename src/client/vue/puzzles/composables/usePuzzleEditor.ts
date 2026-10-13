@@ -91,6 +91,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const redStones = ref<Move[]>(puzzle ? [...puzzle.redStones] : []);
     const blueStones = ref<Move[]>(puzzle ? [...puzzle.blueStones] : []);
     const disabledCells = ref<Move[]>(puzzle ? [...puzzle.disabledCells] : []);
+    const hideDisabledCells = ref(puzzle?.hideDisabledCells ?? false);
     const lastMove = ref<null | Move>(puzzle?.lastMove ?? null);
     const playerColor = ref<0 | 1>(puzzle?.playerColor ?? 0);
     // toRaw: puzzle may come from a vue ref, and proxies cannot be cloned
@@ -855,6 +856,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redStones: redStones.value,
         blueStones: blueStones.value,
         disabledCells: disabledCells.value,
+        hideDisabledCells: hideDisabledCells.value,
         lastMove: lastMove.value,
         playerColor: playerColor.value,
         tree: cleanNode(tree.value),
@@ -1082,6 +1084,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redStones,
         blueStones,
         disabledCells,
+        hideDisabledCells,
         playerColor,
         setPlayerColor,
         lastMove,

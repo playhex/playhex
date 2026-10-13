@@ -85,7 +85,7 @@ describe('createThemeFromJson', () => {
         json.theme.stones = { type: 'circle', size: 0.8, strokeColor: '#000000' };
 
         const { theme } = createThemeFromJson(json);
-        const boardView = theme.board({ boardsize: 5, colors: theme.colors });
+        const boardView = theme.board({ boardsize: 5, colors: theme.colors, isCellVisible: () => true });
 
         assert.strictEqual(boardView.sides?.length, 2);
         assert.strictEqual(typeof boardView.setCellShading, 'function');
@@ -98,7 +98,7 @@ describe('createThemeFromJson', () => {
 
         const { theme } = createThemeFromJson(json);
 
-        assert.strictEqual(theme.board({ boardsize: 5, colors: theme.colors }).sides?.length, 2);
+        assert.strictEqual(theme.board({ boardsize: 5, colors: theme.colors, isCellVisible: () => true }).sides?.length, 2);
 
         json.theme.board = { type: 'hex', cellColor: '#d8b478', strokeColor: '#000000', frame: 'yes' } as never;
         assert.throws(() => createThemeFromJson(json), /^Error: theme.board.frame: expected true or false/);

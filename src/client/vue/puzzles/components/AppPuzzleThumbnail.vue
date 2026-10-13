@@ -4,7 +4,7 @@ import { whenever } from '@vueuse/core';
 import { GameMarksFacade, GameView } from '@playhex/pixi-board';
 import { Puzzle } from '../../../../shared/app/models/index.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
-import { drawPuzzlePosition } from '../services/puzzleBoard.js';
+import { createPuzzleCellsMask, drawPuzzlePosition } from '../services/puzzleBoard.js';
 
 /*
  * Non-interactive board showing puzzle initial position.
@@ -15,7 +15,7 @@ const props = defineProps<{
 }>();
 
 // GameView must not be a vue ref, see GameView.ts
-const gameView = new GameView(props.puzzle.boardsize, { interactive: false });
+const gameView = new GameView(props.puzzle.boardsize, { interactive: false, cellsMask: createPuzzleCellsMask(props.puzzle) });
 const playerSettingsFacade = new PlayerSettingsFacade(gameView, { showCoords: false });
 
 drawPuzzlePosition(gameView, props.puzzle);

@@ -72,7 +72,7 @@ export const goBoard = (params: GoBoardParams): BoardRenderer => {
     return renderer;
 };
 
-const drawGoBoard = (params: GoBoardParams, { boardsize, colors }: BoardRenderContext): BoardView => {
+const drawGoBoard = (params: GoBoardParams, { boardsize, colors, isCellVisible }: BoardRenderContext): BoardView => {
     const {
         lineColor,
         lineWidth = 0.06,
@@ -161,22 +161,34 @@ const drawGoBoard = (params: GoBoardParams, { boardsize, colors }: BoardRenderCo
     // Lines in the 3 directions
     const lines = new Graphics();
 
-    const line = (from: PointData, to: PointData): void => {
+    const segment = (from: PointData, to: PointData): void => {
         lines.moveTo(from.x, from.y);
         lines.lineTo(to.x, to.y);
     };
 
-    for (let i = 0; i < boardsize; ++i) {
-        line(Hex.coords(i, 0), Hex.coords(i, last)); // rows
-        line(Hex.coords(0, i), Hex.coords(last, i)); // columns
+    /**
+     * Draws a line through intersections,
+     * only between consecutive visible intersections.
+     */
+    const line = (intersections: [number, number][]): void => {
+        for (let i = 1; i < intersections.length; ++i) {
+            if (isCellVisible(...intersections[i - 1]) && isCellVisible(...intersections[i])) {
+                segment(Hex.coords(...intersections[i - 1]), Hex.coords(...intersections[i]));
+            }
+        }
+    };
+
+    const range = (from: number, to: number): number[] => Array.from({ length: to - from + 1 }, (_, i) => from + i);
+    const indexes = range(0, last);
+
+    for (const i of indexes) {
+        line(indexes.map(col => [i, col])); // rows
+        line(indexes.map(row => [row, i])); // columns
     }
 
     // diagonals, between (row, col) and (row + 1, col - 1)
     for (let k = 1; k < 2 * last; ++k) {
-        const rowStart = Math.max(0, k - last);
-        const rowEnd = Math.min(k, last);
-
-        line(Hex.coords(rowStart, k - rowStart), Hex.coords(rowEnd, k - rowEnd));
+        line(range(Math.max(0, k - last), Math.min(k, last)).map(row => [row, k - row]));
     }
 
     lines.stroke({ color: lineColor, width: Hex.RADIUS * lineWidth, cap: 'round' });
