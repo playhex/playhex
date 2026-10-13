@@ -8,14 +8,14 @@ const SQRT_3_2 = sqrt(3) / 2;
  * Outward normals of board edges.
  * Player 1 connects top to bottom, player 2 connects left to right.
  */
-const normals = {
+export const normals = {
     top: { x: 0, y: -1 },
     bottom: { x: 0, y: 1 },
     left: { x: -SQRT_3_2, y: 0.5 },
     right: { x: SQRT_3_2, y: -0.5 },
 };
 
-type Normal = typeof normals.top;
+export type Normal = typeof normals.top;
 
 export type OffsetCorner = {
     /**

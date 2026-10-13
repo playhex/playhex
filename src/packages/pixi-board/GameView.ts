@@ -1,4 +1,4 @@
-import { Application, Container } from 'pixi.js';
+import { Application, Container, Graphics } from 'pixi.js';
 import Hex from './Hex.js';
 import { BoardTheme, BoardView } from './theming/types.js';
 import { resolveTheme } from './theming/resolveTheme.js';
@@ -11,11 +11,23 @@ import { BoardEntity } from './BoardEntity.js';
 import Stone from './entities/Stone.js';
 import { colToLetter, Coords, coordsToMove, Move, parseMove, rowToNumber } from '@playhex/move-notation';
 import { ResizeObserverDebounced } from './resize-observer-debounced/ResizeObserverDebounced.js';
+import { CellsMask } from './cells-mask/CellsMask.js';
+import { createCellsMaskGraphics } from './cells-mask/cellsMaskGraphics.js';
+import { computeBoardFit, FitDisc } from './boardFit.js';
 
-const { min, max, sin, cos, sqrt, ceil, PI } = Math;
-const SQRT_3_2 = sqrt(3) / 2;
-const PI_3 = PI / 3;
+const { min, max, ceil, PI } = Math;
 const PI_6 = PI / 6;
+
+/**
+ * Space to keep visible around cells when fitting the board, relative to cell radius.
+ * Includes player sides.
+ */
+const FIT_CELL_RADIUS = 1.4;
+
+/**
+ * Space to keep visible around coords when fitting the board, relative to cell radius.
+ */
+const FIT_COORDS_RADIUS = 0.6;
 
 export type GameViewSize = {
     width: number;
@@ -111,6 +123,12 @@ type GameViewOptions = {
      * Defaults to true. Set to false when not needed and for better performances.
      */
     interactive: boolean;
+
+    /**
+     * Which cells are displayed, to hide some cells or display a partial board.
+     * Defaults to all cells displayed.
+     */
+    cellsMask: null | CellsMask;
 };
 
 const defaultOptions: GameViewOptions = {
@@ -118,6 +136,7 @@ const defaultOptions: GameViewOptions = {
     displayCoords: false,
     orientation: 11,
     interactive: true,
+    cellsMask: null,
 };
 
 /**
@@ -201,6 +220,24 @@ export default class GameView extends TypedEmitter<GameViewEvents>
      * Can be rotated.
      */
     private gameContainer: Container = new Container();
+
+    /**
+     * Contains board, cells and entities,
+     * masked to hide hidden cells and everything on them.
+     * Coords are not inside, they are not masked.
+     */
+    private maskedContainer: Container = new Container();
+
+    /**
+     * Which cells are displayed.
+     */
+    private cellsMask: CellsMask;
+
+    /**
+     * Graphics covering visible cells, used as mask on maskedContainer.
+     * Null when all cells are displayed.
+     */
+    private cellsMaskGraphics: null | Graphics = null;
 
     /**
      * Container that contains coords.
@@ -292,6 +329,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.theme = this.gameViewOptions.theme;
         this.displayCoords = this.gameViewOptions.displayCoords;
         this.orientation = this.modOrientation(this.gameViewOptions.orientation);
+        this.cellsMask = this.gameViewOptions.cellsMask ?? CellsMask.all(boardsize);
 
         this.init();
     }
@@ -311,15 +349,18 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.cellShadings = Array(this.boardsize).fill(null).map(() => Array(this.boardsize).fill(0));
 
-        this.gameContainer.addChild(
+        this.maskedContainer.addChild(
             this.boardContainer,
             this.createHexesContainer(),
             this.entityLayersContainer,
+        );
+
+        this.gameContainer.addChild(
+            this.maskedContainer,
             this.coordsContainer = new Container(),
         );
 
-        this.redrawBoard();
-        this.redrawCoords();
+        this.applyCellsMask();
     }
 
     private async doMount(element: HTMLElement): Promise<void>
@@ -393,6 +434,57 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const { row, col } = parseMove(move);
 
         this.hexes[row][col] = hex;
+    }
+
+    getCellsMask(): CellsMask
+    {
+        return this.cellsMask;
+    }
+
+    /**
+     * Change which cells are displayed.
+     * Hidden cells are not drawn, nor stones and marks on them,
+     * and cannot be clicked. Stones are still there, i.e `getStone()` still returns them.
+     * Board is zoomed to fit displayed cells.
+     */
+    setCellsMask(cellsMask: CellsMask): void
+    {
+        if (cellsMask.getBoardsize() !== this.boardsize) {
+            throw new Error(`Cells mask boardsize ${cellsMask.getBoardsize()} does not match board size ${this.boardsize}`);
+        }
+
+        this.cellsMask = cellsMask;
+
+        this.applyCellsMask();
+        this.redrawAfterOrientationOrWrapperSizeChanged();
+    }
+
+    /**
+     * Hide masked cells, and everything drawn on them, and redraw board and coords.
+     */
+    private applyCellsMask(): void
+    {
+        if (this.cellsMaskGraphics !== null) {
+            this.maskedContainer.mask = null;
+            this.cellsMaskGraphics.destroy(destroyDrawnOptions);
+        }
+
+        this.cellsMaskGraphics = createCellsMaskGraphics(this.cellsMask);
+
+        if (this.cellsMaskGraphics !== null) {
+            this.gameContainer.addChild(this.cellsMaskGraphics);
+            this.maskedContainer.mask = this.cellsMaskGraphics;
+        }
+
+        // Hidden hexes are not clickable
+        for (let row = 0; row < this.boardsize; ++row) {
+            for (let col = 0; col < this.boardsize; ++col) {
+                this.hexes[row][col].visible = this.cellsMask.isVisible({ row, col });
+            }
+        }
+
+        this.redrawBoard();
+        this.redrawCoords();
     }
 
     /**
@@ -492,6 +584,7 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.boardView = this.theme.board({
             boardsize: this.boardsize,
             colors: this.theme.colors,
+            isCellVisible: (row, col) => this.cellsMask.isVisible({ row, col }),
         });
 
         this.boardContainer.addChild(this.boardView.container);
@@ -522,11 +615,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.gameContainer.rotation = this.orientation * PI_6;
         this.updateCoordsTextsOrientation();
         this.updateEntitiesRotation();
-
-        this.gameContainer.pivot = Hex.coords(
-            this.boardsize / 2 - 0.5,
-            this.boardsize / 2 - 0.5,
-        );
 
         this.gameContainer.position = {
             x: wrapperSize.width / 2,
@@ -653,74 +741,49 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     }
 
     /**
-     * Rescale the game board to fit in the container,
-     * depending on board orientation.
+     * Rescale and center the game board to fit in the container,
+     * depending on board orientation, displayed cells and coords.
      */
     private autoResize(): void
     {
-        const { rotation } = this.gameContainer;
-
-        const boardHeight = Hex.RADIUS * this.boardsize * 1.5 - 0.5;
-        const boardWidth = Hex.RADIUS * this.boardsize * SQRT_3_2;
         const wrapperSize = this.getWrapperSize();
 
         if (wrapperSize === null) {
             return;
         }
 
-        const boardCorner0 = {
-            x: wrapperSize.width / 2 + boardHeight * cos(rotation + 3.5 * PI_3),
-            y: wrapperSize.height / 2 + boardHeight * sin(rotation + 3.5 * PI_3),
-        };
-
-        const boardCorner1 = {
-            x: wrapperSize.width / 2 + boardWidth * cos(rotation - PI_3),
-            y: wrapperSize.height / 2 + boardWidth * sin(rotation - PI_3),
-        };
-
-        const boardCorner2 = {
-            x: wrapperSize.width - boardCorner0.x,
-            y: wrapperSize.height - boardCorner0.y,
-        };
-
-        const boardCorner3 = {
-            x: wrapperSize.width - boardCorner1.x,
-            y: wrapperSize.height - boardCorner1.y,
-        };
-
-        const boardMaxCorner0 = {
-            x: min(boardCorner0.x, boardCorner1.x, boardCorner2.x, boardCorner3.x),
-            y: min(boardCorner0.y, boardCorner1.y, boardCorner2.y, boardCorner3.y),
-        };
-
-        const boardMaxCorner1 = {
-            x: max(boardCorner0.x, boardCorner1.x, boardCorner2.x, boardCorner3.x),
-            y: max(boardCorner0.y, boardCorner1.y, boardCorner2.y, boardCorner3.y),
-        };
-
-        let boxWidth = boardMaxCorner1.x - boardMaxCorner0.x;
-        let boxHeight = boardMaxCorner1.y - boardMaxCorner0.y;
-
-        // Add margin to prevent cells to be slightly cropped.
-        // Depending on orientation, either width or height margin is needed.
-        if ([1, 2, 3].includes(this.getOrientation() % 6)) {
-            boxWidth += 30;
-        } else {
-            boxHeight += 30;
-        }
-
-        // Add margin to display coords around the board
-        if (this.displayCoords) {
-            boxWidth += Hex.RADIUS * 1.8;
-            boxHeight += Hex.RADIUS * 1.8;
-        }
-
-        const scale = min(
-            wrapperSize.width / boxWidth,
-            wrapperSize.height / boxHeight,
+        const { scale, pivot } = computeBoardFit(
+            this.getDiscsToFit(),
+            this.gameContainer.rotation,
+            wrapperSize,
         );
 
+        this.gameContainer.pivot = pivot;
         this.gameContainer.scale = { x: scale, y: scale };
+    }
+
+    /**
+     * Areas that must be visible when fitting the board:
+     * displayed cells, and coords if displayed.
+     */
+    private getDiscsToFit(): FitDisc[]
+    {
+        const discs: FitDisc[] = this.getDisplayedCellsOrAll().map(({ row, col }) => ({
+            ...Hex.coords(row, col),
+            radius: Hex.RADIUS * FIT_CELL_RADIUS,
+        }));
+
+        if (this.displayCoords) {
+            for (const text of this.coordsTexts) {
+                discs.push({
+                    x: text.position.x,
+                    y: text.position.y,
+                    radius: Hex.RADIUS * FIT_COORDS_RADIUS,
+                });
+            }
+        }
+
+        return discs;
     }
 
     private clearLongPressTimeout(): void
@@ -834,19 +897,50 @@ export default class GameView extends TypedEmitter<GameViewEvents>
             return text;
         };
 
-        for (let i = 0; i < this.boardsize; ++i) {
-            const number = rowToNumber(i);
-            container.addChild(createText(number, i, -1, 'number'));
-            container.addChild(createText(number, i, this.boardsize, 'number'));
+        // Display coords around displayed cells only
+        const { minRow, maxRow, minCol, maxCol } = this.getDisplayedCellsRange();
 
-            const letter = colToLetter(i);
-            container.addChild(createText(letter, -1, i, 'letter'));
-            container.addChild(createText(letter, this.boardsize, i, 'letter'));
+        for (let row = minRow; row <= maxRow; ++row) {
+            const number = rowToNumber(row);
+            container.addChild(createText(number, row, minCol - 1, 'number'));
+            container.addChild(createText(number, row, maxCol + 1, 'number'));
+        }
+
+        for (let col = minCol; col <= maxCol; ++col) {
+            const letter = colToLetter(col);
+            container.addChild(createText(letter, minRow - 1, col, 'letter'));
+            container.addChild(createText(letter, maxRow + 1, col, 'letter'));
         }
 
         this.updateCoordsTextsOrientation();
 
         this.coordsContainer.addChild(container);
+    }
+
+    /**
+     * Displayed cells, or whole board if no cell displayed.
+     */
+    private getDisplayedCellsOrAll(): Coords[]
+    {
+        const cells = this.cellsMask.getVisibleCoords();
+
+        return cells.length > 0 ? cells : CellsMask.all(this.boardsize).getVisibleCoords();
+    }
+
+    /**
+     * Rows and columns containing displayed cells.
+     * Whole board if no cell displayed.
+     */
+    private getDisplayedCellsRange(): { minRow: number, maxRow: number, minCol: number, maxCol: number }
+    {
+        const cells = this.getDisplayedCellsOrAll();
+
+        return {
+            minRow: min(...cells.map(({ row }) => row)),
+            maxRow: max(...cells.map(({ row }) => row)),
+            minCol: min(...cells.map(({ col }) => col)),
+            maxCol: max(...cells.map(({ col }) => col)),
+        };
     }
 
     private updateCoordsTextsOrientation(): void

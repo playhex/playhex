@@ -3,6 +3,7 @@ export { default as GameView } from './GameView.js';
 export type { GameViewSize } from './GameView.js';
 export { default as Hex } from './Hex.js';
 export { BoardEntity } from './BoardEntity.js';
+export { CellsMask } from './cells-mask/CellsMask.js';
 export { colorAverage, lighten, darken } from './colorUtils.js';
 
 // Theming

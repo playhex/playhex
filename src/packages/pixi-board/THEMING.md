@@ -558,8 +558,10 @@ const myTheme: ThemeDefinition = {
             .rect(0, 0, width, height)
             .fill({ color: 0x102030 }),
 
-        // Board renderer receives { boardsize, colors }, and returns { container, sides?, setCellShading? }.
+        // Board renderer receives { boardsize, colors, isCellVisible }, and returns { container, sides?, setCellShading? }.
         // Cells centers are given by Hex.coords(row, col).
+        // Hidden cells (partial boards) are already masked by GameView,
+        // isCellVisible(row, col) can be used to not draw what would overflow on visible cells.
         board: hexBoard({ cellColor: 0x5a4a2a, strokeColor: 0x1a1d20, shadingColor: 0x3a2a1a }),
 
         stones: {

@@ -151,6 +151,26 @@ gameView.highlightSides(false, false); // makes all sides faded
 gameView.highlightSideForPlayer(1); // highlight sides for blue, fade red sides
 ```
 
+- Partial board
+
+Some cells can be hidden, or only some cells displayed to show a partial board (i.e a puzzle on a corner of the board).
+Hidden cells are not drawn, nor stones and marks on them, and cannot be clicked.
+Stones are still there: `getStone()` still returns them.
+Board is zoomed to fit displayed cells, and coords are displayed around them.
+
+``` ts
+gameView.setCellsMask(CellsMask.hiding(9, ['d4', 'e5'])); // display all cells except d4 and e5
+gameView.setCellsMask(CellsMask.showingOnly(9, ['a1', 'a2', 'b1', 'b2'])); // display only these cells
+gameView.setCellsMask(CellsMask.all(9)); // display whole board again
+
+gameView.getCellsMask().isVisible('a1');
+
+// or from constructor
+new GameView(9, {
+    cellsMask: CellsMask.showingOnly(9, ['a1', 'a2', 'b1', 'b2']), // or CellsMask.hiding(9, [...])
+});
+```
+
 - Theming
 
 Board appearance is customizable with themes, created from json or in typescript.

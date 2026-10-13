@@ -83,6 +83,15 @@ export type BackgroundRenderer = ((context: BackgroundRenderContext) => Containe
 export type BoardRenderContext = {
     boardsize: number;
     colors: ThemeColors;
+
+    /**
+     * Whether a cell is displayed, when only a part of the board is displayed.
+     * Hidden cells, and what is drawn outside the board in front of hidden edge cells (sides...),
+     * are already masked by GameView, so renderers can ignore it.
+     * Can be used to not draw elements that would partially overflow on visible cells,
+     * i.e lines between a visible and a hidden intersection on a go-like board.
+     */
+    isCellVisible: (row: number, col: number) => boolean;
 };
 
 /**
