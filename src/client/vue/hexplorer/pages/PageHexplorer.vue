@@ -41,11 +41,9 @@ import {
     IconStarFill,
     IconXLg,
 } from '../../icons.js';
-import { hexGameImporter } from '../../../../shared/app/hex-game-importer/index.js';
-import { SourceNotSupportedError } from '../../../../shared/app/hex-game-importer/errors.js';
 import EvaluationGraph from '../components/EvaluationGraph.vue';
 import MoveTree from '../components/MoveTree.vue';
-import ImportFormatsHelpOverlay from '../overlays/ImportFormatsHelpOverlay.vue';
+import ImportGameOverlay from '../../components/overlay/ImportGameOverlay.vue';
 import { PlaceMarkTool } from '../tools/PlaceMarkTool.js';
 import { NoopAnalyzer } from '../analyzers/NoopAnalyzer';
 import { AnalyzerInterface } from '../analyzers/AnalyzerInterface.js';
@@ -163,23 +161,13 @@ const sidebarOpen = ref(true);
 /*
  * Import
  */
-const importFormatsHelpOverlay = defineOverlay(ImportFormatsHelpOverlay);
+const importGameOverlay = defineOverlay(ImportGameOverlay);
 
 const openImportOverlay = () => {
-    void importFormatsHelpOverlay({
-        onImport: async (source: string) => {
-            try {
-                const importedGame = await hexGameImporter.import(source);
-                await importGame(importedGame);
-                return { ok: true } as const;
-            } catch (e) {
-                if (e instanceof SourceNotSupportedError) {
-                    return { ok: false, error: t('hexplorer.format_not_supported') } as const;
-                }
-
-                return { ok: false, error: e instanceof Error ? e.message : String(e) } as const;
-            }
-        },
+    void importGameOverlay({
+        onImport: importGame,
+    }).catch(() => {
+        // dismissed
     });
 };
 

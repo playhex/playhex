@@ -7,13 +7,14 @@ import { useWindowFocus, whenever } from '@vueuse/core';
 import { t } from 'i18next';
 import { Game, Puzzle, PuzzleCollection } from '../../../../shared/app/models/index.js';
 import { isElseNode, PUZZLE_DESCRIPTION_MAX_LENGTH, PUZZLE_MESSAGE_MAX_LENGTH, PUZZLE_TITLE_MAX_LENGTH } from '../../../../shared/app/puzzles/puzzleTree.js';
-import { MAX_BOARDSIZE, MIN_BOARDSIZE, MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
+import { isValidBoardsize, MAX_BOARDSIZE, MIN_BOARDSIZE, MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
 import { apiDeletePuzzle, apiGetMyPuzzleCollections, apiPostPuzzle, apiPutPuzzle } from '../../../apiClient.js';
 import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconHexagonFill, IconInfoCircle, IconLightbulb, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
+import ImportGameOverlay from '../../components/overlay/ImportGameOverlay.vue';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconHexagonFill, IconInfoCircle, IconMagic, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { createKatahexAnalyzers, useAnalysisEngines } from '../../hexplorer/composables/useAnalysisEngines.js';
@@ -58,6 +59,9 @@ const {
     lastMove,
     clearLastMove,
     positionTool,
+    positionSource,
+    gamePublicId,
+    importPosition,
     sourceGameMovesCount,
     setSourceGameMovesCount,
     tree,
@@ -103,6 +107,12 @@ const {
     analysisError,
 } = usePuzzleEditor(props.puzzle, props.sourceGame, props.collectionPublicId ?? null);
 
+/**
+ * Game the puzzle is taken from, shown as "from this game".
+ * Can only be set when creating puzzle.
+ */
+const linkedGamePublicId = computed(() => props.puzzle === null ? gamePublicId.value : props.puzzle.game?.publicId ?? null);
+
 const gameViewElement = useTemplateRef('game-view-element');
 
 whenever(gameViewElement, async element => {
@@ -139,17 +149,38 @@ whenever(useWindowFocus(), loadCollections);
 
 const newBoardsize = ref(boardsize.value);
 
-const isValidBoardsize = (size: number): boolean =>
-    Number.isInteger(size) && size >= MIN_BOARDSIZE && size <= MAX_BOARDSIZE;
+const isEmpty = (): boolean => redStones.value.length + blueStones.value.length + disabledCells.value.length === 0 && !tree.value.children?.length;
 
 const applyBoardsize = async (): Promise<void> => {
-    const isEmpty = redStones.value.length + blueStones.value.length + disabledCells.value.length === 0 && !tree.value.children?.length;
-
-    if (!isEmpty && !confirm(t('puzzles.editor.boardsize_confirm'))) {
+    if (!isEmpty() && !confirm(t('puzzles.editor.boardsize_confirm'))) {
         return;
     }
 
     await setBoardsize(newBoardsize.value);
+};
+
+/*
+ * Import position from any source (link, SGF, move list...)
+ */
+
+const importGameOverlay = defineOverlay(ImportGameOverlay);
+
+const openImportOverlay = async (): Promise<void> => {
+    if (!isEmpty() && !confirm(t('puzzles.editor.import_confirm'))) {
+        return;
+    }
+
+    try {
+        await importGameOverlay({
+            titleKey: 'puzzles.editor.import_position',
+            onImport: async importedGame => {
+                await importPosition(importedGame);
+                newBoardsize.value = boardsize.value;
+            },
+        });
+    } catch {
+        // dismissed
+    }
 };
 
 /*
@@ -310,12 +341,12 @@ const deletePuzzle = async (): Promise<void> => {
 
             <div class="d-flex flex-wrap justify-content-center align-items-center gap-1 position-relative py-1 px-5">
                 <!-- Rewind source game -->
-                <div v-if="'position' === step && sourceGame && !puzzle" class="btn-group">
+                <div v-if="'position' === step && positionSource" class="btn-group">
                     <button class="btn btn-outline-primary" @click="setSourceGameMovesCount(0)" :aria-label="$t('puzzles.editor.first_move')"><IconChevronBarLeft /></button>
                     <button class="btn btn-outline-primary" @click="setSourceGameMovesCount(sourceGameMovesCount - 1)" :aria-label="$t('puzzles.editor.previous_move')"><IconChevronLeft /></button>
-                    <span class="btn btn-outline-primary disabled text-body">{{ sourceGameMovesCount }} / {{ sourceGame.moves.length }}</span>
+                    <span class="btn btn-outline-primary disabled text-body">{{ sourceGameMovesCount }} / {{ positionSource.moves.length }}</span>
                     <button class="btn btn-outline-primary" @click="setSourceGameMovesCount(sourceGameMovesCount + 1)" :aria-label="$t('puzzles.editor.next_move')"><IconChevronRight /></button>
-                    <button class="btn btn-outline-primary" @click="setSourceGameMovesCount(sourceGame.moves.length)" :aria-label="$t('puzzles.editor.last_move')"><IconChevronBarRight /></button>
+                    <button class="btn btn-outline-primary" @click="setSourceGameMovesCount(positionSource.moves.length)" :aria-label="$t('puzzles.editor.last_move')"><IconChevronBarRight /></button>
                 </div>
 
                 <button
@@ -327,7 +358,7 @@ const deletePuzzle = async (): Promise<void> => {
 
                 <!-- Keep bar height when no button above, so board does not resize when changing tab -->
                 <span
-                    v-else-if="!('position' === step && sourceGame && !puzzle)"
+                    v-else-if="!('position' === step && positionSource)"
                     class="btn invisible"
                     aria-hidden="true"
                 >&nbsp;</span>
@@ -399,8 +430,19 @@ const deletePuzzle = async (): Promise<void> => {
 
                 <!-- Position -->
                 <template v-if="'position' === step">
-                    <p v-if="sourceGame && !puzzle" class="small text-body-secondary">{{ $t('puzzles.editor.rewind_help') }}</p>
-                    <p v-else-if="!puzzle" class="alert alert-info py-2"><IconLightbulb /> {{ $t('puzzles.editor.from_game_help') }}</p>
+                    <p v-if="linkedGamePublicId" class="small">
+                        <router-link :to="{ name: 'online-game', params: { gameId: linkedGamePublicId } }" target="_blank">{{ $t('puzzles.from_game') }}</router-link>
+                    </p>
+
+                    <div class="mb-3">
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            @click="openImportOverlay()"
+                        ><IconMagic /> {{ $t('puzzles.editor.import_position') }}</button>
+                    </div>
+
+                    <div v-if="positionSource" class="alert alert-info py-2 mb-3">{{ $t('puzzles.editor.rewind_help') }}</div>
 
                     <div class="mb-3">
                         <label class="form-label" for="puzzle-boardsize">{{ $t('puzzles.editor.boardsize') }}</label>

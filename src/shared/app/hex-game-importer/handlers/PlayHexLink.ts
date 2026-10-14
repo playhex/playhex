@@ -82,6 +82,8 @@ export class PlayHexLink implements ImporterHandlerInterface
             moves: game.moves,
             playerBlackName: game.gameToPlayers[0]?.player.pseudo,
             playerWhiteName: game.gameToPlayers[1]?.player.pseudo,
+            // Only ended games can be linked to a puzzle, see canCreatePuzzleFromGame()
+            playHexGamePublicId: game.state === 'ended' ? gameId.toLowerCase() : undefined,
         };
     }
 }

@@ -10,3 +10,6 @@ export const MAX_BOARDSIZE = 53; // https://discord.com/channels/964029738161176
  * Max board size Mohex supports, to play or solve.
  */
 export const MOHEX_MAX_BOARDSIZE = 14;
+
+export const isValidBoardsize = (size: number): boolean =>
+    Number.isInteger(size) && size >= MIN_BOARDSIZE && size <= MAX_BOARDSIZE;

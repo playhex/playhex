@@ -5,4 +5,10 @@ export type ImportedGame = {
     moves: HexMove[];
     playerBlackName?: string;
     playerWhiteName?: string;
+
+    /**
+     * Set when imported from a PlayHex game,
+     * e.g to link it to a puzzle created from this game.
+     */
+    playHexGamePublicId?: string;
 };

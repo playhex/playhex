@@ -1,13 +1,30 @@
 <script setup lang="ts">
 import { ref, PropType } from 'vue';
 import { useDisclosure } from '@overlastic/vue';
+import { t } from 'i18next';
+import { hexGameImporter } from '../../../../shared/app/hex-game-importer/index.js';
+import { SourceNotSupportedError } from '../../../../shared/app/hex-game-importer/errors.js';
+import { ImportedGame } from '../../../../shared/app/hex-game-importer/types.js';
+
+/*
+ * Import a Hex game from any source (link, SGF, move list...), see hexGameImporter.
+ * Closed once imported game has been handled by onImport, else shows the error.
+ */
 
 const { visible, confirm, cancel } = useDisclosure();
 
 const props = defineProps({
     onImport: {
-        type: Function as PropType<(source: string) => Promise<{ ok: true } | { ok: false, error: string }>>,
+        type: Function as PropType<(importedGame: ImportedGame) => Promise<void>>,
         required: true,
+    },
+
+    /**
+     * Translation key of modal title.
+     */
+    titleKey: {
+        type: String,
+        default: 'hexplorer.import_a_game',
     },
 });
 
@@ -22,14 +39,16 @@ const doImport = async () => {
     importError.value = null;
     importLoading.value = true;
 
-    const result = await props.onImport(source);
-
-    importLoading.value = false;
-
-    if (result.ok) {
+    try {
+        await props.onImport(await hexGameImporter.import(source));
         confirm();
-    } else {
-        importError.value = result.error;
+    } catch (e) {
+        importError.value = e instanceof SourceNotSupportedError
+            ? t('hexplorer.format_not_supported')
+            : e instanceof Error ? e.message : String(e)
+        ;
+    } finally {
+        importLoading.value = false;
     }
 };
 </script>
@@ -40,7 +59,7 @@ const doImport = async () => {
             <div class="modal-dialog" @click="e => e.stopPropagation()">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">{{ $t('hexplorer.import_a_game') }}</h5>
+                        <h5 class="modal-title">{{ $t(titleKey) }}</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">

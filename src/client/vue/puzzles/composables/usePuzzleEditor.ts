@@ -1,7 +1,8 @@
 import { CircleMark, GameMarksFacade, GameView, PolicyOverlayFacade, TextMark } from '@playhex/pixi-board';
 import { onKeyDown, useEventListener } from '@vueuse/core';
-import { coordsToMove, type Move } from '@playhex/move-notation';
+import { coordsToMove, type HexMove, type Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue';
+import { t } from 'i18next';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
 import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findErrorNode, findSamePositionNode, findTranspositions, getFirstColor, hasComputerAlternatives, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleDefinition, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
@@ -10,9 +11,10 @@ import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js
 import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterface.js';
 import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
 import type { PuzzleCheckEngine, PuzzleCheckState, PuzzleSolvePositionOutput } from '../../../../shared/app/puzzles/puzzleCheck.js';
-import { MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
+import { isValidBoardsize, MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
 import { apiPuzzleCheck, apiPuzzleSolvePosition } from '../../../apiClient.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
+import type { ImportedGame } from '../../../../shared/app/hex-game-importer/types.js';
 
 export type EditorStep = 'position' | 'tree' | 'publish';
 
@@ -22,6 +24,15 @@ export type EditorStep = 'position' | 'tree' | 'publish';
 export type PositionTool = 'red' | 'blue' | 'erase' | 'disable' | 'last_move';
 
 type EditorNode = PuzzleNode | PuzzleElseNode;
+
+/**
+ * Game moves to pick initial position from, by rewinding.
+ */
+type PositionSource = {
+    boardsize: number;
+    swapRule: boolean;
+    moves: HexMove[];
+};
 
 const DEFAULT_BOARDSIZE = 11;
 
@@ -78,7 +89,7 @@ const cleanNode = <T extends EditorNode>(node: T): T => {
 };
 
 /**
- * Create or edit a puzzle: set initial position (manually, or from a game),
+ * Create or edit a puzzle: set initial position (manually, from a game, or imported),
  * then edit decision tree by playing moves on board.
  *
  * @param puzzle Puzzle to edit, or null to create a new one
@@ -145,19 +156,32 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const lastMoveStones = computed(() => secondColor.value === 0 ? redStones.value : blueStones.value);
 
     /*
-     * Position from game
+     * Position from game, or imported
      */
 
-    const sourceGameMovesCount = ref(sourceGame?.moves.length ?? 0);
+    /**
+     * Moves to rewind when creating puzzle from a game, or after an import.
+     */
+    const positionSource = shallowRef<null | PositionSource>(puzzle === null && sourceGame !== null
+        ? { boardsize: sourceGame.boardsize, swapRule: sourceGame.swapRule, moves: sourceGame.moves }
+        : null,
+    );
+
+    /**
+     * PlayHex game the created puzzle is taken from, shown as "from the game of...".
+     */
+    const gamePublicId = ref<null | string>(sourceGame?.publicId ?? null);
+
+    const sourceGameMovesCount = ref(positionSource.value?.moves.length ?? 0);
 
     const setSourceGameMovesCount = (movesCount: number): void => {
-        if (sourceGame === null) {
+        if (positionSource.value === null) {
             return;
         }
 
-        sourceGameMovesCount.value = Math.max(0, Math.min(sourceGame.moves.length, movesCount));
+        sourceGameMovesCount.value = Math.max(0, Math.min(positionSource.value.moves.length, movesCount));
 
-        const position = getGamePosition(sourceGame, sourceGameMovesCount.value);
+        const position = getGamePosition(positionSource.value, sourceGameMovesCount.value);
 
         redStones.value = position.redStones;
         blueStones.value = position.blueStones;
@@ -168,6 +192,33 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         // Game last move is an opponent stone, invalid when computer plays first
         clearInvalidLastMove();
         redraw();
+    };
+
+    /**
+     * Replaces position and tree by an imported game, which can then be rewound.
+     */
+    const importPosition = async (importedGame: ImportedGame): Promise<void> => {
+        if (!isValidBoardsize(importedGame.boardsize)) {
+            throw new Error(t('puzzles.errors.invalid_boardsize', { boardsize: importedGame.boardsize }));
+        }
+
+        const source: PositionSource = {
+            boardsize: importedGame.boardsize,
+            // Swap is explicit in imported moves
+            swapRule: true,
+            moves: importedGame.moves,
+        };
+
+        // Throws on illegal moves, before clearing current position and tree
+        getGamePosition(source, source.moves.length);
+
+        await setBoardsize(importedGame.boardsize);
+
+        positionSource.value = source;
+
+        gamePublicId.value = importedGame.playHexGamePublicId ?? null;
+
+        setSourceGameMovesCount(importedGame.moves.length);
     };
 
     /*
@@ -209,6 +260,9 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      */
     const setBoardsize = async (newBoardsize: number): Promise<void> => {
         boardsize.value = newBoardsize;
+        // Game moves may not fit anymore
+        positionSource.value = null;
+        sourceGameMovesCount.value = 0;
         redStones.value = [];
         blueStones.value = [];
         disabledCells.value = [];
@@ -959,7 +1013,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         computerPlaysFirst: computerPlaysFirst.value,
         tree: cleanNode(tree.value),
         published: publish,
-        gamePublicId: puzzle === null ? sourceGame?.publicId ?? null : undefined,
+        gamePublicId: puzzle === null ? gamePublicId.value : undefined,
         // Sent only if changed, to not move back puzzle to its previous collection
         // if it has been changed from collection page meanwhile
         collectionPublicId: puzzle !== null && collectionPublicId.value === loadedCollectionPublicId
@@ -1132,7 +1186,14 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
             return;
         }
 
-        const run = step.value === 'position' ? onPosition : step.value === 'tree' ? onTree : null;
+        // Position shortcuts rewind game moves, only when there are some
+        let run: null | (() => void) = null;
+
+        if (step.value === 'tree') {
+            run = onTree;
+        } else if (step.value === 'position' && positionSource.value !== null) {
+            run = onPosition;
+        }
 
         if (run === null) {
             return;
@@ -1142,11 +1203,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         run();
     };
 
-    // Rewind only when creating from a game, as edited puzzle has no game moves loaded
-    const rewind = (offset: -1 | 1): null | (() => void) => puzzle === null && sourceGame !== null
-        ? () => setSourceGameMovesCount(sourceGameMovesCount.value + offset)
-        : null
-    ;
+    // Rewind only when there are game moves loaded (puzzle created from a game, or imported)
+    const rewind = (offset: -1 | 1): (() => void) => () => setSourceGameMovesCount(sourceGameMovesCount.value + offset);
 
     onKeyDown('ArrowLeft', arrowShortcut(rewind(-1), selectParent));
     onKeyDown('ArrowRight', arrowShortcut(rewind(1), selectFirstChild));
@@ -1155,8 +1213,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
     createGameView();
 
-    if (puzzle === null && sourceGame !== null) {
-        setSourceGameMovesCount(sourceGame.moves.length);
+    if (positionSource.value !== null) {
+        setSourceGameMovesCount(positionSource.value.moves.length);
     } else {
         redraw();
     }
@@ -1195,6 +1253,9 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         lastMove,
         clearLastMove,
         positionTool,
+        positionSource,
+        gamePublicId,
+        importPosition,
         sourceGameMovesCount,
         setSourceGameMovesCount,
 
