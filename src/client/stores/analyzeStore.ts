@@ -3,7 +3,7 @@ import useSocketStore from './socketStore.js';
 import useToastsStore from './toastsStore.js';
 import { GameAnalyze } from '../../shared/app/models/index.js';
 import { Ref, reactive, ref } from 'vue';
-import { type AnalyzeApiBase, apiGetGameAnalyze, apiRequestGameAnalyze, apiRequestGameAnalyzeMoveMcts } from '../apiClient.js';
+import { type AnalyzeApiBase, apiGetGameAnalyze, apiRequestGameAnalyze, apiRequestGameAnalyzeMovesMcts } from '../apiClient.js';
 import { t } from 'i18next';
 
 /**
@@ -91,24 +91,53 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
     ;
 
     /**
-     * Request a deep analyze (tree search) of a move of an analyzed game.
-     * Result comes later with "analyze" socket event.
+     * Request deep analyzes (tree search) of a range of moves of an analyzed game.
+     * Server ignores moves already analyzed or being processed, and moves that cannot be analyzed.
+     * Results come later with "analyze" socket event, for each move.
      */
-    const requestMctsMoveAnalyze = async (gamePublicId: string, moveIndex: number): Promise<void> => {
-        const key = `${gamePublicId}:${moveIndex}`;
+    const requestMctsMovesAnalyze = async (gamePublicId: string, from: number, to: number): Promise<void> => {
+        const added: string[] = [];
 
-        if (pendingMctsMoveAnalyzes.has(key)) {
+        for (let moveIndex = from; moveIndex <= to; ++moveIndex) {
+            const key = `${gamePublicId}:${moveIndex}`;
+
+            if (!pendingMctsMoveAnalyzes.has(key)) {
+                pendingMctsMoveAnalyzes.add(key);
+                added.push(key);
+            }
+        }
+
+        try {
+            const moveIndexes = await apiRequestGameAnalyzeMovesMcts(gamePublicId, from, to, apiBase(gamePublicId));
+            const processing = new Set(moveIndexes.map(moveIndex => `${gamePublicId}:${moveIndex}`));
+
+            for (const key of added) {
+                if (!processing.has(key)) {
+                    pendingMctsMoveAnalyzes.delete(key);
+                }
+            }
+        } catch {
+            for (const key of added) {
+                pendingMctsMoveAnalyzes.delete(key);
+            }
+
+            toastDeepAnalyzeFailed();
+        }
+    };
+
+    /**
+     * Last time deep analyze failure has been toasted,
+     * to not toast once by move when all moves of a range fail.
+     */
+    let lastDeepAnalyzeFailedToastAt = 0;
+
+    const toastDeepAnalyzeFailed = (): void => {
+        if (Date.now() - lastDeepAnalyzeFailedToastAt < 2000) {
             return;
         }
 
-        pendingMctsMoveAnalyzes.add(key);
-
-        try {
-            await apiRequestGameAnalyzeMoveMcts(gamePublicId, moveIndex, apiBase(gamePublicId));
-        } catch {
-            pendingMctsMoveAnalyzes.delete(key);
-            useToastsStore().addToast(t('game_analysis.deep_analysis_failed'), { level: 'danger' });
-        }
+        lastDeepAnalyzeFailedToastAt = Date.now();
+        useToastsStore().addToast(t('game_analysis.deep_analysis_failed'), { level: 'danger' });
     };
 
     socket.on('analyze', (gameId: string, gameAnalyze: GameAnalyze) => {
@@ -146,7 +175,7 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
 
     socket.on('analyzeMoveMctsFailed', (gameId: string, moveIndex: number) => {
         if (pendingMctsMoveAnalyzes.delete(`${gameId}:${moveIndex}`)) {
-            useToastsStore().addToast(t('game_analysis.deep_analysis_failed'), { level: 'danger' });
+            toastDeepAnalyzeFailed();
         }
     });
 
@@ -155,7 +184,7 @@ const useAnalyzeStore = defineStore('analyzeStore', () => {
         getAnalyze,
         loadAnalyze,
         isMctsMoveAnalyzePending,
-        requestMctsMoveAnalyze,
+        requestMctsMovesAnalyze,
     };
 
 });

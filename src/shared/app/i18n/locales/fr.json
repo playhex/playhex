@@ -611,6 +611,8 @@
         "in_progress": "analyse {{done}}/{{total}}…",
         "request_failed": "Impossible de demander l'analyse, aucun worker IA n'est peut-être disponible pour le moment.",
         "deep_analysis": "Analyse approfondie",
+        "deep_analysis_moves_one": "Analyse approfondie ({{count}} coup)",
+        "deep_analysis_moves_other": "Analyse approfondie ({{count}} coups)",
         "analyzing": "Analyse en cours…",
         "deep_analysis_failed": "L'analyse approfondie a échoué, aucun worker IA n'est peut-être disponible pour le moment."
     },

@@ -1,4 +1,4 @@
-import { BadRequestError, Get, HttpError, JsonController, NotFoundError, OnUndefined, Param, Put } from 'routing-controllers';
+import { BadRequestError, Get, HttpCode, HttpError, JsonController, NotFoundError, OnUndefined, Param, Put, QueryParam } from 'routing-controllers';
 import { Service } from 'typedi';
 import { isSpecialHexMove } from '@playhex/move-notation';
 import GameAnalyzeRepository from '../../../repositories/GameAnalyzeRepository.js';
@@ -13,7 +13,8 @@ import GameRepository from '../../../repositories/GameRepository.js';
 import { hasGameAnalyzeErrored } from '../../../../shared/app/models/GameAnalyze.js';
 import AiJobService from '../../../ai-jobs/AiJobService.js';
 import { getAnalyzeMoveInput } from '../../../ai-jobs/gameAnalyze.js';
-import type { AnalyzeMoveOutput, MoveAndValue } from '../../../ai-jobs/protocol.js';
+import type { AnalyzeMoveInput, AnalyzeMoveOutput, MoveAndValue } from '../../../ai-jobs/protocol.js';
+import PendingMctsMoveAnalyzes from '../../../ai-jobs/PendingMctsMoveAnalyzes.js';
 import { MCTS_PLAYOUTS } from '../../../../shared/app/mctsSettings.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import { rateLimiterConsumeAnalyzeMoveMcts } from '../../../services/rate-limiters.js';
@@ -38,12 +39,6 @@ const toMctsMove = ({ move, value, whiteWin }: MoveAndValue): MctsMove => {
 export default class GameAnalyzeController
 {
     /**
-     * Deep analyzes being processed, by "publicId:moveIndex",
-     * to not process same move twice.
-     */
-    private pendingMctsAnalyzes = new Set<string>();
-
-    /**
      * Last game analyze update by game publicId,
      * to persist deep analyzes results of a same game one after the other.
      */
@@ -55,6 +50,7 @@ export default class GameAnalyzeController
         private aiJobService: AiJobService,
         private gameStore: GameStore,
         private io: HexServer,
+        private pendingMctsMoveAnalyzes: PendingMctsMoveAnalyzes,
     ) {}
 
     @Get('/api/games/:publicId/analyze')
@@ -127,18 +123,23 @@ export default class GameAnalyzeController
     }
 
     /**
-     * Deep analyze of a single move of an analyzed game, with tree search.
-     * Result is sent later with "analyze" socket event, or "analyzeMoveMctsFailed".
+     * Deep analyze of a range of moves of an analyzed game, with tree search.
+     * Range is clamped to game moves.
+     * Moves already deeply analyzed, being processed, or that cannot be analyzed are ignored.
+     * Results are sent later with "analyze" socket event, or "analyzeMoveMctsFailed", for each move.
+     *
+     * @returns Moves being processed in this range, including ones requested before.
      */
-    @Put('/api/games/:publicId/analyze/moves/:moveIndex/mcts')
-    @OnUndefined(202)
-    async requestMoveMctsAnalyze(
+    @Put('/api/games/:publicId/analyze/moves/mcts')
+    @HttpCode(202)
+    async requestMovesMctsAnalyze(
         @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
-        @Param('moveIndex') moveIndex: number,
-    ): Promise<void> {
-        if (!Number.isInteger(moveIndex) || moveIndex < 0) {
-            throw new BadRequestError('Invalid move index');
+        @QueryParam('from', { required: true }) from: number,
+        @QueryParam('to', { required: true }) to: number,
+    ): Promise<{ moveIndexes: number[] }> {
+        if (!Number.isInteger(from) || !Number.isInteger(to) || from > to) {
+            throw new BadRequestError('Invalid moves range');
         }
 
         const gameAnalyze = await this.gameAnalyzeRepository.findByGamePublicId(publicId);
@@ -147,51 +148,60 @@ export default class GameAnalyzeController
             throw new BadRequestError('Game must be analyzed first');
         }
 
-        const moveAnalyze = gameAnalyze.analyze[moveIndex];
-
-        if (moveAnalyze === undefined) {
-            throw new BadRequestError('Invalid move index');
-        }
-
-        // Intuition analyze of this move failed, deep analyze would be lost
-        if (moveAnalyze === null) {
-            throw new BadRequestError('This move has not been analyzed');
-        }
-
-        const pendingKey = `${publicId}:${moveIndex}`;
-
-        if (moveAnalyze.mcts || this.pendingMctsAnalyzes.has(pendingKey)) {
-            return;
-        }
-
         const analyzeGameRequest = await this.gameRepository.getAnalyzeGameRequest(publicId);
 
         if (analyzeGameRequest === null) {
             throw new NotFoundError('Game not found or not finished');
         }
 
-        const input = getAnalyzeMoveInput(analyzeGameRequest, moveIndex);
-
-        if (!input || isSpecialHexMove(input.move)) {
-            throw new BadRequestError('This move cannot be analyzed');
-        }
-
         if (!this.aiJobService.isJobTypeAvailable('katahex-mcts-analyze-move')) {
             throw new HttpError(503, 'No AI worker can deeply analyze moves right now');
         }
 
-        await rateLimiterConsumeAnalyzeMoveMcts(player.publicId);
+        // No await from here to reservation, so overlapping requests cannot reserve same move
+        const inputs = new Map<number, AnalyzeMoveInput>();
 
-        this.pendingMctsAnalyzes.add(pendingKey);
+        for (let moveIndex = Math.max(from, 0); moveIndex <= Math.min(to, gameAnalyze.analyze.length - 1); ++moveIndex) {
+            const moveAnalyze = gameAnalyze.analyze[moveIndex];
 
-        this.aiJobService.analyzeMoveMcts(input)
-            .then(result => this.saveMoveMctsAnalyze(publicId, moveIndex, result))
-            .catch(e => {
-                logger.error('Error in game analyze move mcts', { publicId, moveIndex, ...errorToLogger(e) });
-                this.io.to(Rooms.game(publicId)).emit('analyzeMoveMctsFailed', publicId, moveIndex);
-            })
-            .finally(() => this.pendingMctsAnalyzes.delete(pendingKey))
-        ;
+            // Intuition analyze of this move failed, deep analyze would be lost
+            if (!moveAnalyze || moveAnalyze.mcts) {
+                continue;
+            }
+
+            const input = getAnalyzeMoveInput(analyzeGameRequest, moveIndex);
+
+            if (!input || isSpecialHexMove(input.move)) {
+                continue;
+            }
+
+            inputs.set(moveIndex, input);
+        }
+
+        const moveIndexes = [...inputs.keys()];
+        const reserved = this.pendingMctsMoveAnalyzes.reserve('game', publicId, moveIndexes);
+
+        if (reserved.length > 0) {
+            try {
+                await rateLimiterConsumeAnalyzeMoveMcts(player.publicId, reserved.length);
+            } catch (e) {
+                this.pendingMctsMoveAnalyzes.release('game', publicId, reserved);
+                throw e;
+            }
+        }
+
+        for (const moveIndex of reserved) {
+            this.aiJobService.analyzeMoveMcts(inputs.get(moveIndex) as AnalyzeMoveInput)
+                .then(result => this.saveMoveMctsAnalyze(publicId, moveIndex, result))
+                .catch(e => {
+                    logger.error('Error in game analyze move mcts', { publicId, moveIndex, ...errorToLogger(e) });
+                    this.io.to(Rooms.game(publicId)).emit('analyzeMoveMctsFailed', publicId, moveIndex);
+                })
+                .finally(() => this.pendingMctsMoveAnalyzes.release('game', publicId, moveIndex))
+            ;
+        }
+
+        return { moveIndexes };
     }
 
     /**

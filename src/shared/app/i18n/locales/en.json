@@ -195,6 +195,8 @@
         "in_progress": "analyzing {{done}}/{{total}}…",
         "request_failed": "Could not request analysis, no AI worker may be available right now.",
         "deep_analysis": "Deep analysis",
+        "deep_analysis_moves_one": "Deep analysis ({{count}} move)",
+        "deep_analysis_moves_other": "Deep analysis ({{count}} moves)",
         "analyzing": "Analyzing…",
         "deep_analysis_failed": "Deep analysis failed, no AI worker may be available right now."
     },

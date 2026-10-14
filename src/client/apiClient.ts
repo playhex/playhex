@@ -675,8 +675,13 @@ export const apiRequestGameAnalyze = async (gamePublicId: string, apiBase: Analy
     return plainToInstance(GameAnalyze, await response.json());
 };
 
-export const apiRequestGameAnalyzeMoveMcts = async (gamePublicId: string, moveIndex: number, apiBase: AnalyzeApiBase = '/api/games'): Promise<void> => {
-    const response = await fetch(`${apiBase}/${gamePublicId}/analyze/moves/${moveIndex}/mcts`, {
+/**
+ * Request deep analyzes of a range of moves, clamped to game moves.
+ *
+ * @returns Moves being processed in this range, results will come with socket events.
+ */
+export const apiRequestGameAnalyzeMovesMcts = async (gamePublicId: string, from: number, to: number, apiBase: AnalyzeApiBase = '/api/games'): Promise<number[]> => {
+    const response = await fetch(`${apiBase}/${gamePublicId}/analyze/moves/mcts?from=${from}&to=${to}`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -684,6 +689,10 @@ export const apiRequestGameAnalyzeMoveMcts = async (gamePublicId: string, moveIn
     });
 
     await checkResponse(response);
+
+    const { moveIndexes } = await response.json() as { moveIndexes: number[] };
+
+    return moveIndexes;
 };
 
 export const apiGetGameRatingUpdates = async (gamePublicId: string, category: RatingCategory = 'overall'): Promise<null | Rating[]> => {

@@ -60,7 +60,74 @@ const requestDeepAnalyze = (): void => {
         return;
     }
 
-    void analyzeStore.requestMctsMoveAnalyze(props.gamePublicId, moveAnalyze.value.moveIndex);
+    void analyzeStore.requestMctsMovesAnalyze(props.gamePublicId, moveAnalyze.value.moveIndex, moveAnalyze.value.moveIndex);
+};
+
+/**
+ * Moves range selected by dragging on chart, to deeply analyze them all at once.
+ * Anchor is where drag started, end is last hovered move.
+ */
+const rangeAnchor = ref<null | number>(null);
+const rangeEnd = ref<null | number>(null);
+const isDragging = ref(false);
+
+/**
+ * Selected range, only if at least two moves are selected.
+ */
+const range = computed((): null | { from: number, to: number } => {
+    if (rangeAnchor.value === null || rangeEnd.value === null || rangeAnchor.value === rangeEnd.value) {
+        return null;
+    }
+
+    return {
+        from: Math.min(rangeAnchor.value, rangeEnd.value),
+        to: Math.max(rangeAnchor.value, rangeEnd.value),
+    };
+});
+
+const isInRange = (moveIndex: number): boolean => range.value !== null
+    && moveIndex >= range.value.from
+    && moveIndex <= range.value.to
+;
+
+const clearRange = (): void => {
+    rangeAnchor.value = null;
+    rangeEnd.value = null;
+};
+
+/**
+ * Moves of selected range that would be deeply analyzed.
+ */
+const rangeAnalyzableCount = computed((): number => {
+    if (range.value === null) {
+        return 0;
+    }
+
+    let count = 0;
+
+    for (let moveIndex = range.value.from; moveIndex <= range.value.to; ++moveIndex) {
+        const move = props.analyze[moveIndex];
+
+        if (move && !move.mcts && !isSpecialHexMove(move.move.move) && !analyzeStore.isMctsMoveAnalyzePending(props.gamePublicId, moveIndex)) {
+            ++count;
+        }
+    }
+
+    return count;
+});
+
+const canRequestRangeDeepAnalyze = computed((): boolean => props.deepAnalyzeEnabled
+    && loggedInPlayer.value !== null
+    && rangeAnalyzableCount.value > 0,
+);
+
+const requestRangeDeepAnalyze = (): void => {
+    if (range.value === null) {
+        return;
+    }
+
+    void analyzeStore.requestMctsMovesAnalyze(props.gamePublicId, range.value.from, range.value.to);
+    clearRange();
 };
 
 const toCssColor = (color: number): string => '#' + color.toString(16).padStart(6, '0');
@@ -140,7 +207,65 @@ const selectMove = (moveIndex: number): void => {
  * Show selected move info again, so it can be deeply analyzed.
  */
 const unhighlightMove = (): void => {
+    if (isDragging.value) {
+        return;
+    }
+
     highlightedIndex.value = selectedIndex.value;
+};
+
+/**
+ * Move under pointer, from its position on chart rather than hovered element,
+ * because pointer is captured while dragging, so other elements receive no event.
+ */
+const moveIndexAt = (event: PointerEvent): number => {
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const moveIndex = Math.floor((event.clientX - rect.left) / rect.width * props.analyze.length);
+
+    return Math.min(Math.max(moveIndex, 0), props.analyze.length - 1);
+};
+
+const onPointerDown = (event: PointerEvent): void => {
+    if (event.button !== 0) {
+        return;
+    }
+
+    const moveIndex = moveIndexAt(event);
+
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    isDragging.value = true;
+    rangeAnchor.value = moveIndex;
+    rangeEnd.value = moveIndex;
+    highlightMove(moveIndex);
+};
+
+const onPointerMove = (event: PointerEvent): void => {
+    const moveIndex = moveIndexAt(event);
+
+    if (isDragging.value) {
+        rangeEnd.value = moveIndex;
+    }
+
+    highlightMove(moveIndex);
+};
+
+/**
+ * Show last hovered move. Simple click: no range, same as before.
+ */
+const onPointerUp = (): void => {
+    if (!isDragging.value) {
+        return;
+    }
+
+    isDragging.value = false;
+
+    if (rangeEnd.value !== null) {
+        selectMove(rangeEnd.value);
+    }
+
+    if (range.value === null) {
+        clearRange();
+    }
 };
 
 // Show deep analyze marks on board once received for selected move.
@@ -200,19 +325,25 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="analyze-chart" :style="chartColors" @mouseleave="unhighlightMove()">
+    <div
+        class="analyze-chart"
+        :style="chartColors"
+        @pointerdown="onPointerDown"
+        @pointermove="onPointerMove"
+        @pointerup="onPointerUp()"
+        @pointercancel="onPointerUp()"
+        @pointerleave="unhighlightMove()"
+    >
         <div
             v-for="(move, moveIndex) in props.analyze"
             :key="moveIndex"
             class="move"
-            :class="{ highlighted: highlightedIndex === moveIndex }"
-            @mouseenter="highlightMove(moveIndex)"
-            @click="selectMove(moveIndex)"
+            :class="{ highlighted: highlightedIndex === moveIndex, 'in-range': isInRange(moveIndex) }"
         >
             <div v-if="null === displayedWhiteWin(move)" class="pending"></div>
             <div
                 class="bar"
-                :class="[barColorClass(displayedWhiteWin(move)), { background: hasMcts }]"
+                :class="[barColorClass(displayedWhiteWin(move)), { background: hasMcts, faint: !!move?.mcts }]"
                 :style="barStyle(displayedWhiteWin(move))"
             ></div>
             <div
@@ -246,7 +377,9 @@ onUnmounted(() => {
                 <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
                 {{ $t('game_analysis.analyzing') }}
             </span>
-            <button v-else-if="canRequestDeepAnalyze" type="button" class="btn btn-link btn-sm p-0 ms-1 align-baseline" @click="requestDeepAnalyze()">{{ $t('game_analysis.deep_analysis') }}</button>
+            <button v-else-if="canRequestDeepAnalyze && !range" type="button" class="btn btn-link btn-sm p-0 ms-1 align-baseline" @click="requestDeepAnalyze()">{{ $t('game_analysis.deep_analysis') }}</button>
+
+            <button v-if="canRequestRangeDeepAnalyze" type="button" class="btn btn-primary btn-sm py-0 px-1 ms-1 align-baseline" @click="requestRangeDeepAnalyze()">{{ $t('game_analysis.deep_analysis_moves', { count: rangeAnalyzableCount }) }}</button>
         </small>
     </div>
 </template>
@@ -256,11 +389,16 @@ onUnmounted(() => {
     display flex
     height 6em
     cursor pointer
+    user-select none
+    touch-action pan-y
 
     .move
         position relative
         flex 1 1 0
         min-width 0
+
+        &.in-range
+            background-color unquote('rgba(var(--bs-emphasis-color-rgb), 0.12)')
 
         &.highlighted
             outline 1px solid var(--bs-body-color)
@@ -281,6 +419,10 @@ onUnmounted(() => {
 
         &.background
             opacity 0.3
+
+            // Under deep analyze, only to compare
+            &.faint
+                opacity 0.12
 
     .pending
         position absolute
