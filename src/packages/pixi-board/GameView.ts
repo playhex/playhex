@@ -14,6 +14,7 @@ import { ResizeObserverDebounced } from './resize-observer-debounced/ResizeObser
 import { CellsMask } from './cells-mask/CellsMask.js';
 import { createCellsMaskGraphics } from './cells-mask/cellsMaskGraphics.js';
 import { computeBoardFit, FitDisc } from './boardFit.js';
+import { isAntialiasSupported } from './gpuQuirks.js';
 
 const { min, max, ceil, PI } = Math;
 const PI_6 = PI / 6;
@@ -372,9 +373,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         const resolution = ceil(window.devicePixelRatio); // passing devicePixelRatio * 2 here, and no longer need to double resolution of PIXI.Text
 
         await this.pixi.init({
-            // Antialias is useless on high density screens, already rendered at higher resolution.
-            // Also, resizing antialiased canvas froze GPU on some mobiles (Adreno 506), i.e when going fullscreen in landscape.
-            antialias: resolution < 2,
+            // Resizing antialiased canvas froze GPU on some mobiles (Adreno 506), i.e when going fullscreen in landscape.
+            antialias: isAntialiasSupported(),
             backgroundAlpha: 0,
             resolution,
             autoDensity: true,
