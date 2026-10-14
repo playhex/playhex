@@ -35,6 +35,11 @@ const props = defineProps<{
      * Collection to put created puzzle in.
      */
     collectionPublicId?: null | string;
+
+    /**
+     * Puzzle to copy when creating a new one.
+     */
+    clonedPuzzle: null | Puzzle;
 }>();
 
 const {
@@ -105,7 +110,7 @@ const {
     enableSolver,
     analysisLoading,
     analysisError,
-} = usePuzzleEditor(props.puzzle, props.sourceGame, props.collectionPublicId ?? null);
+} = usePuzzleEditor(props.puzzle, props.sourceGame, props.collectionPublicId ?? null, props.clonedPuzzle);
 
 /**
  * Game the puzzle is taken from, shown as "from this game".

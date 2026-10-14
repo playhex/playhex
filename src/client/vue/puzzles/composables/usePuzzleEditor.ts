@@ -95,12 +95,18 @@ const cleanNode = <T extends EditorNode>(node: T): T => {
  * @param puzzle Puzzle to edit, or null to create a new one
  * @param sourceGame Game to create puzzle from
  * @param initialCollectionPublicId Collection to put created puzzle in
+ * @param clonedPuzzle Puzzle to copy when creating a new one
  */
-export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, initialCollectionPublicId: null | string = null) => {
-    const step = ref<EditorStep>(puzzle === null ? 'position' : 'tree');
+export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, initialCollectionPublicId: null | string = null, clonedPuzzle: null | Puzzle = null) => {
+    /**
+     * Initial data: edited puzzle, or copied one.
+     */
+    const initial = puzzle ?? clonedPuzzle;
 
-    const title = ref(puzzle?.title ?? '');
-    const description = ref(puzzle?.description ?? '');
+    const step = ref<EditorStep>(initial === null ? 'position' : 'tree');
+
+    const title = ref(initial?.title ?? '');
+    const description = ref(initial?.description ?? '');
 
     /**
      * Collection to put puzzle in, null for none.
@@ -112,26 +118,26 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      * Saved state, changed only by saving.
      */
     const published = puzzle?.published ?? false;
-    const boardsize = ref(puzzle?.boardsize ?? sourceGame?.boardsize ?? DEFAULT_BOARDSIZE);
-    const redStones = ref<Move[]>(puzzle ? [...puzzle.redStones] : []);
-    const blueStones = ref<Move[]>(puzzle ? [...puzzle.blueStones] : []);
-    const disabledCells = ref<Move[]>(puzzle ? [...puzzle.disabledCells] : []);
-    const hideDisabledCells = ref(puzzle?.hideDisabledCells ?? false);
-    const lastMove = ref<null | Move>(puzzle?.lastMove ?? null);
-    const playerColor = ref<0 | 1>(puzzle?.playerColor ?? 0);
+    const boardsize = ref(initial?.boardsize ?? sourceGame?.boardsize ?? DEFAULT_BOARDSIZE);
+    const redStones = ref<Move[]>(initial ? [...initial.redStones] : []);
+    const blueStones = ref<Move[]>(initial ? [...initial.blueStones] : []);
+    const disabledCells = ref<Move[]>(initial ? [...initial.disabledCells] : []);
+    const hideDisabledCells = ref(initial?.hideDisabledCells ?? false);
+    const lastMove = ref<null | Move>(initial?.lastMove ?? null);
+    const playerColor = ref<0 | 1>(initial?.playerColor ?? 0);
     // toRaw: puzzle may come from a vue ref, and proxies cannot be cloned
-    const tree = ref<PuzzleNode>(puzzle ? structuredClone(toRaw(puzzle.tree)) : {});
+    const tree = ref<PuzzleNode>(initial ? structuredClone(toRaw(initial.tree)) : {});
 
     /**
      * Computer plays first move, only with alternatives enabled.
      */
-    const computerPlaysFirst = ref(puzzle?.computerPlaysFirst ?? false);
+    const computerPlaysFirst = ref(initial?.computerPlaysFirst ?? false);
 
     /**
      * Allows several computer answers, and computer playing first.
      * Not stored: enabled when puzzle uses them.
      */
-    const alternativesEnabled = ref(puzzle !== null && hasComputerAlternatives(puzzle.tree, puzzle.computerPlaysFirst));
+    const alternativesEnabled = ref(initial !== null && hasComputerAlternatives(initial.tree, initial.computerPlaysFirst));
 
     /**
      * Alternatives cannot be disabled while tree uses them.
@@ -169,8 +175,9 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
     /**
      * PlayHex game the created puzzle is taken from, shown as "from the game of...".
+     * Kept when cloning a puzzle.
      */
-    const gamePublicId = ref<null | string>(sourceGame?.publicId ?? null);
+    const gamePublicId = ref<null | string>(sourceGame?.publicId ?? clonedPuzzle?.game?.publicId ?? null);
 
     const sourceGameMovesCount = ref(positionSource.value?.moves.length ?? 0);
 

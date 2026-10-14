@@ -1059,6 +1059,8 @@
         "restart": "Recommencer",
         "hint": "Indice",
         "solution_in_hexplorer": "Solution dans Hexplorer",
+        "clone": "Cloner",
+        "clone_help": "Créer un nouveau puzzle à partir d'une copie de celui-ci",
         "list_title": "Puzzles",
         "loading_list": "Chargement des puzzles…",
         "no_puzzles": "Aucun puzzle pour le moment.",

@@ -11,7 +11,7 @@ import { puzzleToHexplorerAnalysis } from '../services/puzzleToHexplorer.js';
 import { validatePuzzle } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { apiGetNextPuzzle, apiPublishPuzzle } from '../../../apiClient.js';
 import { HEXPLORER_ANALYSIS_STATE_KEY } from '../../hexplorer/HexplorerState.js';
-import { IconAlphabet, IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowRight, IconCheck, IconCircleFill, IconDiagram2, IconLightbulb, IconPencilSquare, IconRepeat, IconSendFill, IconXLg } from '../../icons.js';
+import { IconAlphabet, IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowRight, IconCheck, IconCircleFill, IconCopy, IconDiagram2, IconLightbulb, IconPencilSquare, IconRepeat, IconSendFill, IconXLg } from '../../icons.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppPuzzleNextLink from './AppPuzzleNextLink.vue';
 import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
@@ -319,6 +319,14 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                         :aria-label="$t('toggle_coords')"
                         :title="$t('toggle_coords')"
                     ><IconAlphabet /> {{ $t('toggle_coords_short') }}</button>
+
+                    <!-- Create a new puzzle from a copy of this one -->
+                    <router-link
+                        v-if="loggedInPlayer"
+                        :to="{ name: 'puzzle-create', query: { clone: puzzle.publicId } }"
+                        class="btn btn-sm btn-outline-secondary"
+                        :title="$t('puzzles.clone_help')"
+                    ><IconCopy /> {{ $t('puzzles.clone') }}</router-link>
                 </div>
             </div>
 

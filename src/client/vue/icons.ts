@@ -48,6 +48,7 @@ export { default as IconCircleHalf } from '~icons/bi/circle-half';
 export { default as IconCollection } from '~icons/bi/collection';
 export { default as IconCrown } from '~icons/mdi/crown';
 export { default as IconCrosshair } from '~icons/bi/crosshair';
+export { default as IconCopy } from '~icons/bi/copy';
 export { default as IconDiagram2 } from '~icons/bi/diagram-2';
 export { default as IconDiscord } from '~icons/bi/discord';
 export { default as IconDot } from '~icons/bi/dot';

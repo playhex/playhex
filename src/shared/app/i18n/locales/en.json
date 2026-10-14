@@ -1074,6 +1074,8 @@
         "restart": "Restart",
         "hint": "Hint",
         "solution_in_hexplorer": "Solution in Hexplorer",
+        "clone": "Clone",
+        "clone_help": "Create a new puzzle from a copy of this one",
         "list_title": "Puzzles",
         "loading_list": "Loading puzzles…",
         "no_puzzles": "No puzzles yet.",

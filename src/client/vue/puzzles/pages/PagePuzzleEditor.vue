@@ -12,6 +12,7 @@ import AppPuzzleEditor from '../components/AppPuzzleEditor.vue';
 
 /*
  * Create a puzzle (/puzzles/new, optionally ?game=<publicId> to start from a game,
+ * or ?clone=<publicId> to start from a copy of a puzzle,
  * and ?collection=<publicId> to put it in a collection),
  * or edit an existing one (/puzzles/<publicId>/edit).
  */
@@ -21,6 +22,7 @@ const { loggedInPlayer } = storeToRefs(useAuthStore());
 
 const publicId = typeof route.params.publicId === 'string' ? route.params.publicId : null;
 const gamePublicId = typeof route.query.game === 'string' ? route.query.game : null;
+const clonePublicId = typeof route.query.clone === 'string' ? route.query.clone : null;
 const collectionPublicId = typeof route.query.collection === 'string' ? route.query.collection : null;
 
 useHead({
@@ -30,7 +32,7 @@ useHead({
 type LoadState =
     | { state: 'loading' }
     | { state: 'error', errorKey: string }
-    | { state: 'ready', puzzle: null | Puzzle, sourceGame: null | Game }
+    | { state: 'ready', puzzle: null | Puzzle, sourceGame: null | Game, clonedPuzzle: null | Puzzle }
 ;
 
 const load = ref<LoadState>({ state: 'loading' });
@@ -49,7 +51,7 @@ watch(loggedInPlayer, async player => {
         } else if (puzzle.author?.publicId !== player.publicId) {
             load.value = { state: 'error', errorKey: 'puzzles.editor.not_author' };
         } else {
-            load.value = { state: 'ready', puzzle, sourceGame: null };
+            load.value = { state: 'ready', puzzle, sourceGame: null, clonedPuzzle: null };
         }
 
         return;
@@ -63,13 +65,24 @@ watch(loggedInPlayer, async player => {
         } else if (!canCreatePuzzleFromGame(game)) {
             load.value = { state: 'error', errorKey: 'puzzles.editor.game_not_allowed' };
         } else {
-            load.value = { state: 'ready', puzzle: null, sourceGame: game };
+            load.value = { state: 'ready', puzzle: null, sourceGame: game, clonedPuzzle: null };
         }
 
         return;
     }
 
-    load.value = { state: 'ready', puzzle: null, sourceGame: null };
+    if (clonePublicId !== null) {
+        const clonedPuzzle = await apiGetPuzzle(clonePublicId);
+
+        load.value = clonedPuzzle === null
+            ? { state: 'error', errorKey: 'puzzles.not_found' }
+            : { state: 'ready', puzzle: null, sourceGame: null, clonedPuzzle }
+        ;
+
+        return;
+    }
+
+    load.value = { state: 'ready', puzzle: null, sourceGame: null, clonedPuzzle: null };
 }, { immediate: true });
 </script>
 
@@ -78,6 +91,7 @@ watch(loggedInPlayer, async player => {
         v-if="'ready' === load.state"
         :puzzle="load.puzzle"
         :sourceGame="load.sourceGame"
+        :clonedPuzzle="load.clonedPuzzle"
         :collectionPublicId
     />
 
