@@ -245,6 +245,29 @@ describe('tournamentUtils', () => {
             assert.strictEqual(tournament.participants[7].rank, 7);
         });
 
+        it('sets ranks in a tournament with 2 participants, without loser bracket', () => {
+            const notStarted = createTestTournament([
+                [0, 1, 1, 'a', 'b', null],
+                [0, 2, 1, null, null, null],
+            ]);
+
+            rankParticipantsDoubleElimination(notStarted);
+
+            assert.strictEqual(findParticipantByPlayerStrict(notStarted, createPlayer('a')).rank, 2);
+            assert.strictEqual(findParticipantByPlayerStrict(notStarted, createPlayer('b')).rank, 2);
+
+            const endedAfterReset = createTestTournament([
+                [0, 1, 1, 'a', 'b', 0],
+                [0, 2, 1, 'a', 'b', 1],
+                [0, 3, 1, 'b', 'a', 0],
+            ]);
+
+            rankParticipantsDoubleElimination(endedAfterReset);
+
+            assert.strictEqual(findParticipantByPlayerStrict(endedAfterReset, createPlayer('b')).rank, 1);
+            assert.strictEqual(findParticipantByPlayerStrict(endedAfterReset, createPlayer('a')).rank, 2);
+        });
+
         it('sets all ranks to the right one on an ended tournament', () => {
             const tournament = createTestTournament([
                 // hex monthly 28, 8 participants, ended. https://playhex.org/tournaments/hex-monthly-28

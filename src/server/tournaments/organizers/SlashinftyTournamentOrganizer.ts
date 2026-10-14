@@ -213,7 +213,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
      */
     private getFirstLoserBracketRound(toTournament: TOTournament): number
     {
-        // Get first match with no paths for loser and winner: this is final match.
+        // Get first match with no paths for loser and winner: this is grand final reset match.
         // Then return next round
         for (const match of toTournament.matches) {
             if (match.path.win === null && match.path.loss === null) {
@@ -244,6 +244,18 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         return [group, round, number];
     }
 
+    /**
+     * For double elimination: grand final reset is the only match without winner nor loser path.
+     * It is played only if the player coming from the losers bracket wins the grand final.
+     */
+    private isGrandFinalReset(toTournament: TOTournament, match: Match): boolean
+    {
+        return toTournament.stageOne.format === 'double-elimination'
+            && match.path.win === null
+            && match.path.loss === null
+        ;
+    }
+
     updateTournamentMatches(tournament: Tournament): void
     {
         const toTournament = this.getTournament(tournament);
@@ -268,6 +280,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         // Create new tournamentMatches for new matches
         for (const match of toTournament.matches) {
+            // Do not show grand final reset until we know it will be played
+            if (this.isGrandFinalReset(toTournament, match) && !match.player1.id && !match.player2.id) {
+                continue;
+            }
+
             const [group, round, number] = this.getGroupRoundNumber(toTournament, match);
             const tournamentMatch = tournamentMatches[group]?.[round - 1]?.[number - 1];
 
@@ -288,49 +305,39 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         const matchesById = this.getMatchesById(toTournament);
 
+        /**
+         * Path to the next tournament match, or null if there is no next match,
+         * or if it is not yet shown (grand final reset).
+         */
+        const getPath = (matchId: null | string): null | string => {
+            if (!matchId) {
+                return null;
+            }
+
+            const [group, round, number] = this.getGroupRoundNumber(toTournament, matchesById[matchId]);
+
+            if (!tournamentMatches[group]?.[round - 1]?.[number - 1]) {
+                return null;
+            }
+
+            return [group, round, number].join('.');
+        };
+
         // Create winner and loser paths
         for (const match of toTournament.matches) {
             const [group, round, number] = this.getGroupRoundNumber(toTournament, match);
-            const tournamentMatch = tournamentMatches[group][round - 1][number - 1];
-            const { win, loss } = match.path;
-
-            if (win) {
-                tournamentMatch.winnerPath = this.getGroupRoundNumber(toTournament, matchesById[win]).join('.');
-            } else {
-                tournamentMatch.winnerPath = null;
-            }
-
-            if (loss) {
-                tournamentMatch.loserPath = this.getGroupRoundNumber(toTournament, matchesById[loss]).join('.');
-            } else {
-                tournamentMatch.loserPath = null;
-            }
-        }
-
-        // Hack to handle second final match
-        const secondFinalMatch = this.createFinalSecondMatchIfNecessary(tournament, toTournament);
-
-        if (secondFinalMatch) {
-            const [group, round, number] = [0, secondFinalMatch.round, secondFinalMatch.match];
             const tournamentMatch = tournamentMatches[group]?.[round - 1]?.[number - 1];
 
             if (!tournamentMatch) {
-                setTournamentMatch(
-                    tournamentMatches,
-                    group,
-                    round,
-                    number,
-                    this.doCreateTournamentMatch(tournament, secondFinalMatch, group, round, number),
-                );
-
-                newTournamentMatchesAdded = true;
-            } else if (tournamentMatch.state === 'waiting') {
-                this.doUpdateTournamentMatch(tournament, tournamentMatch, secondFinalMatch);
+                continue;
             }
+
+            tournamentMatch.winnerPath = getPath(match.path.win);
+            tournamentMatch.loserPath = getPath(match.path.loss);
         }
 
         if (newTournamentMatchesAdded) {
-            this.updateTournamentMatchLabels(tournament);
+            this.updateTournamentMatchLabels(tournament, toTournament);
         }
 
         tournament.engineData = toTournament;
@@ -433,7 +440,7 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         return tournamentMatch;
     }
 
-    private updateTournamentMatchLabels(tournament: Tournament): void
+    private updateTournamentMatchLabels(tournament: Tournament, toTournament: TOTournament): void
     {
         if (tournament.stage1Format === 'single-elimination') {
             const [rounds] = groupAndSortTournamentMatches(tournament.matches);
@@ -459,9 +466,8 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         }
 
         if (tournament.stage1Format === 'double-elimination') {
-            const [winnerBracket, loserBracket] = groupAndSortTournamentMatches(tournament.matches);
+            const [winnerBracket, loserBracket = []] = groupAndSortTournamentMatches(tournament.matches);
 
-            // First, set "Match WB x.x" and LB to all matches
             for (const round of winnerBracket) {
                 for (const match of round) {
                     match.label = 'wb';
@@ -474,49 +480,20 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
                 }
             }
 
-            /**
-             * Will contains last winner bracket rounds from semi-final (the round containing 2 matches), included
-             */
-            const lastRounds: TournamentMatch[][] = [];
-            let i = winnerBracket.length - 1;
+            // Winner bracket ends with grand final, then grand final reset, then loser bracket starts
+            const grandFinalRoundIndex = this.getFirstLoserBracketRound(toTournament) - 3;
 
-            do {
-                lastRounds.unshift(winnerBracket[i]);
-                --i;
-            } while (lastRounds[0].length < 2 && i > -1);
-
-            const labels = [
-                'semi_final',
-                'winners_final',
-                'grand_final',
-                'grand_final_reset',
+            const labels: [number, string][] = [
+                [grandFinalRoundIndex - 2, 'semi_final'],
+                [grandFinalRoundIndex - 1, 'winners_final'],
+                [grandFinalRoundIndex, 'grand_final'],
+                [grandFinalRoundIndex + 1, 'grand_final_reset'],
             ];
 
-            let label;
-
-            // no loser bracket rounds means not enough participants for a semi final
-            if (loserBracket.length === 0) {
-                labels.shift();
-            }
-
-            label = labels.shift() ?? null;
-            for (const match of lastRounds[0]) {
-                match.label = label;
-            }
-
-            label = labels.shift() ?? null;
-            for (const match of lastRounds[1]) {
-                match.label = label;
-            }
-
-            label = labels.shift() ?? null;
-            for (const match of lastRounds[2]) {
-                match.label = label;
-            }
-
-            label = labels.shift() ?? null;
-            for (const match of lastRounds[3] ?? []) {
-                match.label = label;
+            for (const [roundIndex, label] of labels) {
+                for (const match of winnerBracket[roundIndex] ?? []) {
+                    match.label = label;
+                }
             }
 
             for (const match of loserBracket[loserBracket.length - 1] ?? []) {
@@ -631,144 +608,9 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
         sortAndRankParticipants(tournament.participants);
     }
 
-    /**
-     * For double elimination tournaments:
-     * whether we should add a second match in the grand final.
-     * i.e when tournament is finished in the engine, but in the final,
-     * both players lost once (so the winner comes from loser brackets).
-     */
-    private isSecondGrandFinalMatchNecessary(toTournament: TOTournament): boolean
-    {
-        if (toTournament.stageOne.format !== 'double-elimination') {
-            return false;
-        }
-
-        if (toTournament.status !== 'complete') {
-            return false;
-        }
-
-        logger.debug('Checking whether grand final reset is necessary...', { tournamentId: toTournament.id });
-
-        const finalMatch = toTournament.matches.find(({ path }) => !path.win && !path.loss);
-
-        if (!finalMatch) {
-            throw new TournamentEngineError('Unexpected no final match');
-        }
-
-        const { player1, player2 } = finalMatch;
-
-        if (!player1 || !player2) {
-            throw new TournamentEngineError('Unexpected missing a final player while engine tournament is over');
-        }
-
-        const players = [player1, player2].map(player => {
-            const p = toTournament.players.find(p => p.id === player.id);
-
-            if (!p) {
-                throw new TournamentEngineError('Player not found in list of player');
-            }
-
-            return p;
-        });
-
-        const lossesPlayer1 = players[0].matches.reduce((losses, match) => losses + match.loss, 0);
-        const lossesPlayer2 = players[1].matches.reduce((losses, match) => losses + match.loss, 0);
-
-        const isNecessary = lossesPlayer1 < 2 && lossesPlayer2 < 2;
-
-        logger.info('Grand final reset necessity result', {
-            tournamentId: toTournament.id,
-            player1Pseudo: players[0].name,
-            player2Pseudo: players[1].name,
-            player1Losses: lossesPlayer1,
-            player2Losses: lossesPlayer2,
-            isNecessary,
-        });
-
-        return isNecessary;
-    }
-
-    private getSecondGrandFinalTournamentMatch(tournament: Tournament): null | TournamentMatch
-    {
-        if (tournament.stage1Format !== 'double-elimination') {
-            throw new TournamentEngineError('Call getSecondGrandFinalTournamentMatch() but tournament is not double elim');
-        }
-
-        const [winnerBracket] = groupAndSortTournamentMatches(tournament.matches);
-
-        const lastRoundsMatches: TournamentMatch[] = [];
-        let i = winnerBracket.length - 1;
-
-        while (winnerBracket[i] && winnerBracket[i].length === 1) {
-            lastRoundsMatches.push(winnerBracket[i][0]);
-            --i;
-        }
-
-        // Only 2 matches: semi final and final. No second final.
-        if (lastRoundsMatches.length < 3) {
-            return null;
-        }
-
-        // 3 matches, last one is final.
-        return lastRoundsMatches[0];
-    }
-
-    /**
-     * Get list of engine tournament matches, with second final in grand final if necessary.
-     */
-    private createFinalSecondMatchIfNecessary(tournament: Tournament, toTournament: TOTournament): null | Match
-    {
-        // Hack to handle second final match
-        if (!this.isSecondGrandFinalMatchNecessary(toTournament)) {
-            return null;
-        }
-
-        const tournamentMatches = groupAndSortTournamentMatches(tournament.matches);
-        const secondFinal = this.getSecondGrandFinalTournamentMatch(tournament);
-        const finalMatch = this.findMatchFromTournamentMatch(toTournament, tournamentMatches[0][tournamentMatches[0].length - 1][0]);
-
-        if (!finalMatch) {
-            throw new TournamentEngineError('No final match found');
-        }
-
-        return {
-            id: toTournament.id + '-second-final',
-            active: secondFinal?.state === 'playing',
-            bye: false,
-            round: secondFinal?.round ?? tournamentMatches[0].length + 1,
-            match: 1,
-            path: { win: null, loss: null },
-            player1: {
-                ...finalMatch.player2,
-                win: 0,
-                loss: 0,
-            },
-            player2: {
-                ...finalMatch.player1,
-                win: 0,
-                loss: 0,
-            },
-            meta: {},
-            values: {},
-        };
-    }
-
     isFinished(tournament: Tournament): boolean
     {
-        const toTournament = this.getTournament(tournament);
-
-        // Hack to handle second final match
-        if (this.isSecondGrandFinalMatchNecessary(toTournament)) {
-            const secondFinal = this.getSecondGrandFinalTournamentMatch(tournament);
-
-            if (!secondFinal) {
-                return false;
-            }
-
-            return secondFinal.state === 'done';
-        }
-
-        return toTournament.status === 'complete';
+        return this.getTournament(tournament).status === 'complete';
     }
 
     private isMatchDone(match: Match): boolean
@@ -852,6 +694,11 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
             const childTournamentMatch = this.findTournamentMatchFromMatch(tournament, toTournament, childMatch);
 
             if (!childTournamentMatch) {
+                // Grand final reset not shown yet
+                if (this.isGrandFinalReset(toTournament, childMatch)) {
+                    return;
+                }
+
                 throw new Error(`Expected to have a tournament match for ${childMatch.round}.${childMatch.match}`);
             }
 

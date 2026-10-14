@@ -56,9 +56,10 @@ onBeforeUnmount(() => helpers.clearAllArrows());
         </div>
     </div>
 
-    <h2 class="mt-3">{{ $t('losers_bracket') }}</h2>
+    <!-- No loser bracket with 2 participants -->
+    <h2 v-if="loserRounds" class="mt-3">{{ $t('losers_bracket') }}</h2>
 
-    <div class="brackets-rounds has-arrows">
+    <div v-if="loserRounds" class="brackets-rounds has-arrows">
         <div
             v-for="round, i in loserRounds"
             :key="i"

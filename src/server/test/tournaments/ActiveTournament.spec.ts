@@ -8,7 +8,7 @@ import { NoopGameAccessor } from '../../tournaments/game-accessor/NoopGameAccess
 import { NoopAutoSave } from '../../auto-save/NoopAutoSave.js';
 import { getTournamentEngine } from '../../tournaments/organizers/getTournamentEngine.js';
 import { v4 as uuidv4 } from 'uuid';
-import { groupAndSortTournamentMatches } from '../../../shared/app/tournamentUtils.js';
+import { groupAndSortTournamentMatches, tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 
 class MockedOrganizer implements TournamentEngineInterface
 {
@@ -209,5 +209,55 @@ describe('ActiveTournament', () => {
             assert.strictEqual(rounds[0][0].state, 'playing', 'final has started');
             assert.ok(!matches.some(match => match.label === 'semi_final'), 'there is no semi final');
         });
+
+        for (const [participantsCount, expectedMatches] of [
+            [2, ['0.1.1 winners_final', '0.2.1 grand_final']],
+            [3, ['0.1.1 semi_final', '0.2.1 winners_final', '0.3.1 grand_final', '1.1.1 losers_final']],
+        ] as const) {
+            it(`can start a double elimination tournament with only ${participantsCount} participants`, async () => {
+                const tournament = createTournamentFromCreateInput({
+                    ...createTournamentDefaultsCreate(),
+                    title: 'Test',
+                    stage1Format: 'double-elimination',
+                    startOfficialAt: new Date(),
+                    startDelayInSeconds: -1,
+                });
+
+                tournament.subscriptions = Array(participantsCount).fill(null).map((_, i) => {
+                    const subscription = new TournamentSubscription();
+
+                    subscription.checkedIn = new Date();
+                    subscription.subscribedAt = new Date();
+                    subscription.tournament = tournament;
+
+                    subscription.player = new Player();
+                    subscription.player.publicId = uuidv4();
+                    subscription.player.pseudo = `Player ${i}`;
+                    subscription.player.slug = `player-${i}`;
+
+                    return subscription;
+                });
+
+                const activeTournament = new ActiveTournament(
+                    tournament,
+                    getTournamentEngine(tournament),
+                    new NoopGameAccessor(),
+                    new NoopAutoSave(tournament),
+                );
+
+                await activeTournament.init();
+
+                await activeTournament.startNow();
+
+                assert.strictEqual(tournament.state, 'running');
+
+                const matches = groupAndSortTournamentMatches(tournament.matches)
+                    .flatMap(group => group.flatMap(round => round.map(match => `${tournamentMatchKey(match)} ${match.label}`)))
+                ;
+
+                assert.deepStrictEqual(matches, expectedMatches, 'no grand final reset until needed');
+                assert.strictEqual(tournament.matches[0].state, 'playing', 'first match has started');
+            });
+        }
     });
 });

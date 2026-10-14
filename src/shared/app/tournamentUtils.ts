@@ -278,7 +278,8 @@ export const rankParticipantsDoubleElimination = (tournament: Tournament): void 
         participant.tiebreak = 0;
     }
 
-    const [winnerBracket, loserBracket] = groupAndSortTournamentMatches(tournament.matches);
+    // No loser bracket with 2 participants
+    const [winnerBracket, loserBracket = []] = groupAndSortTournamentMatches(tournament.matches);
     const grandFinal = winnerBracket[winnerBracket.length - 1][0];
 
     // Set 1st and 2nd ranks to grand final players
@@ -299,6 +300,9 @@ export const rankParticipantsDoubleElimination = (tournament: Tournament): void 
     }
 
     const eliminatedPlayersRanks = calculateRanksOfLosersBracketRounds(loserBracket);
+
+    // Rank of players eliminated in first round, or 2nd if there is no loser bracket
+    const lowestRank = eliminatedPlayersRanks[0] ?? 2;
 
     // Set definitive ranks to players who have been eliminated
     for (let roundIndex = loserBracket.length - 1; roundIndex >= 0; --roundIndex) {
@@ -348,10 +352,10 @@ export const rankParticipantsDoubleElimination = (tournament: Tournament): void 
     // Set scores relative to rank to keep their ranks in case we reorder them from scores
     for (const participant of tournament.participants) {
         if (participant.rank === undefined) {
-            participant.rank = eliminatedPlayersRanks[0];
+            participant.rank = lowestRank;
         }
 
-        participant.score = eliminatedPlayersRanks[0] - participant.rank + 1;
+        participant.score = lowestRank - participant.rank + 1;
         participant.tiebreak = 0;
     }
 };
