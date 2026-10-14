@@ -106,6 +106,7 @@ export default class TournamentRepository
             },
             where: {
                 series: { id: tournamentSeriesId },
+                hidden: false,
             },
             order: {
                 startOfficialAt: 'desc',
@@ -130,6 +131,7 @@ export default class TournamentRepository
             where: {
                 series: { id: tournamentSeriesId },
                 state: 'ended',
+                hidden: false,
             },
             order: {
                 startOfficialAt: 'desc',
@@ -194,6 +196,7 @@ export default class TournamentRepository
             },
             where: {
                 state: 'ended',
+                hidden: false,
             },
             order: {
                 endedAt: 'desc',

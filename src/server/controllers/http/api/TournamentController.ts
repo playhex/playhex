@@ -323,7 +323,15 @@ export default class TournamentController
 
         mustBeTournamentOrganizer(activeTournament.getTournament(), player);
 
-        await this.tournamentStore.cancelActiveTournament(activeTournament);
+        try {
+            await this.tournamentStore.cancelActiveTournament(activeTournament);
+        } catch (e) {
+            if (e instanceof TournamentError) {
+                throw new HttpError(409, e.message);
+            }
+
+            throw e;
+        }
     }
 
     @Put('/api/tournaments/:slug/admins')

@@ -339,6 +339,15 @@ export default class Tournament implements TimeControlBoardsize
     @Type(() => String)
     cancelReason: null | string;
 
+    /**
+     * Hidden by admin from tournament lists, e.g a test or spam tournament.
+     * Only for ended tournaments, which keep their state and results,
+     * and remain reachable by direct link.
+     * Backend only, not exposed.
+     */
+    @Column({ default: false })
+    hidden: boolean;
+
     @OneToMany(() => TournamentHistory, tournamentHistory => tournamentHistory.tournament, { cascade: true })
     @Expose()
     history: TournamentHistory[];
@@ -393,6 +402,7 @@ export const createTournamentDefaults = (): Tournament => {
     tournament.canceledAt = null;
     tournament.cancelReason = null;
     tournament.featuredFromInSeconds = 0;
+    tournament.hidden = false;
     tournament.engineData = null;
 
     return tournament;
@@ -457,6 +467,7 @@ export const createTournamentFromCreateInput = (input: Tournament): Tournament =
     tournament.canceledAt = null;
     tournament.cancelReason = null;
     tournament.featuredFromInSeconds = 0;
+    tournament.hidden = false;
     tournament.history = [];
 
     return tournament;

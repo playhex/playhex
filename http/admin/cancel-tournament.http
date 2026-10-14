@@ -1,7 +1,7 @@
 # Cancels a tournament. If tournament is currently playing,
 # all games are canceled first.
 
-@touramentSlug=ヘックス総当たり戦-日本大会
+@touramentSlug=test23452352
 
 DELETE /api/admin/tournaments/{{ touramentSlug }}
 Authorization: Bearer {{ adminPassword }}

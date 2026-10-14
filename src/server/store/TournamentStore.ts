@@ -13,6 +13,7 @@ import type { GameAccessorInterface } from '../tournaments/game-accessor/GameAcc
 import { GameAccessor } from '../tournaments/game-accessor/GameAccessor.js';
 import { AutoSave } from '../auto-save/AutoSave.js';
 import TournamentRepository from '../repositories/TournamentRepository.js';
+import { TournamentError } from '../tournaments/TournamentError.js';
 
 @Service()
 export default class TournamentStore
@@ -250,5 +251,32 @@ export default class TournamentStore
         await activeTournament.save();
 
         delete this.activeTournaments[tournament.publicId];
+    }
+
+    /**
+     * Hide an ended tournament from lists, e.g a test or spam tournament.
+     * Tournament keeps its ended state and results, and is still reachable by direct link.
+     *
+     * @throws {TournamentError} If tournament is not ended.
+     */
+    async hideEndedTournament(tournament: Tournament): Promise<void>
+    {
+        if (tournament.state !== 'ended') {
+            throw new TournamentError(`Cannot hide, tournament is not ended, but "${tournament.state}"`);
+        }
+
+        tournament.hidden = true;
+
+        const activeTournament = this.activeTournaments[tournament.publicId];
+
+        if (activeTournament) {
+            await activeTournament.save();
+
+            // Ended tournaments stay in memory and listed, remove it to hide it
+            delete this.activeTournaments[tournament.publicId];
+            return;
+        }
+
+        await this.save(tournament);
     }
 }

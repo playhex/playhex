@@ -13,6 +13,7 @@ import { GROUP_DEFAULT, instanceToPlain } from '../../../../shared/app/class-tra
 import { GameStaleEvaluator } from '../../../services/auto-cancel-stale-games/GameStaleEvaluator.js';
 import { AutoCancelStaleGames } from '../../../services/auto-cancel-stale-games/AutoCancelStaleGames.js';
 import { ROLE_ADMIN } from '../../../services/roles.js';
+import { TournamentError } from '../../../tournaments/TournamentError.js';
 
 class CreateAiVsAiInput
 {
@@ -188,19 +189,43 @@ export default class AdminController
         });
     }
 
+    /**
+     * Cancel tournament if upcoming or running,
+     * or only hide it if already ended (e.g test or spam tournament).
+     */
     @Delete('/api/admin/tournaments/:slug')
     async cancelTournament(
         @Param('slug') slug: string,
     ) {
-        const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
+        const tournament = await this.tournamentStore.findBySlug(slug);
 
-        if (activeTournament === null) {
-            throw new NotFoundError(`No active tournament "${slug}"`);
+        if (tournament === null) {
+            throw new NotFoundError(`No tournament "${slug}"`);
         }
 
-        await this.tournamentStore.cancelActiveTournament(activeTournament);
+        try {
+            if (tournament.state === 'ended') {
+                await this.tournamentStore.hideEndedTournament(tournament);
 
-        return instanceToPlain(activeTournament.getTournament());
+                return instanceToPlain(tournament);
+            }
+
+            const activeTournament = this.tournamentStore.getActiveTournamentBySlug(slug);
+
+            if (activeTournament === null) {
+                throw new HttpError(409, `Cannot cancel tournament "${slug}" in state "${tournament.state}"`);
+            }
+
+            await this.tournamentStore.cancelActiveTournament(activeTournament);
+
+            return instanceToPlain(activeTournament.getTournament());
+        } catch (e) {
+            if (e instanceof TournamentError) {
+                throw new HttpError(409, e.message);
+            }
+
+            throw e;
+        }
     }
 
     @Post('/api/admin/tournaments/:slug/iterate')
