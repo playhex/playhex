@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getNodeResult, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
+import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getComputerAnswers, getNodeResult, hasComputerAlternatives, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
 
 const noTransposition: NodeResolver = node => node;
 
@@ -148,8 +148,8 @@ describe('puzzleTree', () => {
         assert.strictEqual(validatePuzzle(createPuzzle({ lastMove: 'e1', playerColor: 1 })).length, 1, 'last move of player color, blue');
 
         assert.strictEqual(validatePuzzle(createPuzzle({
-            tree: { children: [{ move: 'c3', children: [{ move: 'b3' }, { move: 'b4' }] }] },
-        })).length, 1, 'computer has two answers');
+            tree: { children: [{ move: 'c3', result: 'solved', children: [{ move: 'b3', children: [{ move: 'd2', children: [{ move: 'b4' }, { move: 'd3' }] }] }] }] },
+        })).length, 1, 'computer has two answers in continuation');
 
         assert.strictEqual(validatePuzzle(createPuzzle({
             tree: { children: [{ move: 'c3', children: [{ move: 'c3' }] }] },
@@ -495,6 +495,90 @@ describe('puzzleTree', () => {
                 validatePuzzle(createPuzzle({ tree: tree(true) })),
                 [{ code: 'parallel_transposition', path: ['d2', 'b4', 'c3', 'b3'], params: { other: 'c3 b3 d2 b4' } }],
             );
+        });
+    });
+
+    describe('computer alternatives', () => {
+        const alternativesTree: PuzzleNode = {
+            children: [
+                {
+                    move: 'c3',
+                    children: [
+                        { move: 'b3', children: [{ move: 'b4' }] },
+                        { move: 'b4', children: [{ move: 'b3' }] },
+                    ],
+                },
+            ],
+        };
+
+        it('lists computer answers', () => {
+            const c3 = findChild(alternativesTree, 'c3')!;
+
+            assert.deepStrictEqual(getComputerAnswers(c3).map(node => node.move), ['b3', 'b4']);
+            assert.strictEqual(getComputerAnswer(c3)?.move, 'b3');
+            assert.deepStrictEqual(getComputerAnswers(findChild(getComputerAnswer(c3)!, 'b4')!), []);
+        });
+
+        it('accepts several computer answers', () => {
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: alternativesTree })), []);
+        });
+
+        it('requires all computer answers to be solvable', () => {
+            const unsolvable: PuzzleNode = {
+                children: [{ move: 'c3', children: [{ move: 'b3', children: [{ move: 'b4' }] }, { move: 'b4', result: 'failed' }] }],
+            };
+
+            assert.deepStrictEqual(findSolution(alternativesTree, noTransposition)?.map(node => node.move), ['c3', 'b3', 'b4']);
+            assert.strictEqual(findSolution(unsolvable, noTransposition), null);
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: unsolvable })), [{ code: 'no_solution' }]);
+        });
+
+        it('rejects alternatives in parallel sequences', () => {
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({
+                tree: {
+                    children: [{ move: 'c3', children: [{ move: 'b3', children: [{ move: 'b4' }] }] }],
+                    parallel: [{ children: [{ move: 'a1', children: [{ move: 'a2' }, { move: 'a3' }] }] }],
+                },
+            })).map(error => error.code), ['computer_one_answer']);
+        });
+
+        it('lets computer play first', () => {
+            const computerFirstTree: PuzzleNode = {
+                message: 'Blue plays',
+                children: [
+                    { move: 'c3', children: [{ move: 'b3' }] },
+                    { move: 'b3', children: [{ move: 'c3' }] },
+                ],
+            };
+
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: computerFirstTree, computerPlaysFirst: true })), []);
+            assert.deepStrictEqual(
+                findSolution(computerFirstTree, createNodeResolver(computerFirstTree), true)?.map(node => node.move),
+                ['c3', 'b3'],
+            );
+
+            // Else is a player choice, root is a computer answer
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({
+                tree: { children: [{ move: 'c3', children: [{ move: 'b3' }] }, { else: 'b3' }] },
+                computerPlaysFirst: true,
+            })).map(error => error.code), ['else_as_computer_answer']);
+
+            // A computer answer without solution
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({
+                tree: { children: [{ move: 'c3', children: [{ move: 'b3' }] }, { move: 'b3', result: 'failed' }] },
+                computerPlaysFirst: true,
+            })), [{ code: 'no_solution' }]);
+        });
+
+        it('checks last move color when computer plays first', () => {
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: { children: [{ move: 'c3', children: [{ move: 'b3' }] }] }, computerPlaysFirst: true, lastMove: 'a5' })), []);
+            assert.deepStrictEqual(validatePuzzle(createPuzzle({ tree: { children: [{ move: 'c3', children: [{ move: 'b3' }] }] }, computerPlaysFirst: true, lastMove: 'e1' })), [{ code: 'last_move_not_player', params: { move: 'e1' } }]);
+        });
+
+        it('detects alternatives usage', () => {
+            assert.strictEqual(hasComputerAlternatives(tree), false);
+            assert.strictEqual(hasComputerAlternatives(tree, true), true);
+            assert.strictEqual(hasComputerAlternatives(alternativesTree), true);
         });
     });
 });

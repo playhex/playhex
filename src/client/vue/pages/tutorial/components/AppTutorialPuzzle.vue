@@ -20,6 +20,7 @@ const emit = defineEmits<{
 const puzzle = Object.assign(new Puzzle(), {
     disabledCells: [],
     lastMove: null,
+    computerPlaysFirst: false,
     ...props.puzzle,
 });
 
@@ -28,11 +29,14 @@ const {
     status,
     messages,
     resultMessage,
+    alternativeMove,
     canUndo,
+    canRestart,
     canHint,
     undo,
     restart,
     hint,
+    nextAlternative,
 } = usePuzzle(puzzle);
 
 const gameViewElement = useTemplateRef('game-view-element');
@@ -63,8 +67,16 @@ watch(status, newStatus => {
 
             <div v-for="(message, index) in messages" :key="index" class="alert alert-info py-2 mb-2">{{ $t(message) }}</div>
 
-            <div v-if="'solved' === status" class="p-2 mb-2 rounded fw-bold text-bg-success"><IconCheck /> {{ resultMessage ? $t(resultMessage) : $t('puzzles.solved') }}</div>
+            <div v-if="'solved' === status || 'line_solved' === status" class="p-2 mb-2 rounded fw-bold text-bg-success">
+                <IconCheck /> {{ $t(resultMessage ?? ('solved' === status ? 'puzzles.solved' : 'puzzles.line_solved')) }}
+                <template v-if="'line_solved' === status && alternativeMove">
+                    <div>{{ $t('puzzles.alternative_question', { move: alternativeMove }) }}</div>
+                    <button class="btn btn-sm btn-light mt-1" @click="nextAlternative()">{{ $t('puzzles.see_alternative') }}</button>
+                </template>
+            </div>
             <div v-else-if="'failed' === status" class="p-2 mb-2 rounded fw-bold text-bg-danger"><IconXLg /> {{ resultMessage ? $t(resultMessage) : $t('puzzles.failed') }}</div>
+
+            <div v-if="alternativeMove && 'line_solved' !== status" class="alert alert-info py-2 mb-2">{{ $t('puzzles.alternative_question', { move: alternativeMove }) }}</div>
 
             <!-- e.g next puzzle button, before other buttons so it is not confused with restart once solved -->
             <slot name="actions"></slot>
@@ -80,7 +92,7 @@ watch(status, newStatus => {
                 <button
                     @click="restart()"
                     class="btn btn-sm btn-outline-warning"
-                    :disabled="!canUndo"
+                    :disabled="!canRestart"
                 ><IconRepeat /> {{ $t('puzzles.restart') }}</button>
 
                 <button

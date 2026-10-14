@@ -19,6 +19,12 @@ type PuzzleFile = {
     hideDisabledCells?: boolean;
     lastMove?: null | Move;
     playerColor: 'red' | 'blue';
+
+    /**
+     * Defaults to false
+     */
+    computerPlaysFirst?: boolean;
+
     tree: Puzzle['tree'];
 
     /**
@@ -53,6 +59,7 @@ export const readPuzzleFile = async (file: string): Promise<Puzzle> => {
     puzzle.hideDisabledCells = input.hideDisabledCells ?? false;
     puzzle.lastMove = input.lastMove ?? null;
     puzzle.playerColor = input.playerColor === 'red' ? 0 : 1;
+    puzzle.computerPlaysFirst = input.computerPlaysFirst ?? false;
     puzzle.tree = input.tree;
     puzzle.author = null;
     puzzle.game = null;

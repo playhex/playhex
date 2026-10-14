@@ -27,6 +27,7 @@ export const getPuzzleCheckKey = (puzzle: PuzzleDefinition, engine: PuzzleCheckE
         blueStones: [...puzzle.blueStones].sort(),
         disabledCells: [...puzzle.disabledCells ?? []].sort(),
         playerColor: puzzle.playerColor,
+        computerPlaysFirst: puzzle.computerPlaysFirst ?? false,
         tree: puzzle.tree,
     };
 

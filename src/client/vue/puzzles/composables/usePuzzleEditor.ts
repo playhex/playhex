@@ -4,7 +4,7 @@ import { coordsToMove, type Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
-import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findErrorNode, findSamePositionNode, findTranspositions, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleDefinition, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findErrorNode, findSamePositionNode, findTranspositions, getFirstColor, hasComputerAlternatives, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleDefinition, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterface.js';
@@ -29,6 +29,20 @@ const PLANNED_MOVES_GROUP = 'planned_moves';
 const SOLVER_MARKS_GROUP = 'solver_marks';
 const KATAHEX_CHECK_POLL_INTERVAL_MS = 2000;
 const AI_EVAL_COLOR = 0x22bb55;
+
+/**
+ * Letter of a planned move on board: A, B, C... for player choices,
+ * X, Y, Z, then W, V, U... backwards for computer answers.
+ */
+const getPlannedMoveLetter = (index: number, byComputer: boolean): string => {
+    if (!byComputer) {
+        return String.fromCharCode('A'.charCodeAt(0) + index);
+    }
+
+    return index < 3
+        ? String.fromCharCode('X'.charCodeAt(0) + index)
+        : String.fromCharCode('W'.charCodeAt(0) - (index - 3));
+};
 
 /**
  * Copy of the tree without vue proxies, empty messages and undefined values,
@@ -97,7 +111,38 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     // toRaw: puzzle may come from a vue ref, and proxies cannot be cloned
     const tree = ref<PuzzleNode>(puzzle ? structuredClone(toRaw(puzzle.tree)) : {});
 
+    /**
+     * Computer plays first move, only with alternatives enabled.
+     */
+    const computerPlaysFirst = ref(puzzle?.computerPlaysFirst ?? false);
+
+    /**
+     * Allows several computer answers, and computer playing first.
+     * Not stored: enabled when puzzle uses them.
+     */
+    const alternativesEnabled = ref(puzzle !== null && hasComputerAlternatives(puzzle.tree, puzzle.computerPlaysFirst));
+
+    /**
+     * Alternatives cannot be disabled while tree uses them.
+     */
+    const alternativesUsed = computed(() => hasComputerAlternatives(tree.value, computerPlaysFirst.value));
+
     const computerColor = computed<0 | 1>(() => playerColor.value === 0 ? 1 : 0);
+
+    /**
+     * Color of the first move from root.
+     */
+    const firstColor = computed(() => getFirstColor({ playerColor: playerColor.value, computerPlaysFirst: computerPlaysFirst.value }));
+
+    /**
+     * Color of the second move from root, also color of last move to reach initial position.
+     */
+    const secondColor = computed<0 | 1>(() => firstColor.value === 0 ? 1 : 0);
+
+    /**
+     * Stones where last move can be: the ones of the color not playing first.
+     */
+    const lastMoveStones = computed(() => secondColor.value === 0 ? redStones.value : blueStones.value);
 
     /*
      * Position from game
@@ -120,6 +165,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         disabledCells.value = disabledCells.value.filter(move => !position.redStones.includes(move) && !position.blueStones.includes(move));
         lastMove.value = position.lastMove ?? null;
         playerColor.value = position.playerColor;
+        // Game last move is an opponent stone, invalid when computer plays first
+        clearInvalidLastMove();
         redraw();
     };
 
@@ -204,7 +251,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     /**
      * Color of the next move from selected node.
      */
-    const nextColor = computed<0 | 1>(() => selectedMoveNodes.value.length % 2 === 0 ? playerColor.value : computerColor.value);
+    const nextColor = computed<0 | 1>(() => selectedMoveNodes.value.length % 2 === 0 ? firstColor.value : secondColor.value);
 
     /**
      * Whether selected node is in a parallel sequence, or is its root.
@@ -261,7 +308,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      */
     const selectedMoves = computed<ColoredMove[]>(() => selectedMoveNodes.value.map((node, index) => ({
         move: isElseNode(node) ? node.else : node.move!,
-        color: index % 2 === 0 && !isElseNode(node) ? playerColor.value : computerColor.value,
+        color: isElseNode(node) ? computerColor.value : index % 2 === 0 ? firstColor.value : secondColor.value,
     })));
 
     /**
@@ -463,8 +510,10 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
             return;
         }
 
-        // Computer has only one answer
-        if (nextColor.value === computerColor.value && node.children.length > 0) {
+        // Computer has only one answer, unless alternatives are enabled: not after the end, nor in parallel sequences
+        const canAddAlternative = alternativesEnabled.value && !isInContinuation.value && node.result === undefined && !isInParallel.value;
+
+        if (nextColor.value === computerColor.value && node.children.length > 0 && !canAddAlternative) {
             boardError.value = 'only_one_answer';
             return;
         }
@@ -558,8 +607,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
             return;
         }
 
-        // Last move must be an opponent stone
-        if ((computerColor.value === 0 ? redStones : blueStones).value.includes(move)) {
+        // Last move must be a stone of the color not playing first
+        if (lastMoveStones.value.includes(move)) {
             lastMove.value = lastMove.value === move ? null : move;
             redraw();
         }
@@ -570,15 +619,42 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redraw();
     };
 
-    const setPlayerColor = (color: 0 | 1): void => {
-        playerColor.value = color;
-
-        // Last move must stay an opponent stone
-        if (lastMove.value !== null && !(color === 0 ? blueStones : redStones).value.includes(lastMove.value)) {
+    /**
+     * Last move must stay a stone of the color not playing first.
+     */
+    const clearInvalidLastMove = (): void => {
+        if (lastMove.value !== null && !lastMoveStones.value.includes(lastMove.value)) {
             lastMove.value = null;
         }
+    };
 
+    const setPlayerColor = (color: 0 | 1): void => {
+        playerColor.value = color;
+        clearInvalidLastMove();
         redraw();
+    };
+
+    /**
+     * Cannot be changed once tree has moves, as their colors would change.
+     */
+    const canSetComputerPlaysFirst = computed(() => !tree.value.children?.length && !tree.value.parallel?.length);
+
+    const setComputerPlaysFirst = (value: boolean): void => {
+        if (!canSetComputerPlaysFirst.value || (value && !alternativesEnabled.value)) {
+            return;
+        }
+
+        computerPlaysFirst.value = value;
+        clearInvalidLastMove();
+        redraw();
+    };
+
+    const setAlternativesEnabled = (enabled: boolean): void => {
+        if (!enabled && alternativesUsed.value) {
+            return;
+        }
+
+        alternativesEnabled.value = enabled;
     };
 
     const setStep = (newStep: EditorStep): void => {
@@ -677,12 +753,11 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         }
 
         const plannedMoves = getPlannedMoves();
+        const byComputer = nextColor.value === computerColor.value;
         let index = 0;
 
         for (const move of plannedMoves) {
-            const letter = String.fromCharCode('A'.charCodeAt(0) + index++);
-
-            gameView.addEntity(new TextMark(letter).setCoords(move), PLANNED_MOVES_GROUP);
+            gameView.addEntity(new TextMark(getPlannedMoveLetter(index++, byComputer)).setCoords(move), PLANNED_MOVES_GROUP);
         }
 
         // Any other empty cell falls into "else" node, if any
@@ -881,6 +956,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         hideDisabledCells: hideDisabledCells.value,
         lastMove: lastMove.value,
         playerColor: playerColor.value,
+        computerPlaysFirst: computerPlaysFirst.value,
         tree: cleanNode(tree.value),
         published: publish,
         gamePublicId: puzzle === null ? sourceGame?.publicId ?? null : undefined,
@@ -956,19 +1032,19 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      */
 
     const toDefinition = (): PuzzleDefinition => {
-        const { title, description, boardsize, redStones, blueStones, disabledCells, lastMove, playerColor, tree } = toInput(published);
+        const { title, description, boardsize, redStones, blueStones, disabledCells, lastMove, playerColor, computerPlaysFirst, tree } = toInput(published);
 
-        return { title, description, boardsize, redStones, blueStones, disabledCells, lastMove, playerColor, tree };
+        return { title, description, boardsize, redStones, blueStones, disabledCells, lastMove, playerColor, computerPlaysFirst, tree };
     };
 
     /**
      * Changes when position or tree changes, to invalidate katahex check results.
      */
     const puzzleCheckKey = computed(() => {
-        const { boardsize, redStones, blueStones, disabledCells, playerColor, tree } = toDefinition();
+        const { boardsize, redStones, blueStones, disabledCells, playerColor, computerPlaysFirst, tree } = toDefinition();
 
         return JSON.stringify(
-            { boardsize, redStones, blueStones, disabledCells, playerColor, tree },
+            { boardsize, redStones, blueStones, disabledCells, playerColor, computerPlaysFirst, tree },
             (key, value: unknown) => key === 'message' ? undefined : value,
         );
     });
@@ -1109,6 +1185,13 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         hideDisabledCells,
         playerColor,
         setPlayerColor,
+        firstColor,
+        computerPlaysFirst,
+        canSetComputerPlaysFirst,
+        setComputerPlaysFirst,
+        alternativesEnabled,
+        alternativesUsed,
+        setAlternativesEnabled,
         lastMove,
         clearLastMove,
         positionTool,

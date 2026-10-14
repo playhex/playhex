@@ -94,6 +94,13 @@ export default class Puzzle
     playerColor: 0 | 1;
 
     /**
+     * Computer plays first move, see PuzzleDefinition.computerPlaysFirst.
+     */
+    @Column({ default: false })
+    @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
+    computerPlaysFirst: boolean;
+
+    /**
      * Decision tree, see puzzleTree.ts
      */
     @Column({ type: 'json' })

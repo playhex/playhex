@@ -93,6 +93,7 @@ const applyPuzzleInput = (puzzle: Puzzle, input: PuzzleInput): void => {
     puzzle.hideDisabledCells = input.hideDisabledCells === true;
     puzzle.lastMove = input.lastMove ?? null;
     puzzle.playerColor = input.playerColor;
+    puzzle.computerPlaysFirst = input.computerPlaysFirst === true;
     puzzle.tree = input.tree;
     setPublished(puzzle, input.published === true);
     puzzle.updatedAt = new Date();

@@ -4,9 +4,13 @@
  * A puzzle starts from an initial position (red and blue stones, not necessarily legal),
  * then the player and the computer play alternately, following the tree:
  *
- * - root: initial position, no move. Its children are the moves accepted from the player.
- * - player move node: its first child, if any, is the computer answer.
- *   Other children are not played.
+ * - root: initial position, no move. Its children are the moves accepted from the player,
+ *   or the computer answers when computer plays first (see PuzzleDefinition.computerPlaysFirst):
+ *   then root is like a player move node.
+ * - player move node: its children, if any, are the computer answers.
+ *   First one is played, others are alternatives: once player solved the line,
+ *   puzzle goes back and plays them, and player must also solve them.
+ *   Only one answer in a continuation or a parallel sequence.
  * - computer move node: its children are the moves accepted from the player.
  *
  * Reaching a node with `result`, or without children, ends the puzzle,
@@ -134,8 +138,20 @@ export type PuzzleDefinition = {
 
     lastMove?: null | Move;
     playerColor: 0 | 1;
+
+    /**
+     * Computer plays first move: root children are computer answers. Defaults to false.
+     */
+    computerPlaysFirst?: boolean;
+
     tree: PuzzleNode;
 };
+
+/**
+ * Color of the first move from root: computer color when computer plays first, else player color.
+ */
+export const getFirstColor = ({ playerColor, computerPlaysFirst }: Pick<PuzzleDefinition, 'playerColor' | 'computerPlaysFirst'>): 0 | 1 =>
+    computerPlaysFirst ? (playerColor === 0 ? 1 : 0) : playerColor;
 
 /**
  * Body sent to create or edit a puzzle.
@@ -184,12 +200,41 @@ export const findElseNode = (node: PuzzleNode): null | PuzzleElseNode => {
 };
 
 /**
- * Computer answer to the player move node, or null if no answer.
+ * Computer answers to the player move node: first one is played, others are alternatives.
+ * Empty if no answer.
  */
-export const getComputerAnswer = (playerMoveNode: PuzzleNode): null | PuzzleNode => {
-    const answer = playerMoveNode.children?.[0];
+export const getComputerAnswers = (playerMoveNode: PuzzleNode): PuzzleNode[] =>
+    playerMoveNode.children?.filter((child): child is PuzzleNode => !isElseNode(child)) ?? [];
 
-    return answer && !isElseNode(answer) ? answer : null;
+/**
+ * Computer answer played after the player move node, or null if no answer.
+ * See getComputerAnswers() for alternatives.
+ */
+export const getComputerAnswer = (playerMoveNode: PuzzleNode): null | PuzzleNode =>
+    getComputerAnswers(playerMoveNode)[0] ?? null;
+
+/**
+ * Whether puzzle uses computer alternative answers, or computer plays first.
+ * Continuations are ignored, they cannot have alternatives.
+ */
+export const hasComputerAlternatives = (tree: PuzzleNode, computerPlaysFirst = false): boolean => {
+    if (computerPlaysFirst) {
+        return true;
+    }
+
+    const walk = (node: PuzzleNode, isPlayerMove: boolean): boolean => {
+        if (node.result !== undefined) {
+            return false;
+        }
+
+        if (isPlayerMove && getComputerAnswers(node).length > 1) {
+            return true;
+        }
+
+        return node.children?.some(child => !isElseNode(child) && walk(child, !isPlayerMove)) ?? false;
+    };
+
+    return walk(tree, false);
 };
 
 /**
@@ -247,11 +292,13 @@ export type NodeResolver = (node: PuzzleNode) => PuzzleNode;
 
 /**
  * Nodes to reach from this node to solve the puzzle, player moves and computer answers,
- * following first winning player move at each step.
+ * following first winning player move at each step, and first computer answer.
+ * Computer alternative answers must also be solvable.
  * Returns empty list if node is already solved, or null if puzzle cannot be solved from this node.
  *
  * @param resolve To follow transpositions, see createNodeResolver()
- * @param isPlayerMove Whether this node is a player move, so computer answers next
+ * @param isPlayerMove Whether this node is a player move, so computer answers next.
+ *                     True for root when computer plays first.
  */
 export const findSolution = (originalNode: PuzzleNode, resolve: NodeResolver, isPlayerMove = false): null | PuzzleNode[] => {
     const node = resolve(originalNode);
@@ -261,13 +308,19 @@ export const findSolution = (originalNode: PuzzleNode, resolve: NodeResolver, is
         return result === 'solved' ? [] : null;
     }
 
-    const candidates: PuzzleNode[] = isPlayerMove
-        ? [getComputerAnswer(node)].filter(answer => answer !== null)
-        : node.children!.filter(child => !isElseNode(child))
-    ;
+    if (isPlayerMove) {
+        const answers = getComputerAnswers(node);
+        const solutions = answers.map(answer => findSolution(answer, resolve, false));
 
-    for (const child of candidates) {
-        const solution = findSolution(child, resolve, !isPlayerMove);
+        if (solutions.length === 0 || solutions.includes(null)) {
+            return null;
+        }
+
+        return [answers[0], ...solutions[0]!];
+    }
+
+    for (const child of node.children!.filter(c => !isElseNode(c))) {
+        const solution = findSolution(child, resolve, true);
 
         if (solution !== null) {
             return [child, ...solution];
@@ -503,6 +556,7 @@ export type PuzzleErrorCode =
     | 'invalid_stones'
     | 'empty_position'
     | 'last_move_not_opponent'
+    | 'last_move_not_player'
     | 'invalid_tree'
     | 'empty_tree'
     | 'no_solution'
@@ -774,11 +828,18 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
         errors.push({ code: 'empty_position', path: [] });
     }
 
-    if (puzzle.lastMove != null && checkMove(puzzle.lastMove)) {
-        const opponentStones = puzzle.playerColor === 0 ? puzzle.blueStones : puzzle.redStones;
+    const computerPlaysFirst = puzzle.computerPlaysFirst ?? false;
 
-        if (!opponentStones.includes(puzzle.lastMove)) {
-            errors.push({ code: 'last_move_not_opponent', params: { move: puzzle.lastMove } });
+    if (typeof computerPlaysFirst !== 'boolean') {
+        errors.push({ code: 'invalid_type', params: { property: 'computerPlaysFirst' } });
+    }
+
+    if (puzzle.lastMove != null && checkMove(puzzle.lastMove)) {
+        // Last move is from the color not playing first
+        const lastMoveStones = getFirstColor(puzzle) === 0 ? puzzle.blueStones : puzzle.redStones;
+
+        if (!lastMoveStones.includes(puzzle.lastMove)) {
+            errors.push({ code: computerPlaysFirst ? 'last_move_not_player' : 'last_move_not_opponent', params: { move: puzzle.lastMove } });
         }
     }
 
@@ -958,7 +1019,8 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
 
         const children: unknown[] = node.children;
 
-        if (isPlayerMove && children.length > 1) {
+        // Alternatives are played once line is solved: not after the end, nor in optional parallel sequences
+        if (isPlayerMove && children.length > 1 && (childrenEnded || location.parallel !== undefined)) {
             addError('computer_one_answer', location, { count: children.length });
         }
 
@@ -1028,7 +1090,7 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
         });
     };
 
-    checkNode(puzzle.tree, initialStones, { path: [] }, false, false, []);
+    checkNode(puzzle.tree, initialStones, { path: [] }, computerPlaysFirst === true, false, []);
 
     // Transposition would continue with other parallel sequences, not checked against continued subtree
     for (const { key, path, parallels } of leafPositions) {
@@ -1041,7 +1103,7 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
 
     if (!Array.isArray(puzzle.tree.children) || puzzle.tree.children.length === 0) {
         errors.push({ code: 'empty_tree' });
-    } else if (errors.length === 0 && !findSolution(puzzle.tree, createNodeResolver(puzzle.tree))?.length) {
+    } else if (errors.length === 0 && !findSolution(puzzle.tree, createNodeResolver(puzzle.tree), computerPlaysFirst === true)?.length) {
         // Only on a valid tree, findSolution() expects it. Likely forgot to set which moves solve the puzzle
         errors.push({ code: 'no_solution' });
     }

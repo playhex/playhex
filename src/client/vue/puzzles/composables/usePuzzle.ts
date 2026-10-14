@@ -2,13 +2,18 @@ import { CircleMark, GameMarksFacade, GameView } from '@playhex/pixi-board';
 import type { Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, shallowRef } from 'vue';
 import { Puzzle } from '../../../../shared/app/models/index.js';
-import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findSolution, getComputerAnswer, getNodeResult, getParallelNodeResult, isElseNode, type PuzzleElseNode, type PuzzleNode, type PuzzleResult } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findSolution, getComputerAnswer, getComputerAnswers, getFirstColor, getNodeResult, getParallelNodeResult, isElseNode, type PuzzleElseNode, type PuzzleNode, type PuzzleResult } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { createPuzzleCellsMask, drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 
 export type PuzzleStatus =
     'player_turn'
     | 'computer_turn'
+
+    /**
+     * Current line solved, but computer still has alternative answers to play.
+     */
+    | 'line_solved'
     | 'solved'
     | 'failed'
 ;
@@ -44,6 +49,18 @@ type PlayedMove = ColoredMove & TreeMove & {
 };
 
 /**
+ * Computer alternative answer, played once current line is solved.
+ */
+type PendingAlternative = {
+    /**
+     * Moves played before the alternative answer, up to the player move it answers.
+     */
+    prefix: PlayedMove[];
+
+    answer: PuzzleNode;
+};
+
+/**
  * Delay before computer answers, to let player see his move first.
  */
 const COMPUTER_ANSWER_DELAY_MS = 200;
@@ -59,10 +76,14 @@ const HINT_MARK_COLOR = 0x198754;
  * Play a puzzle: player plays on board, computer answers following puzzle tree.
  * Once ended, player can keep playing: computer answers if tree has an answer,
  * else player plays both colors.
+ * Once a line is solved, computer alternative answers are played, from the top of the line,
+ * and player must also solve them.
  */
 export const usePuzzle = (puzzle: Puzzle) => {
     const playerColor = puzzle.playerColor;
     const computerColor: 0 | 1 = playerColor === 0 ? 1 : 0;
+    const computerPlaysFirst = puzzle.computerPlaysFirst ?? false;
+    const firstColor = getFirstColor(puzzle);
 
     /*
      * GameView must not be a vue ref, see GameView.ts.
@@ -84,6 +105,38 @@ export const usePuzzle = (puzzle: Puzzle) => {
     const path = ref<PlayedMove[]>([]);
 
     const computerThinking = ref(false);
+
+    /**
+     * Alternative answers to play once current line is solved, first one next.
+     */
+    const pendingAlternatives = ref<PendingAlternative[]>([]);
+
+    /**
+     * Computer answers already played or queued, to queue each alternative once.
+     */
+    let discoveredAnswers = new Set<PuzzleNode>();
+
+    /**
+     * Alternatives state before current line was solved,
+     * restored when line is undone, as player may solve another line with other alternatives.
+     */
+    let beforeLineSolved: null | { pending: PendingAlternative[], discovered: Set<PuzzleNode> } = null;
+
+    /**
+     * Moves before this index cannot be undone: computer first move, or alternative answer being solved.
+     */
+    const initialLineStartIndex = computerPlaysFirst ? 1 : 0;
+    const lineStartIndex = ref(initialLineStartIndex);
+
+    /**
+     * Alternative answer being solved, null for main line.
+     */
+    const currentAlternative = ref<null | PuzzleNode>(null);
+
+    /**
+     * Number of the line being solved: 1 for main line, then incremented on each alternative.
+     */
+    const lineNumber = ref(1);
 
     /**
      * Computer answer about to be played.
@@ -155,9 +208,13 @@ export const usePuzzle = (puzzle: Puzzle) => {
 
     const treeState = computed(() => replay(path.value));
 
-    const nextColor = computed<0 | 1>(() => path.value.length % 2 === 0 ? playerColor : computerColor);
+    const nextColor = computed<0 | 1>(() => path.value.length % 2 === 0 ? firstColor : (firstColor === 0 ? 1 : 0));
 
     const status = computed<PuzzleStatus>(() => {
+        if (treeState.value.result === 'solved' && pendingAlternatives.value.length > 0) {
+            return 'line_solved';
+        }
+
         if (treeState.value.result !== null) {
             return treeState.value.result;
         }
@@ -188,8 +245,14 @@ export const usePuzzle = (puzzle: Puzzle) => {
      * Without ending node message, already shown in resultMessage.
      */
     const messages = computed<string[]>(() => {
+        // Root message stays until player plays, also when computer plays first
+        const rootMessages = puzzle.tree.message && path.value.every(({ byComputer }) => byComputer)
+            ? [puzzle.tree.message]
+            : []
+        ;
+
         if (path.value.length === 0) {
-            return puzzle.tree.message ? [puzzle.tree.message] : [];
+            return rootMessages;
         }
 
         let lastPlayerMoveIndex = path.value.length - 1;
@@ -199,11 +262,27 @@ export const usePuzzle = (puzzle: Puzzle) => {
         }
 
         // Set to show "else" node message once, it is on both player move and computer answer
-        return [...new Set(path.value.slice(lastPlayerMoveIndex).map(({ node }) => node))]
+        return [...rootMessages, ...[...new Set(path.value.slice(lastPlayerMoveIndex).map(({ node }) => node))]
             .filter(node => node !== treeState.value.resultNode)
             .map(getNodeMessage)
-            .filter((message): message is string => !!message)
-        ;
+            .filter((message): message is string => !!message),
+        ];
+    });
+
+    /**
+     * Computer alternative move to ask player about:
+     * next one once line is solved, or the one just played until player answers it.
+     */
+    const alternativeMove = computed<null | Move>(() => {
+        if (status.value === 'line_solved') {
+            return pendingAlternatives.value[0].answer.move!;
+        }
+
+        if (currentAlternative.value !== null && path.value.length <= lineStartIndex.value) {
+            return currentAlternative.value.move!;
+        }
+
+        return null;
     });
 
     /**
@@ -221,6 +300,50 @@ export const usePuzzle = (puzzle: Puzzle) => {
         } else {
             gameMarksFacade.markLastMove(lastMove);
         }
+    };
+
+    /**
+     * Once a line is solved, queues computer alternative answers met along it,
+     * from the top of the line.
+     */
+    const queueAlternatives = (): void => {
+        const { result, resultNode } = treeState.value;
+
+        if (result !== 'solved') {
+            return;
+        }
+
+        beforeLineSolved ??= { pending: [...pendingAlternatives.value], discovered: new Set(discoveredAnswers) };
+
+        let node: PuzzleNode = puzzle.tree;
+
+        for (const [index, playedMove] of path.value.entries()) {
+            if (playedMove.parallel !== null || playedMove.node === null || isElseNode(playedMove.node)) {
+                continue;
+            }
+
+            if (playedMove.byComputer) {
+                for (const answer of getComputerAnswers(resolve(node))) {
+                    if (!discoveredAnswers.has(answer) && answer !== playedMove.node) {
+                        pendingAlternatives.value.push({ prefix: path.value.slice(0, index), answer });
+                    }
+
+                    discoveredAnswers.add(answer);
+                }
+            }
+
+            if (playedMove.node === resultNode) {
+                break;
+            }
+
+            node = playedMove.node;
+        }
+    };
+
+    const pushMove = (playedMove: PlayedMove): void => {
+        path.value.push(playedMove);
+        queueAlternatives();
+        redraw();
     };
 
     const cancelPendingMove = (): void => {
@@ -246,8 +369,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
         pendingMoveTimeout = setTimeout(() => {
             pendingMoveTimeout = null;
             computerThinking.value = false;
-            path.value.push({ move, color: computerColor, ...treeMove, byComputer: true });
-            redraw();
+            pushMove({ move, color: computerColor, ...treeMove, byComputer: true });
         }, COMPUTER_ANSWER_DELAY_MS);
     };
 
@@ -279,8 +401,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
         const child = treeNode === null ? null : findChild(treeNode, move);
 
         if (child !== null) {
-            path.value.push({ move, color, node: child, parallel: null, byComputer: false });
-            redraw();
+            pushMove({ move, color, node: child, parallel: null, byComputer: false });
 
             const answer = color === playerColor ? getComputerAnswer(resolve(child)) : null;
 
@@ -296,8 +417,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
         if (parallelMove !== null) {
             const { node, parallel } = parallelMove;
 
-            path.value.push({ move, color, node, parallel, byComputer: false });
-            redraw();
+            pushMove({ move, color, node, parallel, byComputer: false });
 
             const answer = getComputerAnswer(node);
 
@@ -311,8 +431,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
         // Move not in tree: "else" node if any, else wrong move, or free move once ended
         const elseNode = treeNode === null || ended.value ? null : findElseNode(treeNode);
 
-        path.value.push({ move, color, node: elseNode, parallel: null, byComputer: false });
-        redraw();
+        pushMove({ move, color, node: elseNode, parallel: null, byComputer: false });
 
         if (elseNode !== null) {
             playComputerMove(elseNode.else, { node: elseNode, parallel: null });
@@ -329,11 +448,11 @@ export const usePuzzle = (puzzle: Puzzle) => {
             return;
         }
 
-        // Player to play is when an even number of moves have been played
-        let movesCount = path.value.length - path.value.length % 2;
+        // Player to play when an even number of moves have been played since line start
+        let movesCount = path.value.length - (path.value.length - lineStartIndex.value) % 2;
         let solution: null | PuzzleNode[] = null;
 
-        for (; movesCount >= 0; movesCount -= 2) {
+        for (; movesCount >= lineStartIndex.value; movesCount -= 2) {
             const { result, node } = replay(path.value.slice(0, movesCount));
 
             solution = result === null && node !== null ? findSolution(node, resolve) : null;
@@ -360,28 +479,83 @@ export const usePuzzle = (puzzle: Puzzle) => {
      * Cancel last player move, and computer answer, to try again from last position.
      */
     const undo = (): void => {
+        // Also when computer is about to play line first move
+        if (path.value.length <= lineStartIndex.value) {
+            return;
+        }
+
         cancelPendingMove();
 
-        while (path.value[path.value.length - 1]?.byComputer) {
+        while (path.value.length > lineStartIndex.value && path.value[path.value.length - 1].byComputer) {
             path.value.pop();
         }
 
-        path.value.pop();
+        if (path.value.length > lineStartIndex.value) {
+            path.value.pop();
+        }
+
+        if (beforeLineSolved !== null && treeState.value.result !== 'solved') {
+            pendingAlternatives.value = beforeLineSolved.pending;
+            discoveredAnswers = beforeLineSolved.discovered;
+            beforeLineSolved = null;
+        }
 
         redraw();
     };
 
+    /**
+     * Computer plays first move from root, if it plays first.
+     */
+    const playFirstComputerMove = (): void => {
+        const answer = computerPlaysFirst ? getComputerAnswer(puzzle.tree) : null;
+
+        if (answer !== null) {
+            playComputerMove(answer.move!, { node: answer, parallel: null });
+        }
+    };
+
+    /**
+     * Goes back to where next alternative answer is played, and plays it.
+     */
+    const nextAlternative = (): void => {
+        const alternative = pendingAlternatives.value.shift();
+
+        if (alternative === undefined) {
+            return;
+        }
+
+        cancelPendingMove();
+        beforeLineSolved = null;
+        path.value = [...alternative.prefix];
+        lineStartIndex.value = alternative.prefix.length + 1;
+        currentAlternative.value = alternative.answer;
+        ++lineNumber.value;
+        redraw();
+        playComputerMove(alternative.answer.move!, { node: alternative.answer, parallel: null });
+    };
+
+    /**
+     * Restarts whole puzzle, alternatives included.
+     */
     const restart = (): void => {
         cancelPendingMove();
         path.value = [];
+        pendingAlternatives.value = [];
+        discoveredAnswers = new Set();
+        beforeLineSolved = null;
+        lineStartIndex.value = initialLineStartIndex;
+        currentAlternative.value = null;
+        lineNumber.value = 1;
         redraw();
+        playFirstComputerMove();
     };
 
-    const hasSolution = findSolution(puzzle.tree, resolve) !== null;
+    const hasSolution = findSolution(puzzle.tree, resolve, computerPlaysFirst) !== null;
 
     gameView.on('hexClicked', move => playMove(move));
 
     redraw();
+    playFirstComputerMove();
 
     onUnmounted(() => {
         cancelPendingMove();
@@ -396,10 +570,14 @@ export const usePuzzle = (puzzle: Puzzle) => {
         nextColor,
         messages,
         resultMessage,
-        canUndo: computed(() => path.value.length > 0),
-        canHint: computed(() => hasSolution && !computerThinking.value && status.value !== 'solved'),
+        alternativeMove,
+        lineNumber,
+        canUndo: computed(() => path.value.length > lineStartIndex.value),
+        canRestart: computed(() => path.value.length > initialLineStartIndex || lineNumber.value > 1),
+        canHint: computed(() => hasSolution && !computerThinking.value && status.value !== 'solved' && status.value !== 'line_solved'),
         undo,
         restart,
         hint,
+        nextAlternative,
     };
 };

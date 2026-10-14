@@ -60,6 +60,7 @@ export default class PuzzleRepository
                 'puzzle.hideDisabledCells',
                 'puzzle.lastMove',
                 'puzzle.playerColor',
+                'puzzle.computerPlaysFirst',
                 'puzzle.published',
                 'puzzle.publishedAt',
                 'puzzle.createdAt',

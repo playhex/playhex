@@ -1,7 +1,7 @@
 import type { Move } from '@playhex/move-notation';
 import type { SolvePositionInput, SolvePositionOutput, SolveResult } from '../ai-jobs/protocol.js';
 import { solveCacheKey } from '../ai-jobs/PositionSolveCache.js';
-import { createNodeResolver, createParallelsFinder, findSolution, getComputerAnswer, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
+import { createNodeResolver, createParallelsFinder, findSolution, getComputerAnswers, getFirstColor, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
 import { SOLVER_CHILDREN_MAX_TIME_SECONDS, SOLVER_MAX_JOBS, type PuzzleCheckWarning, type PuzzleCheckWarningCode } from '../../shared/app/puzzles/puzzleCheck.js';
 import { createLimiter, getWinner, play, toColor, toSolveInput, type Position, type SolveClaim } from './puzzleCheckUtils.js';
 
@@ -37,6 +37,7 @@ export type PuzzleSolverCheckerOptions = {
  */
 export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: PuzzleSolverCheckerOptions): Promise<PuzzleCheckWarning[]> => {
     const { boardsize, playerColor, tree } = puzzle;
+    const computerPlaysFirst = puzzle.computerPlaysFirst ?? false;
     const disabledCells = puzzle.disabledCells ?? [];
     const player = toColor(playerColor);
     const opponent = toColor(playerColor === 0 ? 1 : 0);
@@ -185,7 +186,7 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
 
                 return [
                     ...(winning === null ? [] : [warn('solver_winning_move_rejected', path, { move }, winning.pv, index)]),
-                    ...(result === 'failed' ? [] : await checkComputerAnswer(child, childPath, childPosition)),
+                    ...(result === 'failed' ? [] : await checkComputerAnswers(child, childPath, childPosition)),
                 ];
             }
 
@@ -202,7 +203,7 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
 
             return [
                 ...(losing === null ? [] : [warn('solver_accepted_move_not_winning', childPath, { move }, losing.pv)]),
-                ...await checkComputerAnswer(child, childPath, childPosition),
+                ...await checkComputerAnswers(child, childPath, childPosition),
             ];
         };
 
@@ -215,9 +216,10 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
     };
 
     /**
-     * Computer to move, after player move node.
+     * Computer to move, after player move node, or on root when computer plays first.
+     * Checks all computer answers, alternatives included.
      */
-    const checkComputerAnswer = async (playerMoveNode: PuzzleNode, path: Move[], position: Position): Promise<PuzzleCheckWarning[]> => {
+    const checkComputerAnswers = async (playerMoveNode: PuzzleNode, path: Move[], position: Position): Promise<PuzzleCheckWarning[]> => {
         // Transposition leaf: continues from another node, checked there
         const node = resolve(playerMoveNode);
 
@@ -225,9 +227,13 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
             return [];
         }
 
-        const answer = getComputerAnswer(node);
+        const results = await Promise.all(getComputerAnswers(node).map(answer => checkComputerAnswer(answer, path, position)));
 
-        if (answer === null || answer.move === undefined || resolve(answer) !== answer) {
+        return results.flat();
+    };
+
+    const checkComputerAnswer = async (answer: PuzzleNode, path: Move[], position: Position): Promise<PuzzleCheckWarning[]> => {
+        if (answer.move === undefined || resolve(answer) !== answer) {
             return [];
         }
 
@@ -262,7 +268,7 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
     const initialPosition: Position = {
         red: puzzle.redStones,
         blue: puzzle.blueStones,
-        toMove: playerColor,
+        toMove: getFirstColor(puzzle),
     };
 
     /**
@@ -291,28 +297,46 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
     };
 
     const planComputerAnswer = (playerMoveNode: PuzzleNode, position: Position): void => {
-        const answer = getComputerAnswer(playerMoveNode);
-
-        if (resolve(playerMoveNode) !== playerMoveNode || answer === null || answer.move === undefined || resolve(answer) !== answer) {
+        if (resolve(playerMoveNode) !== playerMoveNode) {
             return;
         }
 
-        const answerPosition = play(position, answer.move);
-        const result = getNodeResult(answer);
+        for (const answer of getComputerAnswers(playerMoveNode)) {
+            if (answer.move === undefined || resolve(answer) !== answer) {
+                continue;
+            }
 
-        if (result === 'solved' && getWinner(boardsize, answerPosition) === null) {
-            knownKeys.add(solveKey(answerPosition, 'notWin', false));
-        } else if (result === null) {
-            planPlayerChoice(answer, answerPosition);
+            const answerPosition = play(position, answer.move);
+            const result = getNodeResult(answer);
+
+            if (result === 'solved' && getWinner(boardsize, answerPosition) === null) {
+                knownKeys.add(solveKey(answerPosition, 'notWin', false));
+            } else if (result === null) {
+                planPlayerChoice(answer, answerPosition);
+            }
         }
     };
 
-    planPlayerChoice(tree, initialPosition);
+    const initialEnded = getWinner(boardsize, initialPosition) !== null;
+
+    // Also planned by planPlayerChoice() when player plays first
+    if (!initialEnded) {
+        knownKeys.add(solveKey(initialPosition, 'notWin', true));
+    }
+
+    if (computerPlaysFirst) {
+        planComputerAnswer(tree, initialPosition);
+    } else {
+        planPlayerChoice(tree, initialPosition);
+    }
+
     options.onProgress?.(0, progressTotal());
 
     const [initialSolve, treeWarnings] = await Promise.all([
-        getWinner(boardsize, initialPosition) === null ? solve(initialPosition, 'notWin', true) : null,
-        checkPlayerChoice(tree, [], initialPosition),
+        initialEnded ? null : solve(initialPosition, 'notWin', true),
+        computerPlaysFirst
+            ? checkComputerAnswers(tree, [], initialPosition)
+            : checkPlayerChoice(tree, [], initialPosition),
     ]);
 
     const warnings: PuzzleCheckWarning[] = [];

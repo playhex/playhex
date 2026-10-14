@@ -11,7 +11,7 @@ import { puzzleToHexplorerAnalysis } from '../services/puzzleToHexplorer.js';
 import { validatePuzzle } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { apiGetNextPuzzle, apiPublishPuzzle } from '../../../apiClient.js';
 import { HEXPLORER_ANALYSIS_STATE_KEY } from '../../hexplorer/HexplorerState.js';
-import { IconAlphabet, IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconCheck, IconCircleFill, IconDiagram2, IconLightbulb, IconPencilSquare, IconRepeat, IconSendFill, IconXLg } from '../../icons.js';
+import { IconAlphabet, IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowRight, IconCheck, IconCircleFill, IconDiagram2, IconLightbulb, IconPencilSquare, IconRepeat, IconSendFill, IconXLg } from '../../icons.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppPuzzleNextLink from './AppPuzzleNextLink.vue';
 import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
@@ -30,11 +30,15 @@ const {
     nextColor,
     messages,
     resultMessage,
+    alternativeMove,
+    lineNumber,
     canUndo,
+    canRestart,
     canHint,
     undo,
     restart,
     hint,
+    nextAlternative,
 } = usePuzzle(props.puzzle);
 
 const gameViewElement = useTemplateRef('game-view-element');
@@ -130,17 +134,30 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                     </template>
 
                     <div
-                        v-if="'solved' === status && !dismissedBoardMessages.has('status')"
+                        v-if="('solved' === status || 'line_solved' === status) && !dismissedBoardMessages.has('status')"
                         class="py-1 px-2 mb-1 rounded fw-bold text-bg-success"
                         role="button"
                         @click="dismissBoardMessage('status')"
-                    ><IconCheck /> <span class="pre-line">{{ resultMessage ?? $t('puzzles.solved') }}</span></div>
+                    >
+                        <IconCheck /> <span class="pre-line">{{ resultMessage ?? $t('solved' === status ? 'puzzles.solved' : 'puzzles.line_solved') }}</span>
+                        <template v-if="'line_solved' === status && alternativeMove">
+                            <div>{{ $t('puzzles.alternative_question', { move: alternativeMove }) }}</div>
+                            <button class="btn btn-sm btn-light mt-1" @click.stop="nextAlternative()">{{ $t('puzzles.see_alternative') }}</button>
+                        </template>
+                    </div>
                     <div
                         v-else-if="'failed' === status && !dismissedBoardMessages.has('status')"
                         class="py-1 px-2 mb-1 rounded fw-bold text-bg-danger"
                         role="button"
                         @click="dismissBoardMessage('status')"
                     ><IconXLg /> <span class="pre-line">{{ resultMessage ?? $t('puzzles.failed') }}</span></div>
+
+                    <div
+                        v-if="alternativeMove && 'line_solved' !== status && !dismissedBoardMessages.has('alternative')"
+                        class="alert alert-info py-1 px-2 mb-1"
+                        role="button"
+                        @click="dismissBoardMessage('alternative')"
+                    >{{ $t('puzzles.alternative_question', { move: alternativeMove }) }}</div>
                 </div>
             </div>
 
@@ -149,7 +166,7 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                     <button
                         @click="restart()"
                         class="btn btn-outline-warning"
-                        :disabled="!canUndo"
+                        :disabled="!canRestart"
                         :title="$t('puzzles.restart')"
                         :aria-label="$t('puzzles.restart')"
                     ><IconRepeat /> <span class="d-none d-lg-inline">{{ $t('puzzles.restart') }}</span></button>
@@ -164,7 +181,7 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                 </div>
 
                 <!-- Already in sidebar when open -->
-                <AppPuzzleNextLink v-if="ended && !sidebarOpen" :puzzle :nextPuzzle />
+                <AppPuzzleNextLink v-if="ended && 'line_solved' !== status && !sidebarOpen" :puzzle :nextPuzzle />
 
                 <button
                     type="button"
@@ -241,12 +258,24 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                     <span v-else class="text-primary"><IconCircleFill /> {{ $t('game.blue') }}</span>
                 </p>
 
+                <p v-if="lineNumber > 1"><span class="badge text-bg-secondary">{{ $t('puzzles.line_number', { number: lineNumber }) }}</span></p>
+
                 <p v-if="'player_turn' === status" class="text-body-secondary">{{ $t('puzzles.your_turn') }}</p>
 
                 <div v-for="(message, index) in messages" :key="index" class="alert alert-info pre-line">{{ message }}</div>
 
-                <div v-if="'solved' === status" class="p-3 mb-3 rounded fw-bold text-bg-success"><IconCheck /> <span class="pre-line">{{ resultMessage ?? $t('puzzles.solved') }}</span></div>
+                <div v-if="'solved' === status || 'line_solved' === status" class="p-3 mb-3 rounded fw-bold text-bg-success">
+                    <IconCheck /> <span class="pre-line">{{ resultMessage ?? $t('solved' === status ? 'puzzles.solved' : 'puzzles.line_solved') }}</span>
+                    <template v-if="'line_solved' === status && alternativeMove">
+                        <div>{{ $t('puzzles.alternative_question', { move: alternativeMove }) }}</div>
+                        <div class="mt-2">
+                            <button class="btn btn-light" @click="nextAlternative()"><IconArrowRight /> {{ $t('puzzles.see_alternative') }}</button>
+                        </div>
+                    </template>
+                </div>
                 <div v-else-if="'failed' === status" class="p-3 mb-3 rounded fw-bold text-bg-danger"><IconXLg /> <span class="pre-line">{{ resultMessage ?? $t('puzzles.failed') }}</span></div>
+
+                <div v-if="alternativeMove && 'line_solved' !== status" class="alert alert-info fw-bold">{{ $t('puzzles.alternative_question', { move: alternativeMove }) }}</div>
 
                 <p v-if="ended" class="text-body-secondary">
                     {{ $t('puzzles.free_play') }}
@@ -267,7 +296,7 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                         class="btn btn-warning"
                     ><IconRepeat /> {{ $t('puzzles.restart') }}</button>
 
-                    <AppPuzzleNextLink v-if="ended" :puzzle :nextPuzzle />
+                    <AppPuzzleNextLink v-if="ended && 'line_solved' !== status" :puzzle :nextPuzzle />
                 </div>
 
                 <hr>

@@ -7,12 +7,13 @@
  * Parallel sequences are branches after children, with a dashed line and a "‖" root.
  * A result (solved or failed) is shown as a round node after the node ending puzzle.
  * Compact mode (zoomed out) shows smaller hexagons without coordinates.
+ * Computer alternative answers (not first answer) have a badge.
  */
 import { computed } from 'vue';
 import { filterMoveNodes, isElseNode, isParallelRoot, type PuzzleElseNode, type PuzzleError, type PuzzleNode, type PuzzleResult, type Transposition } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { translatePuzzleErrorMessage } from '../services/puzzleErrorMessage.js';
 import AppConditionalMoveButton from '../../components/AppConditionalMoveButton.vue';
-import { IconArrowReturnRight, IconChatRightText, IconCheck, IconPencilSquare, IconXLg } from '../../icons.js';
+import { IconArrowReturnRight, IconChatRightText, IconCheck, IconPencilSquare, IconSignpostSplit, IconXLg } from '../../icons.js';
 
 type EditorNode = PuzzleNode | PuzzleElseNode;
 
@@ -26,6 +27,16 @@ const props = defineProps<{
 
     selectedNode: EditorNode;
     playerColor: 0 | 1;
+
+    /**
+     * Color of the first move from root: computer color when computer plays first.
+     */
+    firstColor: 0 | 1;
+
+    /**
+     * Node is a computer alternative answer, played once line with first answer is solved.
+     */
+    alternative?: boolean;
 
     /**
      * Transposition by leaf, see findTranspositions().
@@ -54,13 +65,18 @@ const computerColor = computed(() => (1 - props.playerColor) as 0 | 1);
 const isParallelRootNode = computed(() => !isRoot.value && isParallelRoot(props.node));
 
 /**
- * Player moves at odd depth, computer answers at even depth.
+ * First color moves at odd depth, other color at even depth.
  * Parallel sequence roots are not moves, so not counted.
  */
 const playerIndex = computed<0 | 1>(() => filterMoveNodes(props.path).length % 2 === 1
-    ? props.playerColor
-    : computerColor.value,
+    ? props.firstColor
+    : (1 - props.firstColor) as 0 | 1,
 );
+
+/**
+ * Whether children are computer answers: this node is a player move, or root when computer plays first.
+ */
+const childrenByComputer = computed(() => playerIndex.value === props.playerColor);
 
 type Branch = {
     node: EditorNode;
@@ -136,6 +152,7 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
             <IconPencilSquare v-if="isRoot && !compact" class="root-icon" />
 
             <IconChatRightText v-if="node.message" class="node-badge message-badge" />
+            <IconSignpostSplit v-if="alternative" class="node-badge alternative-badge" />
         </button>
 
         <!-- Result: puzzle ends here, "else" node is always failed -->
@@ -176,6 +193,7 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
                 :path="[...path, branches[0].node]"
                 :selectedNode
                 :playerColor
+                :firstColor
                 :transpositions
                 :nodeErrors
                 :compact
@@ -193,6 +211,8 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
                         :path="[...path, branch.node]"
                         :selectedNode
                         :playerColor
+                        :firstColor
+                        :alternative="childrenByComputer && !branch.parallel && index > 0 && !isElseNode(branch.node)"
                         :transpositions
                         :nodeErrors
                         :compact
@@ -256,13 +276,16 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
 
 .node-badge
     position absolute
+    right -0.3rem
     font-size 0.55rem
+    color var(--bs-body-color)
     pointer-events none
 
 .message-badge
     bottom -0.1rem
-    right -0.3rem
-    color var(--bs-body-color)
+
+.alternative-badge
+    top -0.1rem
 
 .result-node
     position relative

@@ -199,6 +199,41 @@ describe('PuzzleKatahexChecker', () => {
         }]);
     });
 
+    it('checks all computer alternative answers, without comparing them to each other', async () => {
+        const tree = createTree();
+        (tree.children![0] as PuzzleNode).children!.push({ move: 'a2', children: [{ move: 'b4' }] });
+
+        const { analyze, calls } = createAnalyzer({
+            winrates: { ...baseWinrates, 'a2 c3': 0.3, 'a2 b4 c3': 0.2 },
+            policies: { c3: { a2: 0.6, b3: 0.3 } },
+        });
+
+        const warnings = await checkPuzzleWithKatahex(createPuzzle({ tree }), { analyze });
+
+        assert.deepStrictEqual(warnings, [{
+            code: 'katahex_solved_not_won',
+            path: ['c3', 'a2', 'b4'],
+            params: { winrate: 20 },
+        }]);
+        assert.ok(calls.includes('policy:a2 c3'), 'player choice after alternative is checked');
+    });
+
+    it('checks computer first move', async () => {
+        const warnings = await check(createPuzzle({
+            computerPlaysFirst: true,
+            tree: { children: [{ move: 'c3', children: [{ move: 'b3' }] }] },
+        }), {
+            winrates: { a2: 0.2 },
+            policies: { '': { a2: 0.6, c3: 0.3 } },
+        });
+
+        assert.deepStrictEqual(warnings, [{
+            code: 'katahex_computer_better_move',
+            path: ['c3'],
+            params: { move: 'c3', winrate: 10, best: 'a2', bestWinrate: 80 },
+        }]);
+    });
+
     it('checks else answer against most likely uncovered move', async () => {
         const tree = createTree();
         tree.children!.push({ else: 'd4' });

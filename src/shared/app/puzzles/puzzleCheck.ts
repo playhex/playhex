@@ -59,7 +59,7 @@ export type PuzzleCheckWarningCode =
      */
 
     /**
-     * Player loses in initial position, whatever move.
+     * Player loses in initial position, whatever move, or computer has a winning first move.
      */
     | 'solver_initial_not_winning'
 

@@ -114,6 +114,32 @@ describe('PuzzleSolverChecker', () => {
         assert.deepStrictEqual(calls.map(call => [...call.black, ...call.white].sort().join(' ')), ['e1', 'b3 c3 e1']);
     });
 
+    it('checks all computer alternative answers', async () => {
+        const tree = createTree();
+        (tree.children![0] as PuzzleNode).children!.push({ move: 'a2', children: [{ move: 'b4' }] });
+
+        const { solve, calls } = createSolver({ ...baseWinners, 'a2 b4 c3': 'black' });
+
+        assert.deepStrictEqual(await checkPuzzleWithSolver(createPuzzle({ tree }), { solve }), []);
+        assert.ok(calls.some(call => [...call.black, ...call.white].sort().join(' ') === 'a2 c3 e1'), 'player choice after alternative is solved');
+
+        assert.deepStrictEqual(await checkPuzzleWithSolver(createPuzzle({ tree }), { solve: createSolver(baseWinners).solve }), [
+            { code: 'solver_solved_not_won', path: ['c3', 'a2', 'b4'], params: {} },
+        ]);
+    });
+
+    it('checks computer first move', async () => {
+        const tree: PuzzleNode = { children: [{ move: 'c3', children: [{ move: 'b3' }] }] };
+        const { solve, calls } = createSolver({ '': 'black', 'b3 c3': 'black' });
+
+        assert.deepStrictEqual(await checkPuzzleWithSolver(createPuzzle({ tree, computerPlaysFirst: true }), { solve }), []);
+        assert.strictEqual(calls[0].color, 'white', 'computer to move in initial position');
+
+        assert.deepStrictEqual(await check(createPuzzle({ tree, computerPlaysFirst: true }), { '': 'white', 'b3 c3': 'black' }), [
+            { code: 'solver_initial_not_winning', path: [], params: {} },
+        ]);
+    });
+
     it('warns when initial position is lost', async () => {
         const warnings = await check(createPuzzle(), { '': { winner: 'white', pv: ['c3', 'b3'] } });
 

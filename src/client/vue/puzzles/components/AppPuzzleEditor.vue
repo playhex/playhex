@@ -13,7 +13,7 @@ import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconHexagonFill, IconInfoCircle, IconLightbulb, IconRobot, IconSave2, IconSendFill, IconShuffle, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconHexagonFill, IconInfoCircle, IconLightbulb, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { createKatahexAnalyzers, useAnalysisEngines } from '../../hexplorer/composables/useAnalysisEngines.js';
@@ -48,6 +48,13 @@ const {
     setBoardsize,
     playerColor,
     setPlayerColor,
+    firstColor,
+    computerPlaysFirst,
+    canSetComputerPlaysFirst,
+    setComputerPlaysFirst,
+    alternativesEnabled,
+    alternativesUsed,
+    setAlternativesEnabled,
     lastMove,
     clearLastMove,
     positionTool,
@@ -416,6 +423,33 @@ const deletePuzzle = async (): Promise<void> => {
                         </div>
                     </div>
 
+                    <!-- Expert mode, or when puzzle already uses it -->
+                    <div v-if="expertMode || alternativesEnabled" class="mb-3">
+                        <div class="form-check form-switch">
+                            <input
+                                id="puzzle-alternatives"
+                                class="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                :checked="alternativesEnabled"
+                                :disabled="alternativesEnabled && alternativesUsed"
+                                @change="e => setAlternativesEnabled((e.target as HTMLInputElement).checked)"
+                            >
+                            <label class="form-check-label" for="puzzle-alternatives"><IconSignpostSplit /> {{ $t('puzzles.editor.alternatives') }}</label>
+                        </div>
+                        <div class="form-text">{{ $t('puzzles.editor.alternatives_help') }}</div>
+                        <div v-if="alternativesEnabled && alternativesUsed" class="form-text">{{ $t('puzzles.editor.alternatives_used') }}</div>
+
+                        <div v-if="alternativesEnabled" class="mt-2">
+                            <div class="form-label">{{ $t('puzzles.editor.first_player') }}</div>
+                            <div class="btn-group">
+                                <button class="btn" :class="!computerPlaysFirst ? 'btn-secondary' : 'btn-outline-secondary'" :disabled="!canSetComputerPlaysFirst" @click="setComputerPlaysFirst(false)">{{ $t('puzzles.editor.first_move_player') }}</button>
+                                <button class="btn" :class="computerPlaysFirst ? 'btn-secondary' : 'btn-outline-secondary'" :disabled="!canSetComputerPlaysFirst" @click="setComputerPlaysFirst(true)">{{ $t('puzzles.editor.first_move_computer') }}</button>
+                            </div>
+                            <div v-if="!canSetComputerPlaysFirst" class="form-text">{{ $t('puzzles.editor.first_move_locked') }}</div>
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <div class="form-label">{{ $t('puzzles.editor.initial_position') }}</div>
                         <div class="btn-group flex-wrap">
@@ -522,6 +556,7 @@ const deletePuzzle = async (): Promise<void> => {
                                 :path="[]"
                                 :selectedNode
                                 :playerColor
+                                :firstColor
                                 :transpositions
                                 :nodeErrors
                                 :compact="expertMode && treeZoomedOut"

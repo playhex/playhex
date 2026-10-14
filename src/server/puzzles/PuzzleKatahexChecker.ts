@@ -1,6 +1,6 @@
 import { coordsToMove, type Move } from '@playhex/move-notation';
 import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../shared/app/hexplorer.js';
-import { createNodeResolver, createParallelsFinder, findElseNode, findSolution, getComputerAnswer, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
+import { createNodeResolver, createParallelsFinder, findElseNode, findSolution, getComputerAnswers, getFirstColor, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
 import { createLimiter, getWinner, play, type Position } from './puzzleCheckUtils.js';
 import { KATAHEX_COMPUTER_ALTERNATIVES, KATAHEX_COMPUTER_DELTA, KATAHEX_INITIAL_WIN_THRESHOLD, KATAHEX_MAX_PLAUSIBLE_MOVES, KATAHEX_MAX_POSITIONS, KATAHEX_PLAUSIBLE_POLICY_RATIO, KATAHEX_WIN_THRESHOLD, type PuzzleCheckWarning, type PuzzleCheckWarningCode } from '../../shared/app/puzzles/puzzleCheck.js';
 
@@ -45,6 +45,7 @@ const percent = (value: number): number => Math.round(value * 100);
  */
 export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: PuzzleKatahexCheckerOptions): Promise<PuzzleCheckWarning[]> => {
     const { boardsize, playerColor, tree } = puzzle;
+    const computerPlaysFirst = puzzle.computerPlaysFirst ?? false;
     const disabledCells = new Set(puzzle.disabledCells ?? []);
     const resolve: NodeResolver = createNodeResolver(tree);
     const findParallels = createParallelsFinder(tree);
@@ -165,11 +166,13 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     /**
      * Compares computer move to best computer moves by policy.
      *
+     * @param treeMoves Other computer answers in tree, not compared as they are already played as alternatives
+     *
      * @returns Player winrate after computer move, and warning params if a better move exists
      */
-    const checkComputerMove = async (position: Position, computerMove: Move): Promise<{ answerWinrate: null | number, warning: null | Record<string, string | number> }> => {
+    const checkComputerMove = async (position: Position, computerMove: Move, treeMoves: Move[] = []): Promise<{ answerWinrate: null | number, warning: null | Record<string, string | number> }> => {
         const alternatives = (await candidateMoves(position))
-            .filter(candidate => candidate.move !== computerMove)
+            .filter(candidate => candidate.move !== computerMove && !treeMoves.includes(candidate.move))
             .slice(0, KATAHEX_COMPUTER_ALTERNATIVES)
         ;
 
@@ -244,7 +247,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
                         ? [warn('katahex_winning_move_rejected', path, { move, winrate: percent(winrate) }, index)]
                         : []
                     ),
-                    ...await checkComputerAnswer(child, childPath, childPosition),
+                    ...await checkComputerAnswers(child, childPath, childPosition),
                 ];
             }
 
@@ -253,7 +256,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
                     ? [warn('katahex_accepted_move_not_winning', childPath, { move, winrate: percent(winrate) })]
                     : []
                 ),
-                ...await checkComputerAnswer(child, childPath, childPosition),
+                ...await checkComputerAnswers(child, childPath, childPosition),
             ];
         };
 
@@ -313,9 +316,10 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     };
 
     /**
-     * Computer to move, after player move node.
+     * Computer to move, after player move node, or on root when computer plays first.
+     * Checks all computer answers, alternatives included.
      */
-    const checkComputerAnswer = async (playerMoveNode: PuzzleNode, path: Move[], position: Position): Promise<PuzzleCheckWarning[]> => {
+    const checkComputerAnswers = async (playerMoveNode: PuzzleNode, path: Move[], position: Position): Promise<PuzzleCheckWarning[]> => {
         // Transposition leaf: continues from another node, checked there
         const node = resolve(playerMoveNode);
 
@@ -323,16 +327,23 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
             return [];
         }
 
-        const answer = getComputerAnswer(node);
+        const answers = getComputerAnswers(node);
+        const answerMoves = answers.flatMap(answer => answer.move === undefined ? [] : [answer.move]);
 
-        if (answer === null || answer.move === undefined) {
+        const results = await Promise.all(answers.map(answer => checkComputerAnswer(answer, answerMoves, path, position)));
+
+        return results.flat();
+    };
+
+    const checkComputerAnswer = async (answer: PuzzleNode, answerMoves: Move[], path: Move[], position: Position): Promise<PuzzleCheckWarning[]> => {
+        if (answer.move === undefined) {
             return [];
         }
 
         const answerPath = [...path, answer.move];
         const answerPosition = play(position, answer.move);
 
-        const { answerWinrate, warning } = await checkComputerMove(position, answer.move);
+        const { answerWinrate, warning } = await checkComputerMove(position, answer.move, answerMoves);
         const warnings: PuzzleCheckWarning[] = warning === null
             ? []
             : [warn('katahex_computer_better_move', answerPath, warning)]
@@ -364,7 +375,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     const initialPosition: Position = {
         red: puzzle.redStones,
         blue: puzzle.blueStones,
-        toMove: playerColor,
+        toMove: getFirstColor(puzzle),
     };
 
     /**
@@ -395,29 +406,44 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     };
 
     const planComputerAnswer = (playerMoveNode: PuzzleNode, position: Position): void => {
-        const answer = getComputerAnswer(playerMoveNode);
+        const answers = getComputerAnswers(playerMoveNode);
 
-        if (resolve(playerMoveNode) !== playerMoveNode || answer === null || answer.move === undefined) {
+        if (resolve(playerMoveNode) !== playerMoveNode || answers.length === 0) {
             return;
         }
 
-        const answerPosition = play(position, answer.move);
-
         knownKeys.add(analysisKey(position, 'policy'));
-        planValue(answerPosition);
 
-        if (resolve(answer) === answer && getNodeResult(answer) === null) {
-            planPlayerChoice(answer, answerPosition);
+        for (const answer of answers) {
+            if (answer.move === undefined) {
+                continue;
+            }
+
+            const answerPosition = play(position, answer.move);
+
+            planValue(answerPosition);
+
+            if (resolve(answer) === answer && getNodeResult(answer) === null) {
+                planPlayerChoice(answer, answerPosition);
+            }
         }
     };
 
     planValue(initialPosition);
-    planPlayerChoice(tree, initialPosition);
+
+    if (computerPlaysFirst) {
+        planComputerAnswer(tree, initialPosition);
+    } else {
+        planPlayerChoice(tree, initialPosition);
+    }
+
     options.onProgress?.(0, progressTotal());
 
     const [initialWinrate, treeWarnings] = await Promise.all([
         playerWinrate(initialPosition),
-        checkPlayerChoice(tree, [], initialPosition),
+        computerPlaysFirst
+            ? checkComputerAnswers(tree, [], initialPosition)
+            : checkPlayerChoice(tree, [], initialPosition),
     ]);
 
     const warnings: PuzzleCheckWarning[] = [];
