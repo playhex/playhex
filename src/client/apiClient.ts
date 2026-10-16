@@ -1746,7 +1746,7 @@ export const apiGetVideoMetadata = async (url: string): Promise<VideoMetadata> =
 };
 
 /**
- * Submit a video, will be listed once moderated.
+ * Submit a video, listed immediately.
  * Thumbnail is either an uploaded file, or an url the server will download.
  */
 export const apiPostVideo = async (input: VideoInput, thumbnail: { file: File } | { url: string }): Promise<Video> => {

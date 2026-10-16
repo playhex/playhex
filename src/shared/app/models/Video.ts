@@ -79,10 +79,10 @@ export default class Video
     submittedBy: null | Relation<Player>;
 
     /**
-     * Moderation result:
-     * null: pending, not yet moderated, not listed
-     * true: accepted, listed
-     * false: refused, not listed
+     * Whether video is listed:
+     * true: listed, set when submitted
+     * false: unlisted by moderation
+     * null: legacy, submitted when videos were moderated before being listed, not listed
      */
     @Column({ type: Boolean, nullable: true })
     @Expose({ groups: [GROUP_DEFAULT] })

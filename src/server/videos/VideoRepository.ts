@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
-import { IsNull, Repository } from 'typeorm';
-import { Player, Video } from '../../shared/app/models/index.js';
+import { Repository } from 'typeorm';
+import { Video } from '../../shared/app/models/index.js';
 
 @Service()
 export default class VideoRepository
@@ -25,14 +25,6 @@ export default class VideoRepository
     async existsByUrl(url: string): Promise<boolean>
     {
         return await this.videoRepository.existsBy({ url });
-    }
-
-    async countPendingBySubmitter(player: Player): Promise<number>
-    {
-        return await this.videoRepository.countBy({
-            accepted: IsNull(),
-            submittedBy: { id: player.id },
-        });
     }
 
     /**

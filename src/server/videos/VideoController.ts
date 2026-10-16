@@ -15,11 +15,6 @@ import { VideoMetadataUnavailableError, VideoNotFoundError } from './metadata/me
 import logger from '../services/logger.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 
-/**
- * Prevent a player to flood moderation queue.
- */
-const MAX_PENDING_VIDEOS_PER_PLAYER = 10;
-
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 2 * 1024 * 1024 },
@@ -112,7 +107,7 @@ export default class VideoController
     }
 
     /**
-     * Submit a video, will be listed once accepted by moderation.
+     * Submit a video, listed immediately. Can be unlisted from moderation.
      * Multipart, with either a "thumbnail" file, or a "thumbnailUrl" field.
      */
     @Post('/api/videos')
@@ -129,10 +124,6 @@ export default class VideoController
 
         if (await this.videoRepository.existsByUrl(input.url)) {
             throw new HttpError(409, 'This video has already been submitted');
-        }
-
-        if (await this.videoRepository.countPendingBySubmitter(player) >= MAX_PENDING_VIDEOS_PER_PLAYER) {
-            throw new HttpError(429, 'Too many videos waiting for moderation, try again later');
         }
 
         let thumbnailPath: string;
@@ -164,7 +155,7 @@ export default class VideoController
         video.keywords = input.keywords === '' ? null : input.keywords;
         video.thumbnailPath = thumbnailPath;
         video.submittedBy = player;
-        video.accepted = null;
+        video.accepted = true;
         video.moderatedAt = null;
 
         try {

@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useHead } from '@unhead/vue';
+import { useRouter } from 'vue-router';
 import { t } from 'i18next';
 import useAuthStore from '../../../stores/authStore.js';
 import { apiGetVideoMetadata, apiPostVideo } from '../../../apiClient.js';
@@ -16,6 +17,7 @@ useHead({
 });
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
+const router = useRouter();
 
 /*
  * Prefill from a video link
@@ -111,7 +113,6 @@ const prefill = async (): Promise<void> => {
  */
 const submitting = ref(false);
 const submitError = ref<null | string>(null);
-const submitted = ref(false);
 
 const durationSeconds = computed(() => parseVideoDuration(duration.value));
 
@@ -131,22 +132,6 @@ const hasThumbnail = computed(() => thumbnailMode.value === 'file'
 
 const canSubmit = computed(() => validateVideoInput(input.value).length === 0 && hasThumbnail.value && !submitting.value);
 
-const resetForm = (): void => {
-    url.value = '';
-    title.value = '';
-    authorName.value = '';
-    duration.value = '';
-    publishedAt.value = '';
-    keywords.value = '';
-    thumbnailUrl.value = '';
-    thumbnailFile.value = null;
-
-    if (thumbnailFilePreview.value !== null) {
-        URL.revokeObjectURL(thumbnailFilePreview.value);
-        thumbnailFilePreview.value = null;
-    }
-};
-
 const submit = async (): Promise<void> => {
     if (!canSubmit.value) {
         return;
@@ -163,9 +148,7 @@ const submit = async (): Promise<void> => {
                 : { url: thumbnailUrl.value },
         );
 
-        submitted.value = true;
-        resetForm();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        await router.push({ name: 'videos' });
     } catch (e) {
         submitError.value = apiErrorMessage(e);
     } finally {
@@ -187,14 +170,6 @@ const submit = async (): Promise<void> => {
             <router-link :to="{ name: 'login' }">{{ $t('log_in') }}</router-link>
             ·
             <router-link :to="{ name: 'signup' }">{{ $t('sign_up') }}</router-link>
-        </div>
-
-        <div v-else-if="submitted" class="alert alert-success">
-            <p>{{ $t('videos.submitted') }}</p>
-            <div class="d-flex flex-wrap gap-2">
-                <button type="button" class="btn btn-success" @click="submitted = false">{{ $t('videos.submit_another') }}</button>
-                <router-link :to="{ name: 'videos' }" class="btn btn-outline-secondary">{{ $t('videos.back_to_list') }}</router-link>
-            </div>
         </div>
 
         <template v-else>
