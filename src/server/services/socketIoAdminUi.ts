@@ -1,26 +1,21 @@
 import { instrument } from '@socket.io/admin-ui';
+import bcrypt from 'bcryptjs';
 import { Server } from 'socket.io';
+import { requireAdminUiCredentials } from './security/adminUiBasicAuth.js';
 
 const socketIoAdminUi = (io: Server): void => {
     if (process.env.SOCKET_IO_ADMIN_UI_ENABLED !== 'true') {
         return;
     }
 
-    const {
-        SOCKET_IO_ADMIN_UI_USER: username,
-        SOCKET_IO_ADMIN_UI_PASS: password,
-    } = process.env;
-
-    if (!username !== !password) {
-        throw new Error('SOCKET_IO_ADMIN_UI_USER and SOCKET_IO_ADMIN_UI_PASS must be either both set, or both unset.');
-    }
+    const { username, password } = requireAdminUiCredentials('socket.io admin UI');
 
     instrument(io, {
-        auth: username && password ? {
+        auth: {
             type: 'basic',
             username,
-            password,
-        } : false,
+            password: bcrypt.hashSync(password, 10), // admin ui expects a bcrypt hash
+        },
         mode: 'development',
     });
 };

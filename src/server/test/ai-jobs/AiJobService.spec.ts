@@ -20,24 +20,23 @@ const analyzeGameOutput = (input: AnalyzeGameInput): AnalyzeGameOutput =>
 ;
 
 describe('AiJobService', () => {
-    let nodeEnv: undefined | string;
+    let redisUrl: undefined | string;
     let aiJobService: AiJobService;
 
     beforeEach(() => {
         // Use in memory queue
-        nodeEnv = process.env.NODE_ENV;
-        process.env.NODE_ENV = 'development';
+        redisUrl = process.env.REDIS_URL;
+        delete process.env.REDIS_URL;
 
         aiJobService = new AiJobService(new AiWorkersRegistry());
     });
 
     afterEach(async () => {
+        aiJobService.stopEmbeddedWorkers();
         await aiJobService.queue.close();
 
-        if (nodeEnv === undefined) {
-            delete process.env.NODE_ENV;
-        } else {
-            process.env.NODE_ENV = nodeEnv;
+        if (redisUrl !== undefined) {
+            process.env.REDIS_URL = redisUrl;
         }
     });
 
@@ -143,7 +142,20 @@ describe('AiJobService', () => {
         assert.deepStrictEqual((await analyzingB)?.map(move => move?.move.move), ['d4', 'e5']);
     });
 
-    it('calculates davies moves locally in development', async () => {
+    it('calculates davies moves with embedded worker', async () => {
+        const daviesEmbeddedWorker = process.env.DAVIES_EMBEDDED_WORKER;
+        process.env.DAVIES_EMBEDDED_WORKER = 'true';
+        aiJobService.startEmbeddedWorkers();
+
+        if (daviesEmbeddedWorker === undefined) {
+            delete process.env.DAVIES_EMBEDDED_WORKER;
+        } else {
+            process.env.DAVIES_EMBEDDED_WORKER = daviesEmbeddedWorker;
+        }
+
+        // Let embedded worker wait for a job
+        await setImmediate();
+
         const move = await aiJobService.calculateMove({
             type: 'davies',
             data: { game: { size: 11, movesHistory: 'f6', currentPlayer: 'white', swapRule: false }, level: 1 },

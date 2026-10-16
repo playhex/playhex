@@ -1,11 +1,11 @@
 import { getBestMove, WHO_BLUE, WHO_RED } from 'davies-hex-ai';
-import type { LocalProcessor } from './InMemoryAiJobQueue.js';
+import type { EmbeddedProcessor } from './EmbeddedAiWorker.js';
 
 /**
- * Davies is lightweight and written in javascript,
- * so it can run in this process when there is no remote worker (development).
+ * Davies is lightweight (a few ms per move) and written in javascript,
+ * so it can run in this process, see EmbeddedAiWorker.
  */
-export const processDavies: LocalProcessor = task => {
+export const processDavies: EmbeddedProcessor = task => {
     if (task.type !== 'davies') {
         throw new Error(`Davies cannot process task "${task.type}"`);
     }

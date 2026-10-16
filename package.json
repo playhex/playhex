@@ -35,6 +35,8 @@
     "test": "pnpm test:unit"
   },
   "dependencies": {
+    "@bull-board/api": "^9.10.4",
+    "@bull-board/express": "^9.10.4",
     "@flystorage/file-storage": "^1.2.2",
     "@flystorage/local-fs": "^1.2.0",
     "@influxdata/influxdb3-client": "^2.4.0",

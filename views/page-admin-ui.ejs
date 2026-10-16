@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>PlayHex admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1">
+    <meta name="robots" content="noindex">
+    <style>
+        body {
+            margin: 0;
+            padding: 2em 1em;
+            font-family: sans-serif;
+            background-color: #212529;
+            color: #dee2e6;
+        }
+        main { max-width: 960px; margin: 0 auto; }
+        h1 { font-size: 1.6em; margin: 0 0 1em; }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1em;
+        }
+        .card {
+            display: block;
+            padding: 1em 1.2em;
+            border: 1px solid #495057;
+            border-radius: 0.5em;
+            background-color: #2b3035;
+            color: inherit;
+            text-decoration: none;
+        }
+        a.card:hover { border-color: #0d6efd; background-color: #343a40; }
+        .card h2 { font-size: 1.15em; margin: 0 0 0.4em; }
+        .card p { margin: 0.4em 0 0; line-height: 1.5; font-size: 0.95em; }
+        .card.disabled { opacity: 0.5; }
+        .card.disabled h2::after { content: ' (disabled)'; font-weight: normal; font-size: 0.8em; color: #adb5bd; }
+        code {
+            display: inline-block;
+            padding: 0.1em 0.4em;
+            border-radius: 0.25em;
+            background-color: #1a1d20;
+            color: #e685b5;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>PlayHex admin</h1>
+        <div class="cards">
+            <% for (const card of cards) { %>
+                <% if (card.enabled) { %>
+                    <a class="card" href="<%= card.url %>">
+                        <h2><%= card.name %></h2>
+                        <p><%= card.description %></p>
+                    </a>
+                <% } else { %>
+                    <div class="card disabled">
+                        <h2><%= card.name %></h2>
+                        <p><%= card.description %></p>
+                        <p>Add in .env: <code><%= card.envToEnable %></code></p>
+                    </div>
+                <% } %>
+            <% } %>
+        </div>
+    </main>
+</body>
+</html>

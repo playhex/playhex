@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, it } from 'mocha';
 import { MAX_ATTEMPTS, StaleJobTokenError, type AiJobInfo, type AiJobQueueInterface } from '../../ai-jobs/queue/AiJobQueueInterface.js';
 import InMemoryAiJobQueue from '../../ai-jobs/queue/InMemoryAiJobQueue.js';
 import BullMqAiJobQueue from '../../ai-jobs/queue/BullMqAiJobQueue.js';
+import EmbeddedAiWorker from '../../ai-jobs/worker/EmbeddedAiWorker.js';
 import type { AiTask } from '../../ai-jobs/protocol.js';
 
 const LOCK_MS = 600;
@@ -227,22 +228,40 @@ const testQueue = (name: string, createQueue: () => AiJobQueueInterface) => desc
     });
 });
 
-testQueue('InMemoryAiJobQueue', () => new InMemoryAiJobQueue({}, LOCK_MS));
+testQueue('InMemoryAiJobQueue', () => new InMemoryAiJobQueue(LOCK_MS));
 
-describe('InMemoryAiJobQueue local processors', () => {
-    it('processes jobs of a job type locally', async () => {
-        const queue = new InMemoryAiJobQueue({
-            davies: () => Promise.resolve('e5'),
-        });
-
+describe('EmbeddedAiWorker', () => {
+    it('processes jobs of its job types in this process', async () => {
+        const queue = new InMemoryAiJobQueue(LOCK_MS);
+        const worker = new EmbeddedAiWorker(queue, ['davies'], () => Promise.resolve('e5'));
         const events = collectEvents(queue);
+
+        worker.start();
+        await setTimeout(10); // let worker wait for a job
         await queue.submit({ type: 'davies', data: { game, level: 1 } }, { expiresAt: null });
         await setTimeout(10);
 
         assert.strictEqual(events.completed.length, 1);
         assert.strictEqual(events.completed[0][1], 'e5');
-        assert.strictEqual(await queue.reserve(['davies'], { waitMs: 0 }), null);
 
+        worker.stop();
+        await queue.close();
+    });
+
+    it('fails job when processor throws', async () => {
+        const queue = new InMemoryAiJobQueue(LOCK_MS);
+        const worker = new EmbeddedAiWorker(queue, ['davies'], () => Promise.reject(new Error('Cannot play')));
+        const events = collectEvents(queue);
+
+        worker.start();
+        await setTimeout(10); // let worker wait for a job
+        await queue.submit({ type: 'davies', data: { game, level: 1 } }, { expiresAt: null });
+        await setTimeout(10);
+
+        assert.strictEqual(events.failed.length, 1);
+        assert.strictEqual(events.failed[0][1], 'Cannot play');
+
+        worker.stop();
         await queue.close();
     });
 });

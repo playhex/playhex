@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@bull-board/api':
+        specifier: ^9.10.4
+        version: 9.10.4(@bull-board/ui@9.10.4(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1))))(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1)))
+      '@bull-board/express':
+        specifier: ^9.10.4
+        version: 9.10.4(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1)))
       '@flystorage/file-storage':
         specifier: ^1.2.2
         version: 1.2.2
@@ -591,6 +597,24 @@ packages:
 
   '@borewit/text-codec@0.2.2':
     resolution: {integrity: sha512-DDaRehssg1aNrH4+2hnj1B7vnUGEjU6OIlyRdkMd0aUdIUvKXrJfXsy8LVtXAy7DRvYVluWbMspsRhz2lcW0mQ==}
+
+  '@bull-board/api@9.10.4':
+    resolution: {integrity: sha512-DMI4FrNacQRmNsExF4kCXPE01sDiW2o0UgMxRsogFvcLphQIf3TgspiNFURag6CieMneJp2b/ba1TWPJu1Jnpw==}
+    peerDependencies:
+      '@bull-board/ui': 9.10.4
+      bull: ^4.16.5
+      bullmq: ^5.56.0 || ^6.0.0
+    peerDependenciesMeta:
+      bull:
+        optional: true
+      bullmq:
+        optional: true
+
+  '@bull-board/express@9.10.4':
+    resolution: {integrity: sha512-4vInwCI8x4V/xyxdfw5+vP9HukfYV+s40y/AhvuXyQ/2DJ0DHVDgGj0OuY9PzxTcXgYBQiH9HNYlPYHYpy6+Fg==}
+
+  '@bull-board/ui@9.10.4':
+    resolution: {integrity: sha512-eBg7LcIOR1WDZAZBs6l/eclvpnRD0H2PHTLmoMBBTTsbIHh45aCgfKeFMTIbUQ9mmNaHD6rR9vgcylWZ8TFOdg==}
 
   '@cacheable/memory@2.2.0':
     resolution: {integrity: sha512-CTLKqLItRCEixEAewD3/j9DB3/o96gpTPD4eJ1v+DGOlxZRZncRQkGYqqnAGCscYd6RNeXfGeiuCphsPtqyIfQ==}
@@ -4227,6 +4251,9 @@ packages:
     resolution: {integrity: sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w==}
     engines: {node: '>=4'}
 
+  redis-info@3.1.0:
+    resolution: {integrity: sha512-ER4L9Sh/vm63DkIE0bkSjxluQlioBiBgf5w1UuldaW/3vPcecdljVDisZhmnCMvsxHNiARTTDDHGg9cGwTfrKg==}
+
   redis@6.2.1:
     resolution: {integrity: sha512-Z9VHtgYs48PiQC77X9O2Er8Hj4T+5BtFjT91/vi5Is1D04N72cA946ZslM1ImJw8ZctFBZWAVjM7S5wJNeHMpg==}
     engines: {node: '>= 20.0.0'}
@@ -4870,6 +4897,14 @@ packages:
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
 
+  valibot@1.5.0:
+    resolution: {integrity: sha512-nil6AkP2TChWL43Z5uJ6GTxX01CUA+g8LWUM+N/rB9NBbkUMaUsi9PUNzlUPgoKASgmx9f7eGOYpJ04/fSa6FQ==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   validator@13.15.35:
     resolution: {integrity: sha512-TQ5pAGhd5whStmqWvYF4OjQROlmv9SMFVt37qoCBdqRffuuklWYQlCNnEs2ZaIBD1kZRNnikiZOS1eqgkar0iw==}
     engines: {node: '>= 0.10'}
@@ -5259,6 +5294,36 @@ snapshots:
       '@babel/helper-validator-identifier': 7.29.7
 
   '@borewit/text-codec@0.2.2': {}
+
+  '@bull-board/api@9.10.4(@bull-board/ui@9.10.4(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1))))(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1)))':
+    dependencies:
+      '@bull-board/ui': 9.10.4(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1)))
+      redis-info: 3.1.0
+      valibot: 1.5.0(@typescript/typescript6@6.0.2)
+    optionalDependencies:
+      bullmq: 6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1))
+    transitivePeerDependencies:
+      - typescript
+
+  '@bull-board/express@9.10.4(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1)))':
+    dependencies:
+      '@bull-board/api': 9.10.4(@bull-board/ui@9.10.4(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1))))(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1)))
+      '@bull-board/ui': 9.10.4(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1)))
+      ejs: 6.0.1
+      express: 5.2.1
+    transitivePeerDependencies:
+      - bull
+      - bullmq
+      - supports-color
+      - typescript
+
+  '@bull-board/ui@9.10.4(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1)))':
+    dependencies:
+      '@bull-board/api': 9.10.4(@bull-board/ui@9.10.4(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1))))(@typescript/typescript6@6.0.2)(bullmq@6.3.10(ioredis@6.0.0)(pg@8.23.0)(redis@6.2.1(@opentelemetry/api@1.9.1)))
+    transitivePeerDependencies:
+      - bull
+      - bullmq
+      - typescript
 
   '@cacheable/memory@2.2.0':
     dependencies:
@@ -8794,6 +8859,10 @@ snapshots:
 
   redis-errors@1.2.0: {}
 
+  redis-info@3.1.0:
+    dependencies:
+      lodash: 4.18.1
+
   redis@6.2.1(@opentelemetry/api@1.9.1):
     dependencies:
       '@redis/bloom': 6.2.1(@redis/client@6.2.1(@opentelemetry/api@1.9.1))
@@ -9489,6 +9558,10 @@ snapshots:
   uuid@14.0.2: {}
 
   v8-compile-cache-lib@3.0.1: {}
+
+  valibot@1.5.0(@typescript/typescript6@6.0.2):
+    optionalDependencies:
+      typescript: '@typescript/typescript6@6.0.2'
 
   validator@13.15.35: {}
 

@@ -22,11 +22,6 @@ type InMemoryJob = AiJobInfo & {
 const settle = <T>(callback: () => T): Promise<T> => new Promise(resolve => resolve(callback()));
 
 /**
- * Process a task directly in this process, instead of waiting for a remote worker.
- */
-export type LocalProcessor = (task: AiTask) => Promise<unknown>;
-
-/**
  * Queue kept in memory, used when there is no redis (development).
  * Jobs are lost on restart.
  */
@@ -37,20 +32,12 @@ export default class InMemoryAiJobQueue extends AbstractAiJobQueue
     private lastJobId = 0;
 
     /**
-     * @param localProcessors Jobs of these types are processed directly in this process,
-     *                        no need to run a worker (i.e davies, which is lightweight).
      * @param lockMs Lock duration, can be lowered for tests.
      */
     constructor(
-        private localProcessors: Partial<Record<AiJobType, LocalProcessor>> = {},
         private lockMs = LOCK_MS,
     ) {
         super();
-    }
-
-    hasLocalProcessor(type: AiJobType): boolean
-    {
-        return type in this.localProcessors;
     }
 
     submit(task: AiTask, { expiresAt, meta }: SubmitOptions): Promise<string>
@@ -68,33 +55,10 @@ export default class InMemoryAiJobQueue extends AbstractAiJobQueue
                 lock: null,
             });
 
-            const localProcessor = this.localProcessors[task.type];
-
-            if (localProcessor) {
-                // Let caller listen to job result before processing it
-                setImmediate(() => void this.processLocally(localProcessor, task.type));
-            } else {
-                this.notifyAvailable(task.type);
-            }
+            this.notifyAvailable(task.type);
 
             return jobId;
         });
-    }
-
-    private async processLocally(localProcessor: LocalProcessor, type: AiJobType): Promise<void>
-    {
-        const reserved = await this.tryReserve(type);
-
-        if (reserved === null) {
-            return;
-        }
-
-        try {
-            await this.complete(reserved.jobId, reserved.token, await localProcessor(reserved.task));
-        } catch (e) {
-            logger.error('Error while processing AI job locally', { jobId: reserved.jobId, type, message: e?.message });
-            await this.fail(reserved.jobId, reserved.token, e?.message ?? String(e), false).catch(() => {});
-        }
     }
 
     cancel(jobId: string): Promise<boolean>

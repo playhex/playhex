@@ -3,7 +3,8 @@ import type { AiJobInfo, AiJobQueueInterface } from './queue/AiJobQueueInterface
 import BullMqAiJobQueue from './queue/BullMqAiJobQueue.js';
 import InMemoryAiJobQueue from './queue/InMemoryAiJobQueue.js';
 import AiWorkersRegistry from './worker/AiWorkersRegistry.js';
-import { processDavies } from './queue/localProcessors.js';
+import EmbeddedAiWorker from './worker/EmbeddedAiWorker.js';
+import { processDavies } from './worker/embeddedProcessors.js';
 import { consolidateGameAnalyze, hasSwapMove, splitToAnalyzeMoveInputs, type AnalyzeGameRequest } from './gameAnalyze.js';
 import type { AiJobType, AiTask, AnalyzeGameOutput, AnalyzeMoveInput, AnalyzeMoveOutput, AnalyzePositionInput, AnalyzePositionOutput, MoveOutput, MoveTask, SolvePositionInput, SolvePositionOutput } from './protocol.js';
 import { MCTS_PLAYOUTS } from '../../shared/app/mctsSettings.js';
@@ -84,24 +85,27 @@ const checkTask = (task: MoveTask): void => {
 export const getAiJobsRedisPrefix = (): string => (process.env.REDIS_PREFIX ?? 'hex') + '-ai-jobs';
 
 /**
- * In production, jobs are kept in redis, with bullmq handling locks and stalled jobs.
- * In development, jobs are kept in memory, and davies moves are calculated locally, without worker.
+ * Whether AI jobs are kept in redis with bullmq, or in memory.
+ */
+export const isAiJobQueuePersisted = (): boolean => !!process.env.REDIS_URL;
+
+/**
+ * When redis is configured, jobs are kept in redis, with bullmq handling locks and stalled jobs.
+ * Else jobs are kept in memory, so redis is not required in development.
  *
  * Only works with a single hex instance: job results are emitted in the process that received them,
  * connected workers are tracked in memory, and waiting jobs are drained on start.
  */
 export const createAiJobQueue = (): AiJobQueueInterface => {
-    const { NODE_ENV, REDIS_URL } = process.env;
+    const { REDIS_URL } = process.env;
 
-    if (NODE_ENV === 'production' && REDIS_URL) {
+    if (REDIS_URL) {
         return new BullMqAiJobQueue(REDIS_URL, getAiJobsRedisPrefix());
     }
 
-    logger.info('AI jobs are kept in memory. Davies moves are calculated locally, other engines need a worker.');
+    logger.info('AI jobs are kept in memory.');
 
-    return new InMemoryAiJobQueue({
-        davies: processDavies,
-    });
+    return new InMemoryAiJobQueue();
 };
 
 type PendingJob = {
@@ -132,6 +136,11 @@ export default class AiJobService
      * Jobs are submitted only after, else they would be drained.
      */
     private ready: Promise<void> = Promise.resolve();
+
+    /**
+     * Workers running in this process, see startEmbeddedWorkers().
+     */
+    private embeddedWorkers: EmbeddedAiWorker[] = [];
 
     /**
      * @param aiWorkersRegistry Connected workers, to know which job types can be processed now.
@@ -171,12 +180,39 @@ export default class AiJobService
     }
 
     /**
+     * To call on server start, after init().
+     * Davies is lightweight, so it can be processed in this process instead of running a worker for it.
+     */
+    startEmbeddedWorkers(): void
+    {
+        if (process.env.DAVIES_EMBEDDED_WORKER !== 'true') {
+            return;
+        }
+
+        const worker = new EmbeddedAiWorker(this.queue, ['davies'], processDavies);
+
+        worker.start();
+        this.embeddedWorkers.push(worker);
+
+        logger.info('Davies moves are calculated by embedded worker.');
+    }
+
+    stopEmbeddedWorkers(): void
+    {
+        for (const worker of this.embeddedWorkers) {
+            worker.stop();
+        }
+
+        this.embeddedWorkers = [];
+    }
+
+    /**
      * Whether a job of this type can be processed now:
-     * a remote worker processing this job type is connected, or job type is processed locally.
+     * a remote worker processing this job type is connected, or an embedded worker processes it.
      */
     isJobTypeAvailable(type: AiJobType): boolean
     {
-        if (this.queue instanceof InMemoryAiJobQueue && this.queue.hasLocalProcessor(type)) {
+        if (this.embeddedWorkers.some(worker => worker.types.includes(type))) {
             return true;
         }
 

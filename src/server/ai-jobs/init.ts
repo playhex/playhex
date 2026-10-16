@@ -29,7 +29,10 @@ const monitorAiQueues = (): void => {
  * To call on server start.
  */
 export const initAiJobs = async (): Promise<void> => {
-    await Container.get(AiJobService).init();
+    const aiJobService = Container.get(AiJobService);
+
+    await aiJobService.init();
+    aiJobService.startEmbeddedWorkers();
 
     if (isMonitoringEnabled()) {
         monitorAiQueues();
