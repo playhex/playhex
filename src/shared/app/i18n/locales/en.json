@@ -1218,6 +1218,7 @@
             "alternatives_help": "Computer can answer in several ways: player will have to solve each variation. Computer can also play first.",
             "alternatives_expert_help": "Computer can have several answers to a move, and play first. Once a line is solved, puzzle asks \"And what would you have played on d7?\" and plays the next answer: player must solve each variation. Enable it in \"Initial position\".",
             "alternatives_used": "Used by this puzzle: delete alternative answers and let player play first to disable it.",
+            "variations_count": "Variations: Main + {{ count }}",
             "first_player": "Who plays first",
             "first_move_player": "Player",
             "first_move_computer": "Computer",

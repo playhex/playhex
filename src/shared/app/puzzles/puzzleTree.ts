@@ -238,6 +238,27 @@ export const hasComputerAlternatives = (tree: PuzzleNode, computerPlaysFirst = f
 };
 
 /**
+ * Number of computer alternative answers in the tree, i.e variations player must solve besides the main line.
+ * Continuations are ignored, they cannot have alternatives.
+ */
+export const countComputerAlternatives = (tree: PuzzleNode, computerPlaysFirst = false): number => {
+    const walk = (node: PuzzleNode, isPlayerMove: boolean): number => {
+        if (node.result !== undefined) {
+            return 0;
+        }
+
+        const alternatives = isPlayerMove ? Math.max(0, getComputerAnswers(node).length - 1) : 0;
+
+        return (node.children ?? []).reduce(
+            (count, child) => isElseNode(child) ? count : count + walk(child, !isPlayerMove),
+            alternatives,
+        );
+    };
+
+    return walk(tree, computerPlaysFirst);
+};
+
+/**
  * Whether reaching this node ends the puzzle, and with which result.
  * Returns null if puzzle continues.
  *

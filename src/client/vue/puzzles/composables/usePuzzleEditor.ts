@@ -5,7 +5,7 @@ import { computed, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue';
 import { t } from 'i18next';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
-import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findErrorNode, findSamePositionNode, findTranspositions, getFirstColor, hasComputerAlternatives, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleDefinition, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findErrorNode, findSamePositionNode, countComputerAlternatives, findTranspositions, getFirstColor, hasComputerAlternatives, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleDefinition, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
 import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterface.js';
@@ -143,6 +143,11 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      * Alternatives cannot be disabled while tree uses them.
      */
     const alternativesUsed = computed(() => hasComputerAlternatives(tree.value, computerPlaysFirst.value));
+
+    /**
+     * Number of variations besides the main line, from computer alternative answers.
+     */
+    const alternativesCount = computed(() => countComputerAlternatives(tree.value, computerPlaysFirst.value));
 
     const computerColor = computed<0 | 1>(() => playerColor.value === 0 ? 1 : 0);
 
@@ -1256,6 +1261,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         setComputerPlaysFirst,
         alternativesEnabled,
         alternativesUsed,
+        alternativesCount,
         setAlternativesEnabled,
         lastMove,
         clearLastMove,

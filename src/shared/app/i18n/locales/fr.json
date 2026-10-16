@@ -1203,6 +1203,7 @@
             "alternatives_help": "L'ordi peut répondre de plusieurs façons : le joueur devra résoudre chaque variante. L'ordi peut aussi jouer en premier.",
             "alternatives_expert_help": "L'ordi peut avoir plusieurs réponses à un coup, et jouer en premier. Une fois la ligne résolue, le puzzle demande « Et qu'auriez-vous joué sur d7 ? » et joue la réponse suivante : le joueur doit résoudre chaque variante. À activer dans « Position initiale ».",
             "alternatives_used": "Utilisé par le puzzle : supprimez les réponses alternatives et faites jouer le joueur en premier pour désactiver.",
+            "variations_count": "Variantes : Principale + {{ count }}",
             "first_player": "Qui joue en premier",
             "first_move_player": "Le joueur",
             "first_move_computer": "L'ordi",

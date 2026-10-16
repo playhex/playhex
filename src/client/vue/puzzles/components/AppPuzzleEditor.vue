@@ -60,6 +60,7 @@ const {
     setComputerPlaysFirst,
     alternativesEnabled,
     alternativesUsed,
+    alternativesCount,
     setAlternativesEnabled,
     lastMove,
     clearLastMove,
@@ -622,6 +623,8 @@ const deletePuzzle = async (): Promise<void> => {
                             <IconZoomIn v-if="treeZoomedOut" />
                             <IconZoomOut v-else />
                         </button>
+
+                        <div v-if="alternativesCount > 0" class="small text-body-secondary text-end">{{ $t('puzzles.editor.variations_count', { count: alternativesCount }) }}</div>
                     </div>
 
                     <!-- Selected node -->

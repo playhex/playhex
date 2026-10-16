@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getComputerAnswers, getNodeResult, hasComputerAlternatives, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
+import { countComputerAlternatives, createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getComputerAnswers, getNodeResult, hasComputerAlternatives, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
 
 const noTransposition: NodeResolver = node => node;
 
@@ -579,6 +579,19 @@ describe('puzzleTree', () => {
             assert.strictEqual(hasComputerAlternatives(tree), false);
             assert.strictEqual(hasComputerAlternatives(tree, true), true);
             assert.strictEqual(hasComputerAlternatives(alternativesTree), true);
+        });
+
+        it('counts alternatives', () => {
+            assert.strictEqual(countComputerAlternatives(tree), 0);
+            assert.strictEqual(countComputerAlternatives(alternativesTree), 1);
+
+            // Computer plays first: root children are computer answers
+            assert.strictEqual(countComputerAlternatives({
+                children: [
+                    { move: 'c3', children: [{ move: 'b3', children: [{ move: 'b4' }, { move: 'd2' }] }] },
+                    { move: 'b3', children: [{ move: 'c3' }] },
+                ],
+            }, true), 2);
         });
     });
 });
