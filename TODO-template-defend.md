@@ -1,0 +1,9 @@
+- afficher marque fleche qui pointe vers l'autre bord pour dire "connectée à l'autre bord"
+- ne pas avoir besoin de la base, exporter les puzzles en objet dans le code
+- gérer les coups intermédiaire automatiquement (ponts en sequence parallele), analyzer toute la collection. Vérifier avec Template A-4 qui doit permettre de faire un croissant
+- page defend your templates : ne pas afficher des pixi board pour chaque template, trop lourd
+- afficher N carré pour chaque variante, remplir ceux qui sont validé ou échoué, afficher la variante actuelle
+- page summary et defend your template : on voit "en cours d'acquisition" mais on sait pas quand ca sera bon : afficher un indicateur qui donne une idée d'où en est notre acquisition
+- puzzle editor: afficher le nombre de variantes totales de l'arbre (mode expert only)
+- bilan : afficher les puzzles "toujours acquis"
+- si on en esst au niveau 3, les niveaux 1 ne devraient pas nous faire fermer les ponts. Et au niveau 4, on ne devrait pas avoir à fermer les ziggurats

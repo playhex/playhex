@@ -25,6 +25,9 @@ import type TimeControlType from '../shared/time-control/TimeControlType.js';
 import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
 import type { PuzzleCheckInput, PuzzleCheckState, PuzzleSolvePositionInput, PuzzleSolvePositionOutput } from '../shared/app/puzzles/puzzleCheck.js';
 import type { PuzzleCollectionInput } from '../shared/app/puzzles/puzzleCollection.js';
+import type { TrainingAttemptInput, TrainingAttemptResult, TrainingOverview } from '../shared/app/training/trainingDto.js';
+import type { TrainingProgressData } from '../shared/app/training/trainingRules.js';
+import type { TrainingType } from '../shared/app/training/trainingLevels.js';
 import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.js';
 import type { OAuthConnectedApplication, OAuthInteractionDetails } from '../shared/app/oauth.js';
 
@@ -1719,6 +1722,59 @@ export const apiDeletePuzzleCollection = async (publicId: string): Promise<void>
 /**
  * Accepted videos, most recently added first.
  */
+const denormalizeTrainingProgress = (progress: TrainingProgressData): TrainingProgressData => ({
+    ...progress,
+    lastAttemptAt: new Date(progress.lastAttemptAt),
+    nextReviewAt: new Date(progress.nextReviewAt),
+});
+
+export const apiGetTraining = async (trainingType: TrainingType): Promise<TrainingOverview> => {
+    const response = await fetch(`/api/trainings/${trainingType}`);
+
+    await checkResponse(response);
+
+    const overview = await response.json() as TrainingOverview;
+
+    return {
+        levels: overview.levels.map(level => level.map(puzzle => plainToInstance(Puzzle, puzzle))),
+        progresses: Object.fromEntries(Object.entries(overview.progresses).map(([publicId, progress]) => [publicId, denormalizeTrainingProgress(progress)])),
+        unlockedLevelsCount: overview.unlockedLevelsCount,
+    };
+};
+
+/**
+ * @returns Puzzles publicIds to play, in order
+ */
+export const apiPostTrainingSession = async (trainingType: TrainingType): Promise<string[]> => {
+    const response = await fetch(`/api/trainings/${trainingType}/session`, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return await response.json() as string[];
+};
+
+export const apiPostTrainingAttempt = async (trainingType: TrainingType, input: TrainingAttemptInput): Promise<TrainingAttemptResult> => {
+    const response = await fetch(`/api/trainings/${trainingType}/attempts`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    await checkResponse(response);
+
+    const result = await response.json() as TrainingAttemptResult;
+
+    return { ...result, progress: denormalizeTrainingProgress(result.progress) };
+};
+
 export const apiGetVideos = async (): Promise<Video[]> => {
     const response = await fetch('/api/videos');
 

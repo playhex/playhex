@@ -6,12 +6,12 @@ import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { intlFormat } from 'date-fns';
 import { autoLocale } from '../../../../shared/app/i18n/index.js';
 import { getPuzzleTitle } from '../services/puzzleTitle.js';
-import { usePuzzle } from '../composables/usePuzzle.js';
+import { usePuzzle, type PuzzleReport } from '../composables/usePuzzle.js';
 import { puzzleToHexplorerAnalysis } from '../services/puzzleToHexplorer.js';
 import { validatePuzzle } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { apiGetNextPuzzle, apiPublishPuzzle } from '../../../apiClient.js';
 import { HEXPLORER_ANALYSIS_STATE_KEY } from '../../hexplorer/HexplorerState.js';
-import { IconAlphabet, IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowRight, IconCheck, IconCircleFill, IconCopy, IconDiagram2, IconLightbulb, IconPencilSquare, IconRepeat, IconSendFill, IconXLg } from '../../icons.js';
+import { IconAlphabet, IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowRight, IconCheck, IconCircleFill, IconCopy, IconDiagram2, IconFlag, IconLightbulb, IconPencilSquare, IconRepeat, IconSendFill, IconXLg } from '../../icons.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppPuzzleNextLink from './AppPuzzleNextLink.vue';
 import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
@@ -21,6 +21,17 @@ import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 const props = defineProps<{
     puzzle: Puzzle;
+
+    /**
+     * Played in a training section: hides links to leave the puzzle,
+     * reports result once solved or given up.
+     */
+    training?: boolean;
+}>();
+
+const emit = defineEmits<{
+    solved: [report: PuzzleReport];
+    gaveUp: [report: PuzzleReport];
 }>();
 
 const {
@@ -32,6 +43,7 @@ const {
     resultMessage,
     alternativeMove,
     lineNumber,
+    report,
     canUndo,
     canRestart,
     canHint,
@@ -50,6 +62,23 @@ whenever(gameViewElement, async element => {
 });
 
 const sidebarOpen = ref(true);
+
+/**
+ * Result already sent in training, only first one counts.
+ */
+const reported = ref(false);
+
+watch(status, value => {
+    if (props.training && !reported.value && value === 'solved') {
+        reported.value = true;
+        emit('solved', report.value);
+    }
+});
+
+const giveUp = (): void => {
+    reported.value = true;
+    emit('gaveUp', report.value);
+};
 
 /**
  * Messages over the board (sidebar closed) dismissed by click,
@@ -105,6 +134,10 @@ const formatGameDate = (game: Game): string => intlFormat(
 const nextPuzzle = ref<null | Puzzle>(null);
 
 void (async () => {
+    if (props.training) {
+        return;
+    }
+
     try {
         nextPuzzle.value = await apiGetNextPuzzle(props.puzzle.publicId);
     } catch (e) {
@@ -181,7 +214,7 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                 </div>
 
                 <!-- Already in sidebar when open -->
-                <AppPuzzleNextLink v-if="ended && 'line_solved' !== status && !sidebarOpen" :puzzle :nextPuzzle />
+                <AppPuzzleNextLink v-if="!training && ended && 'line_solved' !== status && !sidebarOpen" :puzzle :nextPuzzle />
 
                 <button
                     type="button"
@@ -196,11 +229,11 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
 
         <div v-if="sidebarOpen" class="puzzle-sidebar col-sm-6 col-lg-5 col-xl-4 d-flex flex-column h-100 border-start bg-body-tertiary">
             <div class="flex-grow-1 overflow-auto p-3">
-                <AppBreadcrumb :items="puzzleBreadcrumb(puzzle)" class="puzzle-breadcrumb small" :title="puzzle.collection?.name" />
+                <AppBreadcrumb v-if="!training" :items="puzzleBreadcrumb(puzzle)" class="puzzle-breadcrumb small" :title="puzzle.collection?.name" />
 
                 <h1 class="h4">{{ getPuzzleTitle(puzzle) }}</h1>
 
-                <p class="small">
+                <p v-if="!training" class="small">
                     <!-- Published is the normal state, only relevant for author -->
                     <span v-if="published && isAuthor" class="badge text-bg-success me-2">{{ $t('puzzles.published') }}</span>
                     <span v-else-if="!published" class="badge text-bg-warning me-2">{{ $t('puzzles.draft') }}</span>
@@ -210,7 +243,7 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                     </template>
                 </p>
 
-                <p v-if="puzzle.game" class="small">
+                <p v-if="!training && puzzle.game" class="small">
                     <i18next
                         v-if="puzzle.game.gameToPlayers?.length === 2"
                         :translation="$t('puzzles.from_game_of', { date: formatGameDate(puzzle.game) })"
@@ -229,7 +262,7 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                     <router-link v-else :to="{ name: 'online-game', params: { gameId: puzzle.game.publicId } }">{{ $t('puzzles.from_game') }}</router-link>
                 </p>
 
-                <p v-if="isAuthor" class="d-flex gap-2">
+                <p v-if="!training && isAuthor" class="d-flex gap-2">
                     <router-link
                         :to="{ name: 'puzzle-edit', params: { publicId: puzzle.publicId } }"
                         class="btn btn-sm btn-outline-primary"
@@ -296,8 +329,16 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                         class="btn btn-warning"
                     ><IconRepeat /> {{ $t('puzzles.restart') }}</button>
 
-                    <AppPuzzleNextLink v-if="ended && 'line_solved' !== status" :puzzle :nextPuzzle />
+                    <AppPuzzleNextLink v-if="!training && ended && 'line_solved' !== status" :puzzle :nextPuzzle />
+
+                    <button
+                        v-if="training && !reported"
+                        @click="giveUp()"
+                        class="btn btn-outline-danger"
+                    ><IconFlag /> {{ $t('training.give_up') }}</button>
                 </div>
+
+                <slot></slot>
 
                 <hr>
 
@@ -309,6 +350,7 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                     ><IconLightbulb /> {{ $t('puzzles.hint') }}</button>
 
                     <router-link
+                        v-if="!training"
                         :to="{ name: 'hexplorer', state: { [HEXPLORER_ANALYSIS_STATE_KEY]: hexplorerAnalysis } }"
                         class="btn btn-sm btn-outline-primary"
                     ><IconDiagram2 /> {{ $t('puzzles.solution_in_hexplorer') }}</router-link>
@@ -322,7 +364,7 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
 
                     <!-- Create a new puzzle from a copy of this one -->
                     <router-link
-                        v-if="loggedInPlayer"
+                        v-if="!training && loggedInPlayer"
                         :to="{ name: 'puzzle-create', query: { clone: puzzle.publicId } }"
                         class="btn btn-sm btn-outline-secondary"
                         :title="$t('puzzles.clone_help')"

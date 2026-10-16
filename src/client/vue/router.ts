@@ -1,6 +1,42 @@
 import { RouteLocationNormalizedLoadedGeneric, RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 import { notifyActivity } from '../services/playerActivity.js';
 import { OnlinePlayerPage } from '../../shared/app/OnlinePlayerPage.js';
+import type { TrainingType } from '../../shared/app/training/trainingLevels.js';
+
+/**
+ * Pages of a training section: progression, session and free practice.
+ * Route names are prefixed by training type, e.g "defend-your-template-training-session".
+ */
+const trainingRoutes = (trainingType: TrainingType, path: string): RouteRecordRaw => ({
+    path,
+    component: () => import('./ReloadOnRouteChange.vue'), // When going from a puzzle to another
+    children: [
+        {
+            name: `${trainingType}-training`,
+            path: '',
+            component: () => import('./training/pages/PageTraining.vue'),
+            props: { trainingType },
+        },
+        {
+            name: `${trainingType}-training-session`,
+            path: 'session',
+            component: () => import('./training/pages/PageTrainingSession.vue'),
+            props: { trainingType },
+            meta: {
+                displayFooter: false,
+            },
+        },
+        {
+            name: `${trainingType}-training-practice`,
+            path: ':publicId',
+            component: () => import('./training/pages/PageTrainingPractice.vue'),
+            props: { trainingType },
+            meta: {
+                displayFooter: false,
+            },
+        },
+    ],
+});
 
 const routes: RouteRecordRaw[] = [
     {
@@ -175,6 +211,7 @@ const routes: RouteRecordRaw[] = [
             },
         ],
     },
+    trainingRoutes('defend-your-template', '/training/defend-your-template'),
     {
         name: 'videos',
         path: '/videos',
