@@ -1,6 +1,6 @@
 import { CircleMark, GameMarksFacade, GameView } from '@playhex/pixi-board';
 import type { Move } from '@playhex/move-notation';
-import { computed, onUnmounted, ref, shallowRef } from 'vue';
+import { computed, onUnmounted, ref, shallowRef, watch } from 'vue';
 import { Puzzle } from '../../../../shared/app/models/index.js';
 import { createNodeResolver, createParallelsFinder, findChild, findElseNode, findSolution, getComputerAnswer, getComputerAnswers, getFirstColor, getNodeResult, getParallelNodeResult, isElseNode, type PuzzleElseNode, type PuzzleNode, type PuzzleResult } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
@@ -17,6 +17,19 @@ export type PuzzleStatus =
     | 'solved'
     | 'failed'
 ;
+
+/**
+ * How player solved the puzzle, e.g to track training progress.
+ */
+export type PuzzleReport = {
+    /**
+     * One entry per line, true if solved first try, without wrong move nor hint.
+     * Lines not solved yet are false.
+     */
+    lines: boolean[];
+
+    hintUsed: boolean;
+};
 
 /**
  * A move played on board since initial position.
@@ -142,6 +155,20 @@ export const usePuzzle = (puzzle: Puzzle) => {
      * Computer answer about to be played.
      */
     let pendingMoveTimeout: null | ReturnType<typeof setTimeout> = null;
+
+    /**
+     * Numbers of lines where player failed or used a hint.
+     * Kept after undo and restart.
+     */
+    const lineMistakes = ref<number[]>([]);
+
+    const hintUsed = ref(false);
+
+    const markLineMistake = (): void => {
+        if (!lineMistakes.value.includes(lineNumber.value)) {
+            lineMistakes.value.push(lineNumber.value);
+        }
+    };
 
     type TreeState = {
         /**
@@ -466,6 +493,8 @@ export const usePuzzle = (puzzle: Puzzle) => {
             return;
         }
 
+        hintUsed.value = true;
+        markLineMistake();
         path.value = path.value.slice(0, movesCount);
         redraw();
 
@@ -552,6 +581,35 @@ export const usePuzzle = (puzzle: Puzzle) => {
 
     const hasSolution = findSolution(puzzle.tree, resolve, computerPlaysFirst) !== null;
 
+    watch(status, value => {
+        if (value === 'failed') {
+            markLineMistake();
+        }
+    });
+
+    /**
+     * Lines known at start: computer first moves when it plays first, e.g template intrusions.
+     */
+    const initialLinesCount = computerPlaysFirst ? Math.max(1, getComputerAnswers(puzzle.tree).length) : 1;
+
+    const report = computed<PuzzleReport>(() => {
+        const linesCount = Math.max(initialLinesCount, lineNumber.value + pendingAlternatives.value.length);
+        const currentLineSolved = status.value === 'solved' || status.value === 'line_solved';
+
+        return {
+            lines: Array.from({ length: linesCount }, (_, index) => {
+                const line = index + 1;
+
+                if (lineMistakes.value.includes(line)) {
+                    return false;
+                }
+
+                return line < lineNumber.value || (line === lineNumber.value && currentLineSolved);
+            }),
+            hintUsed: hintUsed.value,
+        };
+    });
+
     gameView.on('hexClicked', move => playMove(move));
 
     redraw();
@@ -572,6 +630,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
         resultMessage,
         alternativeMove,
         lineNumber,
+        report,
         canUndo: computed(() => path.value.length > lineStartIndex.value),
         canRestart: computed(() => path.value.length > initialLineStartIndex || lineNumber.value > 1),
         canHint: computed(() => hasSolution && !computerThinking.value && status.value !== 'solved' && status.value !== 'line_solved'),
