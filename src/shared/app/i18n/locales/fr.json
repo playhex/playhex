@@ -84,6 +84,8 @@
     "lobby_active_players_one": "joueur actif",
     "lobby_active_players_many": "joueurs actifs",
     "lobby_active_players_other": "joueurs actifs",
+    "playhex_chill_description": "Même lobby, mêmes parties, mêmes joueurs, mais en 3D sur une petite planète chill.",
+    "experimental": "Expérimental",
     "lobby_playing_now": "En cours maintenant",
     "lobby_no_live_games_now": "Pas de partie en direct en ce moment.",
     "lobby_observe_correspondence": "Observer les parties par correspondance",

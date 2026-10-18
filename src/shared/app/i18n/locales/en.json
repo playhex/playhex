@@ -321,6 +321,8 @@
     "lobby_game_no_longer_available": "Game no longer available",
     "lobby_active_players_one": "active player",
     "lobby_active_players_other": "active players",
+    "playhex_chill_description": "Same lobby, same games, same players, but in 3D on a chill tiny planet.",
+    "experimental": "Experimental",
     "lobby_playing_now": "Playing now",
     "lobby_playing_now_short": "Playing",
     "lobby_no_live_games_now": "No live game playing now.",

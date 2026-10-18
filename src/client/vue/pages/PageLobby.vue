@@ -34,6 +34,7 @@ import AppRhombusAutoOrientation from '../components/AppRhombusAutoOrientation.v
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppChannel from '../components/AppChannel.vue';
 import AppTutorialCard from '../components/AppTutorialCard.vue';
+import AppPlayhexChillCard from '../components/AppPlayhexChillCard.vue';
 import { getPlayerLocales } from '../../../shared/app/i18n/index.js';
 
 useHead({
@@ -415,6 +416,8 @@ for (const locale of getPlayerLocales()) {
                 />
 
                 <AppChannel :channels />
+
+                <AppPlayhexChillCard />
 
                 <!-- Playing tournaments -->
                 <template v-if="runningTournaments.length > 0">

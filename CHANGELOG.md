@@ -4,7 +4,7 @@
 A big month! **[Puzzles](/puzzles)**, **[King of the Hill](/king-of-the-hill)**, community **[videos](/videos)**, a full **[onboarding tutorial](/tutorial)**,
 and stronger **game analysis** with Katahex.
 
-And a side project: **PlayHex Chill**. Same lobby, same games, same players, but in 3D on a chill tiny planet.
+And a side project: **[PlayHex Chill](https://chill.playhex.org/)**. Same lobby, same games, same players, but in 3D on a chill tiny planet.
 
 ### New
 - 🧩 **[Puzzles](/puzzles)**: play puzzles, or [create your own](/puzzles/new) (see below)
