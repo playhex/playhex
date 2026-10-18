@@ -70,6 +70,43 @@ useSeoMeta({
 
     <p>If you are curious about how AI analyses are generated, see <router-link :to="{ name: 'analysis-details' }">How AI analysis is done</router-link>.</p>
 
+    <h2 id="deep-analysis">Deep analysis</h2>
+
+    <p>
+        The default analysis is fast, but it only relies on the AI intuition.
+        If you want a more accurate result on a critical move, you can request a deep analysis:
+        the AI will think longer on this move (MCTS search).
+    </p>
+
+    <p>You need to be logged in, and the game analysis must be completed.</p>
+
+    <h3>On a single move</h3>
+
+    <p>Click on the move bar, then click on the link next to the move details:</p>
+
+    <code>move 45 - i8 (0.92) - best: e7 (0.05)</code> <button class="btn btn-link btn-sm p-0 ms-1 align-baseline">{{ $t('game_analysis.deep_analysis') }}</button>
+
+    <p class="mt-2">
+        Once done, a badge <span class="badge text-bg-secondary">MCTS</span> followed by the number of playouts appears,
+        and the move details and board marks are updated with the deep analysis result.
+    </p>
+
+    <h3>On a range of moves</h3>
+
+    <p>
+        To deeply analyze several moves at once, click on a bar and drag horizontally to select a range of moves,
+        then click on the button:
+    </p>
+
+    <button class="btn btn-primary btn-sm py-0 px-1 my-2">{{ $t('game_analysis.deep_analysis_moves', { count: 8 }) }}</button>
+
+    <p>Moves already deeply analyzed, swap and pass moves are not counted.</p>
+
+    <p>
+        Deeply analyzed moves are shown with a plain bar,
+        while the fast analysis is still shown faded behind it, so you can compare both results.
+    </p>
+
     <h2>Handling swap move</h2>
 
     <p>When you swap, the AI analysis can determine if it was a good decision or suggest a better move. Examples:</p>

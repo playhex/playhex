@@ -1,3 +1,59 @@
+## October 19, 2026
+*New on PlayHex, since last month*
+
+A big month! **[Puzzles](/puzzles)**, **[King of the Hill](/king-of-the-hill)**, community **[videos](/videos)**, a full **[onboarding tutorial](/tutorial)**,
+and stronger **game analysis** with Katahex.
+
+And a side project: **PlayHex Chill**. Same lobby, same games, same players, but in 3D on a chill tiny planet.
+
+### New
+- 🧩 **[Puzzles](/puzzles)**: play puzzles, or [create your own](/puzzles/new) (see below)
+- 👑 **[King of the Hill](/king-of-the-hill)**: challenge the king, take the crown, see the king history and players last games
+- 🎬 **[Hex videos](/videos)** from the community: browse videos by language, and [submit your own](/videos/submit)
+- 🎓 The tutorial is now a **[full onboarding](/tutorial)**: rules, bridges, blocking, ziggurat, swap, puzzles, and a first game against a bot
+- 🤝 **[Play with a friend](/offline-lobby)** on the same device, with time control, tabletop mode, and review of past offline games
+- 🎨 **[Board themes](/settings#board-theme)**: choose between PlayHex, HexWorld, Goban, Polish Nostalgia, or your own custom JSON theme in settings
+- ![](/images/external/little-golem.png) **[Link your Little Golem account](/external-games-archive)**: your games are imported in background, then browse and analyze them
+- New **Tools** menu in header, grouping Hexplorer, swap maps, analysis and other tools
+- New **[swap maps](/swap-maps)** page: see which first moves are swapped by bots
+
+### Puzzles
+- **Play puzzles**, and create your own from scratch or from any game
+- Organize puzzles into **[collections](/puzzles/collections)**
+- **Partial boards** and **disabled cells**, to isolate the interesting part of a position
+- **Variants**, like "And what would you have played on e9?"
+- **Clone** a puzzle to create a variation of it
+- Puzzles are **checked by Katahex and MoHex solver**, with errors highlighted in the tree, so you don't miss a winning line
+- **Transposition** detection, and **parallel sequences** for independent areas, to keep the tree small
+- **Expert mode** in the editor, to keep the UI simple by default
+
+### Bots and analysis
+- **All bots now swap**, and play a **fair first move** when swap is enabled
+- **Katahex no longer plays deterministically**: it randomly picks one of its best moves
+- **[Deep analysis](/guide/ai-analysis#deep-analysis)** with Katahex MCTS on game analysis, and select a range of moves to analyze them all at once
+- Game analysis now also shows **up to 3 other best moves**
+- [Hexplorer](/hexplorer) shows a last move mark
+
+### Changed
+- More explanation on when you will be able to challenge a player in [King of the Hill](/king-of-the-hill)
+- Monthly active players added on the [statistics page](/statistics)
+- Slow mode on #lobby-en chat, to mitigate flooding
+
+### Fixed
+- Fixed push notifications on iOS web app
+- Fixed crash when resizing board on some GPUs (Adreno 506, e.g. Fairphone 3)
+- Fixed tournament series page showing "0 participants" instead of "N interested"
+- Fixed "Save" button hidden when saving a "(last)" time control in presets
+- Fixed games archive page breaking when entering an invalid date
+- Fixed header menu breaking layout on medium screen sizes
+- Fixed double elimination tournaments with only 2 or 3 participants
+- Faster game analysis
+- Lighter websocket messages, less data used on mobile
+
+### For developers
+- **OAuth**: third party applications can now connect to a PlayHex account ([documentation](https://github.com/playhex/playhex/blob/master/docs/oauth.md)). You can review connected applications in your settings
+- Board rendering and move notation are now standalone packages: [@playhex/pixi-board](https://github.com/playhex/playhex/blob/master/src/packages/pixi-board) (with themes) and [@playhex/move-notation](https://github.com/playhex/playhex/blob/master/src/packages/move-notation)
+
 ## September 23, 2026
 *New on PlayHex, since last 2 months*
 
