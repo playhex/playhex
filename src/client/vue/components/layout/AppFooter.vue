@@ -5,8 +5,10 @@ import { seo } from '../../../../shared/app/seo.js';
 import { format } from 'date-fns';
 import i18n from 'i18next';
 import AppLiberapayLink from '../AppLiberapayLink.vue';
+import { isTwa } from '../../../services/isTwa.js';
 
 const date = ref<string>(LAST_COMMIT_DATE);
+const displayStoreBadges = !isTwa();
 
 i18n.on('languageChanged', () => {
     date.value = format(new Date(`${LAST_COMMIT_DATE} 12:00:00`), 'd MMM y');
@@ -43,6 +45,14 @@ i18n.on('languageChanged', () => {
         <div class="d-flex justify-content-center">
             <AppLiberapayLink class="mt-4" />
         </div>
+        <div v-if="displayStoreBadges" class="store-badges d-flex justify-content-center flex-wrap mt-3">
+            <a href="https://play.google.com/store/apps/details?id=org.playhex.twa" target="_blank">
+                <img src="/images/stores/get-it-on-google-play.png" alt="Get it on Google Play" width="646" height="250">
+            </a>
+            <a href="https://f-droid.org/packages/org.playhex.twa/" target="_blank">
+                <img src="/images/stores/get-it-on-f-droid.png" alt="Get it on F-Droid" width="646" height="250">
+            </a>
+        </div>
         <p class="infos">
             <router-link v-if="date" :to="{ name: 'changelog' }">{{ $t('last_change', { date }) }}</router-link>
             <router-link :to="{ name: 'guide' }">PlayHex guide</router-link>
@@ -73,6 +83,11 @@ i18n.on('languageChanged', () => {
     flex-wrap wrap
     justify-content center
     gap 0.5em 1.5em
+
+.store-badges
+    img
+        width auto
+        height 4em
 
 .link-icons
     svg
