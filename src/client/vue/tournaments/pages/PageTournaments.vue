@@ -22,7 +22,7 @@ import { tournamentsBreadcrumb } from '../composables/tournamentBreadcrumb.js';
 import { by } from '../../../../shared/app/utils.js';
 
 useHead({
-    title: t('tournaments'),
+    title: () => t('tournaments'),
 });
 
 const activeTournaments = ref<null | Tournament[]>(null);

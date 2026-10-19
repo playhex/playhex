@@ -10,7 +10,7 @@ import Rooms from '../../../shared/app/Rooms.js';
 import { useSocketRoom } from '../composables/useSocketRoom.js';
 
 useHead({
-    title: t('online_players_title'),
+    title: () => t('online_players_title'),
 });
 
 useSocketRoom(Rooms.onlinePlayers);

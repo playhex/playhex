@@ -11,7 +11,7 @@ import { tournamentSeriesListBreadcrumb } from '../composables/tournamentBreadcr
 import useToastsStore from '../../../stores/toastsStore.js';
 
 useHead({
-    title: t('tournament_series_list_page.title'),
+    title: () => t('tournament_series_list_page.title'),
 });
 
 const allSeries = ref<null | TournamentSeriesListItemDto[]>(null);

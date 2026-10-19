@@ -21,7 +21,7 @@ import AppGameView from '../../components/AppGameView.vue';
 import { useHead } from '@unhead/vue';
 
 useHead({
-    title: t('local_play.vs_computer'),
+    title: () => t('local_play.vs_computer'),
 });
 
 const game = shallowRef<EngineGame | null>(null);

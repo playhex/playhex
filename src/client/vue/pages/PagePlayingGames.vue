@@ -12,7 +12,7 @@ import { useRouter, useRoute } from 'vue-router';
 import AppGameThumbnailLobbyLiveCard from '../components/AppGameThumbnailLobbyLiveCard.vue';
 import { t } from 'i18next';
 
-useHead({ title: t('playing_games.title') });
+useHead({ title: () => t('playing_games.title') });
 
 /**
  * Thumbnails displayed above the list, only a single row:

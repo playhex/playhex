@@ -50,7 +50,7 @@ import { AnalyzerInterface } from '../analyzers/AnalyzerInterface.js';
 import { createKatahexAnalyzers, useAnalysisEngines } from '../composables/useAnalysisEngines.js';
 
 useHead({
-    title: t('hexplorer.title'),
+    title: () => t('hexplorer.title'),
 });
 
 // Available analysis engines, selectable in the sidebar. First one is the default.

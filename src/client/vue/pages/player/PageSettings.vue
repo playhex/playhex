@@ -30,7 +30,7 @@ const head = injectHead();
 
 const updateSeoMeta = () => useSeoMeta({
     robots: 'noindex',
-    title: t('player_settings.title'),
+    title: () => t('player_settings.title'),
 }, { head });
 
 updateSeoMeta();

@@ -11,7 +11,7 @@ import { IconPlus } from '../../icons.js';
 import { filterVideos, sortVideos, type VideoSort } from '../../../../shared/app/videos/videoSearch.js';
 
 useHead({
-    title: t('videos.title'),
+    title: () => t('videos.title'),
 });
 
 const videos = ref<null | Video[]>(null);

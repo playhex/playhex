@@ -13,7 +13,7 @@ import { puzzlesBreadcrumb } from '../services/puzzleBreadcrumb.js';
 import { IconPlus } from '../../icons.js';
 
 useHead({
-    title: t('puzzles.list_title'),
+    title: () => t('puzzles.list_title'),
 });
 
 /**

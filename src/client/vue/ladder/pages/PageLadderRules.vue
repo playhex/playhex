@@ -7,7 +7,7 @@ import { timeControlToString } from '../../../../shared/app/timeControlUtils.js'
 import { IconCrown } from '../../icons.js';
 
 useHead({
-    title: `${t('ladder.rules')} · ${t('ladder.title')}`,
+    title: () => `${t('ladder.rules')} · ${t('ladder.title')}`,
 });
 
 const { slug, ladderDto } = useLadderFromUrl();

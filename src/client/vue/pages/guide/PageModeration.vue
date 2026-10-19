@@ -8,7 +8,7 @@ import ChatMessage from '../../../../shared/app/models/ChatMessage.js';
 import { t } from 'i18next';
 
 useSeoMeta({
-    title: t('moderation'),
+    title: () => t('moderation'),
 });
 
 const examplePlayer = Object.assign(new Player(), {

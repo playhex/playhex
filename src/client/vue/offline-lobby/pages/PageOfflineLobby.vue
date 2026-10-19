@@ -14,7 +14,7 @@ import AppOfflineGamesHistory from '../components/AppOfflineGamesHistory.vue';
 import { GameData } from '../../../../shared/game-engine/normalization.js';
 
 useHead({
-    title: t('local_play.title'),
+    title: () => t('local_play.title'),
 });
 
 const router = useRouter();

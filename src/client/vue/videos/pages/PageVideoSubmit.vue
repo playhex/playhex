@@ -13,7 +13,7 @@ import { isHttpUrl, isValidVideoPublishedAt, maxVideoPublishedAt, VIDEO_AUTHOR_N
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 
 useHead({
-    title: t('videos.submit'),
+    title: () => t('videos.submit'),
 });
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());

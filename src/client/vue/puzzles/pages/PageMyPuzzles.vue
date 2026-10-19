@@ -13,7 +13,7 @@ import { myPuzzlesBreadcrumb } from '../services/puzzleBreadcrumb.js';
 import { IconPlus } from '../../icons.js';
 
 useHead({
-    title: t('puzzles.my_puzzles'),
+    title: () => t('puzzles.my_puzzles'),
 });
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());

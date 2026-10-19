@@ -98,11 +98,11 @@ const periodStats = ref<LoadState<PeriodStats>>(null);
 const commonStats = ref<LoadState<CommonStats>>(null);
 
 useHead({
-    title: t('statistics.title'),
+    title: () => t('statistics.title'),
 });
 
 useSeoMeta({
-    description: t('statistics.seo_description'),
+    description: () => t('statistics.seo_description'),
 });
 
 watchEffect(async () => {

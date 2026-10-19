@@ -26,7 +26,7 @@ const clonePublicId = typeof route.query.clone === 'string' ? route.query.clone 
 const collectionPublicId = typeof route.query.collection === 'string' ? route.query.collection : null;
 
 useHead({
-    title: t(publicId === null ? 'puzzles.editor.create_title' : 'puzzles.editor.edit_title'),
+    title: () => t(publicId === null ? 'puzzles.editor.create_title' : 'puzzles.editor.edit_title'),
 });
 
 type LoadState =

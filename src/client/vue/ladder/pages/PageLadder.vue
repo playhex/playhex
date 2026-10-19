@@ -15,7 +15,7 @@ import AppChannel from '../../components/AppChannel.vue';
 import { IconChatRightText, IconClockHistory, IconCrown, IconInfoCircle, IconListOl, IconTablerSwords, IconTrophyFill } from '../../icons.js';
 
 useHead({
-    title: t('ladder.title'),
+    title: () => t('ladder.title'),
 });
 
 const { slug, ladderDto, me, reload } = useLadderFromUrl();

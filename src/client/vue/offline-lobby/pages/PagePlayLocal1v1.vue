@@ -23,7 +23,7 @@ import { useGameViewOrientation } from '../../composables/useGameViewOrientation
 import { IconArrowCounterclockwise, IconList, IconPlayFill } from '../../icons.js';
 
 useHead({
-    title: t('local_play.with_friend'),
+    title: () => t('local_play.with_friend'),
 });
 
 const DRAW_SOUND = '/sounds/lisp/Draw.ogg';

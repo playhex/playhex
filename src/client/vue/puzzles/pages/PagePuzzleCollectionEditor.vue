@@ -25,7 +25,7 @@ const { loggedInPlayer } = storeToRefs(useAuthStore());
 const publicId = typeof route.params.publicId === 'string' ? route.params.publicId : null;
 
 useHead({
-    title: t(publicId === null ? 'puzzles.collections.create' : 'puzzles.collections.edit'),
+    title: () => t(publicId === null ? 'puzzles.collections.create' : 'puzzles.collections.edit'),
 });
 
 type LoadState =

@@ -38,7 +38,7 @@ import AppPlayhexChillCard from '../components/AppPlayhexChillCard.vue';
 import { getPlayerLocales } from '../../../shared/app/i18n/index.js';
 
 useHead({
-    title: t('lobby_title'),
+    title: () => t('lobby_title'),
 });
 
 const router = useRouter();

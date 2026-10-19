@@ -8,7 +8,7 @@ import { swapMaps } from '../../../shared/swap-maps/swap-maps.js';
 import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 
 useHead({
-    title: t('swap_maps.title'),
+    title: () => t('swap_maps.title'),
 });
 
 const availableSizes = Object.keys(swapMaps).map(Number).sort((a, b) => a - b);

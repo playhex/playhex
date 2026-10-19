@@ -6,7 +6,7 @@ import { useTutorialControls } from '../../composables/tutorialControls.js';
 import { IconCheckCircleFill } from '../../icons.js';
 
 useHead({
-    title: t('how_to_play_hex'),
+    title: () => t('how_to_play_hex'),
 });
 
 const { isCompleted, completedCount, totalCount } = useTutorialControls();

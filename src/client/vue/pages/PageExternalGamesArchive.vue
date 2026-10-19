@@ -9,7 +9,7 @@ import { useSearchGamesPagination } from '../composables/searchGamesPagination.j
 import AppExternalGamesTable from '../components/external-games/AppExternalGamesTable.vue';
 
 useSeoMeta({
-    title: t('external_games.archive_title'),
+    title: () => t('external_games.archive_title'),
 });
 
 const DEFAULT_PAGE_SIZE = 20;

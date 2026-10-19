@@ -18,7 +18,7 @@ import { IconArrowLeft, IconHourglass, IconTrophyFill } from '../../icons.js';
  */
 
 useHead({
-    title: t('local_play.review'),
+    title: () => t('local_play.review'),
 });
 
 const route = useRoute();
