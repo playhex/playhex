@@ -130,7 +130,10 @@ export const setLocale = async (locale: string, remember = true) => {
     setI18nLanguage(locale); // Should be last so when "languageChanged" is emitted, date fns also has the new locale
 };
 
-void (async () => {
+/**
+ * Loads translations. App should be mounted after, else texts are first rendered empty.
+ */
+export const initI18n = async (): Promise<void> => {
 
     // Load current locale translation as soon as possible to prevent text blinking
     void loadLocaleMessages(autoLocale());
@@ -149,4 +152,4 @@ void (async () => {
     ;
 
     await setLocale(autoLocale(), false);
-})();
+};

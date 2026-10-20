@@ -1,4 +1,4 @@
-import '../shared/app/i18n/index.js';
+import { initI18n } from '../shared/app/i18n/index.js';
 // Bootstrap CSS is loaded (and swapped LTR/RTL) at runtime by i18n/index.ts, depending on the locale.
 import 'bootstrap/js/src/collapse.js';
 import 'bootstrap/js/src/offcanvas.js';
@@ -40,5 +40,7 @@ usePlayerLocalSettingsStore();
 useAuthStore();
 
 void preloadAssets();
+
+await initI18n();
 
 vueApp.mount('#vue-app');
