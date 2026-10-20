@@ -15,7 +15,7 @@ export type ImageStoneParams = {
 
 /**
  * Stone drawn from an image, one image per player.
- * Images are loaded by `load()`, called by GameView before drawing.
+ * Images are loaded by `load()`, called by GameView, which redraws once loaded.
  * If an image could not be loaded, a circle stone with player color is drawn instead.
  */
 export const imageStone = ({ player1Url, player2Url, size = 0.9 }: ImageStoneParams): StoneRenderer => ({

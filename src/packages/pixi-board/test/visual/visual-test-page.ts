@@ -1,4 +1,5 @@
 import GameView from '../../GameView.js';
+import { loadTheme } from '../../theming/loadTheme.js';
 
 declare global {
     interface Window {
@@ -37,6 +38,9 @@ window.mountGameView = async (gameView: GameView): Promise<void> => {
     window.gameView = gameView;
 
     await gameView.mount(container);
+
+    // Board is displayed without waiting for theme assets, then redrawn once loaded
+    await loadTheme(gameView.getTheme());
 
     // Wait two frames to ensure PixiJS has fully rendered
     await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));

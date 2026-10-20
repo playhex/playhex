@@ -181,12 +181,6 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     private theme: BoardTheme;
 
     /**
-     * Incremented on each setTheme() call,
-     * to ignore a theme loaded after a more recent one has been set.
-     */
-    private themeVersion = 0;
-
-    /**
      * Whether to show cell coords around the board
      */
     private displayCoords: boolean;
@@ -385,19 +379,11 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.pixi.stage.addChild(this.backgroundContainer, this.gameContainer);
 
-        // Load theme assets (i.e images), then redraw everything that has been drawn before assets were loaded
-        if (themeNeedsLoading(this.theme)) {
-            const themeVersion = this.themeVersion;
-            await loadTheme(this.theme);
-
-            if (this.destroyed) {
-                return;
-            }
-
-            if (themeVersion === this.themeVersion) {
-                this.redrawAfterThemeChanged();
-            }
-        }
+        // Do not wait for theme assets to display board, it is redrawn once they are loaded
+        this.loadThemeAssetsAndRedraw().catch((e: unknown) => {
+            // eslint-disable-next-line no-console
+            console.error('Could not redraw board after theme assets loaded', e);
+        });
 
         this.redrawBackground();
 
@@ -539,6 +525,29 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     ready(): Promise<void>
     {
         return this.initPromise.promise;
+    }
+
+    /**
+     * Load current theme assets (i.e images),
+     * then redraw everything that has been drawn without them.
+     * Never resolves if an asset never finishes loading.
+     */
+    private async loadThemeAssetsAndRedraw(): Promise<void>
+    {
+        const theme = this.theme;
+
+        if (!themeNeedsLoading(theme)) {
+            return;
+        }
+
+        await loadTheme(theme);
+
+        // Another theme has been set while loading this one, or view destroyed
+        if (theme !== this.theme || this.destroyed) {
+            return;
+        }
+
+        this.redrawAfterThemeChanged();
     }
 
     private redrawAfterThemeChanged(): void
@@ -728,25 +737,19 @@ export default class GameView extends TypedEmitter<GameViewEvents>
     }
 
     /**
-     * Change theme and redraw board.
-     * Theme assets (i.e images) are loaded before theme is applied.
+     * Change theme and redraw board now.
+     * Theme assets (i.e images) not yet loaded are not drawn (i.e board without its wood image),
+     * board is redrawn with them once loaded.
      *
-     * @returns Promise resolved when theme is applied
+     * @returns Promise resolved when theme assets are loaded and drawn
      */
     async setTheme(theme: BoardTheme): Promise<void>
     {
-        const themeVersion = ++this.themeVersion;
-
-        await loadTheme(theme);
-
-        // Another theme has been set while loading this one, or view destroyed
-        if (themeVersion !== this.themeVersion || this.destroyed) {
-            return;
-        }
-
         this.theme = theme;
 
         this.redrawAfterThemeChanged();
+
+        await this.loadThemeAssetsAndRedraw();
     }
 
     /**

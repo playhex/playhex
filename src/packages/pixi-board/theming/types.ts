@@ -75,7 +75,7 @@ export type BackgroundRenderContext = {
 export type BackgroundRenderer = ((context: BackgroundRenderContext) => Container) & {
     /**
      * Optional async preload (i.e images).
-     * Called by GameView before drawing with this background renderer.
+     * Called by GameView, which draws with this background renderer without waiting, and redraws once loaded.
      */
     load?: () => Promise<void>;
 };
@@ -126,7 +126,7 @@ export type BoardView = {
 export type BoardRenderer = ((context: BoardRenderContext) => BoardView) & {
     /**
      * Optional async preload (i.e images).
-     * Called by GameView before drawing with this board renderer.
+     * Called by GameView, which draws with this board renderer without waiting, and redraws once loaded.
      */
     load?: () => Promise<void>;
 };
@@ -157,7 +157,7 @@ export type StoneRenderer = {
 
     /**
      * Optional async preload (i.e images).
-     * Called by GameView before drawing with this stone renderer.
+     * Called by GameView, which draws with this stone renderer without waiting, and redraws once loaded.
      */
     load?: () => Promise<void>;
 };
@@ -319,7 +319,7 @@ export type BoardTheme = {
 
     /**
      * Optional async preload (i.e images).
-     * Called by GameView before drawing with this theme.
+     * Called by GameView, which draws with this theme without waiting, and redraws once loaded.
      */
     load?: () => Promise<void>;
 };

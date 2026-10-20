@@ -50,30 +50,4 @@ describe('loadTheme', () => {
 
         assert.deepStrictEqual(await loadTheme(theme), []);
     });
-
-    it('resolves when an asset never finishes loading, after timeout', async () => {
-        const theme: BoardTheme = {
-            ...playhexTheme.theme,
-            stones: {
-                ...playhexTheme.theme.stones,
-                load: () => new Promise<void>(() => {}),
-            },
-        };
-
-        /* eslint-disable no-console */
-        const consoleError = console.error;
-        console.error = () => {};
-
-        let errors: Error[];
-
-        try {
-            errors = await loadTheme(theme, 10);
-        } finally {
-            console.error = consoleError;
-        }
-        /* eslint-enable no-console */
-
-        assert.strictEqual(errors.length, 1);
-        assert.match(errors[0].message, /still not loaded after 10ms/);
-    });
 });

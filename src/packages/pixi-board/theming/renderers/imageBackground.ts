@@ -17,7 +17,7 @@ export type ImageBackgroundParams = {
 
 /**
  * Fills the whole background with an image.
- * Image is loaded by `load()`, called by GameView before drawing.
+ * Image is loaded by `load()`, called by GameView, which redraws once loaded.
  */
 export const imageBackground = ({ url, color }: ImageBackgroundParams): BackgroundRenderer => {
     const renderer: BackgroundRenderer = ({ width, height }) => {

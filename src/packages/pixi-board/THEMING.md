@@ -409,7 +409,7 @@ Unknown params are rejected, to catch typos.
 
         "board": { "type": "go", "lineColor": "#3d2b12", "boardColor": "#dcb35c", "boardImage": "https://example.com/images/wood.jpg" },
 
-        // Images are loaded before theme is applied
+        // Board is drawn with circle stones until images are loaded
         "stones": {
             "type": "image",
             "player1Url": "https://example.com/images/black-stone.png",
@@ -596,8 +596,8 @@ See `theming/types.ts` for all types, and builtin themes:
 
 ## Images
 
-Images (background, board, stones) are loaded before the theme is applied: `setTheme()` resolves once they are loaded.
-If an image fails to load, the theme is still applied, without this image (i.e board color without wood image, circle stones instead of image stones).
+The theme is applied immediately, without its images, and the board is redrawn once images (background, board, stones) are loaded: `setTheme()` resolves once they are loaded and drawn.
+Until then, or if an image fails to load, the theme is displayed without this image (i.e board color without wood image, circle stones instead of image stones).
 Keep them small: a board or background image is displayed at most at screen size, a 1024×1024 jpg is usually enough.
 
 ``` ts
@@ -611,7 +611,7 @@ const woodUrl = new URL('./wood.jpg', import.meta.url).href;
 goBoard({ lineColor: 0x3d2b12, boardColor: 0xe2c9a8, boardImage: woodUrl });
 
 // Custom renderers can load images too:
-// background, board and stone renderers can have an async load(), called by GameView before drawing.
+// background, board and stone renderers can have an async load(), called by GameView, which redraws once it resolved.
 const myBoard: BoardRenderer = ({ boardsize, colors }) => {
     const container = new Container();
 
