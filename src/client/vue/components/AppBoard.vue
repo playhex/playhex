@@ -11,6 +11,7 @@ import { GameTimeData } from '../../../shared/time-control/TimeControl.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
+import { errorToString } from '../../../shared/app/utils.js';
 
 const pixiApp = ref<HTMLElement>();
 
@@ -85,6 +86,20 @@ const undoRequestPseudo = computed<string>(() => {
 /*
  * Add pixi view
  */
+
+/**
+ * Error thrown while mounting board, displayed instead of an empty board.
+ */
+const mountError = ref<null | string>(null);
+
+/**
+ * Board still not mounted after a while,
+ * displayed to not leave player with an empty board.
+ */
+const mountTooLong = ref(false);
+
+let mountTooLongTimeout: null | ReturnType<typeof setTimeout> = null;
+
 onMounted(() => {
     if (!pixiApp.value) {
         throw new Error('No element with ref="pixiApp"');
@@ -94,10 +109,28 @@ onMounted(() => {
         throw new Error('no game view');
     }
 
-    void gameView.value.mount(pixiApp.value);
+    mountTooLongTimeout = setTimeout(() => mountTooLong.value = true, 10000);
+
+    gameView.value.mount(pixiApp.value)
+        .then(() => mountTooLong.value = false)
+        .catch((e: unknown) => {
+            // eslint-disable-next-line no-console
+            console.error('Could not display board', e);
+            mountError.value = errorToString(e);
+        })
+        .finally(() => {
+            if (mountTooLongTimeout !== null) {
+                clearTimeout(mountTooLongTimeout);
+            }
+        })
+    ;
 });
 
 onUnmounted(() => {
+    if (mountTooLongTimeout !== null) {
+        clearTimeout(mountTooLongTimeout);
+    }
+
     gameView.value?.destroy();
 });
 
@@ -169,6 +202,18 @@ onUnmounted(() => {
 <template>
     <div class="app-board" :class="{ 'has-rewind-controls': gameUIMode !== 'play' || shouldDisplayAnswerUndoMove }">
         <div class="board-container" ref="pixiApp"></div>
+
+        <div v-if="mountError || mountTooLong" class="board-mount-error">
+            <p class="text-danger">{{ mountError ? $t('board_mount_error.error') : $t('board_mount_error.too_long') }}</p>
+            <p v-if="mountError"><code>{{ mountError }}</code></p>
+            <p>
+                <i18next :translation="$t('board_mount_error.go_to_rescue')">
+                    <template #link>
+                        <router-link :to="{ name: 'rescue' }">/rescue</router-link>
+                    </template>
+                </i18next>
+            </p>
+        </div>
 
         <div v-if="engineGame" :class="['game-info-overlay', `orientation-${orientation}`]">
             <div class="player player-a">
@@ -309,6 +354,15 @@ onUnmounted(() => {
     justify-content center
     width 100%
     height 100%
+
+.board-mount-error
+    position absolute
+    top 50%
+    left 50%
+    transform translate(-50%, -50%)
+    width 90%
+    max-width 30em
+    text-align center
 
 .player
     display flex

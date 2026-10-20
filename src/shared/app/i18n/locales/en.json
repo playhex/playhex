@@ -170,6 +170,11 @@
     "player_game_history": "Game history",
     "waiting": "waiting…",
     "initializing_game": "Initializing game…",
+    "board_mount_error": {
+        "error": "Could not display the board, an error occurred:",
+        "too_long": "The board is taking a long time to display.",
+        "go_to_rescue": "If the problem persists, go to {link} to help us find the cause."
+    },
     "game_finished_overlay": {
         "title": "Game finished"
     },

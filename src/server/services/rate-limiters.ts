@@ -109,6 +109,15 @@ const analyzePositionMctsLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit javascript errors reported from player devices, by ip.
+ */
+const clientErrorReportLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.client_error_report',
+    points: 20,
+    duration: 600,
+});
+
+/**
  * Limit puzzle katahex checks started by a player.
  * Only new checks count, polling a running check or a cached one does not.
  */
@@ -270,6 +279,12 @@ export const rateLimiterConsumeAnalyzePositionMcts = async (ip: string | undefin
 
 export const rateLimiterConsumeAnalyzeMoveMcts = async (playerPublicId: string, movesCount = 1) => {
     await consume(analyzeMoveMctsLimiter, playerPublicId, movesCount);
+};
+
+export const rateLimiterConsumeClientErrorReport = async (ip: string | undefined) => {
+    if (ip) {
+        await consume(clientErrorReportLimiter, ip);
+    }
 };
 
 export const rateLimiterConsumePuzzleCheck = async (playerPublicId: string) => {

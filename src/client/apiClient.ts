@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AiAvailabilityData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { GameOptions, Game, Player, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, PuzzleCollection, Video, ExternalGame, ExternalGameImportJob, PlayerLittleGolemAccount } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ClientErrorReport, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, PuzzleCollection, Video, ExternalGame, ExternalGameImportJob, PlayerLittleGolemAccount } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
@@ -892,6 +892,18 @@ export const apiPutPushSubscription = async (pushSubscription: PushSubscription)
     await checkResponse(response);
 
     return plainToInstance(PlayerPushSubscription, await response.json());
+};
+
+export const apiPostClientErrorReport = async (clientErrorReport: ClientErrorReport): Promise<void> => {
+    const response = await fetch(`/api/client-error-reports`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(clientErrorReport),
+    });
+
+    await checkResponse(response);
 };
 
 export const apiGetPlayerAiWorkerKeys = async (): Promise<PlayerAiWorkerKey[]> => {

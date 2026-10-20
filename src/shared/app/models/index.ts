@@ -3,6 +3,7 @@ import BannedIp from './BannedIp.js';
 import Channel from './Channel.js';
 import ChannelChatMessage from './ChannelChatMessage.js';
 import ChatMessage from './ChatMessage.js';
+import ClientErrorReport from './ClientErrorReport.js';
 import ConditionalMoves from './ConditionalMoves.js';
 import ExternalGame from './ExternalGame.js';
 import ExternalGameAnalyze from './ExternalGameAnalyze.js';
@@ -63,6 +64,7 @@ export {
     Channel,
     ChannelChatMessage,
     ChatMessage,
+    ClientErrorReport,
     ConditionalMoves,
     ExternalGame,
     ExternalGameAnalyze,
@@ -123,6 +125,7 @@ export const entities = {
     Channel,
     ChannelChatMessage,
     ChatMessage,
+    ClientErrorReport,
     ConditionalMoves,
     ExternalGame,
     ExternalGameAnalyze,

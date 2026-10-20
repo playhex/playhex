@@ -36,6 +36,7 @@ import { checkAuthorization } from '../../../services/roles.js';
 import ChannelController from './ChannelController.js';
 import ChangelogController from './ChangelogController.js';
 import HexplorerController from './HexplorerController.js';
+import ClientErrorReportController from './ClientErrorReportController.js';
 import HexGameImporterController from './HexGameImporterController.js';
 import LadderController from '../../../ladder/LadderController.js';
 import PuzzleController from '../../../puzzles/PuzzleController.js';
@@ -125,6 +126,7 @@ export const registerApi = (app: Express) => {
             ServerInfoController,
             ChangelogController,
             HexplorerController,
+            ClientErrorReportController,
             HexGameImporterController,
             OAuthController,
         ],
