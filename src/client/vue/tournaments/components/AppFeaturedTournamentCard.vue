@@ -41,8 +41,8 @@ const subscribeAndPrompt = async () => {
     >
         <IconTrophy class="bg-trophy text-warning" />
         <div class="card-body">
-            <h6 class="card-subtitle text-body-secondary">{{ $t('tournament') }}</h6>
-            <h4 class="card-title">{{ tournament.title }}</h4>
+            <p class="h6 card-subtitle text-body-secondary">{{ $t('tournament') }}</p>
+            <h3 class="h4 card-title">{{ tournament.title }}</h3>
 
             <p class="card-text">
                 <AppTournamentStartsAt :tournament format="short" />

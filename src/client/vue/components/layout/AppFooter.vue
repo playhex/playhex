@@ -47,10 +47,10 @@ i18n.on('languageChanged', () => {
         </div>
         <div v-if="displayStoreBadges" class="store-badges d-flex justify-content-center flex-wrap mt-3">
             <a href="https://play.google.com/store/apps/details?id=org.playhex.twa" target="_blank">
-                <img src="/images/stores/get-it-on-google-play.png" alt="Get it on Google Play" width="646" height="250">
+                <img src="/images/stores/get-it-on-google-play.png" alt="Get it on Google Play" width="180" height="70">
             </a>
             <a href="https://f-droid.org/packages/org.playhex.twa/" target="_blank">
-                <img src="/images/stores/get-it-on-f-droid.png" alt="Get it on F-Droid" width="646" height="250">
+                <img src="/images/stores/get-it-on-f-droid.png" alt="Get it on F-Droid" width="180" height="70">
             </a>
         </div>
         <p class="infos">

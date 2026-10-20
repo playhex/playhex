@@ -187,7 +187,7 @@ const clickLogout = async (): Promise<void> => {
             aria-haspopup="menu"
             :aria-expanded="showMenu"
             :title="pseudoString(loggedInPlayer)"
-            :aria-label="$t('player_menu.open_menu')"
+            :aria-label="pseudoString(loggedInPlayer) + ', ' + $t('player_menu.open_menu')"
             @click="toggleMenu()"
         >
             <span class="nav-avatar"><AppPlayerAvatar :player="loggedInPlayer" thumbnail /></span>

@@ -348,8 +348,8 @@ for (const locale of getPlayerLocales()) {
                             <table class="table text-nowrap table-borderless table-hover mb-0">
                                 <thead>
                                     <tr class="small text-secondary">
-                                        <th></th>
-                                        <th></th>
+                                        <th><span class="visually-hidden">{{ $t('game.review') }}</span></th>
+                                        <th><span class="visually-hidden">{{ $t('ranked') }}</span></th>
                                         <th>{{ $t('game.won') }}</th>
                                         <th>{{ $t('game.lost') }}</th>
                                         <th>{{ $t('game.size') }}</th>
@@ -421,7 +421,7 @@ for (const locale of getPlayerLocales()) {
 
                 <!-- Playing tournaments -->
                 <template v-if="runningTournaments.length > 0">
-                    <h6 class="mt-4">{{ $t('playing_tournaments') }}</h6>
+                    <h3 class="h6 mt-4">{{ $t('playing_tournaments') }}</h3>
 
                     <AppFeaturedTournamentCard
                         v-for="tournament in runningTournaments"
@@ -432,7 +432,7 @@ for (const locale of getPlayerLocales()) {
 
                 <!-- Past tournaments -->
                 <template v-if="endedTournaments.length > 0">
-                    <h6 class="mt-4">{{ $t('past_tournaments') }}</h6>
+                    <h3 class="h6 mt-4">{{ $t('past_tournaments') }}</h3>
 
                     <AppFeaturedTournamentCard
                         v-for="tournament in endedTournaments"
