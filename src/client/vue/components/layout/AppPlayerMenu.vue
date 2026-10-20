@@ -180,6 +180,7 @@ const clickLogout = async (): Promise<void> => {
         @mouseleave="hover(false)"
     >
         <!-- Player button -->
+        <!-- aria-label not using pseudoString() because its "Guest" prefix is not translated, and must match visible text -->
         <button
             v-if="loggedInPlayer"
             type="button"
@@ -187,7 +188,7 @@ const clickLogout = async (): Promise<void> => {
             aria-haspopup="menu"
             :aria-expanded="showMenu"
             :title="pseudoString(loggedInPlayer)"
-            :aria-label="pseudoString(loggedInPlayer) + ', ' + $t('player_menu.open_menu')"
+            :aria-label="(loggedInPlayer.isGuest ? $t('guest') + ' ' : '') + loggedInPlayer.pseudo +', ' + $t('player_menu.open_menu')"
             @click="toggleMenu()"
         >
             <span class="nav-avatar"><AppPlayerAvatar :player="loggedInPlayer" thumbnail /></span>

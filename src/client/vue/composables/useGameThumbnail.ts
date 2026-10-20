@@ -3,9 +3,8 @@ import Game from '../../../shared/app/models/Game.js';
 import useSocketStore from '../../stores/socketStore.js';
 import { addMove, cancelGame, endGame } from '../../../shared/app/gameUtils.js';
 import Rooms from '../../../shared/app/Rooms.js';
-import { GameView } from '@playhex/pixi-board';
-import { PlayingGameFacade } from '@playhex/pixi-board';
-import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
+import type { GameView, PlayingGameFacade } from '@playhex/pixi-board';
+import type { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 import { HexServerToClientEvents } from '../../../shared/app/HexSocketEvents.js';
 
 export const useGameThumbnail = (gamePublicId: string) => {
@@ -103,8 +102,18 @@ export const useGameThumbnail = (gamePublicId: string) => {
             throw new Error('Could not join room for thumbnail game ' + gamePublicId + '. Reason: ' + (e.message ?? e));
         }
 
-        socket.emit('thumbnailGameUpdateRequest', gamePublicId, (gameData, spectatorsCountData) => {
+        socket.emit('thumbnailGameUpdateRequest', gamePublicId, async (gameData, spectatorsCountData) => {
             if (!mounted || !gameData) {
+                return;
+            }
+
+            // Lazy load pixi, so it is not in pages critical path (i.e lobby), and page renders before thumbnails
+            const [{ GameView, PlayingGameFacade }, { PlayerSettingsFacade }] = await Promise.all([
+                import('@playhex/pixi-board'),
+                import('../../services/board-view-facades/PlayerSettingsFacade.js'),
+            ]);
+
+            if (!mounted) {
                 return;
             }
 

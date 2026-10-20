@@ -55,7 +55,7 @@ export function getManifest(): ManifestType {
 let bootstrapStylesheetUrlCache: null | string = null;
 
 /**
- * URL of the (LTR) Bootstrap stylesheet, rendered directly in the page <head> so it loads
+ * URL of the (LTR) Bootstrap stylesheet, rendered directly in the page so it loads
  * without waiting for the JS bundle (avoids a flash of unstyled content). The client swaps it
  * to the RTL build at runtime for right-to-left locales (see src/shared/app/i18n/rtl.ts).
  *

@@ -13,7 +13,7 @@ const bootstrapStylesheetId = 'bootstrap-stylesheet';
  * resetting them, so keeping both active would apply margins/paddings on both sides.
  * So we use a single Bootstrap <link> and swap its source on locale change.
  *
- * The LTR build is rendered up front in the page <head> (data-bootstrap-dir="ltr"), so for the
+ * The LTR build is rendered up front in the page (data-bootstrap-dir="ltr"), so for the
  * common LTR case this is a no-op and there is no flash. We swap to the RTL build by deriving
  * its URL from the rendered one (same path, just the file name), keeping any version query.
  */
