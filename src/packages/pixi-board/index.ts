@@ -48,3 +48,4 @@ export { ConditionalMovesFacade } from './conditional-moves/ConditionalMovesFaca
 
 // Utils
 export { ResizeObserverDebounced } from './resize-observer-debounced/ResizeObserverDebounced.js';
+export { getGpuRenderer } from './gpuQuirks.js';

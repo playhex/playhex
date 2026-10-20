@@ -713,6 +713,15 @@ export default class GameView extends TypedEmitter<GameViewEvents>
         this.emit('orientationChanged');
     }
 
+    /**
+     * Name of pixi renderer used (i.e "webgl", "webgpu"),
+     * or null if not yet initialized.
+     */
+    getRendererName(): null | string
+    {
+        return this.pixi?.renderer?.name ?? null;
+    }
+
     getTheme(): BoardTheme
     {
         return this.theme;
