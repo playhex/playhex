@@ -11,6 +11,13 @@
 
     <%- include('partials/seo-tags.ejs') %>
 
+    <%#
+        Bootstrap CSS, swapped to the RTL build at runtime for RTL locales.
+        Must stay in head, before app css and lazy loaded chunks css (appended to head by vite),
+        else Bootstrap overrides app styles.
+    %>
+    <link id="bootstrap-stylesheet" rel="stylesheet" href="<%- bootstrapCssUrl %>" data-bootstrap-dir="ltr">
+
     <% for(const assetUrl of Object.values(manifest)) { %>
         <% if (assetUrl.endsWith('.css')) { %>
         <link rel="preload" href="<%- assetUrl %>" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -25,13 +32,6 @@
             style="margin:0;padding-top:5em;font-size:2em;position:fixed;left:0;top:0;width:100%;height:100%;font-family:sans-serif;text-align:center;color:#dee2e6;background-color:#212529"
         >Loading…</p>
     </div>
-
-    <%#
-        Bootstrap CSS, swapped to the RTL build at runtime for RTL locales.
-        In body so it does not block rendering of "Loading…" above,
-        but still blocks scripts below, so app is not rendered unstyled.
-    %>
-    <link id="bootstrap-stylesheet" rel="stylesheet" href="<%- bootstrapCssUrl %>" data-bootstrap-dir="ltr">
 
     <%- include('partials/sentry.ejs') %>
 

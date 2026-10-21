@@ -3,7 +3,7 @@ import AppHeader from './components/layout/AppHeader.vue';
 import AppFooter from './components/layout/AppFooter.vue';
 import AppToasts from './components/layout/AppToasts.vue';
 import AppPlayerModerationActionOverlayAll from './components/AppPlayerModerationActionOverlayAll.vue';
-import { useRouter } from 'vue-router';
+import { START_LOCATION, useRouter } from 'vue-router';
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import useAppLayoutStore from '../stores/appLayoutStore.js';
@@ -15,8 +15,8 @@ const { headerHidden } = storeToRefs(useAppLayoutStore());
 
 const displayFooter = computed(() => currentRoute.value.meta.displayFooter ?? true);
 
-// Fix CLS on footer
-const routeLoaded = ref(false);
+// Fix CLS on footer. Initial navigation may be already done when app is mounted.
+const routeLoaded = ref(currentRoute.value !== START_LOCATION);
 
 router.beforeEach(() => { routeLoaded.value = false; });
 router.afterEach(() => { routeLoaded.value = true; });

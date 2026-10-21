@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'path';
 import { IS_DEV } from '../../../config.js';
 
-type ViteEntry = { file: string, name?: string, isEntry?: boolean, css?: string[] };
+type ViteEntry = { file: string, name?: string, isEntry?: boolean, css?: string[], imports?: string[] };
 type ViteManifest = { [key: string]: ViteEntry };
 type ManifestType = { [key: string]: string };
 
@@ -19,8 +19,11 @@ const flattenViteManifest = (raw: ViteManifest): ManifestType => {
 
         result[entry.name ?? entry.file] = PUBLIC + entry.file;
 
-        for (const css of entry.css ?? []) {
-            result[css] = PUBLIC + css;
+        // Also css of imported chunks, i.e components shared with lazy loaded pages, like AppPlayerAvatar
+        for (const chunk of [...(entry.imports ?? []).map(key => raw[key]), entry]) {
+            for (const css of chunk.css ?? []) {
+                result[css] = PUBLIC + css;
+            }
         }
     }
 
@@ -55,7 +58,7 @@ export function getManifest(): ManifestType {
 let bootstrapStylesheetUrlCache: null | string = null;
 
 /**
- * URL of the (LTR) Bootstrap stylesheet, rendered directly in the page so it loads
+ * URL of the (LTR) Bootstrap stylesheet, rendered directly in the page <head> so it loads
  * without waiting for the JS bundle (avoids a flash of unstyled content). The client swaps it
  * to the RTL build at runtime for right-to-left locales (see src/shared/app/i18n/rtl.ts).
  *
