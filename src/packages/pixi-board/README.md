@@ -208,6 +208,25 @@ Some hidden cells, corners of a board displayed for a puzzle, and a ziggurat on 
     <img src="cypress/screenshots-expected/partial-board.cy.ts/ziggurat.png" width="200" alt="ziggurat">
 </p>
 
+#### Edge arrow mark
+
+Arrow pointing towards an edge of the board: `'top'` or `'bottom'` (red edges), `'left'` or `'right'` (blue edges),
+e.g to show a stone is connected to this edge. Rotates with the board.
+
+``` ts
+import { EdgeArrowMark } from '@playhex/pixi-board';
+
+gameView.addEntity(new EdgeArrowMark('top').setCoords('c2'));
+
+// optional color, defaults to white
+gameView.addEntity(new EdgeArrowMark('right', 0xffff00).setCoords('d3'));
+```
+
+<p>
+    <img src="cypress/screenshots-expected/edge-arrow.cy.ts/edge-arrows.png" width="200" alt="arrows on stones pointing to each edge">
+    <img src="cypress/screenshots-expected/edge-arrow.cy.ts/ziggurat.png" width="200" alt="arrow on a ziggurat stone, on a partial board">
+</p>
+
 #### Theming
 
 Board appearance is customizable with themes, created from json or in typescript.

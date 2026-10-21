@@ -21,6 +21,7 @@ export { default as Anchor44Mark } from './entities/Anchor44Mark.js';
 export { default as CircleMark } from './entities/CircleMark.js';
 export { default as CrossMark } from './entities/CrossMark.js';
 export { default as DisabledCellMark } from './entities/DisabledCellMark.js';
+export { default as EdgeArrowMark, type BoardEdge } from './entities/EdgeArrowMark.js';
 export { default as HexagonMark } from './entities/HexagonMark.js';
 export { default as LastMoveMark } from './entities/LastMoveMark.js';
 export { default as SelectMark } from './entities/SelectMark.js';
