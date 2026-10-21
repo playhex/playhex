@@ -211,6 +211,15 @@ const {
                             >{{ $t('puzzles.list_title') }}</router-link>
                         </li>
 
+                        <li class="nav-item">
+                            <router-link
+                                :to="{ name: 'defend-your-template-training' }"
+                                :class="{ active: routeName?.startsWith('defend-your-template-training') }"
+                                class="nav-link"
+                                @click="closeOffcanvas"
+                            >{{ $t('training.sections.defend-your-template.title') }}</router-link>
+                        </li>
+
                         <li class="nav-item has-submenu">
                             <router-link
                                 :to="{ name: 'hexplorer' }"
