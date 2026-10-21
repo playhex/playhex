@@ -61,7 +61,7 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
     const progressTotal = (): number => Math.min(knownKeys.size, SOLVER_MAX_JOBS);
 
     const toInput = ({ red, blue, toMove }: Position, claim: SolveClaim, children: boolean): SolvePositionInput => toSolveInput(
-        { size: boardsize, color: toColor(toMove), black: red, white: blue, disabledCells },
+        { size: boardsize, color: toColor(toMove), black: red, white: blue, disabledCells, edgeConnections: puzzle.edgeConnections },
         player,
         claim,
         children ? SOLVER_CHILDREN_MAX_TIME_SECONDS : undefined,

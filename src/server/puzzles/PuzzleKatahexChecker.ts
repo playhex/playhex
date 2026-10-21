@@ -1,7 +1,7 @@
-import { coordsToMove, type Move } from '@playhex/move-notation';
+import type { Move } from '@playhex/move-notation';
 import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../shared/app/hexplorer.js';
 import { createNodeResolver, createParallelsFinder, findElseNode, findSolution, getComputerAnswers, getFirstColor, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
-import { createLimiter, getWinner, play, type Position } from './puzzleCheckUtils.js';
+import { createLimiter, getPolicyCandidates, getWinner, play, type Position } from './puzzleCheckUtils.js';
 import { KATAHEX_COMPUTER_ALTERNATIVES, KATAHEX_COMPUTER_DELTA, KATAHEX_INITIAL_WIN_THRESHOLD, KATAHEX_MAX_PLAUSIBLE_MOVES, KATAHEX_MAX_POSITIONS, KATAHEX_PLAUSIBLE_POLICY_RATIO, KATAHEX_WIN_THRESHOLD, type PuzzleCheckWarning, type PuzzleCheckWarningCode } from '../../shared/app/puzzles/puzzleCheck.js';
 
 /**
@@ -132,28 +132,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
             return [];
         }
 
-        const occupied = new Set([...position.red, ...position.blue]);
-        const candidates: { move: Move, policy: number }[] = [];
-        let total = 0;
-
-        policy.forEach((line, row) => line.forEach((value, col) => {
-            const move = coordsToMove({ row, col });
-
-            if (row >= boardsize || col >= boardsize || occupied.has(move) || !(value > 0)) {
-                return;
-            }
-
-            total += value;
-
-            if (!disabledCells.has(move)) {
-                candidates.push({ move, policy: value });
-            }
-        }));
-
-        return candidates
-            .map(candidate => ({ ...candidate, policy: candidate.policy / total }))
-            .sort((a, b) => b.policy - a.policy)
-        ;
+        return getPolicyCandidates(policy, boardsize, new Set([...position.red, ...position.blue]), disabledCells);
     };
 
     const warn = (code: PuzzleCheckWarningCode, path: Move[], params: PuzzleCheckWarning['params'], child?: number): PuzzleCheckWarning => ({

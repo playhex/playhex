@@ -1,7 +1,8 @@
-import type { Move } from '@playhex/move-notation';
+import { coordsToMove, type Move } from '@playhex/move-notation';
 import Board from '../../shared/game-engine/Board.js';
 import { SOLVER_TIME_LIMIT_SECONDS, type PuzzleSolvePositionInput } from '../../shared/app/puzzles/puzzleCheck.js';
 import type { SolvePositionInput } from '../ai-jobs/protocol.js';
+import { fillDisabledCells, getEdgePaths, type EdgePaths, type SolveClaim } from '../../shared/app/puzzles/edgeConnections.js';
 
 /**
  * Position while walking a puzzle tree. Stones count can be inconsistent with player to move.
@@ -12,25 +13,13 @@ export type Position = {
     toMove: 0 | 1;
 };
 
-/**
- * What a solve must prove about a player. Decides how disabled cells are filled, see fillDisabledCells().
- */
-export type SolveClaim = 'win' | 'notWin';
+export { fillDisabledCells, type SolveClaim };
 
 /**
- * Solver does not know disabled cells, so they are filled with stones.
- * For any player, a disabled cell is never better than its own stone, and never worse than an opponent stone.
- * So to prove player wins, disabled cells are filled with opponent stones,
- * and to prove player does not win, they are filled with player stones.
+ * Paths of edge connections of a solved position, black being red.
  */
-export const fillDisabledCells = (black: Move[], white: Move[], disabledCells: Move[], player: 'black' | 'white', claim: SolveClaim): { black: Move[], white: Move[] } => {
-    const filledWithBlack = (player === 'black') === (claim === 'notWin');
-
-    return {
-        black: filledWithBlack ? [...black, ...disabledCells] : black,
-        white: filledWithBlack ? white : [...white, ...disabledCells],
-    };
-};
+export const getSolveEdgePaths = ({ size, black, white, disabledCells = [], edgeConnections = [] }: PuzzleSolvePositionInput): EdgePaths =>
+    getEdgePaths({ boardsize: size, redStones: black, blueStones: white, disabledCells }, edgeConnections);
 
 /**
  * Input to send to solver, disabled cells filled depending on claim about player.
@@ -38,14 +27,14 @@ export const fillDisabledCells = (black: Move[], white: Move[], disabledCells: M
  * @param childrenMaxTimeSeconds Also solves children within this time, see SolvePositionInput.children
  */
 export const toSolveInput = (
-    { size, color, black, white, disabledCells = [] }: PuzzleSolvePositionInput,
+    input: PuzzleSolvePositionInput,
     player: 'black' | 'white',
     claim: SolveClaim,
     childrenMaxTimeSeconds?: number,
 ): SolvePositionInput => ({
-    size,
-    color,
-    ...fillDisabledCells(black, white, disabledCells, player, claim),
+    size: input.size,
+    color: input.color,
+    ...fillDisabledCells(input.black, input.white, input.disabledCells ?? [], player, claim, getSolveEdgePaths(input)),
     timeLimitSeconds: SOLVER_TIME_LIMIT_SECONDS,
     ...(childrenMaxTimeSeconds === undefined ? {} : { children: { maxTimeSeconds: childrenMaxTimeSeconds } }),
 });
@@ -68,6 +57,34 @@ export const getWinner = (boardsize: number, { red, blue }: Position): null | 0 
     blue.forEach(move => board.setCell(move, 1));
 
     return board.calculateWinner();
+};
+
+/**
+ * Moves from a katahex policy, best first, with their policy normalized over empty cells.
+ * Occupied cells are excluded, and excluded cells are not returned but still count in normalization.
+ */
+export const getPolicyCandidates = (policy: number[][], boardsize: number, occupied: Set<Move>, excluded: Set<Move>): { move: Move, policy: number }[] => {
+    const candidates: { move: Move, policy: number }[] = [];
+    let total = 0;
+
+    policy.forEach((line, row) => line.forEach((value, col) => {
+        const move = coordsToMove({ row, col });
+
+        if (row >= boardsize || col >= boardsize || occupied.has(move) || !(value > 0)) {
+            return;
+        }
+
+        total += value;
+
+        if (!excluded.has(move)) {
+            candidates.push({ move, policy: value });
+        }
+    }));
+
+    return candidates
+        .map(candidate => ({ ...candidate, policy: candidate.policy / total }))
+        .sort((a, b) => b.policy - a.policy)
+    ;
 };
 
 /**

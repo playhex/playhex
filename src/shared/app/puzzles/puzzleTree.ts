@@ -74,6 +74,7 @@
 
 import { parseMove, validateMove, type Move } from '@playhex/move-notation';
 import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../boardsizeLimits.js';
+import { getEdgePaths, type PuzzleEdgeConnection } from './edgeConnections.js';
 
 export type PuzzleResult = 'solved' | 'failed';
 
@@ -135,6 +136,11 @@ export type PuzzleDefinition = {
      * Cells that cannot be played. Considered occupied: no initial stone nor tree move on them.
      */
     disabledCells?: Move[];
+
+    /**
+     * Initial stones connected to their edge through disabled cells, see edgeConnections.ts.
+     */
+    edgeConnections?: PuzzleEdgeConnection[];
 
     lastMove?: null | Move;
     playerColor: 0 | 1;
@@ -541,7 +547,7 @@ const PARALLEL_ROOT_KEYS = ['children'];
  * Cells used by moves of this node descendants, "else" answers and parallel sequences included.
  * Accepts unchecked node, see validatePuzzle().
  */
-const collectCells = (node: unknown, cells = new Set<string>()): Set<string> => {
+export const collectCells = (node: unknown, cells = new Set<string>()): Set<string> => {
     if (!isObject(node)) {
         return cells;
     }
@@ -611,6 +617,10 @@ export type PuzzleErrorCode =
     | 'parallel_overlap'
     | 'parallel_transposition'
     | 'parallel_on_leaf'
+    | 'invalid_edge_connections'
+    | 'edge_connection_not_stone'
+    | 'edge_connection_twice'
+    | 'edge_connection_impossible'
 ;
 
 /**
@@ -677,6 +687,7 @@ const DRAFT_BLOCKING_ERRORS: PuzzleErrorCode[] = [
     'children_not_list',
     'node_not_object',
     'parallel_not_list',
+    'invalid_edge_connections',
 ];
 
 /**
@@ -843,6 +854,37 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
         }
 
         initialStones.add(move);
+    }
+
+    const edgeConnections: unknown = puzzle.edgeConnections ?? [];
+
+    if (!Array.isArray(edgeConnections) || !edgeConnections.every(connection => isObject(connection)
+        && Object.keys(connection).every(key => key === 'move' || key === 'edge')
+        && typeof connection.move === 'string' && validateMove(connection.move)
+        && (connection.edge === 0 || connection.edge === 1))
+    ) {
+        errors.push({ code: 'invalid_edge_connections' });
+    } else {
+        const connected = new Set<Move>();
+        const position = { boardsize, redStones: puzzle.redStones, blueStones: puzzle.blueStones, disabledCells };
+
+        for (const { move } of edgeConnections as PuzzleEdgeConnection[]) {
+            if (!puzzle.redStones.includes(move) && !puzzle.blueStones.includes(move)) {
+                errors.push({ code: 'edge_connection_not_stone', params: { move } });
+            } else if (connected.has(move)) {
+                errors.push({ code: 'edge_connection_twice', params: { move } });
+            }
+
+            connected.add(move);
+        }
+
+        for (const index of getEdgePaths(position, edgeConnections as PuzzleEdgeConnection[]).impossible) {
+            const { move } = (edgeConnections as PuzzleEdgeConnection[])[index];
+
+            if (puzzle.redStones.includes(move) || puzzle.blueStones.includes(move)) {
+                errors.push({ code: 'edge_connection_impossible', params: { move } });
+            }
+        }
     }
 
     if (puzzle.redStones.length + puzzle.blueStones.length === 0) {

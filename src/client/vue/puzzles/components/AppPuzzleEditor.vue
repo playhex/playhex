@@ -13,8 +13,9 @@ import { usePuzzleEditor } from '../composables/usePuzzleEditor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
+import PuzzleTreeGeneratorPanel from './PuzzleTreeGeneratorPanel.vue';
 import ImportGameOverlay from '../../components/overlay/ImportGameOverlay.vue';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconHexagonFill, IconInfoCircle, IconMagic, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconArrowUp, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconHexagonFill, IconInfoCircle, IconMagic, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { createKatahexAnalyzers, useAnalysisEngines } from '../../hexplorer/composables/useAnalysisEngines.js';
@@ -82,6 +83,7 @@ const {
     canAddElse,
     canAddParallel,
     addParallel,
+    canGenerate,
     pickingElse,
     startPickingElse,
     setResult,
@@ -99,9 +101,18 @@ const {
     puzzleCheckError,
     puzzleChecking,
     runPuzzleCheck,
+    puzzleGenerate,
+    puzzleGenerateError,
+    puzzleGenerating,
+    generateWarnings,
+    runPuzzleGenerate,
     redStones,
     blueStones,
     disabledCells,
+    edgeConnections,
+    edgeToolError,
+    solverFillPreview,
+    setSolverFillPreview,
     hideDisabledCells,
     toInput,
     analyzer,
@@ -519,6 +530,27 @@ const deletePuzzle = async (): Promise<void> => {
                         <div class="form-text">{{ $t(hideDisabledCells ? 'puzzles.editor.disabled_cells_hidden_help' : 'puzzles.editor.disabled_cells_greyed_help') }}</div>
                     </div>
 
+                    <div v-if="disabledCells.length > 0 || edgeConnections.length > 0" class="mb-3">
+                        <div class="form-label">{{ $t('puzzles.editor.edge_connections') }}</div>
+                        <button
+                            class="btn"
+                            :class="'edge' === positionTool ? 'btn-secondary' : 'btn-outline-secondary'"
+                            @click="positionTool = 'edge'"
+                        ><IconArrowUp /> {{ $t('puzzles.editor.edge_connection_tool') }}</button>
+                        <div v-if="'edge' === positionTool" class="form-text">{{ $t('puzzles.editor.edge_connection_help') }}</div>
+                        <div v-if="edgeToolError" class="form-text text-warning-emphasis"><IconExclamationTriangle /> {{ $t('puzzles.editor.edge_connection_unreachable', { move: edgeToolError }) }}</div>
+                    </div>
+
+                    <div v-if="disabledCells.length > 0" class="mb-3">
+                        <div class="form-label">{{ $t('puzzles.editor.solver_fill_preview') }}</div>
+                        <div class="btn-group btn-group-sm flex-wrap">
+                            <button class="btn" :class="null === solverFillPreview ? 'btn-secondary' : 'btn-outline-secondary'" @click="setSolverFillPreview(null)">{{ $t('puzzles.editor.solver_fill_none') }}</button>
+                            <button class="btn" :class="'win' === solverFillPreview ? 'btn-secondary' : 'btn-outline-secondary'" @click="setSolverFillPreview('win')">{{ $t('puzzles.editor.solver_fill_win') }}</button>
+                            <button class="btn" :class="'notWin' === solverFillPreview ? 'btn-secondary' : 'btn-outline-secondary'" @click="setSolverFillPreview('notWin')">{{ $t('puzzles.editor.solver_fill_not_win') }}</button>
+                        </div>
+                        <div class="form-text">{{ $t('puzzles.editor.solver_fill_help') }}</div>
+                    </div>
+
                     <div class="mb-3">
                         <div class="form-label">{{ $t('puzzles.editor.last_move_tool') }}</div>
                         <div class="d-flex flex-wrap align-items-center gap-2">
@@ -596,6 +628,19 @@ const deletePuzzle = async (): Promise<void> => {
                         </div>
                         <p v-else-if="analysisError === 'failed'" class="text-danger small mt-1 mb-0"><IconExclamationTriangle /> {{ $t('hexplorer.analysis_failed') }}</p>
                     </div>
+
+                    <PuzzleTreeGeneratorPanel
+                        v-if="expertMode"
+                        :canGenerate
+                        :hasSubtree="!isElseNode(selectedNode) && !!(selectedNode.children?.length || selectedNode.parallel?.length)"
+                        :solverAvailable="isSolverAvailable"
+                        :generating="puzzleGenerating"
+                        :state="puzzleGenerate"
+                        :error="puzzleGenerateError"
+                        :warnings="generateWarnings"
+                        @generate="runPuzzleGenerate"
+                        @selectWarning="selectErrorNode"
+                    />
 
                     <div class="position-relative mb-3">
                         <div class="move-tree-wrapper bg-body">

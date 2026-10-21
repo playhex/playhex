@@ -1,6 +1,7 @@
-import { CellsMask, DisabledCellMark, type GameView } from '@playhex/pixi-board';
+import { CellsMask, DisabledCellMark, EdgeArrowMark, type GameView } from '@playhex/pixi-board';
 import { coordsToMove, type Move } from '@playhex/move-notation';
 import type { Puzzle } from '../../../../shared/app/models/index.js';
+import { getBoardEdge, getStoneColor } from '../../../../shared/app/puzzles/edgeConnections.js';
 
 export type ColoredMove = {
     move: Move;
@@ -8,8 +9,9 @@ export type ColoredMove = {
 };
 
 const DISABLED_CELLS_GROUP = 'disabled_cells';
+const EDGE_CONNECTIONS_GROUP = 'edge_connections';
 
-type PuzzlePosition = Pick<Puzzle, 'boardsize' | 'redStones' | 'blueStones' | 'disabledCells'> & Partial<Pick<Puzzle, 'hideDisabledCells'>>;
+type PuzzlePosition = Pick<Puzzle, 'boardsize' | 'redStones' | 'blueStones' | 'disabledCells'> & Partial<Pick<Puzzle, 'hideDisabledCells' | 'edgeConnections'>>;
 
 /**
  * Cells displayed to player, to pass to GameView constructor:
@@ -24,7 +26,8 @@ export const createPuzzleCellsMask = (puzzle: PuzzlePosition): null | CellsMask 
 };
 
 /**
- * Draws puzzle initial stones and disabled cells, then given moves, on an emptied board.
+ * Draws puzzle initial stones, disabled cells and arrows on stones connected to their edge,
+ * then given moves, on an emptied board.
  * Disabled cells are greyed out, unless hidden by puzzle, see createPuzzleCellsMask().
  */
 export const drawPuzzlePosition = (
@@ -50,6 +53,16 @@ export const drawPuzzlePosition = (
 
     for (const move of puzzle.redStones) gameView.setStone(move, 0);
     for (const move of puzzle.blueStones) gameView.setStone(move, 1);
+
+    gameView.removeEntitiesGroup(EDGE_CONNECTIONS_GROUP);
+
+    for (const { move, edge } of puzzle.edgeConnections ?? []) {
+        const color = getStoneColor(puzzle, move);
+
+        if (color !== null) {
+            gameView.addEntity(new EdgeArrowMark(getBoardEdge(color, edge)).setCoords(move), EDGE_CONNECTIONS_GROUP);
+        }
+    }
 
     for (const { move, color } of moves) {
         gameView.setStone(move, color);

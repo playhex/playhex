@@ -24,6 +24,7 @@ import { LadderChallenge, LadderEvent, LadderPlayer } from '../shared/app/models
 import type TimeControlType from '../shared/time-control/TimeControlType.js';
 import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
 import type { PuzzleCheckInput, PuzzleCheckState, PuzzleSolvePositionInput, PuzzleSolvePositionOutput } from '../shared/app/puzzles/puzzleCheck.js';
+import type { PuzzleGenerateInput, PuzzleGenerateState } from '../shared/app/puzzles/puzzleGenerate.js';
 import type { PuzzleCollectionInput } from '../shared/app/puzzles/puzzleCollection.js';
 import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.js';
 import type { OAuthConnectedApplication, OAuthInteractionDetails } from '../shared/app/oauth.js';
@@ -1557,6 +1558,31 @@ export const apiPuzzleCheck = async (input: PuzzleCheckInput): Promise<PuzzleChe
         },
         body: JSON.stringify(input),
     });
+
+    await checkResponse(response);
+
+    return await response.json();
+};
+
+/**
+ * Starts generating puzzle tree with Mohex solver, or returns its current state.
+ * Send same input again to poll until generation is done.
+ *
+ * @throws {AnalysisEngineUnavailableError} If no worker can solve positions
+ */
+export const apiPuzzleGenerateTree = async (input: PuzzleGenerateInput): Promise<PuzzleGenerateState> => {
+    const response = await fetch('/api/puzzles/generate-tree', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    if (response.status === 503) {
+        throw new AnalysisEngineUnavailableError('No worker online for mohex solver');
+    }
 
     await checkResponse(response);
 

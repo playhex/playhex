@@ -64,6 +64,16 @@ export class LocalSettings
      */
     @Expose()
     puzzleEditorExpertMode?: boolean;
+
+    /**
+     * Puzzle tree generator options, see PuzzleGenerateInput.
+     * Templates the player is supposed to know: puzzle ends once connected with them.
+     */
+    @Expose()
+    puzzleGeneratorTemplateIds?: string[];
+
+    @Expose()
+    puzzleGeneratorRefutationLength?: 1 | 2;
 }
 
 const loadLocalSettings = (): LocalSettings => {

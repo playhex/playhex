@@ -5,6 +5,7 @@ import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { ColumnUUID } from '../custom-typeorm.js';
 import { deserializeMoves, serializeMoves } from '../movesSerializer.js';
 import type { PuzzleNode } from '../puzzles/puzzleTree.js';
+import type { PuzzleEdgeConnection } from '../puzzles/edgeConnections.js';
 import { keysOf } from '../utils.js';
 import Player from './Player.js';
 import Game from './Game.js';
@@ -68,6 +69,14 @@ export default class Puzzle
     @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
     @Type(() => String)
     disabledCells: Move[];
+
+    /**
+     * Initial stones connected to their edge through disabled cells, marked with an arrow.
+     * See edgeConnections.ts. Null in database means none.
+     */
+    @Column({ type: 'json', nullable: true, transformer: { from: (value: unknown) => value ?? [], to: (value?: PuzzleEdgeConnection[]) => value?.length ? value : null } })
+    @Expose({ groups: [GROUP_DEFAULT, 'puzzle'] })
+    edgeConnections: PuzzleEdgeConnection[];
 
     /**
      * Whether disabled cells are hidden to player, showing a partial board, instead of greyed out.

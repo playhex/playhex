@@ -4,7 +4,7 @@ import { Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthenticatedPlayer } from '../controllers/http/middlewares.js';
 import { Player, Puzzle, PuzzleCollection } from '../../shared/app/models/index.js';
-import { isDraftBlockingError, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type PuzzleInput } from '../../shared/app/puzzles/puzzleTree.js';
+import { isDraftBlockingError, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type PuzzleDefinition, type PuzzleInput } from '../../shared/app/puzzles/puzzleTree.js';
 import { PUZZLE_COLLECTION_MAX_PUZZLES } from '../../shared/app/puzzles/puzzleCollection.js';
 import { canCreatePuzzleFromGame } from '../../shared/app/gameUtils.js';
 import GameStore from '../store/GameStore.js';
@@ -14,7 +14,8 @@ import { serializePuzzleData } from './puzzleSerializer.js';
 import { mustBeCollectionAuthor, mustBePuzzleAuthor } from './puzzleGuards.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 import { ArrayMaxSize, IsArray, IsIn, IsInt, IsOptional, Max, Min, Validate } from 'class-validator';
-import type { Move } from '@playhex/move-notation';
+import { validateMove, type Move } from '@playhex/move-notation';
+import { getEdgePaths, type PuzzleEdgeConnection } from '../../shared/app/puzzles/edgeConnections.js';
 import { PUZZLE_CHECK_ENGINES, type PuzzleCheckEngine, type PuzzleCheckInput, type PuzzleCheckState, type PuzzleSolvePositionInput, type PuzzleSolvePositionOutput } from '../../shared/app/puzzles/puzzleCheck.js';
 import { MIN_BOARDSIZE, MOHEX_MAX_BOARDSIZE } from '../../shared/app/boardsizeLimits.js';
 import { IsHexCoordinate } from '../../shared/app/validator/IsHexCoordinate.js';
@@ -26,7 +27,10 @@ import PuzzleCheckService, { getPuzzleCheckKey } from './PuzzleCheckService.js';
 import { SimilarPlayingPositionChecker } from '../services/anti-cheat/SimilarPlayingPositionChecker.js';
 import { SimilarPositionDetectedError, similarPositionDetectedToTranslatableHttpError } from '../services/anti-cheat/SimilarPositionDetectedError.js';
 import { InvalidPositionError } from '../../shared/position-comparator/position-comparator.js';
-import { rateLimiterConsumePuzzleCheck, rateLimiterConsumePuzzleSolvePosition } from '../services/rate-limiters.js';
+import { rateLimiterConsumePuzzleCheck, rateLimiterConsumePuzzleGenerate, rateLimiterConsumePuzzleSolvePosition } from '../services/rate-limiters.js';
+import { findGenerateStartNode, GENERATOR_REFUTATION_LENGTHS, type PuzzleGenerateInput, type PuzzleGenerateState } from '../../shared/app/puzzles/puzzleGenerate.js';
+import { HEX_TEMPLATES } from '../../shared/hex-templates/hex-templates.js';
+import PuzzleGenerateService, { getPuzzleGenerateKey } from './PuzzleGenerateService.js';
 import { ROLE_ADMIN } from '../services/roles.js';
 
 /**
@@ -90,6 +94,7 @@ const applyPuzzleInput = (puzzle: Puzzle, input: PuzzleInput): void => {
     puzzle.redStones = input.redStones;
     puzzle.blueStones = input.blueStones;
     puzzle.disabledCells = input.disabledCells ?? [];
+    puzzle.edgeConnections = input.edgeConnections ?? [];
     puzzle.hideDisabledCells = input.hideDisabledCells === true;
     puzzle.lastMove = input.lastMove ?? null;
     puzzle.playerColor = input.playerColor;
@@ -98,6 +103,15 @@ const applyPuzzleInput = (puzzle: Puzzle, input: PuzzleInput): void => {
     setPublished(puzzle, input.published === true);
     puzzle.updatedAt = new Date();
     mustBeSavable(puzzle);
+};
+
+/**
+ * Initial position as sent to solver, for both claims, see fillDisabledCells().
+ */
+const getFilledInitialPositions = ({ boardsize, redStones, blueStones, playerColor, disabledCells = [], edgeConnections = [] }: PuzzleDefinition): { black: Move[], white: Move[] }[] => {
+    const edgePaths = getEdgePaths({ boardsize, redStones, blueStones, disabledCells }, edgeConnections);
+
+    return (['win', 'notWin'] as const).map(claim => fillDisabledCells(redStones, blueStones, disabledCells, toColor(playerColor), claim, edgePaths));
 };
 
 const SOLVE_MAX_STONES = MOHEX_MAX_BOARDSIZE * MOHEX_MAX_BOARDSIZE;
@@ -127,7 +141,21 @@ class SolvePositionBody implements PuzzleSolvePositionInput
     @ArrayMaxSize(SOLVE_MAX_STONES)
     @Validate(IsHexCoordinate, { each: true })
     disabledCells?: Move[];
+
+    /**
+     * Checked in controller, see isValidEdgeConnection().
+     */
+    @IsOptional()
+    @IsArray()
+    @ArrayMaxSize(SOLVE_MAX_STONES)
+    edgeConnections?: PuzzleEdgeConnection[];
 }
+
+const isValidEdgeConnection = (connection: unknown): connection is PuzzleEdgeConnection =>
+    typeof connection === 'object' && connection !== null
+    && typeof (connection as PuzzleEdgeConnection).move === 'string' && validateMove((connection as PuzzleEdgeConnection).move)
+    && ((connection as PuzzleEdgeConnection).edge === 0 || (connection as PuzzleEdgeConnection).edge === 1)
+;
 
 /**
  * Body size limit, as a tree with many nodes and messages can exceed default 100kb.
@@ -147,6 +175,7 @@ export default class PuzzleController
         private similarPlayingPositionChecker: SimilarPlayingPositionChecker,
         private positionSolveCache: PositionSolveCache,
         private aiJobService: AiJobService,
+        private puzzleGenerateService: PuzzleGenerateService,
     ) {}
 
     /**
@@ -374,14 +403,11 @@ export default class PuzzleController
         @Req() request: Request,
     ): Promise<PuzzleCheckState> {
         return await this.puzzleCheck(input, async engine => {
-            const { boardsize, redStones, blueStones, playerColor, disabledCells = [] } = input.puzzle;
+            const { boardsize, redStones, blueStones } = input.puzzle;
 
             // Solver sees disabled cells as stones, see fillDisabledCells(): check positions it actually solves
             const positions = engine === 'mohex-solver'
-                ? [
-                    fillDisabledCells(redStones, blueStones, disabledCells, toColor(playerColor), 'win'),
-                    fillDisabledCells(redStones, blueStones, disabledCells, toColor(playerColor), 'notWin'),
-                ]
+                ? getFilledInitialPositions(input.puzzle)
                 : [{ black: redStones, white: blueStones }]
             ;
 
@@ -433,6 +459,10 @@ export default class PuzzleController
         @Body() body: SolvePositionBody,
         @Req() request: Request,
     ): Promise<PuzzleSolvePositionOutput> {
+        if (body.edgeConnections !== undefined && !body.edgeConnections.every(isValidEdgeConnection)) {
+            throw new BadRequestError('Invalid edgeConnections');
+        }
+
         const inputs = getPuzzleSolveInputs(body);
 
         // Disabled cells are filled with stones: checks positions actually solved, and validates all cells
@@ -452,6 +482,61 @@ export default class PuzzleController
         }
 
         return await solvePuzzlePosition(body, input => this.positionSolveCache.solve(input, SOLVE_POSITION_INTERACTIVE_TIMEOUT_MS));
+    }
+
+    /**
+     * Generates tree from a node with Mohex solver, see PuzzleTreeGenerator.
+     * Puzzle is sent, not saved. Client polls by sending same input again until generation is done.
+     */
+    @Post('/api/puzzles/generate-tree')
+    async postGenerateTree(
+        @AuthenticatedPlayer() player: Player,
+        @Body(BODY_OPTIONS) input: PuzzleGenerateInput,
+        @Req() request: Request,
+    ): Promise<PuzzleGenerateState> {
+        const { puzzle, fromPath, templateIds, refutationLength } = input;
+
+        // Tree can be incomplete, only position must be valid
+        const errors = validatePuzzle(puzzle).filter(error => isDraftBlockingError(error)
+            || (error.path === undefined && error.code === 'set_twice')
+            || error.code === 'empty_position',
+        );
+
+        if (errors.length > 0) {
+            throw new BadRequestError(`Invalid puzzle: ${errors.map(puzzleErrorToString).join(', ')}`);
+        }
+
+        if (!Array.isArray(fromPath) || findGenerateStartNode(puzzle.tree, fromPath) === null) {
+            throw new BadRequestError('fromPath must reach a node of main sequence, before puzzle ends');
+        }
+
+        if (!Array.isArray(templateIds) || templateIds.some(id => !HEX_TEMPLATES.some(template => template.id === id))) {
+            throw new BadRequestError('Invalid templateIds');
+        }
+
+        if (!GENERATOR_REFUTATION_LENGTHS.includes(refutationLength)) {
+            throw new BadRequestError('Invalid refutationLength');
+        }
+
+        if (puzzle.boardsize > MOHEX_MAX_BOARDSIZE) {
+            throw new BadRequestError(`Solver supports boards up to ${MOHEX_MAX_BOARDSIZE}`);
+        }
+
+        const state = this.puzzleGenerateService.getState(getPuzzleGenerateKey(input));
+
+        if (state !== null) {
+            return state;
+        }
+
+        if (!this.puzzleGenerateService.isAvailable()) {
+            throw new HttpError(503, 'No AI worker can solve positions right now');
+        }
+
+        this.mustNotBePlayingPositions(puzzle.boardsize, getFilledInitialPositions(puzzle), player, request);
+
+        await rateLimiterConsumePuzzleGenerate(player.publicId);
+
+        return this.puzzleGenerateService.start(input);
     }
 
     /**

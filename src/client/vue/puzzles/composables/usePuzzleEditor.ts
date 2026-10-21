@@ -1,7 +1,7 @@
 import { CircleMark, GameMarksFacade, GameView, PolicyOverlayFacade, TextMark } from '@playhex/pixi-board';
 import { onKeyDown, useEventListener } from '@vueuse/core';
 import { coordsToMove, type HexMove, type Move } from '@playhex/move-notation';
-import { computed, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue';
+import { computed, nextTick, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue';
 import { t } from 'i18next';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
@@ -12,16 +12,18 @@ import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterf
 import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
 import type { PuzzleCheckEngine, PuzzleCheckState, PuzzleSolvePositionOutput } from '../../../../shared/app/puzzles/puzzleCheck.js';
 import { isValidBoardsize, MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
-import { apiPuzzleCheck, apiPuzzleSolvePosition } from '../../../apiClient.js';
+import { apiPuzzleCheck, apiPuzzleGenerateTree, apiPuzzleSolvePosition } from '../../../apiClient.js';
+import type { PuzzleGenerateInput, PuzzleGenerateState, PuzzleGenerateWarning } from '../../../../shared/app/puzzles/puzzleGenerate.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import type { ImportedGame } from '../../../../shared/app/hex-game-importer/types.js';
+import { getReachableEdges, getSolverFilledPosition, type PuzzleEdgeConnection, type SolveClaim } from '../../../../shared/app/puzzles/edgeConnections.js';
 
 export type EditorStep = 'position' | 'tree' | 'publish';
 
 /**
  * How a click on board edits initial position.
  */
-export type PositionTool = 'red' | 'blue' | 'erase' | 'disable' | 'last_move';
+export type PositionTool = 'red' | 'blue' | 'erase' | 'disable' | 'last_move' | 'edge';
 
 type EditorNode = PuzzleNode | PuzzleElseNode;
 
@@ -122,6 +124,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const redStones = ref<Move[]>(initial ? [...initial.redStones] : []);
     const blueStones = ref<Move[]>(initial ? [...initial.blueStones] : []);
     const disabledCells = ref<Move[]>(initial ? [...initial.disabledCells] : []);
+    const edgeConnections = ref<PuzzleEdgeConnection[]>(initial ? (initial.edgeConnections ?? []).map(connection => ({ ...connection })) : []);
     const hideDisabledCells = ref(initial?.hideDisabledCells ?? false);
     const lastMove = ref<null | Move>(initial?.lastMove ?? null);
     const playerColor = ref<0 | 1>(initial?.playerColor ?? 0);
@@ -199,6 +202,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         blueStones.value = position.blueStones;
         // Keep disabled cells, except where a stone has been played
         disabledCells.value = disabledCells.value.filter(move => !position.redStones.includes(move) && !position.blueStones.includes(move));
+        edgeConnections.value = edgeConnections.value.filter(({ move }) => position.redStones.includes(move) || position.blueStones.includes(move));
         lastMove.value = position.lastMove ?? null;
         playerColor.value = position.playerColor;
         // Game last move is an opponent stone, invalid when computer plays first
@@ -278,6 +282,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redStones.value = [];
         blueStones.value = [];
         disabledCells.value = [];
+        edgeConnections.value = [];
         lastMove.value = null;
         tree.value = {};
         selectedPath.value = [];
@@ -361,6 +366,21 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
         return !isElseNode(node)
             && nextColor.value === playerColor.value
+            && !isInContinuation.value
+            && !isInParallel.value
+            && node.result === undefined
+            && !transpositions.value.has(node)
+        ;
+    });
+
+    /**
+     * Tree can be generated from a main sequence node, before puzzle ends.
+     * Not from a transposition leaf, which continues from another node.
+     */
+    const canGenerate = computed(() => {
+        const node = selectedNode.value;
+
+        return !isElseNode(node)
             && !isInContinuation.value
             && !isInParallel.value
             && node.result === undefined
@@ -604,6 +624,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redStones.value = redStones.value.filter(m => m !== move);
         blueStones.value = blueStones.value.filter(m => m !== move);
         disabledCells.value = disabledCells.value.filter(m => m !== move);
+        edgeConnections.value = edgeConnections.value.filter(connection => connection.move !== move);
 
         if (lastMove.value === move) {
             lastMove.value = null;
@@ -618,7 +639,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      * e.g starting on a red stone with red tool removes red stones only.
      * Null when not painting.
      */
-    let painting: null | { tool: Exclude<PositionTool, 'last_move'>, add: boolean } = null;
+    let painting: null | { tool: Exclude<PositionTool, 'last_move' | 'edge'>, add: boolean } = null;
 
     const paintCell = (move: Move): void => {
         const { tool, add } = painting!;
@@ -646,7 +667,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     {
         const tool = positionTool.value;
 
-        if (step.value !== 'position' || tool === 'last_move') {
+        if (step.value !== 'position' || tool === 'last_move' || tool === 'edge') {
             return;
         }
 
@@ -666,9 +687,58 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     });
 
     /**
-     * Only for last move tool, other tools paint on pointer down.
+     * Stone clicked with edge tool has no edge reachable through disabled cells.
+     */
+    const edgeToolError = ref<null | Move>(null);
+
+    /**
+     * Shows disabled cells filled with stones, as sent to solver to prove this claim about player.
+     * Null to show position as is. Position step only.
+     */
+    const solverFillPreview = ref<null | SolveClaim>(null);
+
+    const setSolverFillPreview = (claim: null | SolveClaim): void => {
+        solverFillPreview.value = claim;
+        redraw();
+    };
+
+    watch(positionTool, () => edgeToolError.value = null);
+
+    /**
+     * Cycles edge connection of a stone: none, then each edge reachable through disabled cells.
+     */
+    const toggleEdgeConnection = (move: Move): void => {
+        edgeToolError.value = null;
+
+        if (!redStones.value.includes(move) && !blueStones.value.includes(move)) {
+            return;
+        }
+
+        const position = { boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value };
+        const edges = getReachableEdges(position, move);
+        const current = edgeConnections.value.find(connection => connection.move === move);
+        const next = current === undefined ? edges[0] : edges[edges.indexOf(current.edge) + 1];
+
+        edgeConnections.value = edgeConnections.value.filter(connection => connection.move !== move);
+
+        if (next !== undefined) {
+            edgeConnections.value.push({ move, edge: next });
+        } else if (current === undefined) {
+            edgeToolError.value = move;
+        }
+
+        redraw();
+    };
+
+    /**
+     * Only for last move and edge tools, other tools paint on pointer down.
      */
     const onPositionHexClicked = (move: Move): void => {
+        if (positionTool.value === 'edge') {
+            toggleEdgeConnection(move);
+            return;
+        }
+
         if (positionTool.value !== 'last_move') {
             return;
         }
@@ -740,8 +810,12 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
     function redraw(): void
     {
-        const position = { boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value };
+        let position = { boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value, edgeConnections: edgeConnections.value };
         const moves = step.value === 'tree' ? selectedMoves.value : [];
+
+        if (step.value === 'position' && solverFillPreview.value !== null) {
+            position = { ...position, ...getSolverFilledPosition(position, edgeConnections.value, playerColor.value, solverFillPreview.value) };
+        }
 
         drawPuzzlePosition(gameView, position, moves);
 
@@ -952,6 +1026,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
                 black: red,
                 white: blue,
                 disabledCells: [...disabledCells.value],
+                edgeConnections: edgeConnections.value.map(connection => ({ ...connection })),
             });
         } catch (e) {
             if (requestId !== analysisRequestId) {
@@ -1019,6 +1094,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redStones: redStones.value,
         blueStones: blueStones.value,
         disabledCells: disabledCells.value,
+        edgeConnections: edgeConnections.value.map(connection => ({ ...connection })),
         hideDisabledCells: hideDisabledCells.value,
         lastMove: lastMove.value,
         playerColor: playerColor.value,
@@ -1044,12 +1120,17 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const draftErrors = computed(() => errors.value.filter(isDraftBlockingError));
 
     /**
-     * Errors by tree node, to highlight nodes and show their errors.
+     * Warnings of last generation, highlighted in tree until puzzle changes.
+     */
+    const generateWarnings = ref<PuzzleGenerateWarning[]>([]);
+
+    /**
+     * Errors by tree node, and generation warnings, to highlight nodes and show their errors.
      */
     const nodeErrors = computed(() => {
-        const map = new Map<EditorNode, PuzzleError[]>();
+        const map = new Map<EditorNode, PuzzleError<string>[]>();
 
-        for (const error of errors.value) {
+        for (const error of [...errors.value, ...generateWarnings.value]) {
             const node = findErrorNode(tree.value, error);
 
             if (node !== null) {
@@ -1098,19 +1179,19 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      */
 
     const toDefinition = (): PuzzleDefinition => {
-        const { title, description, boardsize, redStones, blueStones, disabledCells, lastMove, playerColor, computerPlaysFirst, tree } = toInput(published);
+        const { title, description, boardsize, redStones, blueStones, disabledCells, edgeConnections, lastMove, playerColor, computerPlaysFirst, tree } = toInput(published);
 
-        return { title, description, boardsize, redStones, blueStones, disabledCells, lastMove, playerColor, computerPlaysFirst, tree };
+        return { title, description, boardsize, redStones, blueStones, disabledCells, edgeConnections, lastMove, playerColor, computerPlaysFirst, tree };
     };
 
     /**
      * Changes when position or tree changes, to invalidate katahex check results.
      */
     const puzzleCheckKey = computed(() => {
-        const { boardsize, redStones, blueStones, disabledCells, playerColor, computerPlaysFirst, tree } = toDefinition();
+        const { boardsize, redStones, blueStones, disabledCells, edgeConnections, playerColor, computerPlaysFirst, tree } = toDefinition();
 
         return JSON.stringify(
-            { boardsize, redStones, blueStones, disabledCells, playerColor, computerPlaysFirst, tree },
+            { boardsize, redStones, blueStones, disabledCells, edgeConnections, playerColor, computerPlaysFirst, tree },
             (key, value: unknown) => key === 'message' ? undefined : value,
         );
     });
@@ -1176,6 +1257,111 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         } finally {
             if (run === puzzleCheckRun) {
                 puzzleChecking.value = false;
+            }
+        }
+    };
+
+    /*
+     * Tree generation with Mohex solver
+     */
+
+    const puzzleGenerate = ref<null | PuzzleGenerateState>(null);
+    const puzzleGenerateError = ref<null | string>(null);
+    const puzzleGenerating = ref(false);
+
+    /**
+     * Incremented to stop polling a previous generation.
+     */
+    let puzzleGenerateRun = 0;
+
+    const resetPuzzleGenerate = (): void => {
+        ++puzzleGenerateRun;
+        puzzleGenerate.value = null;
+        puzzleGenerateError.value = null;
+        puzzleGenerating.value = false;
+        generateWarnings.value = [];
+    };
+
+    watch(puzzleCheckKey, resetPuzzleGenerate);
+
+    /**
+     * Generates children and parallel sequences of selected node on server, polls until done,
+     * then replaces them in tree.
+     */
+    const runPuzzleGenerate = async (options: Pick<PuzzleGenerateInput, 'templateIds' | 'refutationLength'>): Promise<void> => {
+        const node = selectedNode.value;
+
+        if (!canGenerate.value || isElseNode(node)) {
+            return;
+        }
+
+        resetPuzzleGenerate();
+
+        const run = puzzleGenerateRun;
+        const input: PuzzleGenerateInput = {
+            puzzle: toDefinition(),
+            fromPath: selectedMoveNodes.value.map(moveNode => (moveNode as PuzzleNode).move!),
+            ...options,
+        };
+
+        puzzleGenerating.value = true;
+
+        try {
+            for (;;) {
+                const state = await apiPuzzleGenerateTree(input);
+
+                if (run !== puzzleGenerateRun) {
+                    return;
+                }
+
+                puzzleGenerate.value = state;
+
+                if (state.status !== 'running') {
+                    break;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, KATAHEX_CHECK_POLL_INTERVAL_MS));
+
+                if (run !== puzzleGenerateRun) {
+                    return;
+                }
+            }
+
+            const state = puzzleGenerate.value;
+
+            if (state.status === 'failed') {
+                puzzleGenerateError.value = state.error ?? null;
+                return;
+            }
+
+            const { subtree, warnings } = state.output!;
+
+            if (subtree.children) {
+                node.children = subtree.children;
+            } else {
+                delete node.children;
+            }
+
+            if (subtree.parallel) {
+                node.parallel = subtree.parallel;
+            } else {
+                delete node.parallel;
+            }
+
+            redraw();
+
+            // Tree changed: let watcher reset previous generation before showing this one
+            await nextTick();
+
+            puzzleGenerate.value = state;
+            generateWarnings.value = warnings;
+        } catch (e) {
+            if (run === puzzleGenerateRun) {
+                puzzleGenerateError.value = apiErrorMessage(e);
+            }
+        } finally {
+            if (run === puzzleGenerateRun) {
+                puzzleGenerating.value = false;
             }
         }
     };
@@ -1252,6 +1438,10 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redStones,
         blueStones,
         disabledCells,
+        edgeConnections,
+        edgeToolError,
+        solverFillPreview,
+        setSolverFillPreview,
         hideDisabledCells,
         playerColor,
         setPlayerColor,
@@ -1284,6 +1474,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         canAddElse,
         canAddParallel,
         addParallel,
+        canGenerate,
         pickingElse,
         startPickingElse,
         setResult,
@@ -1304,6 +1495,12 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         puzzleCheckError,
         puzzleChecking,
         runPuzzleCheck,
+
+        puzzleGenerate,
+        puzzleGenerateError,
+        puzzleGenerating,
+        generateWarnings,
+        runPuzzleGenerate,
 
         analyzer,
         setAnalyzer,
