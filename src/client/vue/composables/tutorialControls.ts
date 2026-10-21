@@ -1,9 +1,20 @@
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { t } from 'i18next';
 import useToastsStore from '../../stores/toastsStore.js';
 import { getNextTutorialStep, tutorialSteps, type TutorialStep, type TutorialStepId } from '../pages/tutorial/tutorialSteps.js';
+
+/**
+ * Remember whether tutorial link was displayed last time,
+ * to display it (or not) before player settings are loaded,
+ * and prevent layout shift on lobby page.
+ */
+const DISPLAY_LINK_CACHE_KEY = 'tutorial-display-link';
+
+const getCachedDisplayLink = (): boolean => localStorage?.getItem(DISPLAY_LINK_CACHE_KEY) !== 'false';
+
+const setCachedDisplayLink = (displayLink: boolean): void => localStorage?.setItem(DISPLAY_LINK_CACHE_KEY, String(displayLink));
 
 export const useTutorialControls = () => {
     const playerSettingsStore = usePlayerSettingsStore();
@@ -54,7 +65,17 @@ export const useTutorialControls = () => {
     };
 
     const shouldDisplayLink = computed<boolean>(() => {
-        return playerSettings.value?.showTutorial === true && !isFinished.value;
+        if (playerSettings.value === null) {
+            return getCachedDisplayLink();
+        }
+
+        return playerSettings.value.showTutorial === true && !isFinished.value;
+    });
+
+    watch(shouldDisplayLink, displayLink => {
+        if (playerSettings.value !== null) {
+            setCachedDisplayLink(displayLink);
+        }
     });
 
     const dismissTutorial = async () => {
