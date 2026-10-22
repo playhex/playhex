@@ -17,6 +17,7 @@ import AppPuzzleEdgeConnectionTool from './AppPuzzleEdgeConnectionTool.vue';
 import AppPuzzleMonitorUncoveredLines from './AppPuzzleMonitorUncoveredLines.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
+import PuzzleTreeGeneratorPanel from './PuzzleTreeGeneratorPanel.vue';
 import ImportGameOverlay from '../../components/overlay/ImportGameOverlay.vue';
 import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconAspectRatio, IconAsterisk, IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconCrosshair, IconDiagram2, IconEraser, IconExclamationTriangle, IconEye, IconGraphUp, IconHexagonFill, IconHouseFill, IconInfoCircle, IconMagic, IconPlayFill, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconXLg, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
@@ -94,6 +95,7 @@ const {
     canAddElse,
     canAddParallel,
     addParallel,
+    canGenerate,
     pickingElse,
     startPickingElse,
     setResult,
@@ -116,6 +118,22 @@ const {
     puzzleCheckError,
     puzzleChecking,
     runPuzzleCheck,
+    puzzleGenerateError,
+    puzzleGenerating,
+    generateProgress,
+    generateWarnings,
+    runPuzzleGenerate,
+    generatePending,
+    waitingForPending,
+    generateDone,
+    isAwaitingComputerMove,
+    selectNextPending,
+    skipPending,
+    stopGenerate,
+    canGoBack,
+    canGoForward,
+    goBack,
+    goForward,
     redStones,
     blueStones,
     disabledCells,
@@ -941,6 +959,29 @@ const deletePuzzle = async (): Promise<void> => {
                             </div>
                             <p v-else-if="analysisError === 'failed'" class="text-danger small mt-1 mb-0"><IconExclamationTriangle /> {{ $t('hexplorer.analysis_failed') }}</p>
                         </div>
+
+                        <PuzzleTreeGeneratorPanel
+                            v-if="expertMode"
+                            :canGenerate
+                            :solverAvailable="isSolverAvailable"
+                            :generating="puzzleGenerating"
+                            :progress="generateProgress"
+                            :done="generateDone"
+                            :error="puzzleGenerateError"
+                            :warnings="generateWarnings"
+                            :pendingCount="generatePending.length"
+                            :awaitingComputerMove="isAwaitingComputerMove"
+                            :waitingForPending
+                            :canGoBack
+                            :canGoForward
+                            @generate="runPuzzleGenerate"
+                            @selectWarning="selectErrorNode"
+                            @nextPending="selectNextPending"
+                            @skipPending="skipPending"
+                            @back="goBack"
+                            @forward="goForward"
+                            @stop="stopGenerate"
+                        />
 
                         <div class="move-tree-block position-relative mb-3">
                             <div class="move-tree-frame position-relative">

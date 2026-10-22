@@ -146,6 +146,16 @@ const puzzleMonitorLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit puzzle trees generations started by a player.
+ * Only new generations count, polling a running one does not.
+ */
+const puzzleGenerateLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.puzzle_generate',
+    points: 10,
+    duration: 5,
+});
+
+/**
  * Limit game analyze moves deep analyzes (tree search), by player.
  * One point by move, enough to deeply analyze a whole game at once.
  */
@@ -162,7 +172,7 @@ const analyzeMoveMctsLimiter = new RateLimiterMemory({
 const aiWorkerNextJobLimiter = new RateLimiterMemory({
     keyPrefix: 'rate_limiter.ai_worker_next_job',
     points: 600,
-    duration: 60,
+    duration: 5,
 });
 
 /**
@@ -306,6 +316,10 @@ export const rateLimiterConsumePuzzleSolvePosition = async (playerPublicId: stri
 
 export const rateLimiterConsumePuzzleMonitor = async (playerPublicId: string) => {
     await consume(puzzleMonitorLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumePuzzleGenerate = async (playerPublicId: string) => {
+    await consume(puzzleGenerateLimiter, playerPublicId);
 };
 
 export const rateLimiterConsumeAiWorkerNextJob = async (aiWorkerKeyId: number) => {

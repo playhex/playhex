@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { countComputerAlternatives, createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findPlayedMovesPath, findSamePositionNode, findSolution, findTranspositions, isPlayableLine, isUncoveredLine, getComputerAnswer, getComputerAnswers, getNodeResult, hasComputerAlternatives, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
+import { countComputerAlternatives, createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findPlayedMovesPath, findSamePositionNode, findSolution, findTranspositions, isPlayableLine, isUncoveredLine, getComputerAnswer, getComputerAnswers, getNodeResult, hasComputerAlternatives, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, PUZZLE_MAX_NODES, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
 
 const noTransposition: NodeResolver = node => node;
 
@@ -256,18 +256,23 @@ describe('puzzleTree', () => {
 
     it('limits nodes count', () => {
         const tree: PuzzleNode = { children: [] };
-        let node = tree;
+        const cellsCount = 25 * 25 - 1; // Without y25, red stone
+        const toMove = (cell: number) => `${String.fromCharCode(97 + (cell % 25))}${Math.floor(cell / 25) + 1}` as PuzzleNode['move'];
 
-        // Long line of 513 nodes on a big board
-        for (let i = 0; i < 513; ++i) {
-            const child: PuzzleNode = { move: `${String.fromCharCode(97 + (i % 25))}${Math.floor(i / 25) + 1}` as PuzzleNode['move'], children: [] };
-            node.children!.push(child);
-            node = child;
+        // PUZZLE_MAX_NODES + 1 nodes on a big board, in long lines starting from different cells
+        for (let start = 0, count = 0; count <= PUZZLE_MAX_NODES; ++start) {
+            let node = tree;
+
+            for (let i = 0; i < 600 && count <= PUZZLE_MAX_NODES; ++i, ++count) {
+                const child: PuzzleNode = { move: toMove((start + i) % cellsCount), children: [] };
+                node.children!.push(child);
+                node = child;
+            }
         }
 
         const errors = validatePuzzle(createPuzzle({ boardsize: 25, redStones: ['y25'], blueStones: [], tree }));
 
-        assert.deepStrictEqual(errors, [{ code: 'too_many_nodes', params: { max: 512 } }]);
+        assert.deepStrictEqual(errors, [{ code: 'too_many_nodes', params: { max: PUZZLE_MAX_NODES } }]);
     });
 
     describe('played moves path', () => {
@@ -590,6 +595,23 @@ describe('puzzleTree', () => {
                 validatePuzzle(createPuzzle({ tree: tree(true) })),
                 [{ code: 'parallel_transposition', path: ['d2', 'b4', 'c3', 'b3'], params: { other: 'c3 b3 d2 b4' } }],
             );
+        });
+
+        it('accepts transposition to a node having same parallel sequences, declared on each moves order', () => {
+            // d2 b4 c3 transposes to c3 b4 d2, same bridge intrusion declared after b4 on both moves orders, in another order
+            const intrusion = (reversed: boolean): PuzzleNode => ({
+                children: reversed
+                    ? [{ move: 'e4', children: [{ move: 'e3' }] }, { move: 'e3', children: [{ move: 'e4' }] }]
+                    : [{ move: 'e3', children: [{ move: 'e4' }] }, { move: 'e4', children: [{ move: 'e3' }] }],
+            });
+            const tree: PuzzleNode = {
+                children: [
+                    { move: 'c3', children: [{ move: 'b4', parallel: [intrusion(false)], children: [{ move: 'd2', children: [{ move: 'b3', children: [{ move: 'd3' }] }] }] }] },
+                    { move: 'd2', children: [{ move: 'b4', parallel: [intrusion(true)], children: [{ move: 'c3' }] }] },
+                ],
+            };
+
+            assert.deepStrictEqual(errorCodes(tree), []);
         });
     });
 
