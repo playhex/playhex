@@ -4,7 +4,7 @@
  * explains the features it adds.
  */
 import { useDisclosure } from '@overlastic/vue';
-import { IconAsterisk, IconMagic, IconRobot, IconShuffle, IconSignpostSplit, IconZoomOut } from '../../icons.js';
+import { IconAsterisk, IconDiagram2, IconMagic, IconRobot, IconShuffle, IconSignpostSplit, IconZoomOut } from '../../icons.js';
 
 const { visible, confirm, cancel } = useDisclosure();
 
@@ -14,6 +14,7 @@ const features = [
     { icon: IconShuffle, title: 'puzzles.editor.parallel', help: 'puzzles.editor.parallel_help' },
     { icon: IconSignpostSplit, title: 'puzzles.editor.alternatives', help: 'puzzles.editor.alternatives_expert_help' },
     { icon: IconRobot, title: 'puzzles.editor.ai_eval', help: 'puzzles.editor.ai_eval_help' },
+    { icon: IconDiagram2, title: 'puzzles.editor.generate', help: 'puzzles.editor.generate_help' },
 ];
 </script>
 

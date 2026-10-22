@@ -190,7 +190,7 @@ export type PuzzleInput = PuzzleDefinition & {
 export const PUZZLE_TITLE_MAX_LENGTH = 64;
 export const PUZZLE_DESCRIPTION_MAX_LENGTH = 2048;
 export const PUZZLE_MESSAGE_MAX_LENGTH = 512;
-export const PUZZLE_MAX_NODES = 512;
+export const PUZZLE_MAX_NODES = 2048;
 
 export const isElseNode = (node: PuzzleNode | PuzzleElseNode): node is PuzzleElseNode =>
     'else' in node;
@@ -425,8 +425,30 @@ type PositionedNode = {
     key: string;
 };
 
-const sameItems = (a: unknown[], b: unknown[]): boolean =>
-    a.length === b.length && a.every((item, index) => item === b[index]);
+/**
+ * Moves and results of a parallel sequence, without messages: same key, same sequence for player.
+ * Can be called on an invalid tree.
+ */
+export const getParallelKey = (node: unknown): string => {
+    if (typeof node !== 'object' || node === null) {
+        return JSON.stringify(node);
+    }
+
+    const { move, result, children } = node as Record<string, unknown>;
+    const childrenKeys = Array.isArray(children) ? children.map(getParallelKey).sort() : [];
+
+    return JSON.stringify([move ?? null, result ?? null, childrenKeys]);
+};
+
+/**
+ * Same parallel sequences, possibly declared on different nodes, e.g on both moves orders of a transposition.
+ */
+export const sameParallels = (a: unknown[], b: unknown[]): boolean => {
+    const aKeys = a.map(getParallelKey).sort();
+    const bKeys = b.map(getParallelKey).sort();
+
+    return aKeys.length === bKeys.length && aKeys.every((key, index) => key === bKeys[index]);
+};
 
 const toTransposition = ({ node, path, moves }: PositionedNode): Transposition => ({ target: node, path, moves });
 
@@ -673,7 +695,7 @@ const PARALLEL_ROOT_KEYS = ['children'];
  * Cells used by moves of this node descendants, "else" answers and parallel sequences included.
  * Accepts unchecked node, see validatePuzzle().
  */
-const collectCells = (node: unknown, cells = new Set<string>()): Set<string> => {
+export const collectCells = (node: unknown, cells = new Set<string>()): Set<string> => {
     if (!isObject(node)) {
         return cells;
     }
@@ -1317,7 +1339,7 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
     for (const { key, path, parallels } of leafPositions) {
         const target = definedPositions.get(key);
 
-        if (target !== undefined && !sameItems(target.parallels, parallels)) {
+        if (target !== undefined && !sameParallels(target.parallels, parallels)) {
             errors.push({ code: 'parallel_transposition', path, params: { other: target.path.join(' ') } });
         }
     }
