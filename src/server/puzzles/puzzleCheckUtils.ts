@@ -1,4 +1,4 @@
-import type { Move } from '@playhex/move-notation';
+import { coordsToMove, type Move } from '@playhex/move-notation';
 import Board from '../../shared/game-engine/Board.js';
 import { SOLVER_TIME_LIMIT_SECONDS, type PuzzleSolvePositionInput } from '../../shared/app/puzzles/puzzleCheck.js';
 import type { SolvePositionInput } from '../ai-jobs/protocol.js';
@@ -59,6 +59,34 @@ export const getWinner = (boardsize: number, { red, blue }: Position): null | 0 
     blue.forEach(move => board.setCell(move, 1));
 
     return board.calculateWinner();
+};
+
+/**
+ * Moves from a katahex policy, best first, with their policy normalized over empty cells.
+ * Occupied cells are excluded, and excluded cells are not returned but still count in normalization.
+ */
+export const getPolicyCandidates = (policy: number[][], boardsize: number, occupied: Set<Move>, excluded: Set<Move>): { move: Move, policy: number }[] => {
+    const candidates: { move: Move, policy: number }[] = [];
+    let total = 0;
+
+    policy.forEach((line, row) => line.forEach((value, col) => {
+        const move = coordsToMove({ row, col });
+
+        if (row >= boardsize || col >= boardsize || occupied.has(move) || !(value > 0)) {
+            return;
+        }
+
+        total += value;
+
+        if (!excluded.has(move)) {
+            candidates.push({ move, policy: value });
+        }
+    }));
+
+    return candidates
+        .map(candidate => ({ ...candidate, policy: candidate.policy / total }))
+        .sort((a, b) => b.policy - a.policy)
+    ;
 };
 
 /**

@@ -44,9 +44,9 @@ const props = defineProps<{
     transpositions: Map<PuzzleNode, Transposition>;
 
     /**
-     * Validation errors by node: highlighted, and shown on hover.
+     * Validation errors and generation warnings by node: highlighted, and shown on hover.
      */
-    nodeErrors: Map<EditorNode, PuzzleError[]>;
+    nodeErrors: Map<EditorNode, PuzzleError<string>[]>;
 
     /**
      * Zoomed out: smaller nodes, coordinates only shown on hover.

@@ -12,7 +12,8 @@ import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterf
 import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
 import type { PuzzleCheckEngine, PuzzleCheckState, PuzzleSolvePositionOutput } from '../../../../shared/app/puzzles/puzzleCheck.js';
 import { isValidBoardsize, MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
-import { apiPuzzleCheck, apiPuzzleSolvePosition } from '../../../apiClient.js';
+import { apiPuzzleCheck, apiPuzzleGenerateTree, apiPuzzleSolvePosition } from '../../../apiClient.js';
+import { type PuzzleGenerateInput, type PuzzleGenerateState, type PuzzleGenerateWarning } from '../../../../shared/app/puzzles/puzzleGenerate.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import type { ImportedGame } from '../../../../shared/app/hex-game-importer/types.js';
 import { fillForKatahex, getEdgePaths, getReachableEdges, getSolverFilledPosition, type PuzzleEdgeConnection, type PuzzleFixedFill } from '../../../../shared/app/puzzles/edgeConnections.js';
@@ -411,6 +412,21 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
         return !isElseNode(node)
             && nextColor.value === playerColor.value
+            && !isInContinuation.value
+            && !isInParallel.value
+            && node.result === undefined
+            && !transpositions.value.has(node)
+        ;
+    });
+
+    /**
+     * Tree can be generated from a main sequence node, before puzzle ends.
+     * Not from a transposition leaf, which continues from another node.
+     */
+    const canGenerate = computed(() => {
+        const node = selectedNode.value;
+
+        return !isElseNode(node)
             && !isInContinuation.value
             && !isInParallel.value
             && node.result === undefined
@@ -1359,12 +1375,17 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     };
 
     /**
-     * Errors by tree node, to highlight nodes and show their errors.
+     * Warnings of last generation, highlighted in tree until puzzle changes.
+     */
+    const generateWarnings = ref<PuzzleGenerateWarning[]>([]);
+
+    /**
+     * Errors by tree node, and generation warnings, to highlight nodes and show their errors.
      */
     const nodeErrors = computed(() => {
-        const map = new Map<EditorNode, PuzzleError[]>();
+        const map = new Map<EditorNode, PuzzleError<string>[]>();
 
-        for (const error of errors.value) {
+        for (const error of [...errors.value, ...generateWarnings.value]) {
             const node = findErrorNode(tree.value, error);
 
             if (node !== null) {
@@ -1376,6 +1397,27 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     });
 
     /**
+     * Nodes path reached by these main sequence moves, null if not in tree.
+     */
+    const findMainPath = (moves: Move[]): null | PuzzleNode[] => {
+        const path: PuzzleNode[] = [];
+        let node: PuzzleNode = tree.value;
+
+        for (const move of moves) {
+            const child = findChild(node, move);
+
+            if (child === null) {
+                return null;
+            }
+
+            path.push(child);
+            node = child;
+        }
+
+        return path;
+    };
+
+    /**
      * Selects tree node where this error is, in tree step.
      * Does nothing if error is not in tree, or in a parallel sequence.
      */
@@ -1384,21 +1426,15 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
             return;
         }
 
-        const path: EditorNode[] = [];
-        let node: PuzzleNode = tree.value;
+        const mainPath = findMainPath(error.path);
 
-        for (const move of error.path) {
-            const child = findChild(node, move);
-
-            if (child === null) {
-                return;
-            }
-
-            path.push(child);
-            node = child;
+        if (mainPath === null) {
+            return;
         }
 
+        const node = mainPath[mainPath.length - 1] ?? tree.value;
         const child = error.child === undefined ? undefined : node.children?.[error.child];
+        const path: EditorNode[] = mainPath;
 
         if (child !== undefined) {
             path.push(child);
@@ -1512,6 +1548,142 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         } finally {
             if (run === puzzleCheckRun) {
                 puzzleChecking.value = false;
+            }
+        }
+    };
+
+    /*
+     * Tree generation with Mohex solver from selected node, see PuzzleGenerateInput:
+     * player winning moves from solver, computer answers from katahex policy.
+     */
+
+    /**
+     * State of running generation, null if none.
+     */
+    const generateState = ref<null | PuzzleGenerateState>(null);
+
+    const puzzleGenerating = computed(() => generateState.value !== null);
+
+    const generateProgress = computed(() => ({
+        done: generateState.value?.done ?? 0,
+        total: generateState.value?.total ?? 0,
+    }));
+
+    const puzzleGenerateError = ref<null | string>(null);
+
+    /**
+     * Last generation finished and its subtree inserted.
+     */
+    const generateDone = ref(false);
+
+    /**
+     * Incremented to stop running generation.
+     */
+    let generateSession = 0;
+
+    const selectedMainMoves = (): Move[] => selectedMoveNodes.value.map(moveNode => (moveNode as PuzzleNode).move!);
+
+    const stopGenerate = (): void => {
+        ++generateSession;
+        generateState.value = null;
+    };
+
+    /**
+     * Generation stops when position changes, tree changes are expected.
+     */
+    const generatePositionKey = computed(() => JSON.stringify([
+        boardsize.value, redStones.value, blueStones.value, disabledCells.value, edgeConnections.value, fixedFill.value, playerColor.value, computerPlaysFirst.value,
+    ]));
+
+    watch(generatePositionKey, () => {
+        stopGenerate();
+        generateWarnings.value = [];
+        generateDone.value = false;
+    });
+
+    /**
+     * Generates tree from selected node on server, or completes it, polls until done,
+     * then sets its children and parallel sequences, existing and added ones.
+     * Result is dropped if node has been changed meanwhile.
+     */
+    const runPuzzleGenerate = async (options: Pick<PuzzleGenerateInput, 'templateIds'>): Promise<void> => {
+        const node = selectedNode.value;
+
+        if (!canGenerate.value || isElseNode(node) || generateState.value !== null) {
+            return;
+        }
+
+        const session = ++generateSession;
+        const path = selectedMainMoves();
+        const snapshot = JSON.stringify([node.children, node.parallel]);
+        const input: PuzzleGenerateInput = { puzzle: toDefinition(), fromPath: path, ...options };
+
+        generateState.value = { status: 'running', done: 0, total: 0 };
+        generateWarnings.value = [];
+        puzzleGenerateError.value = null;
+        generateDone.value = false;
+
+        const isStopped = (): boolean => session !== generateSession;
+
+        try {
+            let state: PuzzleGenerateState;
+
+            for (;;) {
+                state = await apiPuzzleGenerateTree(input);
+
+                if (isStopped()) {
+                    return;
+                }
+
+                generateState.value = state;
+
+                if (state.status !== 'running') {
+                    break;
+                }
+
+                await new Promise(resolve => setTimeout(resolve, KATAHEX_CHECK_POLL_INTERVAL_MS));
+
+                if (isStopped()) {
+                    return;
+                }
+            }
+
+            if (state.status === 'failed') {
+                puzzleGenerateError.value = state.error ?? null;
+                return;
+            }
+
+            const mainPath = findMainPath(path);
+            const target = mainPath === null ? null : mainPath[mainPath.length - 1] ?? tree.value;
+
+            if (target === null || JSON.stringify([target.children, target.parallel]) !== snapshot) {
+                puzzleGenerateError.value = t('puzzles.editor.generate_tree_changed');
+                return;
+            }
+
+            const { subtree, warnings } = state.output!;
+
+            delete target.children;
+            delete target.parallel;
+
+            if (subtree.children) {
+                target.children = subtree.children;
+            }
+
+            if (subtree.parallel) {
+                target.parallel = subtree.parallel;
+            }
+
+            redraw();
+            generateWarnings.value = warnings;
+            generateDone.value = true;
+        } catch (e) {
+            if (!isStopped()) {
+                puzzleGenerateError.value = apiErrorMessage(e);
+            }
+        } finally {
+            if (!isStopped()) {
+                generateState.value = null;
             }
         }
     };
@@ -1635,6 +1807,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         canAddElse,
         canAddParallel,
         addParallel,
+        canGenerate,
         pickingElse,
         startPickingElse,
         setResult,
@@ -1660,6 +1833,14 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         puzzleCheckError,
         puzzleChecking,
         runPuzzleCheck,
+
+        puzzleGenerateError,
+        puzzleGenerating,
+        generateProgress,
+        generateWarnings,
+        runPuzzleGenerate,
+        generateDone,
+        stopGenerate,
 
         analyzer,
         setAnalyzer,
