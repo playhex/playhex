@@ -1,10 +1,8 @@
 import type { Move } from '@playhex/move-notation';
 import type { SolvePositionInput, SolvePositionOutput, SolveResult } from '../ai-jobs/protocol.js';
-import { solveCacheKey } from '../ai-jobs/PositionSolveCache.js';
 import { createNodeResolver, createParallelsFinder, findSolution, getComputerAnswers, getFirstColor, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
-import { SOLVER_CHILDREN_MAX_TIME_SECONDS, SOLVER_MAX_JOBS, type PuzzleCheckWarning, type PuzzleCheckWarningCode } from '../../shared/app/puzzles/puzzleCheck.js';
-import { createLimiter, getSolveEdgePaths, getWinner, play, toColor, toSolveInput, type Position, type SolveClaim } from './puzzleCheckUtils.js';
-import type { EdgePaths } from '../../shared/app/puzzles/edgeConnections.js';
+import { SOLVER_MAX_JOBS, type PuzzleCheckWarning, type PuzzleCheckWarningCode } from '../../shared/app/puzzles/puzzleCheck.js';
+import { createLimiter, createSolveSession, getWinner, play, toColor, type Position } from './puzzleCheckUtils.js';
 
 export type PositionSolver = (input: SolvePositionInput) => Promise<SolvePositionOutput>;
 
@@ -39,80 +37,21 @@ export type PuzzleSolverCheckerOptions = {
 export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: PuzzleSolverCheckerOptions): Promise<PuzzleCheckWarning[]> => {
     const { boardsize, playerColor, tree } = puzzle;
     const computerPlaysFirst = puzzle.computerPlaysFirst ?? false;
-    const disabledCells = puzzle.disabledCells ?? [];
     const player = toColor(playerColor);
     const opponent = toColor(playerColor === 0 ? 1 : 0);
     const resolve: NodeResolver = createNodeResolver(tree);
     const findParallels = createParallelsFinder(tree);
-    const limit = createLimiter(options.concurrency ?? 4);
-
-    const solves = new Map<string, Promise<SolvePositionOutput>>();
-    let done = 0;
-    let budgetExceeded = false;
+    const { solve, plan, reportProgress, isBudgetExceeded } = createSolveSession(puzzle, {
+        solve: options.solve,
+        maxJobs: SOLVER_MAX_JOBS,
+        limit: createLimiter(options.concurrency ?? 4),
+        onProgress: options.onProgress,
+    });
 
     /**
      * Results needed by a check, but not proven: check is partial.
      */
     const unproven = new Set<string>();
-
-    /**
-     * Solve keys known to be needed, from planning walk, and solves started.
-     */
-    const knownKeys = new Set<string>();
-    const progressTotal = (): number => Math.min(knownKeys.size, SOLVER_MAX_JOBS);
-
-    /**
-     * Edge paths by position, computed once for both claims, see getSolveEdgePaths().
-     */
-    const edgePathsCache = new Map<string, EdgePaths>();
-
-    const toInput = ({ red, blue, toMove }: Position, claim: SolveClaim, children: boolean): SolvePositionInput => {
-        const input = { size: boardsize, color: toColor(toMove), black: red, white: blue, disabledCells, edgeConnections: puzzle.edgeConnections, fixedFill: puzzle.fixedFill };
-        const pathsKey = red.join(' ') + '|' + blue.join(' ');
-        let edgePaths = edgePathsCache.get(pathsKey);
-
-        if (edgePaths === undefined) {
-            edgePaths = getSolveEdgePaths(input);
-            edgePathsCache.set(pathsKey, edgePaths);
-        }
-
-        return toSolveInput(input, player, claim, edgePaths, children ? SOLVER_CHILDREN_MAX_TIME_SECONDS : undefined);
-    };
-
-    /**
-     * Without disabled cells, both claims give same key, so position is solved once.
-     */
-    const solveKey = (position: Position, claim: SolveClaim, children: boolean): string =>
-        solveCacheKey(toInput(position, claim, children));
-
-    /**
-     * Returns null when too many positions have been solved, then check is skipped.
-     */
-    const solve = (position: Position, claim: SolveClaim, children: boolean): null | Promise<SolvePositionOutput> => {
-        const input = toInput(position, claim, children);
-        const key = solveCacheKey(input);
-        let solved = solves.get(key);
-
-        if (solved !== undefined) {
-            return solved;
-        }
-
-        if (solves.size >= SOLVER_MAX_JOBS) {
-            budgetExceeded = true;
-            return null;
-        }
-
-        solved = limit(() => options.solve(input)).then(output => {
-            options.onProgress?.(++done, progressTotal());
-            return output;
-        });
-
-        solves.set(key, solved);
-        knownKeys.add(key);
-        options.onProgress?.(done, progressTotal());
-
-        return solved;
-    };
 
     /**
      * Winner of a result, or null and marked as unproven.
@@ -291,8 +230,8 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
             return;
         }
 
-        knownKeys.add(solveKey(position, 'win', true));
-        knownKeys.add(solveKey(position, 'notWin', true));
+        plan(position, 'win', true);
+        plan(position, 'notWin', true);
 
         for (const child of node.children ?? []) {
             if (isElseNode(child) || !child.move) {
@@ -321,7 +260,7 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
             const result = getNodeResult(answer);
 
             if (result === 'solved' && getWinner(boardsize, answerPosition) === null) {
-                knownKeys.add(solveKey(answerPosition, 'notWin', false));
+                plan(answerPosition, 'notWin', false);
             } else if (result === null) {
                 planPlayerChoice(answer, answerPosition);
             }
@@ -332,7 +271,7 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
 
     // Also planned by planPlayerChoice() when player plays first
     if (!initialEnded) {
-        knownKeys.add(solveKey(initialPosition, 'notWin', true));
+        plan(initialPosition, 'notWin', true);
     }
 
     if (computerPlaysFirst) {
@@ -341,7 +280,7 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
         planPlayerChoice(tree, initialPosition);
     }
 
-    options.onProgress?.(0, progressTotal());
+    reportProgress();
 
     const [initialSolve, treeWarnings] = await Promise.all([
         initialEnded ? null : solve(initialPosition, 'notWin', true),
@@ -362,7 +301,7 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
         warnings.push({ code: 'solver_unproven', params: { count: unproven.size } });
     }
 
-    if (budgetExceeded) {
+    if (isBudgetExceeded()) {
         warnings.push({ code: 'solver_too_many_positions', params: { max: SOLVER_MAX_JOBS } });
     }
 

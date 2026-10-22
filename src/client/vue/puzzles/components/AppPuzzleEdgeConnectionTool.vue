@@ -4,7 +4,7 @@ import { IconArrowUp, IconExclamationTriangle } from '../../icons.js';
 
 /*
  * Tool to connect stones to their edge through disabled cells,
- * shown in both position and engines panels.
+ * shown in position, engines and generate panels.
  */
 
 defineProps<{

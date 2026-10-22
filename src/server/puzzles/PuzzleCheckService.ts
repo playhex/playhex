@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { Service } from 'typedi';
 import type { AnalysisEngine } from '../../shared/app/hexplorer.js';
 import type { PuzzleDefinition } from '../../shared/app/puzzles/puzzleTree.js';
@@ -8,35 +7,14 @@ import PositionAnalysisCache from '../ai-jobs/PositionAnalysisCache.js';
 import PositionSolveCache from '../ai-jobs/PositionSolveCache.js';
 import { checkPuzzleWithKatahex } from './PuzzleKatahexChecker.js';
 import { checkPuzzleWithSolver } from './PuzzleSolverChecker.js';
-import logger from '../services/logger.js';
-
-/**
- * How long a finished check is kept, for client polling.
- * Running it again later is fast anyway, as analyzes are cached by position.
- */
-const FINISHED_RUN_TTL_MS = 10 * 60_000;
+import { BackgroundRuns } from './BackgroundRuns.js';
+import { getPuzzleRunKey } from './puzzleCheckUtils.js';
 
 /**
  * Identifies a check: same puzzle position and tree, with same engine.
- * Messages and texts are ignored, they don't change the check.
  */
-export const getPuzzleCheckKey = (puzzle: PuzzleDefinition, engine: PuzzleCheckEngine): string => {
-    const definition = {
-        boardsize: puzzle.boardsize,
-        redStones: [...puzzle.redStones].sort(),
-        blueStones: [...puzzle.blueStones].sort(),
-        disabledCells: [...puzzle.disabledCells ?? []].sort(),
-        edgeConnections: puzzle.edgeConnections ?? [],
-        fixedFill: puzzle.fixedFill ?? [],
-        playerColor: puzzle.playerColor,
-        computerPlaysFirst: puzzle.computerPlaysFirst ?? false,
-        tree: puzzle.tree,
-    };
-
-    const json = JSON.stringify(definition, (key, value: unknown) => key === 'message' ? undefined : value);
-
-    return createHash('sha1').update(engine + '|' + json).digest('hex');
-};
+export const getPuzzleCheckKey = (puzzle: PuzzleDefinition, engine: PuzzleCheckEngine): string =>
+    getPuzzleRunKey(puzzle, { engine });
 
 /**
  * Runs puzzle katahex checks in background, as they can take long (many positions to analyze),
@@ -45,7 +23,7 @@ export const getPuzzleCheckKey = (puzzle: PuzzleDefinition, engine: PuzzleCheckE
 @Service()
 export default class PuzzleCheckService
 {
-    private runs = new Map<string, PuzzleCheckState>();
+    private runs = new BackgroundRuns<PuzzleCheckState>('Puzzle check');
 
     constructor(
         private aiJobService: AiJobService,
@@ -59,13 +37,7 @@ export default class PuzzleCheckService
      */
     getState(key: string): null | PuzzleCheckState
     {
-        const state = this.runs.get(key) ?? null;
-
-        if (state?.status === 'failed') {
-            this.runs.delete(key);
-        }
-
-        return state;
+        return this.runs.getState(key);
     }
 
     /**
@@ -86,14 +58,7 @@ export default class PuzzleCheckService
      */
     start(puzzle: PuzzleDefinition, engine: PuzzleCheckEngine): PuzzleCheckState
     {
-        const key = getPuzzleCheckKey(puzzle, engine);
-        const existing = this.getState(key);
-
-        if (existing !== null) {
-            return existing;
-        }
-
-        const state: PuzzleCheckState = {
+        const initialState: PuzzleCheckState = {
             status: 'running',
             engine,
             done: 0,
@@ -101,33 +66,12 @@ export default class PuzzleCheckService
             warnings: [],
         };
 
-        this.runs.set(key, state);
-
-        const onProgress = (done: number, total: number): void => {
-            state.done = done;
-            state.total = total;
-        };
-
-        this.check(puzzle, engine, onProgress)
-            .then(warnings => {
-                state.warnings = warnings;
-                state.status = 'done';
-            })
-            .catch(e => {
-                logger.warning('Puzzle katahex check failed', { message: e?.message });
-                state.status = 'failed';
-                state.error = e?.message ?? 'Unknown error';
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    if (this.runs.get(key) === state) {
-                        this.runs.delete(key);
-                    }
-                }, FINISHED_RUN_TTL_MS).unref();
-            })
-        ;
-
-        return state;
+        return this.runs.start(getPuzzleCheckKey(puzzle, engine), initialState, async state => {
+            state.warnings = await this.check(puzzle, engine, (done, total) => {
+                state.done = done;
+                state.total = total;
+            });
+        });
     }
 
     private check(puzzle: PuzzleDefinition, engine: PuzzleCheckEngine, onProgress: (done: number, total: number) => void): Promise<PuzzleCheckWarning[]>

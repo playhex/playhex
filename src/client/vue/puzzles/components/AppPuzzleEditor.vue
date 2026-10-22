@@ -17,8 +17,10 @@ import AppPuzzleEdgeConnectionTool from './AppPuzzleEdgeConnectionTool.vue';
 import AppPuzzleMonitorUncoveredLines from './AppPuzzleMonitorUncoveredLines.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
+import PuzzleTreeGeneratorPanel from './PuzzleTreeGeneratorPanel.vue';
+import AppPuzzleSolverPositionSettings from './AppPuzzleSolverPositionSettings.vue';
 import ImportGameOverlay from '../../components/overlay/ImportGameOverlay.vue';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconAspectRatio, IconAsterisk, IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconCrosshair, IconDiagram2, IconEraser, IconExclamationTriangle, IconEye, IconGraphUp, IconHexagonFill, IconHouseFill, IconInfoCircle, IconMagic, IconPlayFill, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconXLg, IconZoomIn, IconZoomOut } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconAspectRatio, IconAsterisk, IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconCrosshair, IconDiagram2, IconEraser, IconExclamationTriangle, IconGraphUp, IconHexagonFill, IconHouseFill, IconInfoCircle, IconLightningChargeFill, IconMagic, IconPlayFill, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconXLg, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import { downloadString } from '../../../services/fileDownload.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
@@ -94,6 +96,7 @@ const {
     canAddElse,
     canAddParallel,
     addParallel,
+    canGenerate,
     pickingElse,
     startPickingElse,
     setResult,
@@ -116,6 +119,13 @@ const {
     puzzleCheckError,
     puzzleChecking,
     runPuzzleCheck,
+    puzzleGenerateError,
+    puzzleGenerating,
+    generateProgress,
+    generateWarnings,
+    runPuzzleGenerate,
+    generateDone,
+    stopGenerate,
     redStones,
     blueStones,
     disabledCells,
@@ -157,10 +167,12 @@ const sidebarOpen = ref(true);
 
 /**
  * bottom: shown at bottom of nav, must be last.
+ * expertOnly: shown only in expert mode.
  */
-const panels: { step: EditorStep, icon: Component, labelKey: string, bottom?: true }[] = [
+const panels: { step: EditorStep, icon: Component, labelKey: string, bottom?: true, expertOnly?: true }[] = [
     { step: 'position', icon: IconHexagonFill, labelKey: 'puzzles.editor.initial_position' },
     { step: 'tree', icon: IconDiagram2, labelKey: 'puzzles.editor.tree' },
+    { step: 'generate', icon: IconLightningChargeFill, labelKey: 'puzzles.editor.generate_tab', expertOnly: true },
     { step: 'engines', icon: IconRobot, labelKey: 'puzzles.editor.engines_tab' },
     { step: 'info', icon: IconInfoCircle, labelKey: 'puzzles.editor.info_tab' },
     { step: 'publish', icon: IconSendFill, labelKey: 'puzzles.editor.publish_tab' },
@@ -467,9 +479,19 @@ const isAnalyzerUnavailable = computed(() => analysisError.value === 'engine_una
     || (analyzer.value !== null && !isAnalyzerAvailable(analyzer.value))
     || (solverEnabled.value && aiAvailability.value?.solverAvailable === false));
 
+/**
+ * Template the player is supposed to know when generating tree, bridge by default.
+ * Not saved, kept while editing.
+ */
+const generateTemplateId = ref<null | string>('bridge');
+
 watch(expertMode, enabled => {
     if (!enabled) {
         setAnalyzer(null);
+
+        if (step.value === 'generate') {
+            setStep('tree');
+        }
     }
 });
 
@@ -523,7 +545,9 @@ const getPanelBadge = (panelStep: EditorStep): null | PanelBadge => {
     return null;
 };
 
-const navPanels = computed(() => panels.map(panel => ({ ...panel, badge: getPanelBadge(panel.step) })));
+const navPanels = computed(() => panels
+    .filter(panel => expertMode.value || !panel.expertOnly)
+    .map(panel => ({ ...panel, badge: getPanelBadge(panel.step) })));
 
 /**
  * Title and aria label when nav is collapsed, badge is only a dot then.
@@ -1049,33 +1073,20 @@ const deletePuzzle = async (): Promise<void> => {
 
                     <!-- Engines -->
                     <template v-else-if="'engines' === step">
-                        <div v-if="canEditEdgeConnections" class="mb-3">
-                            <AppPuzzleEdgeConnectionTool
-                                :selected="'edge' === positionTool"
-                                :error="edgeToolError"
-                                :impossibleConnections="impossibleEdgeConnections"
-                                @select="positionTool = 'edge'"
-                            />
-                        </div>
-
-                        <div v-if="disabledCells.length > 0" class="mb-3">
-                            <div class="form-label">{{ $t('puzzles.editor.solver_fill') }}</div>
-                            <div class="d-flex flex-wrap gap-2">
-                                <button
-                                    class="btn"
-                                    :class="solverFillPreview ? 'btn-info' : 'btn-outline-info'"
-                                    :aria-pressed="solverFillPreview"
-                                    @click="toggleSolverFillPreview()"
-                                ><IconEye /> {{ $t('puzzles.editor.solver_fill_preview') }}</button>
-                                <div class="btn-group">
-                                    <button class="btn" :class="'fill_red' === positionTool ? 'btn-danger' : 'btn-outline-danger'" @click="positionTool = 'fill_red'"><IconHexagonFill /> {{ $t('puzzles.editor.solver_fill_red') }}</button>
-                                    <button class="btn" :class="'fill_blue' === positionTool ? 'btn-primary' : 'btn-outline-primary'" @click="positionTool = 'fill_blue'"><IconHexagonFill /> {{ $t('puzzles.editor.solver_fill_blue') }}</button>
-                                </div>
-                            </div>
-                            <div class="form-text">{{ $t('puzzles.editor.solver_fill_help') }}</div>
-                        </div>
+                        <AppPuzzleSolverPositionSettings
+                            v-if="canEditEdgeConnections"
+                            :positionTool
+                            :edgeToolError
+                            :impossibleEdgeConnections
+                            :hasDisabledCells="disabledCells.length > 0"
+                            :solverFillPreview
+                            @selectTool="tool => positionTool = tool"
+                            @toggleSolverFillPreview="toggleSolverFillPreview()"
+                        />
 
                         <!-- Puzzle check -->
+                        <h2 class="panel-section-title h4 mb-3" :class="{ 'border-top pt-3 mt-4': canEditEdgeConnections }">{{ $t('puzzles.editor.check_section') }}</h2>
+
                         <div class="mb-3">
                             <p class="form-text mt-0 mb-2"><IconInfoCircle /> {{ $t(puzzleCheckEngine === 'mohex-solver' ? 'puzzles.editor.solver_check_any_position' : 'puzzles.editor.katahex_check_realistic') }}</p>
                             <div class="d-flex align-items-center gap-2">
@@ -1134,6 +1145,36 @@ const deletePuzzle = async (): Promise<void> => {
                             </template>
                         </div>
 
+                    </template>
+
+                    <!-- Tree generation, expert mode only -->
+                    <template v-else-if="'generate' === step">
+                        <AppPuzzleSolverPositionSettings
+                            v-if="canEditEdgeConnections"
+                            :positionTool
+                            :edgeToolError
+                            :impossibleEdgeConnections
+                            :hasDisabledCells="disabledCells.length > 0"
+                            :solverFillPreview
+                            @selectTool="tool => positionTool = tool"
+                            @toggleSolverFillPreview="toggleSolverFillPreview()"
+                        />
+
+                        <h2 class="panel-section-title h4 mb-3" :class="{ 'border-top pt-3 mt-4': canEditEdgeConnections }">{{ $t('puzzles.editor.generate') }}</h2>
+
+                        <PuzzleTreeGeneratorPanel
+                            v-model:templateId="generateTemplateId"
+                            :canGenerate
+                            :solverAvailable="isSolverAvailable"
+                            :generating="puzzleGenerating"
+                            :progress="generateProgress"
+                            :done="generateDone"
+                            :error="puzzleGenerateError"
+                            :warnings="generateWarnings"
+                            @generate="runPuzzleGenerate"
+                            @selectWarning="selectErrorNode"
+                            @stop="stopGenerate"
+                        />
                     </template>
 
                     <!-- Information -->

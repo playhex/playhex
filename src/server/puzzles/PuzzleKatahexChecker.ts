@@ -1,7 +1,7 @@
-import { coordsToMove, type Move } from '@playhex/move-notation';
+import type { Move } from '@playhex/move-notation';
 import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../shared/app/hexplorer.js';
 import { createNodeResolver, createParallelsFinder, findElseNode, findSolution, getComputerAnswers, getFirstColor, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
-import { createLimiter, getWinner, play, toColor, type Position } from './puzzleCheckUtils.js';
+import { createJobRunner, createLimiter, getPolicyCandidates, getWinner, play, toColor, type Position } from './puzzleCheckUtils.js';
 import { fillForKatahex, getEdgePaths } from '../../shared/app/puzzles/edgeConnections.js';
 import { KATAHEX_COMPUTER_ALTERNATIVES, KATAHEX_COMPUTER_DELTA, KATAHEX_INITIAL_WIN_THRESHOLD, KATAHEX_MAX_PLAUSIBLE_MOVES, KATAHEX_MAX_POSITIONS, KATAHEX_PLAUSIBLE_POLICY_RATIO, KATAHEX_WIN_THRESHOLD, type PuzzleCheckWarning, type PuzzleCheckWarningCode } from '../../shared/app/puzzles/puzzleCheck.js';
 
@@ -52,18 +52,12 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     const edgePaths = getEdgePaths({ boardsize, redStones: puzzle.redStones, blueStones: puzzle.blueStones, disabledCells: [...disabledCells], fixedFill: puzzle.fixedFill }, puzzle.edgeConnections);
     const resolve: NodeResolver = createNodeResolver(tree);
     const findParallels = createParallelsFinder(tree);
-    const limit = createLimiter(options.concurrency ?? 4);
-
-    const analyzes = new Map<string, Promise<AnalysisOutput>>();
-    let done = 0;
-    let budgetExceeded = false;
-
-    /**
-     * Analyzes keys known to be needed: tree positions planned at start, and analyzes started.
-     * Used as progress total, which increases only with positions found by policy.
-     */
-    const knownKeys = new Set<string>();
-    const progressTotal = (): number => Math.min(knownKeys.size, KATAHEX_MAX_POSITIONS);
+    const runner = createJobRunner({
+        run: ({ input, purpose }: { input: Omit<AnalysisInput, 'engine'>, purpose: AnalysisPurpose }) => options.analyze(input, purpose),
+        maxJobs: KATAHEX_MAX_POSITIONS,
+        limit: createLimiter(options.concurrency ?? 4),
+        onProgress: options.onProgress,
+    });
 
     const fill = ({ red, blue }: Position): { black: Move[], white: Move[] } =>
         fillForKatahex(red, blue, [...disabledCells], toColor(playerColor), edgePaths, puzzle.fixedFill);
@@ -92,31 +86,8 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     const analysisKey = (position: Position, purpose: AnalysisPurpose): string =>
         purpose + ':' + analysisCacheKey(toInput(position));
 
-    const analyze = (position: Position, purpose: AnalysisPurpose): null | Promise<AnalysisOutput> => {
-        const input = toInput(position);
-        const key = analysisKey(position, purpose);
-        let analysis = analyzes.get(key);
-
-        if (analysis !== undefined) {
-            return analysis;
-        }
-
-        if (analyzes.size >= KATAHEX_MAX_POSITIONS) {
-            budgetExceeded = true;
-            return null;
-        }
-
-        analysis = limit(() => options.analyze(input, purpose)).then(output => {
-            options.onProgress?.(++done, progressTotal());
-            return output;
-        });
-
-        analyzes.set(key, analysis);
-        knownKeys.add(key);
-        options.onProgress?.(done, progressTotal());
-
-        return analysis;
-    };
+    const analyze = (position: Position, purpose: AnalysisPurpose): null | Promise<AnalysisOutput> =>
+        runner.run(analysisKey(position, purpose), { input: toInput(position), purpose });
 
     /**
      * Player winrate in this position, or null if not analyzed.
@@ -152,28 +123,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
             return [];
         }
 
-        const occupied = new Set([...position.red, ...position.blue]);
-        const candidates: { move: Move, policy: number }[] = [];
-        let total = 0;
-
-        policy.forEach((line, row) => line.forEach((value, col) => {
-            const move = coordsToMove({ row, col });
-
-            if (row >= boardsize || col >= boardsize || occupied.has(move) || !(value > 0)) {
-                return;
-            }
-
-            total += value;
-
-            if (!disabledCells.has(move)) {
-                candidates.push({ move, policy: value });
-            }
-        }));
-
-        return candidates
-            .map(candidate => ({ ...candidate, policy: candidate.policy / total }))
-            .sort((a, b) => b.policy - a.policy)
-        ;
+        return getPolicyCandidates(policy, boardsize, new Set([...position.red, ...position.blue]), disabledCells);
     };
 
     const warn = (code: PuzzleCheckWarningCode, path: Move[], params: PuzzleCheckWarning['params'], child?: number): PuzzleCheckWarning => ({
@@ -404,13 +354,13 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
      */
     const planValue = (position: Position): void => {
         if (getFilledWinner(position) === null) {
-            knownKeys.add(analysisKey(position, 'value'));
+            runner.plan(analysisKey(position, 'value'));
         }
     };
 
     const planPlayerChoice = (node: PuzzleNode, position: Position): void => {
         if (getFilledWinner(position) === null) {
-            knownKeys.add(analysisKey(position, 'policy'));
+            runner.plan(analysisKey(position, 'policy'));
         }
 
         for (const child of node.children ?? []) {
@@ -434,7 +384,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
             return;
         }
 
-        knownKeys.add(analysisKey(position, 'policy'));
+        runner.plan(analysisKey(position, 'policy'));
 
         for (const answer of answers) {
             if (answer.move === undefined) {
@@ -459,7 +409,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
         planPlayerChoice(tree, initialPosition);
     }
 
-    options.onProgress?.(0, progressTotal());
+    runner.reportProgress();
 
     const [initialWinrate, treeWarnings] = await Promise.all([
         playerWinrate(initialPosition),
@@ -476,7 +426,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
 
     warnings.push(...treeWarnings);
 
-    if (budgetExceeded) {
+    if (runner.isBudgetExceeded()) {
         warnings.push({ code: 'katahex_too_many_positions', params: { max: KATAHEX_MAX_POSITIONS } });
     }
 

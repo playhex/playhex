@@ -254,6 +254,12 @@ export const getReachableEdges = (position: EdgeConnectionsPosition, move: Move,
 };
 
 /**
+ * Edge connections of a color, as expected by findTemplateConnection().
+ */
+export const getColorEdgeConnections = (position: Pick<EdgeConnectionsPosition, 'redStones' | 'blueStones'>, edgeConnections: PuzzleEdgeConnection[] = [], color: 0 | 1): PuzzleEdgeConnection[] =>
+    edgeConnections.filter(({ move }) => getStoneColor(position, move) === color);
+
+/**
  * Board edge a stone of a color is connected to, to draw an arrow.
  */
 export const getBoardEdge = (color: 0 | 1, edge: 0 | 1): 'top' | 'bottom' | 'left' | 'right' => {
