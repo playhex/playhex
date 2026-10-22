@@ -31,7 +31,10 @@ import { deserializeMoves, serializeMoves } from '../../shared/app/movesSerializ
 import { SimilarPlayingPositionChecker } from '../services/anti-cheat/SimilarPlayingPositionChecker.js';
 import { SimilarPositionDetectedError, similarPositionDetectedToTranslatableHttpError } from '../services/anti-cheat/SimilarPositionDetectedError.js';
 import { InvalidPositionError } from '../../shared/position-comparator/position-comparator.js';
-import { rateLimiterConsumePuzzleCheck, rateLimiterConsumePuzzleMonitor, rateLimiterConsumePuzzleSolvePosition } from '../services/rate-limiters.js';
+import { rateLimiterConsumePuzzleCheck, rateLimiterConsumePuzzleGenerate, rateLimiterConsumePuzzleMonitor, rateLimiterConsumePuzzleSolvePosition } from '../services/rate-limiters.js';
+import { findGenerateStartNode, type PuzzleGenerateInput, type PuzzleGenerateState } from '../../shared/app/puzzles/puzzleGenerate.js';
+import { HEX_TEMPLATES } from '../../shared/hex-templates/hex-templates.js';
+import PuzzleGenerateService, { getPuzzleGenerateKey } from './PuzzleGenerateService.js';
 import { ROLE_ADMIN } from '../services/roles.js';
 
 /**
@@ -219,6 +222,7 @@ export default class PuzzleController
         private positionSolveCache: PositionSolveCache,
         private aiJobService: AiJobService,
         private puzzleMonitorUncoveredLineRepository: PuzzleMonitorUncoveredLineRepository,
+        private puzzleGenerateService: PuzzleGenerateService,
     ) {}
 
     /**
@@ -530,6 +534,61 @@ export default class PuzzleController
         }
 
         return await solvePuzzlePosition(body, input => this.positionSolveCache.solve(input, SOLVE_POSITION_INTERACTIVE_TIMEOUT_MS));
+    }
+
+    /**
+     * Generates tree from a node with Mohex solver, see PuzzleTreeGenerator.
+     * Puzzle is sent, not saved. Client polls by sending same input again until generation is done.
+     */
+    @Post('/api/puzzles/generate-tree')
+    async postGenerateTree(
+        @AuthenticatedPlayer() player: Player,
+        @Body(BODY_OPTIONS) input: PuzzleGenerateInput,
+        @Req() request: Request,
+    ): Promise<PuzzleGenerateState> {
+        const { puzzle, fromPath, templateIds, stopAtComputerMoves } = input;
+
+        // Tree can be incomplete, only position must be valid
+        const errors = validatePuzzle(puzzle).filter(error => isDraftBlockingError(error)
+            || (error.path === undefined && error.code === 'set_twice')
+            || error.code === 'empty_position',
+        );
+
+        if (errors.length > 0) {
+            throw new BadRequestError(`Invalid puzzle: ${errors.map(puzzleErrorToString).join(', ')}`);
+        }
+
+        if (!Array.isArray(fromPath) || findGenerateStartNode(puzzle.tree, fromPath) === null) {
+            throw new BadRequestError('fromPath must reach a node of main sequence, before puzzle ends');
+        }
+
+        if (!Array.isArray(templateIds) || templateIds.some(id => !HEX_TEMPLATES.some(template => template.id === id))) {
+            throw new BadRequestError('Invalid templateIds');
+        }
+
+        if (stopAtComputerMoves !== undefined && typeof stopAtComputerMoves !== 'boolean') {
+            throw new BadRequestError('Invalid stopAtComputerMoves');
+        }
+
+        if (puzzle.boardsize > MOHEX_MAX_BOARDSIZE) {
+            throw new BadRequestError(`Solver supports boards up to ${MOHEX_MAX_BOARDSIZE}`);
+        }
+
+        const state = this.puzzleGenerateService.getState(getPuzzleGenerateKey(input));
+
+        if (state !== null) {
+            return state;
+        }
+
+        if (!this.puzzleGenerateService.isAvailable()) {
+            throw new HttpError(503, 'No AI worker can solve positions right now');
+        }
+
+        this.mustNotBePlayingPositions(puzzle.boardsize, getFilledInitialPositions(puzzle), player, request);
+
+        await rateLimiterConsumePuzzleGenerate(player.publicId);
+
+        return this.puzzleGenerateService.start(input);
     }
 
     /**
