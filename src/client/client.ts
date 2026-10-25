@@ -3,6 +3,7 @@ import { initI18n } from '../shared/app/i18n/index.js';
 import 'bootstrap/js/src/collapse.js';
 import 'bootstrap/js/src/offcanvas.js';
 import './base.styl';
+import './vue/halloween/halloween.css';
 
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
@@ -18,6 +19,7 @@ import useMatomo from './vue/useMatomo.js';
 import './services/registerServiceWorker.js';
 import './services/playerActivity.js';
 import { preloadAssets } from './services/preload-assets.js';
+import { halloween } from './services/halloween.js';
 import './services/notifications/index.js';
 
 const pinia = createPinia();
@@ -33,6 +35,10 @@ useMatomo(vueApp);
 
 // Load store now to set dark/light theme early enough and prevent blinking
 usePlayerLocalSettingsStore();
+
+if (halloween) {
+    document.documentElement.classList.add('halloween');
+}
 
 // authStore and socketStore reference each other.
 // authStore must be the one initialized first, else socketStore would be

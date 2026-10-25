@@ -4,6 +4,7 @@ import usePlayerLocalSettingsStore, { LocalSettings } from '../../stores/playerL
 import { watch } from 'vue';
 import { playhexTheme, resolveTheme, ThemeDefinition, ThemeMode } from '@playhex/pixi-board';
 import { getPlayerBoardTheme } from '../customBoardTheme.js';
+import { halloweenBoardTheme } from '../halloween.js';
 import { PlayerSettings } from '../../../shared/app/models/index.js';
 import { Anchor44Facade } from '@playhex/pixi-board';
 import { ShadingPatternFacade } from '@playhex/pixi-board';
@@ -188,13 +189,13 @@ export class PlayerSettingsFacade
 
         this.appliedTheme = { definition: themeDefinition, mode };
 
-        this.gameView.setTheme(resolveTheme(themeDefinition, mode)).catch(e => {
+        this.gameView.setTheme(halloweenBoardTheme(resolveTheme(themeDefinition, mode))).catch(e => {
             // eslint-disable-next-line no-console
             console.error('Could not apply board theme, using default theme', e);
 
             // Keep failed theme in appliedTheme to not retry it on next settings change
             if (themeDefinition !== playhexTheme) {
-                void this.gameView.setTheme(resolveTheme(playhexTheme, mode));
+                void this.gameView.setTheme(halloweenBoardTheme(resolveTheme(playhexTheme, mode)));
             }
         });
     }

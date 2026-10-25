@@ -7,6 +7,7 @@ import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { playhexTheme, resolveTheme } from '@playhex/pixi-board';
 import { isSpecialHexMove } from '@playhex/move-notation';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
+import { halloweenBoardTheme } from '../../services/halloween.js';
 import useAnalyzeStore from '../../stores/analyzeStore.js';
 import useAuthStore from '../../stores/authStore.js';
 
@@ -135,7 +136,7 @@ const toCssColor = (color: number): string => '#' + color.toString(16).padStart(
 const playerLocalSettingsStore = usePlayerLocalSettingsStore();
 
 const chartColors = computed(() => {
-    const { colors } = resolveTheme(playhexTheme, playerLocalSettingsStore.displayedTheme());
+    const { colors } = halloweenBoardTheme(resolveTheme(playhexTheme, playerLocalSettingsStore.displayedTheme()));
 
     return {
         '--analyze-player1': toCssColor(colors.player1),

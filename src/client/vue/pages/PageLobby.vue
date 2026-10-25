@@ -17,7 +17,7 @@ import { Game, Tournament } from '../../../shared/app/models/index.js';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { useRouter } from 'vue-router';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
-import { computed, onBeforeMount, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
+import { computed, defineAsyncComponent, onBeforeMount, onBeforeUnmount, ref, useTemplateRef, watch } from 'vue';
 import { apiGetActiveTournaments, apiPostCancel } from '../../apiClient.js';
 import useToastsStore from '../../stores/toastsStore.js';
 import AppFeaturedTournamentCard from '../tournaments/components/AppFeaturedTournamentCard.vue';
@@ -36,10 +36,16 @@ import AppChannel from '../components/AppChannel.vue';
 import AppTutorialCard from '../components/AppTutorialCard.vue';
 import AppPlayhexChillCard from '../components/AppPlayhexChillCard.vue';
 import { getPlayerLocales } from '../../../shared/app/i18n/index.js';
+import { halloween } from '../../services/halloween.js';
 
 useHead({
     title: () => t('lobby_title'),
 });
+
+const AppHalloweenLobby = halloween
+    ? defineAsyncComponent(() => import('../halloween/AppHalloweenLobby.vue'))
+    : null
+;
 
 const router = useRouter();
 const { mySortedGames, myTurnCount } = storeToRefs(useMyGamesStore());
@@ -136,7 +142,9 @@ for (const locale of getPlayerLocales()) {
 </script>
 
 <template>
-    <div class="container-fluid my-3">
+    <div class="container-fluid my-3 lobby">
+
+        <component v-if="AppHalloweenLobby" :is="AppHalloweenLobby" />
 
         <div class="row">
             <div class="col-md-8">
@@ -447,6 +455,10 @@ for (const locale of getPlayerLocales()) {
 </template>
 
 <style lang="stylus" scoped>
+// Stacking context for halloween decorations displayed behind cards
+.lobby
+    isolation isolate
+
 .game-card
     width 12em
 

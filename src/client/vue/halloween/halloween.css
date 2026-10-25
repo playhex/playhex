@@ -1,0 +1,190 @@
+/*
+ * Halloween color palette, enabled by "halloween" class on <html>.
+ *
+ * Player colors are changed too: blue (primary) becomes purple,
+ * red (danger) becomes orange, both with same saturation and lightness as original blue.
+ * Board stones are changed accordingly in ../../services/halloween.ts
+ */
+
+html.halloween {
+    --bs-blue: #850dfd;
+    --bs-primary: #850dfd;
+    --bs-primary-rgb: 133, 13, 253;
+    --bs-red: #fd790d;
+    --bs-danger: #fd790d;
+    --bs-danger-rgb: 253, 121, 13;
+}
+
+html.halloween[data-bs-theme=dark] {
+    --bs-body-bg: #15101d;
+    --bs-body-bg-rgb: 21, 16, 29;
+    --bs-secondary-bg: #211830;
+    --bs-secondary-bg-rgb: 33, 24, 48;
+    --bs-tertiary-bg: #0e0a14;
+    --bs-tertiary-bg-rgb: 14, 10, 20;
+    --bs-body-color: #e8dcc6;
+    --bs-body-color-rgb: 232, 220, 198;
+    --bs-emphasis-color: #fff4e0;
+    --bs-emphasis-color-rgb: 255, 244, 224;
+    --bs-secondary-color: rgba(232, 220, 198, 0.7);
+    --bs-tertiary-color: rgba(232, 220, 198, 0.45);
+    --bs-border-color: #3b2b4d;
+    --bs-border-color-translucent: rgba(180, 120, 255, 0.15);
+    --bs-heading-color: #eab586;
+
+    --bs-primary-text-emphasis: #b66efe;
+    --bs-primary-bg-subtle: #1b0333;
+    --bs-primary-border-subtle: #500898;
+    --bs-danger-text-emphasis: #feaf6e;
+    --bs-danger-bg-subtle: #331903;
+    --bs-danger-border-subtle: #984908;
+    --bs-link-color: #b66efe;
+    --bs-link-color-rgb: 182, 110, 254;
+    --bs-link-hover-color: #c48bfe;
+    --bs-link-hover-color-rgb: 196, 139, 254;
+}
+
+html.halloween[data-bs-theme=light] {
+    --bs-body-bg: #fbf5ea;
+    --bs-body-bg-rgb: 251, 245, 234;
+    --bs-secondary-bg: #ecdcc2;
+    --bs-secondary-bg-rgb: 236, 220, 194;
+    --bs-tertiary-bg: #f3e6d1;
+    --bs-tertiary-bg-rgb: 243, 230, 209;
+    --bs-body-color: #2b1d2e;
+    --bs-body-color-rgb: 43, 29, 46;
+    --bs-emphasis-color: #140a16;
+    --bs-emphasis-color-rgb: 20, 10, 22;
+    --bs-secondary-color: rgba(43, 29, 46, 0.72);
+    --bs-tertiary-color: rgba(43, 29, 46, 0.5);
+    --bs-border-color: #d8c2a0;
+    --bs-border-color-translucent: rgba(90, 40, 10, 0.15);
+    --bs-heading-color: #583415;
+
+    --bs-primary-text-emphasis: #350565;
+    --bs-primary-bg-subtle: #e7cfff;
+    --bs-primary-border-subtle: #ce9efe;
+    --bs-danger-text-emphasis: #653005;
+    --bs-danger-bg-subtle: #ffe5cf;
+    --bs-danger-border-subtle: #fec99e;
+    --bs-link-color: #850dfd;
+    --bs-link-color-rgb: 133, 13, 253;
+    --bs-link-hover-color: #6a0aca;
+    --bs-link-hover-color-rgb: 106, 10, 202;
+    --bs-focus-ring-color: rgba(133, 13, 253, 0.25);
+}
+
+/*
+ * Bootstrap components with primary or danger colors compiled in
+ */
+html.halloween .btn-primary {
+    --bs-btn-bg: #850dfd;
+    --bs-btn-border-color: #850dfd;
+    --bs-btn-hover-bg: #710bd7;
+    --bs-btn-hover-border-color: #6a0aca;
+    --bs-btn-focus-shadow-rgb: 151, 49, 253;
+    --bs-btn-active-bg: #6a0aca;
+    --bs-btn-active-border-color: #640abe;
+    --bs-btn-disabled-bg: #850dfd;
+    --bs-btn-disabled-border-color: #850dfd;
+}
+
+html.halloween .btn-outline-primary {
+    --bs-btn-color: #850dfd;
+    --bs-btn-border-color: #850dfd;
+    --bs-btn-hover-bg: #850dfd;
+    --bs-btn-hover-border-color: #850dfd;
+    --bs-btn-focus-shadow-rgb: 133, 13, 253;
+    --bs-btn-active-bg: #850dfd;
+    --bs-btn-active-border-color: #850dfd;
+    --bs-btn-disabled-color: #850dfd;
+    --bs-btn-disabled-border-color: #850dfd;
+}
+
+html.halloween .btn-danger {
+    --bs-btn-bg: #fd790d;
+    --bs-btn-border-color: #fd790d;
+    --bs-btn-hover-bg: #d7670b;
+    --bs-btn-hover-border-color: #ca600a;
+    --bs-btn-focus-shadow-rgb: 253, 141, 49;
+    --bs-btn-active-bg: #ca600a;
+    --bs-btn-active-border-color: #be5b0a;
+    --bs-btn-disabled-bg: #fd790d;
+    --bs-btn-disabled-border-color: #fd790d;
+}
+
+html.halloween .btn-outline-danger {
+    --bs-btn-color: #fd790d;
+    --bs-btn-border-color: #fd790d;
+    --bs-btn-hover-bg: #fd790d;
+    --bs-btn-hover-border-color: #fd790d;
+    --bs-btn-focus-shadow-rgb: 253, 121, 13;
+    --bs-btn-active-bg: #fd790d;
+    --bs-btn-active-border-color: #fd790d;
+    --bs-btn-disabled-color: #fd790d;
+    --bs-btn-disabled-border-color: #fd790d;
+}
+
+html.halloween .dropdown-menu {
+    --bs-dropdown-link-active-bg: #850dfd;
+}
+
+html.halloween .nav-pills {
+    --bs-nav-pills-link-active-bg: #850dfd;
+}
+
+html.halloween .pagination {
+    --bs-pagination-active-bg: #850dfd;
+    --bs-pagination-active-border-color: #850dfd;
+}
+
+html.halloween .list-group {
+    --bs-list-group-active-bg: #850dfd;
+    --bs-list-group-active-border-color: #850dfd;
+}
+
+html.halloween .progress,
+html.halloween .progress-stacked {
+    --bs-progress-bar-bg: #850dfd;
+}
+
+html.halloween .form-control:focus,
+html.halloween .form-select:focus,
+html.halloween .form-check-input:focus {
+    border-color: #c286fe;
+    box-shadow: 0 0 0 0.25rem rgba(133, 13, 253, 0.25);
+}
+
+html.halloween .form-check-input:checked,
+html.halloween .form-check-input[type=checkbox]:indeterminate {
+    background-color: #850dfd;
+    border-color: #850dfd;
+}
+
+html.halloween .form-range::-webkit-slider-thumb {
+    background-color: #850dfd;
+}
+
+html.halloween .form-range::-moz-range-thumb {
+    background-color: #850dfd;
+}
+
+/*
+ * Decorations
+ */
+
+/*
+ * Faint orange glow coming from below the header
+ */
+html.halloween .app-layout {
+    background-image: radial-gradient(ellipse 120% 40em at 50% 0, rgba(255, 120, 0, 0.07), transparent);
+}
+
+html.halloween .menu-top {
+    box-shadow: 0 2px 14px rgba(255, 120, 0, 0.25) !important;
+}
+
+html.halloween .navbar-brand::after {
+    content: ' 🎃';
+    font-size: 0.85em;
+}
