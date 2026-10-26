@@ -136,6 +136,8 @@ export class PlayerSettingsFacade
         } else {
             this.applyOverrideSettingsOnly();
         }
+
+        this.updateOptionsFromPlayerLocalSettings(usePlayerLocalSettingsStore().localSettings);
     }
 
     /**

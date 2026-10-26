@@ -1,4 +1,4 @@
-import { CircleMark, GameMarksFacade, GameView, PolicyOverlayFacade, TextMark } from '@playhex/pixi-board';
+import { CircleMark, GameMarksFacade, GameView, PolicyOverlayFacade, TextMark, type OrientationMode } from '@playhex/pixi-board';
 import { onKeyDown, useEventListener } from '@vueuse/core';
 import { coordsToMove, type HexMove, type Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue';
@@ -18,7 +18,12 @@ import type { ImportedGame } from '../../../../shared/app/hex-game-importer/type
 import { fillForKatahex, getEdgePaths, getReachableEdges, getSolverFilledPosition, type PuzzleEdgeConnection, type PuzzleFixedFill } from '../../../../shared/app/puzzles/edgeConnections.js';
 import Board from '../../../../shared/game-engine/Board.js';
 
-export type EditorStep = 'position' | 'tree' | 'publish';
+export type EditorStep = 'position' | 'tree' | 'engines' | 'info' | 'publish' | 'display';
+
+/**
+ * Steps where board shows initial position, edited with position tools.
+ */
+const isPositionStep = (step: EditorStep): boolean => step === 'position' || step === 'engines';
 
 /**
  * How a click on board edits initial position.
@@ -31,6 +36,14 @@ export type PositionTool = 'red' | 'blue' | 'erase' | 'disable' | 'last_move' | 
 const fillToolColors = { fill_red: 0, fill_blue: 1 } as const;
 
 const isFillTool = (tool: PositionTool): tool is keyof typeof fillToolColors => tool in fillToolColors;
+
+/**
+ * Position tools available in each position step, first one is selected when entering step.
+ */
+const stepTools: Partial<Record<EditorStep, PositionTool[]>> = {
+    position: ['red', 'blue', 'erase', 'disable', 'last_move', 'edge'],
+    engines: ['edge', 'fill_red', 'fill_blue'],
+};
 
 type EditorNode = PuzzleNode | PuzzleElseNode;
 
@@ -124,7 +137,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const collectionPublicId = ref<null | string>(loadedCollectionPublicId);
 
     /**
-     * Saved state, changed only by saving.
+     * Saved state. Not reactive: publishing or unpublishing always leaves editor.
      */
     const published = puzzle?.published ?? false;
     const boardsize = ref(initial?.boardsize ?? sourceGame?.boardsize ?? DEFAULT_BOARDSIZE);
@@ -257,13 +270,27 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     let playerSettingsFacade: PlayerSettingsFacade;
     let mountedElement: null | HTMLElement = null;
 
+    /*
+     * Board display in editor only, null to use player settings.
+     */
+
+    const forcedOrientation = ref<null | OrientationMode>(null);
+    const forcedShowCoords = ref<null | boolean>(null);
+
+    const getBoardDisplaySettings = (): NonNullable<ConstructorParameters<typeof PlayerSettingsFacade>[1]> => ({
+        ...(forcedOrientation.value === null ? {} : { forcedBoardOrientation: forcedOrientation.value }),
+        ...(forcedShowCoords.value === null ? {} : { showCoords: forcedShowCoords.value }),
+    });
+
+    watch([forcedOrientation, forcedShowCoords], () => playerSettingsFacade.setOverrideSettings(getBoardDisplaySettings()));
+
     const createGameView = (): void => {
         gameView = new GameView(boardsize.value);
         gameMarksFacade = new GameMarksFacade(gameView);
         policyOverlayFacade = new PolicyOverlayFacade(gameView);
         // Not player colors, to not be confused with stones
         policyOverlayFacade.setMarkerColor(AI_EVAL_COLOR);
-        playerSettingsFacade = new PlayerSettingsFacade(gameView);
+        playerSettingsFacade = new PlayerSettingsFacade(gameView, getBoardDisplaySettings());
 
         gameView.on('hexClicked', move => onHexClicked(move));
         gameView.on('hexPointerDown', move => onHexPointerDown(move));
@@ -472,6 +499,26 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         selectParent();
     };
 
+    const selectedHasChildren = computed<boolean>(() => {
+        const node = selectedNode.value;
+
+        return !isElseNode(node) && ((node.children?.length ?? 0) > 0 || (node.parallel?.length ?? 0) > 0);
+    });
+
+    /**
+     * Keeps selected node, but removes its whole subtree: children and parallel sequences.
+     */
+    const deleteChildren = (): void => {
+        const node = selectedNode.value;
+
+        if (isElseNode(node)) {
+            return;
+        }
+
+        node.children = [];
+        delete node.parallel;
+    };
+
     const startPickingElse = (): void => {
         pickingElse.value = true;
     };
@@ -663,7 +710,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     {
         const tool = positionTool.value;
 
-        if (step.value !== 'position') {
+        if (!isPositionStep(step.value)) {
             return;
         }
 
@@ -710,8 +757,14 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const edgeToolError = ref<null | Move>(null);
 
     /**
+     * Edge connections need disabled cells to reach an edge.
+     * Still editable without disabled cells to remove remaining connections.
+     */
+    const canEditEdgeConnections = computed(() => disabledCells.value.length > 0 || edgeConnections.value.length > 0);
+
+    /**
      * Shows disabled cells filled with stones, as sent to engines.
-     * Position step only. Always shown with fill tools.
+     * Engines step only. Always shown with fill tools.
      */
     const solverFillPreview = ref(false);
 
@@ -720,11 +773,22 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      */
     let toolBeforeFill: PositionTool = 'red';
 
-    const toggleSolverFillPreview = (): void => {
-        solverFillPreview.value = !solverFillPreview.value;
+    /**
+     * Also unselects fill tools. Does not redraw.
+     */
+    const hideSolverFillPreview = (): void => {
+        solverFillPreview.value = false;
 
-        if (!solverFillPreview.value && isFillTool(positionTool.value)) {
+        if (isFillTool(positionTool.value)) {
             positionTool.value = toolBeforeFill;
+        }
+    };
+
+    const toggleSolverFillPreview = (): void => {
+        if (solverFillPreview.value) {
+            hideSolverFillPreview();
+        } else {
+            solverFillPreview.value = true;
         }
 
         redraw();
@@ -807,7 +871,11 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      */
     const onPositionHexClicked = (move: Move): void => {
         if (positionTool.value === 'edge') {
-            toggleEdgeConnection(move);
+            // Tool stays selected when hidden, after removing all disabled cells
+            if (canEditEdgeConnections.value) {
+                toggleEdgeConnection(move);
+            }
+
             return;
         }
 
@@ -866,16 +934,28 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     };
 
     const setStep = (newStep: EditorStep): void => {
+        // Fill is only shown in engines step
+        if (newStep !== 'engines') {
+            hideSolverFillPreview();
+        }
+
         step.value = newStep;
         pickingElse.value = false;
+
+        const tools = stepTools[newStep];
+
+        if (tools !== undefined && !tools.includes(positionTool.value)) {
+            positionTool.value = tools[0];
+        }
+
         redraw();
     };
 
     function onHexClicked(move: Move): void
     {
-        if (step.value === 'position') {
+        if (isPositionStep(step.value)) {
             onPositionHexClicked(move);
-        } else {
+        } else if (step.value === 'tree') {
             onTreeHexClicked(move);
         }
     }
@@ -886,7 +966,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         const moves = step.value === 'tree' ? selectedMoves.value : [];
         const solverFill: SolverFillStone[] = [];
 
-        if (step.value === 'position' && solverFillPreview.value) {
+        if (step.value === 'engines' && solverFillPreview.value) {
             const filled = getSolverFilledPosition(position, edgeConnections.value, playerColor.value, 'win');
 
             const fixed = new Set(fixedFill.value.map(({ move }) => move));
@@ -1412,6 +1492,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
     return {
         mount,
+        forcedOrientation,
+        forcedShowCoords,
         step,
         setStep,
 
@@ -1426,6 +1508,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         disabledCells,
         edgeConnections,
         edgeToolError,
+        canEditEdgeConnections,
         impossibleEdgeConnections,
         solverFillPreview,
         toggleSolverFillPreview,
@@ -1465,6 +1548,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         startPickingElse,
         setResult,
         deleteSelected,
+        selectedHasChildren,
+        deleteChildren,
         boardError,
         transpositions,
         selectedTransposition,
