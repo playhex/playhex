@@ -51,16 +51,19 @@ type FakeKatahex = {
 
 const INITIAL_STONES = ['e1'];
 
-const positionKey = (input: Omit<AnalysisInput, 'engine'>): string => [...input.black, ...input.white]
-    .filter(move => !INITIAL_STONES.includes(move))
+/**
+ * Moves played, ignoring initial stones and disabled cells, filled before analyze.
+ */
+const positionKey = (input: Omit<AnalysisInput, 'engine'>, disabledCells: string[] = []): string => [...input.black, ...input.white]
+    .filter(move => !INITIAL_STONES.includes(move) && !disabledCells.includes(move))
     .sort()
     .join(' ');
 
-const createAnalyzer = ({ winrates = {}, policies = {} }: FakeKatahex) => {
+const createAnalyzer = ({ winrates = {}, policies = {} }: FakeKatahex, disabledCells: Move[] = []) => {
     const calls: string[] = [];
 
     const analyze = (input: Omit<AnalysisInput, 'engine'>, purpose: AnalysisPurpose): Promise<AnalysisOutput> => {
-        const key = positionKey(input);
+        const key = positionKey(input, disabledCells);
         const policy: number[][] = Array.from({ length: BOARDSIZE }, () => Array<number>(BOARDSIZE).fill(0));
 
         calls.push(`${purpose}:${key}`);
@@ -80,7 +83,7 @@ const createAnalyzer = ({ winrates = {}, policies = {} }: FakeKatahex) => {
 };
 
 const check = (puzzle: PuzzleDefinition, katahex: FakeKatahex = {}): Promise<PuzzleCheckWarning[]> =>
-    checkPuzzleWithKatahex(puzzle, { analyze: createAnalyzer(katahex).analyze });
+    checkPuzzleWithKatahex(puzzle, { analyze: createAnalyzer(katahex, puzzle.disabledCells).analyze });
 
 /**
  * a1 is a failed move, must be losing.
@@ -269,6 +272,16 @@ describe('PuzzleKatahexChecker', () => {
 
         assert.deepStrictEqual(calls.filter(call => call.startsWith('value:') && call.includes('c3')), []);
         assert.ok(!warnings.some(warning => warning.path?.includes('c3')));
+    });
+
+    it('does not analyze a position already won once disabled cells are filled', async () => {
+        const disabledCells: Move[] = ['a5', 'b5', 'c5', 'd5', 'e5'];
+        const { analyze, calls } = createAnalyzer({ winrates: baseWinrates }, disabledCells);
+
+        // Disabled cells filled with blue to prove red wins: blue connects left to right
+        await checkPuzzleWithKatahex(createPuzzle({ disabledCells }), { analyze });
+
+        assert.deepStrictEqual(calls, []);
     });
 
     it('ignores continuation and transposition leaf', async () => {

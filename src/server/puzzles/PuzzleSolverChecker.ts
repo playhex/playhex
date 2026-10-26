@@ -3,7 +3,8 @@ import type { SolvePositionInput, SolvePositionOutput, SolveResult } from '../ai
 import { solveCacheKey } from '../ai-jobs/PositionSolveCache.js';
 import { createNodeResolver, createParallelsFinder, findSolution, getComputerAnswers, getFirstColor, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
 import { SOLVER_CHILDREN_MAX_TIME_SECONDS, SOLVER_MAX_JOBS, type PuzzleCheckWarning, type PuzzleCheckWarningCode } from '../../shared/app/puzzles/puzzleCheck.js';
-import { createLimiter, getWinner, play, toColor, toSolveInput, type Position, type SolveClaim } from './puzzleCheckUtils.js';
+import { createLimiter, getSolveEdgePaths, getWinner, play, toColor, toSolveInput, type Position, type SolveClaim } from './puzzleCheckUtils.js';
+import type { EdgePaths } from '../../shared/app/puzzles/edgeConnections.js';
 
 export type PositionSolver = (input: SolvePositionInput) => Promise<SolvePositionOutput>;
 
@@ -60,12 +61,23 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
     const knownKeys = new Set<string>();
     const progressTotal = (): number => Math.min(knownKeys.size, SOLVER_MAX_JOBS);
 
-    const toInput = ({ red, blue, toMove }: Position, claim: SolveClaim, children: boolean): SolvePositionInput => toSolveInput(
-        { size: boardsize, color: toColor(toMove), black: red, white: blue, disabledCells },
-        player,
-        claim,
-        children ? SOLVER_CHILDREN_MAX_TIME_SECONDS : undefined,
-    );
+    /**
+     * Edge paths by position, computed once for both claims, see getSolveEdgePaths().
+     */
+    const edgePathsCache = new Map<string, EdgePaths>();
+
+    const toInput = ({ red, blue, toMove }: Position, claim: SolveClaim, children: boolean): SolvePositionInput => {
+        const input = { size: boardsize, color: toColor(toMove), black: red, white: blue, disabledCells, edgeConnections: puzzle.edgeConnections, fixedFill: puzzle.fixedFill };
+        const pathsKey = red.join(' ') + '|' + blue.join(' ');
+        let edgePaths = edgePathsCache.get(pathsKey);
+
+        if (edgePaths === undefined) {
+            edgePaths = getSolveEdgePaths(input);
+            edgePathsCache.set(pathsKey, edgePaths);
+        }
+
+        return toSolveInput(input, player, claim, edgePaths, children ? SOLVER_CHILDREN_MAX_TIME_SECONDS : undefined);
+    };
 
     /**
      * Without disabled cells, both claims give same key, so position is solved once.
@@ -77,7 +89,8 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
      * Returns null when too many positions have been solved, then check is skipped.
      */
     const solve = (position: Position, claim: SolveClaim, children: boolean): null | Promise<SolvePositionOutput> => {
-        const key = solveKey(position, claim, children);
+        const input = toInput(position, claim, children);
+        const key = solveCacheKey(input);
         let solved = solves.get(key);
 
         if (solved !== undefined) {
@@ -88,8 +101,6 @@ export const checkPuzzleWithSolver = async (puzzle: PuzzleDefinition, options: P
             budgetExceeded = true;
             return null;
         }
-
-        const input = toInput(position, claim, children);
 
         solved = limit(() => options.solve(input)).then(output => {
             options.onProgress?.(++done, progressTotal());

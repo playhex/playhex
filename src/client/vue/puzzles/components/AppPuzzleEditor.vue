@@ -14,7 +14,7 @@ import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
 import ImportGameOverlay from '../../components/overlay/ImportGameOverlay.vue';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconHexagonFill, IconInfoCircle, IconMagic, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconArrowRight, IconArrowUp, IconAsterisk, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconEraser, IconExclamationTriangle, IconEye, IconHexagonFill, IconInfoCircle, IconMagic, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { createKatahexAnalyzers, useAnalysisEngines } from '../../hexplorer/composables/useAnalysisEngines.js';
@@ -102,6 +102,11 @@ const {
     redStones,
     blueStones,
     disabledCells,
+    edgeConnections,
+    edgeToolError,
+    impossibleEdgeConnections,
+    solverFillPreview,
+    toggleSolverFillPreview,
     hideDisabledCells,
     toInput,
     analyzer,
@@ -517,6 +522,35 @@ const deletePuzzle = async (): Promise<void> => {
                             <button class="btn" :class="hideDisabledCells ? 'btn-primary' : 'btn-outline-primary'" @click="hideDisabledCells = true">{{ $t('puzzles.editor.disabled_cells_hidden') }}</button>
                         </div>
                         <div class="form-text">{{ $t(hideDisabledCells ? 'puzzles.editor.disabled_cells_hidden_help' : 'puzzles.editor.disabled_cells_greyed_help') }}</div>
+                    </div>
+
+                    <div v-if="disabledCells.length > 0 || edgeConnections.length > 0" class="mb-3">
+                        <div class="form-label">{{ $t('puzzles.editor.edge_connections') }}</div>
+                        <button
+                            class="btn"
+                            :class="'edge' === positionTool ? 'btn-secondary' : 'btn-outline-secondary'"
+                            @click="positionTool = 'edge'"
+                        ><IconArrowUp /> {{ $t('puzzles.editor.edge_connection_tool') }}</button>
+                        <div v-if="'edge' === positionTool" class="form-text">{{ $t('puzzles.editor.edge_connection_help') }}</div>
+                        <div v-if="edgeToolError" class="form-text text-warning-emphasis"><IconExclamationTriangle /> {{ $t('puzzles.editor.edge_connection_unreachable', { move: edgeToolError }) }}</div>
+                        <div v-if="impossibleEdgeConnections.length > 0" class="alert alert-warning py-2 mt-2 mb-0"><IconExclamationTriangle /> {{ $t('puzzles.editor.edge_connection_broken', { moves: impossibleEdgeConnections.join(', ') }) }}</div>
+                    </div>
+
+                    <div v-if="disabledCells.length > 0" class="mb-3">
+                        <div class="form-label">{{ $t('puzzles.editor.solver_fill') }}</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button
+                                class="btn"
+                                :class="solverFillPreview ? 'btn-secondary' : 'btn-outline-secondary'"
+                                :aria-pressed="solverFillPreview"
+                                @click="toggleSolverFillPreview()"
+                            ><IconEye /> {{ $t('puzzles.editor.solver_fill_preview') }}</button>
+                            <div class="btn-group">
+                                <button class="btn" :class="'fill_red' === positionTool ? 'btn-danger' : 'btn-outline-danger'" @click="positionTool = 'fill_red'"><IconHexagonFill /> {{ $t('puzzles.editor.solver_fill_red') }}</button>
+                                <button class="btn" :class="'fill_blue' === positionTool ? 'btn-primary' : 'btn-outline-primary'" @click="positionTool = 'fill_blue'"><IconHexagonFill /> {{ $t('puzzles.editor.solver_fill_blue') }}</button>
+                            </div>
+                        </div>
+                        <div class="form-text">{{ $t('puzzles.editor.solver_fill_help') }}</div>
                     </div>
 
                     <div class="mb-3">

@@ -1,7 +1,8 @@
 import { coordsToMove, type Move } from '@playhex/move-notation';
 import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../shared/app/hexplorer.js';
 import { createNodeResolver, createParallelsFinder, findElseNode, findSolution, getComputerAnswers, getFirstColor, getNodeResult, isElseNode, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
-import { createLimiter, getWinner, play, type Position } from './puzzleCheckUtils.js';
+import { createLimiter, getWinner, play, toColor, type Position } from './puzzleCheckUtils.js';
+import { fillForKatahex, getEdgePaths } from '../../shared/app/puzzles/edgeConnections.js';
 import { KATAHEX_COMPUTER_ALTERNATIVES, KATAHEX_COMPUTER_DELTA, KATAHEX_INITIAL_WIN_THRESHOLD, KATAHEX_MAX_PLAUSIBLE_MOVES, KATAHEX_MAX_POSITIONS, KATAHEX_PLAUSIBLE_POLICY_RATIO, KATAHEX_WIN_THRESHOLD, type PuzzleCheckWarning, type PuzzleCheckWarningCode } from '../../shared/app/puzzles/puzzleCheck.js';
 
 /**
@@ -37,7 +38,8 @@ const percent = (value: number): number => Math.round(value * 100);
  *
  * Only checks main sequence, until puzzle ends: continuations, transposition leaves
  * and parallel sequences are ignored, but parallel sequences first moves are not reported as uncovered.
- * Disabled cells are never considered as candidate moves.
+ * Disabled cells are never considered as candidate moves,
+ * and are sent to katahex filled as to prove player wins, with as many red as blue stones, see fillDisabledCells() and balanceFilledStones().
  *
  * @returns Warnings in tree order, empty if katahex agrees with tree.
  *
@@ -47,6 +49,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     const { boardsize, playerColor, tree } = puzzle;
     const computerPlaysFirst = puzzle.computerPlaysFirst ?? false;
     const disabledCells = new Set(puzzle.disabledCells ?? []);
+    const edgePaths = getEdgePaths({ boardsize, redStones: puzzle.redStones, blueStones: puzzle.blueStones, disabledCells: [...disabledCells], fixedFill: puzzle.fixedFill }, puzzle.edgeConnections);
     const resolve: NodeResolver = createNodeResolver(tree);
     const findParallels = createParallelsFinder(tree);
     const limit = createLimiter(options.concurrency ?? 4);
@@ -62,12 +65,25 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
     const knownKeys = new Set<string>();
     const progressTotal = (): number => Math.min(knownKeys.size, KATAHEX_MAX_POSITIONS);
 
-    const toInput = ({ red, blue, toMove }: Position): Omit<AnalysisInput, 'engine'> => ({
+    const fill = ({ red, blue }: Position): { black: Move[], white: Move[] } =>
+        fillForKatahex(red, blue, [...disabledCells], toColor(playerColor), edgePaths, puzzle.fixedFill);
+
+    const toInput = (position: Position): Omit<AnalysisInput, 'engine'> => ({
         size: boardsize,
-        color: toMove === 0 ? 'black' : 'white',
-        black: red,
-        white: blue,
+        color: position.toMove === 0 ? 'black' : 'white',
+        ...fill(position),
     });
+
+    /**
+     * Winner of position as sent to katahex: filled disabled cells can already connect a player,
+     * e.g opponent stones across the board when no stone is connected to its edge.
+     * Katahex returns no move on such position.
+     */
+    const getFilledWinner = (position: Position): null | 0 | 1 => {
+        const { black, white } = fill(position);
+
+        return getWinner(boardsize, { red: black, blue: white, toMove: position.toMove });
+    };
 
     /**
      * Analyzes position once per purpose.
@@ -106,7 +122,7 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
      * Player winrate in this position, or null if not analyzed.
      */
     const playerWinrate = async (position: Position): Promise<null | number> => {
-        const winner = getWinner(boardsize, position);
+        const winner = getFilledWinner(position);
 
         if (winner !== null) {
             return winner === playerColor ? 1 : 0;
@@ -126,6 +142,10 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
      * Occupied and disabled cells are excluded.
      */
     const candidateMoves = async (position: Position): Promise<{ move: Move, policy: number }[]> => {
+        if (getFilledWinner(position) !== null) {
+            return [];
+        }
+
         const policy = (await analyze(position, 'policy'))?.policy;
 
         if (!policy) {
@@ -383,13 +403,15 @@ export const checkPuzzleWithKatahex = async (puzzle: PuzzleDefinition, options: 
      * to know progress total from start.
      */
     const planValue = (position: Position): void => {
-        if (getWinner(boardsize, position) === null) {
+        if (getFilledWinner(position) === null) {
             knownKeys.add(analysisKey(position, 'value'));
         }
     };
 
     const planPlayerChoice = (node: PuzzleNode, position: Position): void => {
-        knownKeys.add(analysisKey(position, 'policy'));
+        if (getFilledWinner(position) === null) {
+            knownKeys.add(analysisKey(position, 'policy'));
+        }
 
         for (const child of node.children ?? []) {
             if (isElseNode(child) || !child.move) {

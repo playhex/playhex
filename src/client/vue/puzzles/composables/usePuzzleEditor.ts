@@ -7,7 +7,7 @@ import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
 import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findErrorNode, findSamePositionNode, countComputerAlternatives, findTranspositions, getFirstColor, hasComputerAlternatives, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleDefinition, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
-import { drawPuzzlePosition, type ColoredMove } from '../services/puzzleBoard.js';
+import { drawPuzzlePosition, type ColoredMove, type SolverFillStone } from '../services/puzzleBoard.js';
 import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterface.js';
 import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
 import type { PuzzleCheckEngine, PuzzleCheckState, PuzzleSolvePositionOutput } from '../../../../shared/app/puzzles/puzzleCheck.js';
@@ -15,13 +15,22 @@ import { isValidBoardsize, MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/bo
 import { apiPuzzleCheck, apiPuzzleSolvePosition } from '../../../apiClient.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import type { ImportedGame } from '../../../../shared/app/hex-game-importer/types.js';
+import { fillForKatahex, getEdgePaths, getReachableEdges, getSolverFilledPosition, type PuzzleEdgeConnection, type PuzzleFixedFill } from '../../../../shared/app/puzzles/edgeConnections.js';
+import Board from '../../../../shared/game-engine/Board.js';
 
 export type EditorStep = 'position' | 'tree' | 'publish';
 
 /**
  * How a click on board edits initial position.
  */
-export type PositionTool = 'red' | 'blue' | 'erase' | 'disable' | 'last_move';
+export type PositionTool = 'red' | 'blue' | 'erase' | 'disable' | 'last_move' | 'edge' | 'fill_red' | 'fill_blue';
+
+/**
+ * Tools fixing color of disabled cells as sent to engines.
+ */
+const fillToolColors = { fill_red: 0, fill_blue: 1 } as const;
+
+const isFillTool = (tool: PositionTool): tool is keyof typeof fillToolColors => tool in fillToolColors;
 
 type EditorNode = PuzzleNode | PuzzleElseNode;
 
@@ -122,6 +131,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const redStones = ref<Move[]>(initial ? [...initial.redStones] : []);
     const blueStones = ref<Move[]>(initial ? [...initial.blueStones] : []);
     const disabledCells = ref<Move[]>(initial ? [...initial.disabledCells] : []);
+    const edgeConnections = ref<PuzzleEdgeConnection[]>(initial ? (initial.edgeConnections ?? []).map(connection => ({ ...connection })) : []);
+    const fixedFill = ref<PuzzleFixedFill[]>(initial ? (initial.fixedFill ?? []).map(cell => ({ ...cell })) : []);
     const hideDisabledCells = ref(initial?.hideDisabledCells ?? false);
     const lastMove = ref<null | Move>(initial?.lastMove ?? null);
     const playerColor = ref<0 | 1>(initial?.playerColor ?? 0);
@@ -199,6 +210,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         blueStones.value = position.blueStones;
         // Keep disabled cells, except where a stone has been played
         disabledCells.value = disabledCells.value.filter(move => !position.redStones.includes(move) && !position.blueStones.includes(move));
+        edgeConnections.value = edgeConnections.value.filter(({ move }) => position.redStones.includes(move) || position.blueStones.includes(move));
+        fixedFill.value = fixedFill.value.filter(({ move }) => disabledCells.value.includes(move));
         lastMove.value = position.lastMove ?? null;
         playerColor.value = position.playerColor;
         // Game last move is an opponent stone, invalid when computer plays first
@@ -278,6 +291,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redStones.value = [];
         blueStones.value = [];
         disabledCells.value = [];
+        edgeConnections.value = [];
+        fixedFill.value = [];
         lastMove.value = null;
         tree.value = {};
         selectedPath.value = [];
@@ -604,6 +619,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redStones.value = redStones.value.filter(m => m !== move);
         blueStones.value = blueStones.value.filter(m => m !== move);
         disabledCells.value = disabledCells.value.filter(m => m !== move);
+        edgeConnections.value = edgeConnections.value.filter(connection => connection.move !== move);
+        fixedFill.value = fixedFill.value.filter(cell => cell.move !== move);
 
         if (lastMove.value === move) {
             lastMove.value = null;
@@ -618,7 +635,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      * e.g starting on a red stone with red tool removes red stones only.
      * Null when not painting.
      */
-    let painting: null | { tool: Exclude<PositionTool, 'last_move'>, add: boolean } = null;
+    let painting: null | { tool: Exclude<PositionTool, 'last_move' | 'edge' | 'fill_red' | 'fill_blue'>, add: boolean } = null;
 
     const paintCell = (move: Move): void => {
         const { tool, add } = painting!;
@@ -646,7 +663,24 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     {
         const tool = positionTool.value;
 
-        if (step.value !== 'position' || tool === 'last_move') {
+        if (step.value !== 'position') {
+            return;
+        }
+
+        if (isFillTool(tool)) {
+            if (!disabledCells.value.includes(move)) {
+                return;
+            }
+
+            const color = fillToolColors[tool];
+
+            // Starting on a cell already fixed to this color sets cells back to automatic fill instead
+            fixedFillPainting = { color: fixedFill.value.find(cell => cell.move === move)?.color === color ? null : color };
+            paintFixedFill(move);
+            return;
+        }
+
+        if (tool === 'last_move' || tool === 'edge') {
             return;
         }
 
@@ -659,16 +693,124 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         if (painting !== null) {
             paintCell(move);
         }
+
+        if (fixedFillPainting !== null) {
+            paintFixedFill(move);
+        }
     }
 
     useEventListener(document, 'pointerup', () => {
         painting = null;
+        fixedFillPainting = null;
     });
 
     /**
-     * Only for last move tool, other tools paint on pointer down.
+     * Stone clicked with edge tool has no edge reachable through disabled cells.
+     */
+    const edgeToolError = ref<null | Move>(null);
+
+    /**
+     * Shows disabled cells filled with stones, as sent to engines.
+     * Position step only. Always shown with fill tools.
+     */
+    const solverFillPreview = ref(false);
+
+    /**
+     * Tool selected before a fill tool, selected back when preview is turned off.
+     */
+    let toolBeforeFill: PositionTool = 'red';
+
+    const toggleSolverFillPreview = (): void => {
+        solverFillPreview.value = !solverFillPreview.value;
+
+        if (!solverFillPreview.value && isFillTool(positionTool.value)) {
+            positionTool.value = toolBeforeFill;
+        }
+
+        redraw();
+    };
+
+    watch(positionTool, (tool, previousTool) => {
+        edgeToolError.value = null;
+
+        if (isFillTool(tool) && !isFillTool(previousTool)) {
+            toolBeforeFill = previousTool;
+        }
+
+        if (isFillTool(tool) && !solverFillPreview.value) {
+            toggleSolverFillPreview();
+        }
+    });
+
+    /**
+     * Stones connected to their edge, but whose path would change the puzzle,
+     * e.g after editing cells around: puzzle cannot be saved.
+     */
+    const impossibleEdgeConnections = computed<Move[]>(() => {
+        const position = { boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value, fixedFill: fixedFill.value };
+
+        return getEdgePaths(position, edgeConnections.value).impossible.map(index => edgeConnections.value[index].move);
+    });
+
+    /**
+     * Cycles edge connection of a stone: none, then each edge reachable through disabled cells.
+     */
+    const toggleEdgeConnection = (move: Move): void => {
+        edgeToolError.value = null;
+
+        if (!redStones.value.includes(move) && !blueStones.value.includes(move)) {
+            return;
+        }
+
+        const position = { boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value, fixedFill: fixedFill.value };
+        const edges = getReachableEdges(position, move, edgeConnections.value);
+        const current = edgeConnections.value.find(connection => connection.move === move);
+        const next = current === undefined ? edges[0] : edges[edges.indexOf(current.edge) + 1];
+
+        edgeConnections.value = edgeConnections.value.filter(connection => connection.move !== move);
+
+        if (next !== undefined) {
+            edgeConnections.value.push({ move, edge: next });
+        } else if (current === undefined) {
+            edgeToolError.value = move;
+        }
+
+        redraw();
+    };
+
+    /**
+     * Fixes fill color of disabled cells while pointer is held down with a fill tool,
+     * or sets them back to automatic fill (null color).
+     * Lets puzzle author define captured areas outside the puzzle, e.g keep a bridge from the game.
+     * Null when not painting.
+     */
+    let fixedFillPainting: null | { color: null | 0 | 1 } = null;
+
+    const paintFixedFill = (move: Move): void => {
+        const { color } = fixedFillPainting!;
+
+        if (!disabledCells.value.includes(move) || (fixedFill.value.find(cell => cell.move === move)?.color ?? null) === color) {
+            return;
+        }
+
+        fixedFill.value = fixedFill.value.filter(cell => cell.move !== move);
+
+        if (color !== null) {
+            fixedFill.value.push({ move, color });
+        }
+
+        redraw();
+    };
+
+    /**
+     * Only for last move and edge tools, other tools paint on pointer down.
      */
     const onPositionHexClicked = (move: Move): void => {
+        if (positionTool.value === 'edge') {
+            toggleEdgeConnection(move);
+            return;
+        }
+
         if (positionTool.value !== 'last_move') {
             return;
         }
@@ -740,10 +882,22 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
     function redraw(): void
     {
-        const position = { boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value };
+        const position = { boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value, edgeConnections: edgeConnections.value, fixedFill: fixedFill.value };
         const moves = step.value === 'tree' ? selectedMoves.value : [];
+        const solverFill: SolverFillStone[] = [];
 
-        drawPuzzlePosition(gameView, position, moves);
+        if (step.value === 'position' && solverFillPreview.value) {
+            const filled = getSolverFilledPosition(position, edgeConnections.value, playerColor.value, 'win');
+
+            const fixed = new Set(fixedFill.value.map(({ move }) => move));
+
+            solverFill.push(
+                ...filled.redStones.filter(move => !position.redStones.includes(move)).map(move => ({ move, color: 0 as const, fixed: fixed.has(move) })),
+                ...filled.blueStones.filter(move => !position.blueStones.includes(move)).map(move => ({ move, color: 1 as const, fixed: fixed.has(move) })),
+            );
+        }
+
+        drawPuzzlePosition(gameView, position, moves, solverFill);
 
         const markedMove = moves[moves.length - 1]?.move ?? lastMove.value;
 
@@ -900,10 +1054,24 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
             return;
         }
 
+        // Disabled cells filled like katahex check does, see PuzzleKatahexChecker
+        const edgePaths = getEdgePaths({ boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value, fixedFill: fixedFill.value }, edgeConnections.value);
+        const filled = fillForKatahex(red, blue, disabledCells.value, playerColor.value === 0 ? 'black' : 'white', edgePaths, fixedFill.value);
+        const filledBoard = new Board(boardsize.value);
+
+        filled.black.forEach(move => filledBoard.setCell(move, 0));
+        filled.white.forEach(move => filledBoard.setCell(move, 1));
+
+        // Fill already connects a player: katahex has no move to analyze
+        if (filledBoard.calculateWinner() !== null) {
+            analysisLoading.value = false;
+            return;
+        }
+
         let policy: undefined | number[][];
 
         try {
-            ({ policy } = await currentAnalyzer.analyzePosition({ size: boardsize.value, color, black: red, white: blue }));
+            ({ policy } = await currentAnalyzer.analyzePosition({ size: boardsize.value, color, ...filled }));
         } catch (e) {
             if (requestId !== analysisRequestId) {
                 return;
@@ -952,6 +1120,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
                 black: red,
                 white: blue,
                 disabledCells: [...disabledCells.value],
+                edgeConnections: edgeConnections.value.map(connection => ({ ...connection })),
+                fixedFill: fixedFill.value.map(cell => ({ ...cell })),
             });
         } catch (e) {
             if (requestId !== analysisRequestId) {
@@ -1019,6 +1189,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redStones: redStones.value,
         blueStones: blueStones.value,
         disabledCells: disabledCells.value,
+        edgeConnections: edgeConnections.value.map(connection => ({ ...connection })),
+        fixedFill: fixedFill.value.map(cell => ({ ...cell })),
         hideDisabledCells: hideDisabledCells.value,
         lastMove: lastMove.value,
         playerColor: playerColor.value,
@@ -1098,19 +1270,19 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      */
 
     const toDefinition = (): PuzzleDefinition => {
-        const { title, description, boardsize, redStones, blueStones, disabledCells, lastMove, playerColor, computerPlaysFirst, tree } = toInput(published);
+        const { title, description, boardsize, redStones, blueStones, disabledCells, edgeConnections, fixedFill, lastMove, playerColor, computerPlaysFirst, tree } = toInput(published);
 
-        return { title, description, boardsize, redStones, blueStones, disabledCells, lastMove, playerColor, computerPlaysFirst, tree };
+        return { title, description, boardsize, redStones, blueStones, disabledCells, edgeConnections, fixedFill, lastMove, playerColor, computerPlaysFirst, tree };
     };
 
     /**
      * Changes when position or tree changes, to invalidate katahex check results.
      */
     const puzzleCheckKey = computed(() => {
-        const { boardsize, redStones, blueStones, disabledCells, playerColor, computerPlaysFirst, tree } = toDefinition();
+        const { boardsize, redStones, blueStones, disabledCells, edgeConnections, fixedFill, playerColor, computerPlaysFirst, tree } = toDefinition();
 
         return JSON.stringify(
-            { boardsize, redStones, blueStones, disabledCells, playerColor, computerPlaysFirst, tree },
+            { boardsize, redStones, blueStones, disabledCells, edgeConnections, fixedFill, playerColor, computerPlaysFirst, tree },
             (key, value: unknown) => key === 'message' ? undefined : value,
         );
     });
@@ -1252,6 +1424,11 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         redStones,
         blueStones,
         disabledCells,
+        edgeConnections,
+        edgeToolError,
+        impossibleEdgeConnections,
+        solverFillPreview,
+        toggleSolverFillPreview,
         hideDisabledCells,
         playerColor,
         setPlayerColor,

@@ -1,16 +1,20 @@
 import type { SolvePositionInput, SolveResult } from '../ai-jobs/protocol.js';
 import { SOLVER_INTERACTIVE_CHILDREN_MAX_TIME_SECONDS, type PuzzleSolvePositionInput, type PuzzleSolvePositionOutput } from '../../shared/app/puzzles/puzzleCheck.js';
-import { toSolveInput, type SolveClaim } from './puzzleCheckUtils.js';
+import { getSolveEdgePaths, toSolveInput, type SolveClaim } from './puzzleCheckUtils.js';
 import type { PositionSolver } from './PuzzleSolverChecker.js';
 
 /**
  * Inputs to solve, by claim about player to move, see fillDisabledCells().
  * Same input twice when there is no disabled cell.
  */
-export const getPuzzleSolveInputs = (input: PuzzleSolvePositionInput): { [claim in SolveClaim]: SolvePositionInput } => ({
-    win: toSolveInput(input, input.color, 'win', SOLVER_INTERACTIVE_CHILDREN_MAX_TIME_SECONDS),
-    notWin: toSolveInput(input, input.color, 'notWin', SOLVER_INTERACTIVE_CHILDREN_MAX_TIME_SECONDS),
-});
+export const getPuzzleSolveInputs = (input: PuzzleSolvePositionInput): { [claim in SolveClaim]: SolvePositionInput } => {
+    const edgePaths = getSolveEdgePaths(input);
+
+    return {
+        win: toSolveInput(input, input.color, 'win', edgePaths, SOLVER_INTERACTIVE_CHILDREN_MAX_TIME_SECONDS),
+        notWin: toSolveInput(input, input.color, 'notWin', edgePaths, SOLVER_INTERACTIVE_CHILDREN_MAX_TIME_SECONDS),
+    };
+};
 
 /**
  * Solves a puzzle position and each move of player to move.

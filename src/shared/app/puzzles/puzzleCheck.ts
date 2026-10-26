@@ -9,6 +9,7 @@
 import type { Move } from '@playhex/move-notation';
 import { ANALYSIS_ENGINES } from '../hexplorer.js';
 import type { PuzzleDefinition, PuzzleError } from './puzzleTree.js';
+import type { PuzzleEdgeConnection, PuzzleFixedFill } from './edgeConnections.js';
 
 export type PuzzleCheckWarningCode =
     /**
@@ -198,6 +199,16 @@ export type PuzzleSolvePositionInput = {
     black: Move[];
     white: Move[];
     disabledCells?: Move[];
+
+    /**
+     * Stones connected to their edge through disabled cells, see edgeConnections.ts.
+     */
+    edgeConnections?: PuzzleEdgeConnection[];
+
+    /**
+     * Disabled cells filled with a color chosen by puzzle author, see fillDisabledCells().
+     */
+    fixedFill?: PuzzleFixedFill[];
 };
 
 /**

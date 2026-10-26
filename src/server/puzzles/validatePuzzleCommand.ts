@@ -39,6 +39,8 @@ const toDefinition = (puzzle: Puzzle): PuzzleDefinition => ({
     redStones: puzzle.redStones,
     blueStones: puzzle.blueStones,
     disabledCells: puzzle.disabledCells,
+    edgeConnections: puzzle.edgeConnections,
+    fixedFill: puzzle.fixedFill,
     lastMove: puzzle.lastMove,
     playerColor: puzzle.playerColor,
     computerPlaysFirst: puzzle.computerPlaysFirst,

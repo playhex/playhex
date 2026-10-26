@@ -4,7 +4,7 @@ import { Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthenticatedPlayer } from '../controllers/http/middlewares.js';
 import { Player, Puzzle, PuzzleCollection } from '../../shared/app/models/index.js';
-import { isDraftBlockingError, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type PuzzleInput } from '../../shared/app/puzzles/puzzleTree.js';
+import { isDraftBlockingError, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type PuzzleDefinition, type PuzzleInput } from '../../shared/app/puzzles/puzzleTree.js';
 import { PUZZLE_COLLECTION_MAX_PUZZLES } from '../../shared/app/puzzles/puzzleCollection.js';
 import { canCreatePuzzleFromGame } from '../../shared/app/gameUtils.js';
 import GameStore from '../store/GameStore.js';
@@ -14,7 +14,8 @@ import { serializePuzzleData } from './puzzleSerializer.js';
 import { mustBeCollectionAuthor, mustBePuzzleAuthor } from './puzzleGuards.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 import { ArrayMaxSize, IsArray, IsIn, IsInt, IsOptional, Max, Min, Validate } from 'class-validator';
-import type { Move } from '@playhex/move-notation';
+import { validateMove, type Move } from '@playhex/move-notation';
+import { getEdgePaths, type PuzzleEdgeConnection, type PuzzleFixedFill } from '../../shared/app/puzzles/edgeConnections.js';
 import { PUZZLE_CHECK_ENGINES, type PuzzleCheckEngine, type PuzzleCheckInput, type PuzzleCheckState, type PuzzleSolvePositionInput, type PuzzleSolvePositionOutput } from '../../shared/app/puzzles/puzzleCheck.js';
 import { MIN_BOARDSIZE, MOHEX_MAX_BOARDSIZE } from '../../shared/app/boardsizeLimits.js';
 import { IsHexCoordinate } from '../../shared/app/validator/IsHexCoordinate.js';
@@ -90,6 +91,8 @@ const applyPuzzleInput = (puzzle: Puzzle, input: PuzzleInput): void => {
     puzzle.redStones = input.redStones;
     puzzle.blueStones = input.blueStones;
     puzzle.disabledCells = input.disabledCells ?? [];
+    puzzle.edgeConnections = input.edgeConnections ?? [];
+    puzzle.fixedFill = input.fixedFill ?? [];
     puzzle.hideDisabledCells = input.hideDisabledCells === true;
     puzzle.lastMove = input.lastMove ?? null;
     puzzle.playerColor = input.playerColor;
@@ -98,6 +101,15 @@ const applyPuzzleInput = (puzzle: Puzzle, input: PuzzleInput): void => {
     setPublished(puzzle, input.published === true);
     puzzle.updatedAt = new Date();
     mustBeSavable(puzzle);
+};
+
+/**
+ * Initial position as sent to solver, for both claims, see fillDisabledCells().
+ */
+const getFilledInitialPositions = ({ boardsize, redStones, blueStones, playerColor, disabledCells = [], edgeConnections = [], fixedFill = [] }: PuzzleDefinition): { black: Move[], white: Move[] }[] => {
+    const edgePaths = getEdgePaths({ boardsize, redStones, blueStones, disabledCells, fixedFill }, edgeConnections);
+
+    return (['win', 'notWin'] as const).map(claim => fillDisabledCells(redStones, blueStones, disabledCells, toColor(playerColor), claim, edgePaths, fixedFill));
 };
 
 const SOLVE_MAX_STONES = MOHEX_MAX_BOARDSIZE * MOHEX_MAX_BOARDSIZE;
@@ -127,7 +139,35 @@ class SolvePositionBody implements PuzzleSolvePositionInput
     @ArrayMaxSize(SOLVE_MAX_STONES)
     @Validate(IsHexCoordinate, { each: true })
     disabledCells?: Move[];
+
+    /**
+     * Checked in controller, see isValidEdgeConnection().
+     */
+    @IsOptional()
+    @IsArray()
+    @ArrayMaxSize(SOLVE_MAX_STONES)
+    edgeConnections?: PuzzleEdgeConnection[];
+
+    /**
+     * Checked in controller, see isValidFixedFill().
+     */
+    @IsOptional()
+    @IsArray()
+    @ArrayMaxSize(SOLVE_MAX_STONES)
+    fixedFill?: PuzzleFixedFill[];
 }
+
+const isValidEdgeConnection = (connection: unknown): connection is PuzzleEdgeConnection =>
+    typeof connection === 'object' && connection !== null
+    && typeof (connection as PuzzleEdgeConnection).move === 'string' && validateMove((connection as PuzzleEdgeConnection).move)
+    && ((connection as PuzzleEdgeConnection).edge === 0 || (connection as PuzzleEdgeConnection).edge === 1)
+;
+
+const isValidFixedFill = (cell: unknown): cell is PuzzleFixedFill =>
+    typeof cell === 'object' && cell !== null
+    && typeof (cell as PuzzleFixedFill).move === 'string' && validateMove((cell as PuzzleFixedFill).move)
+    && ((cell as PuzzleFixedFill).color === 0 || (cell as PuzzleFixedFill).color === 1)
+;
 
 /**
  * Body size limit, as a tree with many nodes and messages can exceed default 100kb.
@@ -374,14 +414,11 @@ export default class PuzzleController
         @Req() request: Request,
     ): Promise<PuzzleCheckState> {
         return await this.puzzleCheck(input, async engine => {
-            const { boardsize, redStones, blueStones, playerColor, disabledCells = [] } = input.puzzle;
+            const { boardsize, redStones, blueStones } = input.puzzle;
 
             // Solver sees disabled cells as stones, see fillDisabledCells(): check positions it actually solves
             const positions = engine === 'mohex-solver'
-                ? [
-                    fillDisabledCells(redStones, blueStones, disabledCells, toColor(playerColor), 'win'),
-                    fillDisabledCells(redStones, blueStones, disabledCells, toColor(playerColor), 'notWin'),
-                ]
+                ? getFilledInitialPositions(input.puzzle)
                 : [{ black: redStones, white: blueStones }]
             ;
 
@@ -433,6 +470,14 @@ export default class PuzzleController
         @Body() body: SolvePositionBody,
         @Req() request: Request,
     ): Promise<PuzzleSolvePositionOutput> {
+        if (body.edgeConnections !== undefined && !body.edgeConnections.every(isValidEdgeConnection)) {
+            throw new BadRequestError('Invalid edgeConnections');
+        }
+
+        if (body.fixedFill !== undefined && !body.fixedFill.every(isValidFixedFill)) {
+            throw new BadRequestError('Invalid fixedFill');
+        }
+
         const inputs = getPuzzleSolveInputs(body);
 
         // Disabled cells are filled with stones: checks positions actually solved, and validates all cells

@@ -74,6 +74,7 @@
 
 import { parseMove, validateMove, type Move } from '@playhex/move-notation';
 import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../boardsizeLimits.js';
+import { getEdgePaths, type PuzzleEdgeConnection, type PuzzleFixedFill } from './edgeConnections.js';
 
 export type PuzzleResult = 'solved' | 'failed';
 
@@ -135,6 +136,16 @@ export type PuzzleDefinition = {
      * Cells that cannot be played. Considered occupied: no initial stone nor tree move on them.
      */
     disabledCells?: Move[];
+
+    /**
+     * Initial stones connected to their edge through disabled cells, see edgeConnections.ts.
+     */
+    edgeConnections?: PuzzleEdgeConnection[];
+
+    /**
+     * Disabled cells filled with a color chosen by author when sent to solver, see fillDisabledCells().
+     */
+    fixedFill?: PuzzleFixedFill[];
 
     lastMove?: null | Move;
     playerColor: 0 | 1;
@@ -611,6 +622,13 @@ export type PuzzleErrorCode =
     | 'parallel_overlap'
     | 'parallel_transposition'
     | 'parallel_on_leaf'
+    | 'invalid_edge_connections'
+    | 'edge_connection_not_stone'
+    | 'edge_connection_twice'
+    | 'edge_connection_impossible'
+    | 'invalid_fixed_fill'
+    | 'fixed_fill_not_disabled'
+    | 'fixed_fill_twice'
 ;
 
 /**
@@ -677,6 +695,8 @@ const DRAFT_BLOCKING_ERRORS: PuzzleErrorCode[] = [
     'children_not_list',
     'node_not_object',
     'parallel_not_list',
+    'invalid_edge_connections',
+    'invalid_fixed_fill',
 ];
 
 /**
@@ -843,6 +863,65 @@ export const validatePuzzle = (puzzle: PuzzleDefinition): PuzzleError[] => {
         }
 
         initialStones.add(move);
+    }
+
+    const fixedFill: unknown = puzzle.fixedFill ?? [];
+    const validFixedFill: PuzzleFixedFill[] = [];
+
+    if (!Array.isArray(fixedFill) || !fixedFill.every(cell => isObject(cell)
+        && Object.keys(cell).every(key => key === 'move' || key === 'color')
+        && typeof cell.move === 'string' && validateMove(cell.move)
+        && (cell.color === 0 || cell.color === 1))
+    ) {
+        errors.push({ code: 'invalid_fixed_fill' });
+    } else {
+        const fixed = new Set<Move>();
+
+        for (const cell of fixedFill as PuzzleFixedFill[]) {
+            if (!disabledCells.includes(cell.move)) {
+                errors.push({ code: 'fixed_fill_not_disabled', params: { move: cell.move } });
+            } else if (fixed.has(cell.move)) {
+                errors.push({ code: 'fixed_fill_twice', params: { move: cell.move } });
+            } else {
+                validFixedFill.push(cell);
+            }
+
+            fixed.add(cell.move);
+        }
+    }
+
+    const edgeConnections: unknown = puzzle.edgeConnections ?? [];
+
+    if (!Array.isArray(edgeConnections) || !edgeConnections.every(connection => isObject(connection)
+        && Object.keys(connection).every(key => key === 'move' || key === 'edge')
+        && typeof connection.move === 'string' && validateMove(connection.move)
+        && (connection.edge === 0 || connection.edge === 1))
+    ) {
+        errors.push({ code: 'invalid_edge_connections' });
+    } else {
+        const connected = new Set<Move>();
+        const position = { boardsize, redStones: puzzle.redStones, blueStones: puzzle.blueStones, disabledCells, fixedFill: validFixedFill };
+
+        for (const { move } of edgeConnections as PuzzleEdgeConnection[]) {
+            if (!puzzle.redStones.includes(move) && !puzzle.blueStones.includes(move)) {
+                errors.push({ code: 'edge_connection_not_stone', params: { move } });
+            } else if (connected.has(move)) {
+                errors.push({ code: 'edge_connection_twice', params: { move } });
+            }
+
+            connected.add(move);
+        }
+
+        for (const index of getEdgePaths(position, edgeConnections as PuzzleEdgeConnection[]).impossible) {
+            const { move } = (edgeConnections as PuzzleEdgeConnection[])[index];
+
+            // Not a stone and duplicates already reported
+            if ((puzzle.redStones.includes(move) || puzzle.blueStones.includes(move))
+                && (edgeConnections as PuzzleEdgeConnection[]).findIndex(connection => connection.move === move) === index
+            ) {
+                errors.push({ code: 'edge_connection_impossible', params: { move } });
+            }
+        }
     }
 
     if (puzzle.redStones.length + puzzle.blueStones.length === 0) {
