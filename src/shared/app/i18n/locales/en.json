@@ -1327,6 +1327,46 @@
             "back_to_collection": "Back to collection"
         }
     },
+    "training": {
+        "sections": {
+            "defend-your-template": {
+                "title": "Defend your template",
+                "intro": "Edge templates are only useful if you can defend them. Train at answering every intrusion: templates you master come back from time to time for review, the ones you struggle with come back more often."
+            }
+        },
+        "start_session": "Start a training",
+        "due_count_one": "{{count}} to review",
+        "due_count_other": "{{count}} to review",
+        "level": "Level {{number}}",
+        "locked": "Locked",
+        "locked_help": "Acquire most puzzles of the previous level to unlock this one. You can still practice them.",
+        "state": {
+            "new": "New",
+            "not_acquired": "Not acquired",
+            "in_progress": "In progress",
+            "acquired": "Acquired"
+        },
+        "next_review": "Review on {{date}}",
+        "review_due": "To review",
+        "give_up": "Give up",
+        "feedback": {
+            "acquired": "Acquired!",
+            "forgotten": "Forgotten: you will see it again soon.",
+            "state": "State: { state }"
+        },
+        "counter": "{{current}} / {{total}}",
+        "next": "Next",
+        "see_summary": "See summary",
+        "summary_title": "Training summary",
+        "summary_acquired": "Newly acquired",
+        "summary_regressed": "Forgotten",
+        "summary_in_progress": "Still to work on",
+        "back": "Back to progression",
+        "nothing_to_train": "Nothing to train for now, come back later.",
+        "empty": "Nothing here yet.",
+        "loading": "Loading…",
+        "save_error": "Could not save your result."
+    },
     "videos": {
         "title": "Videos",
         "loading": "Loading videos…",

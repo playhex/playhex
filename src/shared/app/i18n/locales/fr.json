@@ -1307,6 +1307,46 @@
             "back_to_collection": "Retour à la collection"
         }
     },
+    "training": {
+        "sections": {
+            "defend-your-template": {
+                "title": "Défends ton template",
+                "intro": "Un template ne sert que si vous savez le défendre. Entraînez-vous à répondre à chaque intrusion : les templates maîtrisés reviennent de temps en temps pour révision, ceux qui vous posent problème reviennent plus souvent."
+            }
+        },
+        "start_session": "Commencer un entraînement",
+        "due_count_one": "{{count}} à revoir",
+        "due_count_other": "{{count}} à revoir",
+        "level": "Niveau {{number}}",
+        "locked": "Verrouillé",
+        "locked_help": "Acquérez la plupart des puzzles du niveau précédent pour débloquer celui-ci. Vous pouvez quand même vous y entraîner.",
+        "state": {
+            "new": "Nouveau",
+            "not_acquired": "Non acquis",
+            "in_progress": "En cours d'acquisition",
+            "acquired": "Acquis"
+        },
+        "next_review": "À revoir le {{date}}",
+        "review_due": "À revoir",
+        "give_up": "Abandonner",
+        "feedback": {
+            "acquired": "Acquis !",
+            "forgotten": "Oublié : vous le reverrez bientôt.",
+            "state": "État : { state }"
+        },
+        "counter": "{{current}} / {{total}}",
+        "next": "Suivant",
+        "see_summary": "Voir le bilan",
+        "summary_title": "Bilan de l'entraînement",
+        "summary_acquired": "Nouveaux acquis",
+        "summary_regressed": "Oubliés",
+        "summary_in_progress": "Encore à travailler",
+        "back": "Retour à la progression",
+        "nothing_to_train": "Rien à entraîner pour le moment, revenez plus tard.",
+        "empty": "Rien ici pour le moment.",
+        "loading": "Chargement…",
+        "save_error": "Impossible d'enregistrer votre résultat."
+    },
     "videos": {
         "title": "Vidéos",
         "loading": "Chargement des vidéos…",

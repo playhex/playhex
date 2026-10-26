@@ -41,6 +41,7 @@ import HexGameImporterController from './HexGameImporterController.js';
 import LadderController from '../../../ladder/LadderController.js';
 import PuzzleController from '../../../puzzles/PuzzleController.js';
 import PuzzleCollectionController from '../../../puzzles/PuzzleCollectionController.js';
+import TrainingController from '../../../training/TrainingController.js';
 import VideoController from '../../../videos/VideoController.js';
 import ExternalGameController from '../../../external-games/ExternalGameController.js';
 import ExternalGameImportController from '../../../external-games/ExternalGameImportController.js';
@@ -103,6 +104,7 @@ export const registerApi = (app: Express) => {
             LadderController,
             PuzzleController,
             PuzzleCollectionController,
+            TrainingController,
             VideoController,
             ExternalGameImportController,
             ExternalGameController,

@@ -55,6 +55,8 @@ import TournamentSubscription from './TournamentSubscription.js';
 import TournamentParticipant from './TournamentParticipant.js';
 import TournamentSeries from './TournamentSeries.js';
 import TournamentSeriesAdmin from './TournamentSeriesAdmin.js';
+import TrainingAttempt from './TrainingAttempt.js';
+import TrainingProgress from './TrainingProgress.js';
 import Video from './Video.js';
 
 export {
@@ -115,6 +117,8 @@ export {
     TournamentParticipant,
     TournamentSeries,
     TournamentSeriesAdmin,
+    TrainingAttempt,
+    TrainingProgress,
     Video,
 };
 
@@ -172,6 +176,8 @@ export const entities = {
     TournamentParticipant,
     TournamentSeries,
     TournamentSeriesAdmin,
+    TrainingAttempt,
+    TrainingProgress,
     Video,
 };
 

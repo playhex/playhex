@@ -77,6 +77,7 @@ export { default as IconLightbulb } from '~icons/bi/lightbulb';
 export { default as IconLightningChargeFill } from '~icons/bi/lightning-charge-fill';
 export { default as IconList } from '~icons/bi/list';
 export { default as IconListOl } from '~icons/bi/list-ol';
+export { default as IconLock } from '~icons/bi/lock';
 export { default as IconMagic } from '~icons/bi/magic';
 export { default as IconMeditation } from '~icons/mdi/meditation';
 export { default as IconMailbox } from '~icons/bi/mailbox';
