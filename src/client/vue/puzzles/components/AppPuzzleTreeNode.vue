@@ -13,7 +13,7 @@ import { computed } from 'vue';
 import { filterMoveNodes, isElseNode, isParallelRoot, type PuzzleElseNode, type PuzzleError, type PuzzleNode, type PuzzleResult, type Transposition } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { translatePuzzleErrorMessage } from '../services/puzzleErrorMessage.js';
 import AppConditionalMoveButton from '../../components/AppConditionalMoveButton.vue';
-import { IconArrowReturnRight, IconChatRightText, IconCheck, IconPencilSquare, IconSignpostSplit, IconXLg } from '../../icons.js';
+import { IconArrowReturnRight, IconChatRightText, IconCheck, IconHouseFill, IconSignpostSplit, IconXLg } from '../../icons.js';
 
 type EditorNode = PuzzleNode | PuzzleElseNode;
 
@@ -149,7 +149,7 @@ const transposition = computed(() => isElseNode(props.node) ? null : props.trans
             @click="emit('select', path)"
         >
             <AppConditionalMoveButton :label="label(isParallelRootNode ? '‖' : node.move ?? '')" :playerIndex :class="{ 'root-node': isRoot, 'parallel-root': isParallelRootNode }" />
-            <IconPencilSquare v-if="isRoot && !compact" class="root-icon" />
+            <IconHouseFill v-if="isRoot && !compact" class="root-icon" />
 
             <IconChatRightText v-if="node.message" class="node-badge message-badge" />
             <IconSignpostSplit v-if="alternative" class="node-badge alternative-badge" />

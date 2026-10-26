@@ -70,6 +70,7 @@ export { default as IconHexagon } from '~icons/bi/hexagon';
 export { default as IconHexagonFill } from '~icons/bi/hexagon-fill';
 export { default as IconHourglass } from '~icons/bi/hourglass';
 export { default as IconHouse } from '~icons/bi/house';
+export { default as IconHouseFill } from '~icons/bi/house-fill';
 export { default as IconInfoCircle } from '~icons/bi/info-circle';
 export { default as IconInfoCircleFill } from '~icons/bi/info-circle-fill';
 export { default as IconInfoLg } from '~icons/bi/info-lg';

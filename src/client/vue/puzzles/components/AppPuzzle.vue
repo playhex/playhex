@@ -32,6 +32,7 @@ const {
     resultMessage,
     alternativeMove,
     lineNumber,
+    playedMoves,
     canUndo,
     canRestart,
     canHint,
@@ -230,8 +231,9 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                 </p>
 
                 <p v-if="isAuthor" class="d-flex gap-2">
+                    <!-- Opens editor on current position -->
                     <router-link
-                        :to="{ name: 'puzzle-edit', params: { publicId: puzzle.publicId } }"
+                        :to="{ name: 'puzzle-edit', params: { publicId: puzzle.publicId }, query: playedMoves.length > 0 ? { moves: playedMoves.join(',') } : {} }"
                         class="btn btn-sm btn-outline-primary"
                     ><IconPencilSquare /> {{ $t('puzzles.edit') }}</router-link>
 

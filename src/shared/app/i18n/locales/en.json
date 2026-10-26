@@ -1237,6 +1237,8 @@
             "expert_mode_ok": "Got it",
             "zoom_out": "Zoom out tree",
             "zoom_in": "Zoom in tree",
+            "center_tree_root": "Center tree on initial position",
+            "center_tree_selected": "Center tree on selected node",
             "expert_zoom_help": "Shows a smaller tree, without coordinates, to see the structure of large trees at a glance. Hover a move to see its coordinate.",
             "next_player_move": "Next: player move",
             "next_computer_move": "Next: computer answer",

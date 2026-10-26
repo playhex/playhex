@@ -3,6 +3,7 @@ import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useHead } from '@unhead/vue';
+import { validateMove, type Move } from '@playhex/move-notation';
 import { t } from 'i18next';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { canCreatePuzzleFromGame } from '../../../../shared/app/gameUtils.js';
@@ -14,7 +15,8 @@ import AppPuzzleEditor from '../components/AppPuzzleEditor.vue';
  * Create a puzzle (/puzzles/new, optionally ?game=<publicId> to start from a game,
  * or ?clone=<publicId> to start from a copy of a puzzle,
  * and ?collection=<publicId> to put it in a collection),
- * or edit an existing one (/puzzles/<publicId>/edit).
+ * or edit an existing one (/puzzles/<publicId>/edit,
+ * optionally ?moves=c3,b3 to select the node reached by moves played while testing it).
  */
 
 const route = useRoute();
@@ -24,6 +26,7 @@ const publicId = typeof route.params.publicId === 'string' ? route.params.public
 const gamePublicId = typeof route.query.game === 'string' ? route.query.game : null;
 const clonePublicId = typeof route.query.clone === 'string' ? route.query.clone : null;
 const collectionPublicId = typeof route.query.collection === 'string' ? route.query.collection : null;
+const playedMoves: Move[] = typeof route.query.moves === 'string' ? route.query.moves.split(',').filter(validateMove) : [];
 
 useHead({
     title: () => t(publicId === null ? 'puzzles.editor.create_title' : 'puzzles.editor.edit_title'),
@@ -93,6 +96,7 @@ watch(loggedInPlayer, async player => {
         :sourceGame="load.sourceGame"
         :clonedPuzzle="load.clonedPuzzle"
         :collectionPublicId
+        :playedMoves
     />
 
     <div v-else class="container my-3">

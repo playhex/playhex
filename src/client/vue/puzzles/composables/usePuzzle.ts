@@ -572,6 +572,7 @@ export const usePuzzle = (puzzle: Puzzle) => {
         resultMessage,
         alternativeMove,
         lineNumber,
+        playedMoves: computed(() => path.value.map(({ move }) => move)),
         canUndo: computed(() => path.value.length > lineStartIndex.value),
         canRestart: computed(() => path.value.length > initialLineStartIndex || lineNumber.value > 1),
         canHint: computed(() => hasSolution && !computerThinking.value && status.value !== 'solved' && status.value !== 'line_solved'),

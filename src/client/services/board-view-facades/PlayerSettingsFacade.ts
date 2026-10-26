@@ -11,6 +11,11 @@ import { ShadingPatternFacade } from '@playhex/pixi-board';
 import { AutoOrientationFacade, OrientationMode } from '@playhex/pixi-board';
 
 /**
+ * Settings used instead of player settings.
+ */
+export type OverrideSettings = Partial<PlayerSettings & LocalSettings>;
+
+/**
  * Customizes game view with player current settings
  * (theme, preferred orientation, show coords by default, ...)
  */
@@ -46,7 +51,7 @@ export class PlayerSettingsFacade
          * and ignore player setting.
          * Used for example to nether show coords in a small gameView, despite player settings.
          */
-        private overrideSettings: Partial<PlayerSettings & LocalSettings> = {},
+        private overrideSettings: OverrideSettings = {},
     ) {
         this.init();
     }
@@ -125,7 +130,7 @@ export class PlayerSettingsFacade
      * Change settings to use instead of player settings, and apply them now.
      * Used for example in local games, where board orientation is chosen from game menu.
      */
-    setOverrideSettings(overrideSettings: Partial<PlayerSettings & LocalSettings>): void
+    setOverrideSettings(overrideSettings: OverrideSettings): void
     {
         this.overrideSettings = overrideSettings;
 

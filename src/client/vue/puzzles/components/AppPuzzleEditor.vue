@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { type Component, computed, ref, useTemplateRef, watch } from 'vue';
+import { type Component, computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { defineOverlay } from '@overlastic/vue';
 import { useElementSize, useWindowFocus, whenever } from '@vueuse/core';
 import { t } from 'i18next';
+import type { Move } from '@playhex/move-notation';
 import { Game, Puzzle, PuzzleCollection } from '../../../../shared/app/models/index.js';
 import { isElseNode, PUZZLE_DESCRIPTION_MAX_LENGTH, PUZZLE_MESSAGE_MAX_LENGTH, PUZZLE_TITLE_MAX_LENGTH } from '../../../../shared/app/puzzles/puzzleTree.js';
 import { isValidBoardsize, MAX_BOARDSIZE, MIN_BOARDSIZE, MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
@@ -15,7 +16,7 @@ import AppPuzzleEdgeConnectionTool from './AppPuzzleEdgeConnectionTool.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
 import ImportGameOverlay from '../../components/overlay/ImportGameOverlay.vue';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconAspectRatio, IconAsterisk, IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconDiagram2, IconEraser, IconExclamationTriangle, IconEye, IconHexagonFill, IconInfoCircle, IconMagic, IconPlayFill, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconXLg, IconZoomIn, IconZoomOut } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconAspectRatio, IconAsterisk, IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconCrosshair, IconDiagram2, IconEraser, IconExclamationTriangle, IconEye, IconHexagonFill, IconHouseFill, IconInfoCircle, IconMagic, IconPlayFill, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconXLg, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { createKatahexAnalyzers, useAnalysisEngines } from '../../hexplorer/composables/useAnalysisEngines.js';
@@ -41,6 +42,11 @@ const props = defineProps<{
      * Puzzle to copy when creating a new one.
      */
     clonedPuzzle: null | Puzzle;
+
+    /**
+     * Moves played while testing puzzle, to select the node they reach.
+     */
+    playedMoves?: Move[];
 }>();
 
 const {
@@ -121,7 +127,7 @@ const {
     enableSolver,
     analysisLoading,
     analysisError,
-} = usePuzzleEditor(props.puzzle, props.sourceGame, props.collectionPublicId ?? null, props.clonedPuzzle);
+} = usePuzzleEditor(props.puzzle, props.sourceGame, props.collectionPublicId ?? null, props.clonedPuzzle, props.playedMoves);
 
 /**
  * Game the puzzle is taken from, shown as "from this game".
@@ -178,23 +184,19 @@ const layoutElement = useTemplateRef('layout-element');
  */
 const sidebarWidth = ref<null | number>(null);
 
-let resizing = false;
-
+/**
+ * Resizing while handle has pointer capture, released on pointer up or cancel.
+ */
 const startResize = (e: PointerEvent): void => {
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    resizing = true;
 };
 
 const resize = (e: PointerEvent): void => {
-    if (!resizing || layoutElement.value === null) {
+    if (!(e.currentTarget as HTMLElement).hasPointerCapture(e.pointerId) || layoutElement.value === null) {
         return;
     }
 
     sidebarWidth.value = layoutElement.value.getBoundingClientRect().right - e.clientX;
-};
-
-const stopResize = (): void => {
-    resizing = false;
 };
 
 /**
@@ -290,6 +292,113 @@ const setExpertMode = async (enabled: boolean): Promise<void> => {
  * Expert mode only.
  */
 const treeZoomedOut = ref(false);
+
+/*
+ * Tree scroll: centers on selected node when selected from outside the tree
+ * (board click, keyboard arrows, check warning, played moves from puzzle test...).
+ */
+
+const treeWrapperElement = useTemplateRef('tree-wrapper-element');
+
+/**
+ * Faster than native smooth scroll, which duration cannot be set.
+ */
+const TREE_SCROLL_DURATION_MS = 150;
+
+let treeScrollAnimation: null | number = null;
+
+/**
+ * Scrolls tree so that this node button is in the middle.
+ */
+const centerTreeOn = (element: null | Element, behavior: 'smooth' | 'instant' = 'smooth'): void => {
+    const wrapper = treeWrapperElement.value;
+
+    if (wrapper === null || element === null) {
+        return;
+    }
+
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+
+    const fromLeft = wrapper.scrollLeft;
+    const fromTop = wrapper.scrollTop;
+    const deltaLeft = elementRect.left + elementRect.width / 2 - (wrapperRect.left + wrapperRect.width / 2);
+    const deltaTop = elementRect.top + elementRect.height / 2 - (wrapperRect.top + wrapperRect.height / 2);
+
+    if (treeScrollAnimation !== null) {
+        cancelAnimationFrame(treeScrollAnimation);
+        treeScrollAnimation = null;
+    }
+
+    if (behavior === 'instant' || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        wrapper.scrollTo(fromLeft + deltaLeft, fromTop + deltaTop);
+        return;
+    }
+
+    const start = performance.now();
+
+    const step = (now: number): void => {
+        const progress = Math.min(1, (now - start) / TREE_SCROLL_DURATION_MS);
+        // Ease out
+        const eased = 1 - (1 - progress) ** 3;
+
+        wrapper.scrollTo(fromLeft + deltaLeft * eased, fromTop + deltaTop * eased);
+
+        treeScrollAnimation = progress < 1 ? requestAnimationFrame(step) : null;
+    };
+
+    treeScrollAnimation = requestAnimationFrame(step);
+};
+
+const centerTreeOnRoot = (): void => centerTreeOn(treeWrapperElement.value?.querySelector('.tree-node-button') ?? null);
+
+const getSelectedTreeNodeElement = (): null | Element => treeWrapperElement.value?.querySelector('.tree-node-current') ?? null;
+
+const centerTreeOnSelected = (behavior?: 'smooth' | 'instant'): void => centerTreeOn(getSelectedTreeNodeElement(), behavior);
+
+const isVisibleInTree = (element: Element): boolean => {
+    const wrapperRect = treeWrapperElement.value!.getBoundingClientRect();
+    const elementRect = element.getBoundingClientRect();
+
+    return elementRect.left >= wrapperRect.left && elementRect.right <= wrapperRect.right
+        && elementRect.top >= wrapperRect.top && elementRect.bottom <= wrapperRect.bottom;
+};
+
+/**
+ * Node clicked in tree is usually already visible: scroll only if not, e.g transposition link.
+ */
+let selectedFromTree = false;
+
+const selectFromTree = (path: Parameters<typeof selectPath>[0]): void => {
+    selectedFromTree = true;
+    selectPath(path);
+
+    // After watcher below, also when same node is selected again and watcher is not called
+    void nextTick(() => selectedFromTree = false);
+};
+
+watch(selectedNode, () => {
+    const element = getSelectedTreeNodeElement();
+
+    if (selectedFromTree && element !== null && isVisibleInTree(element)) {
+        return;
+    }
+
+    centerTreeOn(element);
+}, { flush: 'post' });
+
+// Tree shown when entering tree panel, e.g from a check warning, or played moves when opening editor
+watch(treeWrapperElement, async element => {
+    if (element !== null) {
+        await nextTick();
+        centerTreeOnSelected('instant');
+    }
+});
+
+watch(treeZoomedOut, async () => {
+    await nextTick();
+    centerTreeOnSelected('instant');
+});
 
 /*
  * AI eval, expert mode only
@@ -433,10 +542,10 @@ const save = ({ publish = published, stay = false } = {}): Promise<void> => with
         return;
     }
 
-    // New puzzle: next saves update it. Only change url, navigating would reload editor.
+    // New puzzle: next saves update it. Same page component is reused, editor is not reloaded.
     if (savedPublicId.value === null) {
         savedPublicId.value = saved.publicId;
-        history.replaceState(history.state, '', router.resolve({ name: 'puzzle-edit', params: { publicId: saved.publicId } }).href);
+        await router.replace({ name: 'puzzle-edit', params: { publicId: saved.publicId } });
     }
 
     justSaved.value = true;
@@ -514,8 +623,6 @@ const deletePuzzle = async (): Promise<void> => {
                 aria-orientation="vertical"
                 @pointerdown.prevent="startResize"
                 @pointermove="resize"
-                @pointerup="stopResize"
-                @pointercancel="stopResize"
             ></div>
 
             <nav class="puzzle-nav d-flex flex-column flex-shrink-0 border-end">
@@ -545,14 +652,12 @@ const deletePuzzle = async (): Promise<void> => {
                     </div>
                 </template>
 
-                <div class="mb-4"></div>
-
                 <button
-                    v-for="panel in navPanels"
+                    v-for="(panel, index) in navPanels"
                     :key="panel.step"
                     type="button"
                     class="puzzle-nav-item"
-                    :class="{ active: panel.step === step, 'mt-auto': panel.bottom }"
+                    :class="{ active: panel.step === step, 'mt-4': index === 0, 'mt-auto': panel.bottom }"
                     :title="navCollapsed ? collapsedLabel(panel) : undefined"
                     :aria-label="navCollapsed ? collapsedLabel(panel) : undefined"
                     :aria-current="panel.step === step ? 'page' : undefined"
@@ -776,7 +881,7 @@ const deletePuzzle = async (): Promise<void> => {
                         </div>
 
                         <div class="move-tree-block position-relative mb-3">
-                            <div class="move-tree-wrapper bg-body">
+                            <div ref="tree-wrapper-element" class="move-tree-wrapper bg-body">
                                 <AppPuzzleTreeNode
                                     :node="tree"
                                     :path="[]"
@@ -786,21 +891,40 @@ const deletePuzzle = async (): Promise<void> => {
                                     :transpositions
                                     :nodeErrors
                                     :compact="expertMode && treeZoomedOut"
-                                    @select="selectPath"
+                                    @select="selectFromTree"
                                 />
                             </div>
 
-                            <button
-                                v-if="expertMode"
-                                type="button"
-                                class="tree-zoom-button btn btn-sm btn-outline-info bg-body"
-                                :aria-label="treeZoomedOut ? $t('puzzles.editor.zoom_in') : $t('puzzles.editor.zoom_out')"
-                                :title="treeZoomedOut ? $t('puzzles.editor.zoom_in') : $t('puzzles.editor.zoom_out')"
-                                @click="treeZoomedOut = !treeZoomedOut"
-                            >
-                                <IconZoomIn v-if="treeZoomedOut" />
-                                <IconZoomOut v-else />
-                            </button>
+                            <div class="tree-buttons d-flex gap-1">
+                                <!-- Same colors as root node, and selected node outline -->
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-warning bg-body"
+                                    :aria-label="$t('puzzles.editor.center_tree_root')"
+                                    :title="$t('puzzles.editor.center_tree_root')"
+                                    @click="centerTreeOnRoot()"
+                                ><IconHouseFill /></button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-body bg-body"
+                                    :aria-label="$t('puzzles.editor.center_tree_selected')"
+                                    :title="$t('puzzles.editor.center_tree_selected')"
+                                    @click="centerTreeOnSelected()"
+                                ><IconCrosshair /></button>
+
+                                <button
+                                    v-if="expertMode"
+                                    type="button"
+                                    class="btn btn-sm btn-outline-info bg-body"
+                                    :aria-label="treeZoomedOut ? $t('puzzles.editor.zoom_in') : $t('puzzles.editor.zoom_out')"
+                                    :title="treeZoomedOut ? $t('puzzles.editor.zoom_in') : $t('puzzles.editor.zoom_out')"
+                                    @click="treeZoomedOut = !treeZoomedOut"
+                                >
+                                    <IconZoomIn v-if="treeZoomedOut" />
+                                    <IconZoomOut v-else />
+                                </button>
+                            </div>
 
                             <div v-if="alternativesCount > 0" class="small text-body-secondary text-end">{{ $t('puzzles.editor.variations_count', { count: alternativesCount }) }}</div>
                         </div>
@@ -1185,7 +1309,17 @@ const deletePuzzle = async (): Promise<void> => {
     border-radius var(--bs-border-radius)
     padding 0.5rem
 
-.tree-zoom-button
+.btn-outline-body
+    --bs-btn-color var(--bs-body-color)
+    --bs-btn-border-color var(--bs-body-color)
+    --bs-btn-hover-color var(--bs-body-bg)
+    --bs-btn-hover-bg var(--bs-body-color)
+    --bs-btn-hover-border-color var(--bs-body-color)
+    --bs-btn-active-color var(--bs-body-bg)
+    --bs-btn-active-bg var(--bs-body-color)
+    --bs-btn-active-border-color var(--bs-body-color)
+
+.tree-buttons
     position absolute
     top 0.25rem
     right 0.25rem

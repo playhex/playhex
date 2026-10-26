@@ -1,12 +1,12 @@
-import { CircleMark, GameMarksFacade, GameView, PolicyOverlayFacade, TextMark, type OrientationMode } from '@playhex/pixi-board';
+import { CircleMark, GameMarksFacade, GameView, PolicyOverlayFacade, TextMark, TriangleMark, type OrientationMode } from '@playhex/pixi-board';
 import { onKeyDown, useEventListener } from '@vueuse/core';
-import { coordsToMove, type HexMove, type Move } from '@playhex/move-notation';
+import { coordsToMove, validateMove, type HexMove, type Move } from '@playhex/move-notation';
 import { computed, onUnmounted, ref, shallowRef, toRaw, watch } from 'vue';
 import { t } from 'i18next';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { getGamePosition } from '../../../../shared/app/puzzles/gamePosition.js';
-import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findErrorNode, findSamePositionNode, countComputerAlternatives, findTranspositions, getFirstColor, hasComputerAlternatives, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleDefinition, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
-import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
+import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findErrorNode, findPlayedMovesPath, findSamePositionNode, countComputerAlternatives, findTranspositions, getFirstColor, hasComputerAlternatives, isDraftBlockingError, isElseNode, isParallelRoot, normalizePuzzleText, validatePuzzle, type PuzzleDefinition, type PuzzleElseNode, type PuzzleError, type PuzzleInput, type PuzzleNode } from '../../../../shared/app/puzzles/puzzleTree.js';
+import { type OverrideSettings, PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove, type SolverFillStone } from '../services/puzzleBoard.js';
 import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterface.js';
 import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
@@ -19,11 +19,6 @@ import { fillForKatahex, getEdgePaths, getReachableEdges, getSolverFilledPositio
 import Board from '../../../../shared/game-engine/Board.js';
 
 export type EditorStep = 'position' | 'tree' | 'engines' | 'info' | 'publish' | 'display';
-
-/**
- * Steps where board shows initial position, edited with position tools.
- */
-const isPositionStep = (step: EditorStep): boolean => step === 'position' || step === 'engines';
 
 /**
  * How a click on board edits initial position.
@@ -45,6 +40,11 @@ const stepTools: Partial<Record<EditorStep, PositionTool[]>> = {
     engines: ['edge', 'fill_red', 'fill_blue'],
 };
 
+/**
+ * Steps where board shows initial position, edited with position tools.
+ */
+const isPositionStep = (step: EditorStep): boolean => step in stepTools;
+
 type EditorNode = PuzzleNode | PuzzleElseNode;
 
 /**
@@ -60,8 +60,14 @@ const DEFAULT_BOARDSIZE = 11;
 
 const PLANNED_MOVES_GROUP = 'planned_moves';
 const SOLVER_MARKS_GROUP = 'solver_marks';
+const HIGHLIGHTED_MOVE_GROUP = 'highlighted_move';
 const KATAHEX_CHECK_POLL_INTERVAL_MS = 2000;
 const AI_EVAL_COLOR = 0x22bb55;
+
+/**
+ * Same as coords clicked in game chat
+ */
+const HIGHLIGHTED_MOVE_COLOR = 0x0dcaf0;
 
 /**
  * Letter of a planned move on board: A, B, C... for player choices,
@@ -118,8 +124,9 @@ const cleanNode = <T extends EditorNode>(node: T): T => {
  * @param sourceGame Game to create puzzle from
  * @param initialCollectionPublicId Collection to put created puzzle in
  * @param clonedPuzzle Puzzle to copy when creating a new one
+ * @param playedMoves Moves played while testing puzzle, to select the node they reach
  */
-export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, initialCollectionPublicId: null | string = null, clonedPuzzle: null | Puzzle = null) => {
+export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, initialCollectionPublicId: null | string = null, clonedPuzzle: null | Puzzle = null, playedMoves: Move[] = []) => {
     /**
      * Initial data: edited puzzle, or copied one.
      */
@@ -277,7 +284,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const forcedOrientation = ref<null | OrientationMode>(null);
     const forcedShowCoords = ref<null | boolean>(null);
 
-    const getBoardDisplaySettings = (): NonNullable<ConstructorParameters<typeof PlayerSettingsFacade>[1]> => ({
+    const getBoardDisplaySettings = (): OverrideSettings => ({
         ...(forcedOrientation.value === null ? {} : { forcedBoardOrientation: forcedOrientation.value }),
         ...(forcedShowCoords.value === null ? {} : { showCoords: forcedShowCoords.value }),
     });
@@ -424,10 +431,17 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
      */
     const transpositionNotice = ref<null | Move[]>(null);
 
+    /**
+     * Cell marked on board in tree step, e.g the move of a check warning.
+     * Cleared when selecting another node.
+     */
+    const highlightedMove = ref<null | Move>(null);
+
     const selectPath = (path: EditorNode[]): void => {
         selectedPath.value = path;
         pickingElse.value = false;
         transpositionNotice.value = null;
+        highlightedMove.value = null;
         redraw();
     };
 
@@ -517,6 +531,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
         node.children = [];
         delete node.parallel;
+        redraw();
     };
 
     const startPickingElse = (): void => {
@@ -988,7 +1003,19 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         }
 
         drawPlannedMoves();
+        drawHighlightedMove();
         void updateAnalysis();
+    }
+
+    function drawHighlightedMove(): void
+    {
+        gameView.removeEntitiesGroup(HIGHLIGHTED_MOVE_GROUP);
+
+        if (step.value !== 'tree' || highlightedMove.value === null) {
+            return;
+        }
+
+        gameView.addEntity(new TriangleMark(HIGHLIGHTED_MOVE_COLOR).setCoords(highlightedMove.value), HIGHLIGHTED_MOVE_GROUP);
     }
 
     /*
@@ -1343,6 +1370,14 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
 
         setStep('tree');
         selectPath(path);
+
+        // Better move for computer, else the move the warning is about
+        const move = error.params?.best ?? error.params?.move;
+
+        if (typeof move === 'string' && validateMove(move)) {
+            highlightedMove.value = move;
+            drawHighlightedMove();
+        }
     };
 
     /*
@@ -1476,6 +1511,13 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     onKeyDown('ArrowDown', arrowShortcut(null, () => selectSibling(1)));
 
     createGameView();
+
+    if (playedMoves.length > 0 && step.value === 'tree') {
+        const { path, outOfTreeMove } = findPlayedMovesPath(tree.value, playedMoves);
+
+        selectedPath.value = path;
+        highlightedMove.value = outOfTreeMove;
+    }
 
     if (positionSource.value !== null) {
         setSourceGameMovesCount(positionSource.value.moves.length);

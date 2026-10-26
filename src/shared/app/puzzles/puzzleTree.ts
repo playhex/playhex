@@ -535,6 +535,89 @@ export const findSamePositionNode = (tree: PuzzleNode, node: PuzzleNode): null |
     return other === undefined || other.node === node ? null : toTransposition(other);
 };
 
+export type PlayedMovesPath = {
+    /**
+     * Nodes from root (excluded) to the node reached by played moves.
+     * When last move followed is in a parallel sequence: main sequence nodes, then parallel sequence root and its nodes.
+     */
+    path: (PuzzleNode | PuzzleElseNode)[];
+
+    /**
+     * First played move not in tree, also when answered by an "else" node. Null if all moves are in tree.
+     */
+    outOfTreeMove: null | Move;
+};
+
+/**
+ * Finds tree node reached by moves played from initial position, as when playing the puzzle:
+ * follows transpositions, parallel sequences and "else" nodes.
+ * Stops at first move not in tree.
+ */
+export const findPlayedMovesPath = (tree: PuzzleNode, moves: Move[]): PlayedMovesPath => {
+    const transpositions = findTranspositions(tree);
+    const findParallels = createParallelsFinder(tree);
+    let mainPath: PuzzleNode[] = [];
+
+    /**
+     * Nodes played in started parallel sequences, by parallel sequence root.
+     */
+    const parallels = new Map<PuzzleNode, PuzzleNode[]>();
+
+    /**
+     * Parallel sequence of last followed move, null if in main sequence.
+     */
+    let lastParallel: null | PuzzleNode = null;
+
+    const getPath = (): PlayedMovesPath['path'] => lastParallel === null
+        ? mainPath
+        : [...mainPath, lastParallel, ...parallels.get(lastParallel)!]
+    ;
+
+    for (const move of moves) {
+        let node = mainPath[mainPath.length - 1] ?? tree;
+        const transposition = transpositions.get(node);
+
+        if (transposition !== undefined) {
+            mainPath = [...transposition.path];
+            node = transposition.target;
+        }
+
+        const child = findChild(node, move);
+
+        if (child !== null) {
+            mainPath.push(child);
+            lastParallel = null;
+            continue;
+        }
+
+        const parallelRoot = [...new Set([...parallels.keys(), ...findParallels(node)])].find(root => {
+            const played = parallels.get(root) ?? [];
+            const parallelChild = findChild(played[played.length - 1] ?? root, move);
+
+            if (parallelChild !== null) {
+                parallels.set(root, [...played, parallelChild]);
+            }
+
+            return parallelChild !== null;
+        });
+
+        if (parallelRoot !== undefined) {
+            lastParallel = parallelRoot;
+            continue;
+        }
+
+        const elseNode = findElseNode(node);
+
+        // Next moves are "else" answer, then free moves
+        return elseNode === null
+            ? { path: getPath(), outOfTreeMove: move }
+            : { path: [...mainPath, elseNode], outOfTreeMove: move }
+        ;
+    }
+
+    return { path: getPath(), outOfTreeMove: null };
+};
+
 const isInBoard = (move: Move, boardsize: number): boolean => {
     const { row, col } = parseMove(move);
 

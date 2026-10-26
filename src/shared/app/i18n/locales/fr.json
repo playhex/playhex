@@ -1217,6 +1217,8 @@
             "expert_mode_ok": "Compris",
             "zoom_out": "Dézoomer l'arbre",
             "zoom_in": "Zoomer l'arbre",
+            "center_tree_root": "Centrer l'arbre sur la position initiale",
+            "center_tree_selected": "Centrer l'arbre sur le nœud sélectionné",
             "expert_zoom_help": "Affiche l'arbre en plus petit, sans les coordonnées, pour voir d'un coup d'œil la structure des grands arbres. Survolez un coup pour voir sa coordonnée.",
             "next_player_move": "Suivant : coup du joueur",
             "next_computer_move": "Suivant : réponse de l'ordi",

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { countComputerAlternatives, createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getComputerAnswers, getNodeResult, hasComputerAlternatives, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
+import { countComputerAlternatives, createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findPlayedMovesPath, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getComputerAnswers, getNodeResult, hasComputerAlternatives, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
 
 const noTransposition: NodeResolver = node => node;
 
@@ -268,6 +268,46 @@ describe('puzzleTree', () => {
         const errors = validatePuzzle(createPuzzle({ boardsize: 25, redStones: ['y25'], blueStones: [], tree }));
 
         assert.deepStrictEqual(errors, [{ code: 'too_many_nodes', params: { max: 512 } }]);
+    });
+
+    describe('played moves path', () => {
+        const c3 = tree.children![0] as PuzzleNode;
+        const b3 = c3.children![0] as PuzzleNode;
+
+        it('follows played moves', () => {
+            assert.deepStrictEqual(findPlayedMovesPath(tree, []), { path: [], outOfTreeMove: null });
+            assert.deepStrictEqual(findPlayedMovesPath(tree, ['c3', 'b3', 'd2']), { path: [c3, b3, b3.children![1]], outOfTreeMove: null });
+        });
+
+        it('stops at first move out of tree', () => {
+            assert.deepStrictEqual(findPlayedMovesPath(tree, ['c3', 'b3', 'e5', 'e4']), { path: [c3, b3], outOfTreeMove: 'e5' });
+        });
+
+        it('selects else node', () => {
+            assert.deepStrictEqual(findPlayedMovesPath(tree, ['e5', 'd4', 'e4']), { path: [tree.children![2]], outOfTreeMove: 'e5' });
+        });
+
+        it('follows transpositions', () => {
+            const target: PuzzleNode = { move: 'b4', children: [{ move: 'd4' }] };
+            const transposed: PuzzleNode = { move: 'c3' };
+            const c3: PuzzleNode = { move: 'c3', children: [{ move: 'b3', children: [target] }] };
+            const b4: PuzzleNode = { move: 'b4', children: [{ move: 'b3', children: [transposed] }] };
+            const tree: PuzzleNode = { children: [c3, b4] };
+
+            assert.deepStrictEqual(findPlayedMovesPath(tree, ['b4', 'b3', 'c3']).path, [b4, b4.children![0], transposed]);
+            assert.deepStrictEqual(findPlayedMovesPath(tree, ['b4', 'b3', 'c3', 'd4']).path, [c3, c3.children![0], target, target.children![0]]);
+        });
+
+        it('follows parallel sequences', () => {
+            const parallel: PuzzleNode = { children: [{ move: 'a1', children: [{ move: 'a2' }] }] };
+            const c3: PuzzleNode = { move: 'c3', children: [{ move: 'b3' }] };
+            const tree: PuzzleNode = { parallel: [parallel], children: [c3] };
+            const a1 = parallel.children![0] as PuzzleNode;
+
+            assert.deepStrictEqual(findPlayedMovesPath(tree, ['c3', 'a1']).path, [c3, parallel, a1]);
+            assert.deepStrictEqual(findPlayedMovesPath(tree, ['c3', 'a1', 'a2']).path, [c3, parallel, a1, a1.children![0]]);
+            assert.deepStrictEqual(findPlayedMovesPath(tree, ['a1', 'a2', 'c3', 'b3']).path, [c3, c3.children![0]], 'back to main sequence');
+        });
     });
 
     describe('transpositions', () => {
