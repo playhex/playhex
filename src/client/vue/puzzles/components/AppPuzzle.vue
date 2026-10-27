@@ -18,6 +18,7 @@ import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
 import { puzzleBreadcrumb } from '../services/puzzleBreadcrumb.js';
 import useAuthStore from '../../../stores/authStore.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
+import { renderMessageWithCoords, useCoordsMarks } from '../../composables/useCoordsMarks.js';
 
 const props = defineProps<{
     puzzle: Puzzle;
@@ -51,6 +52,13 @@ whenever(gameViewElement, async element => {
 });
 
 const sidebarOpen = ref(true);
+
+/**
+ * Coords in messages are clickable to show them on board, like in game chat.
+ */
+const { coordsClick } = useCoordsMarks(gameView);
+
+const renderMessage = (message: string): string => renderMessageWithCoords(message, props.puzzle.boardsize);
 
 /**
  * Messages over the board (sidebar closed) dismissed by click,
@@ -131,7 +139,10 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                             class="alert alert-info pre-line py-1 px-2 mb-1"
                             role="button"
                             @click="dismissBoardMessage(`message-${index}`)"
-                        >{{ message }}</div>
+                        >
+                            <!-- eslint-disable-next-line vue/no-v-html message is sanitized, see renderMessageWithCoords() -->
+                            <span @click="coordsClick" v-html="renderMessage(message)"></span>
+                        </div>
                     </template>
 
                     <div
@@ -140,7 +151,10 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                         role="button"
                         @click="dismissBoardMessage('status')"
                     >
-                        <IconCheck /> <span class="pre-line">{{ resultMessage ?? $t('solved' === status ? 'puzzles.solved' : 'puzzles.line_solved') }}</span>
+                        <IconCheck />
+                        <!-- eslint-disable-next-line vue/no-v-html message is sanitized, see renderMessageWithCoords() -->
+                        <span v-if="resultMessage" class="pre-line" @click="coordsClick" v-html="renderMessage(resultMessage)"></span>
+                        <span v-else class="pre-line">{{ $t('solved' === status ? 'puzzles.solved' : 'puzzles.line_solved') }}</span>
                         <template v-if="'line_solved' === status && alternativeMove">
                             <div>{{ $t('puzzles.alternative_question', { move: alternativeMove }) }}</div>
                             <button class="btn btn-sm btn-light mt-1" @click.stop="nextAlternative()">{{ $t('puzzles.see_alternative') }}</button>
@@ -151,7 +165,12 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                         class="py-1 px-2 mb-1 rounded fw-bold text-bg-danger"
                         role="button"
                         @click="dismissBoardMessage('status')"
-                    ><IconXLg /> <span class="pre-line">{{ resultMessage ?? $t('puzzles.failed') }}</span></div>
+                    >
+                        <IconXLg />
+                        <!-- eslint-disable-next-line vue/no-v-html message is sanitized, see renderMessageWithCoords() -->
+                        <span v-if="resultMessage" class="pre-line" @click="coordsClick" v-html="renderMessage(resultMessage)"></span>
+                        <span v-else class="pre-line">{{ $t('puzzles.failed') }}</span>
+                    </div>
 
                     <div
                         v-if="alternativeMove && 'line_solved' !== status && !dismissedBoardMessages.has('alternative')"
@@ -264,10 +283,14 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
 
                 <p v-if="'player_turn' === status" class="text-body-secondary">{{ $t('puzzles.your_turn') }}</p>
 
-                <div v-for="(message, index) in messages" :key="index" class="alert alert-info pre-line">{{ message }}</div>
+                <!-- eslint-disable-next-line vue/no-v-html message is sanitized, see renderMessageWithCoords() -->
+                <div v-for="(message, index) in messages" :key="index" class="alert alert-info pre-line" @click="coordsClick" v-html="renderMessage(message)"></div>
 
                 <div v-if="'solved' === status || 'line_solved' === status" class="p-3 mb-3 rounded fw-bold text-bg-success">
-                    <IconCheck /> <span class="pre-line">{{ resultMessage ?? $t('solved' === status ? 'puzzles.solved' : 'puzzles.line_solved') }}</span>
+                    <IconCheck />
+                    <!-- eslint-disable-next-line vue/no-v-html message is sanitized, see renderMessageWithCoords() -->
+                    <span v-if="resultMessage" class="pre-line" @click="coordsClick" v-html="renderMessage(resultMessage)"></span>
+                    <span v-else class="pre-line">{{ $t('solved' === status ? 'puzzles.solved' : 'puzzles.line_solved') }}</span>
                     <template v-if="'line_solved' === status && alternativeMove">
                         <div>{{ $t('puzzles.alternative_question', { move: alternativeMove }) }}</div>
                         <div class="mt-2">
@@ -275,7 +298,12 @@ const isAuthor = computed(() => !!props.puzzle.author && props.puzzle.author.pub
                         </div>
                     </template>
                 </div>
-                <div v-else-if="'failed' === status" class="p-3 mb-3 rounded fw-bold text-bg-danger"><IconXLg /> <span class="pre-line">{{ resultMessage ?? $t('puzzles.failed') }}</span></div>
+                <div v-else-if="'failed' === status" class="p-3 mb-3 rounded fw-bold text-bg-danger">
+                    <IconXLg />
+                    <!-- eslint-disable-next-line vue/no-v-html message is sanitized, see renderMessageWithCoords() -->
+                    <span v-if="resultMessage" class="pre-line" @click="coordsClick" v-html="renderMessage(resultMessage)"></span>
+                    <span v-else class="pre-line">{{ $t('puzzles.failed') }}</span>
+                </div>
 
                 <div v-if="alternativeMove && 'line_solved' !== status" class="alert alert-info fw-bold">{{ $t('puzzles.alternative_question', { move: alternativeMove }) }}</div>
 

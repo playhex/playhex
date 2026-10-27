@@ -10,7 +10,7 @@ import { ChatMessage, Game, Player } from '../../../shared/app/models/index.js';
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
-import { canPlayerChatInGame, blockEnterOnMobile, formatMessagePostedHour, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage } from '../../../shared/app/chatUtils.js';
+import { canPlayerChatInGame, blockEnterOnMobile, formatMessagePostedHour } from '../../../shared/app/chatUtils.js';
 import { DurationUnit, format, formatDistanceToNow, formatDuration, formatRelative, intervalToDuration, intlFormat, isSameDay, isToday, isYesterday } from 'date-fns';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import useAnalyzeStore from '../../stores/analyzeStore.js';
@@ -31,8 +31,8 @@ import AppSpectatorCount from './AppSpectatorCount.vue';
 import { MoveSettings } from '../../../shared/app/models/PlayerSettings.js';
 import { tournamentMatchKey } from '../../../shared/app/tournamentUtils.js';
 import { useChatInputStore } from '../../stores/chatInputStore.js';
-import { GameView, TriangleMark } from '@playhex/pixi-board';
-import { parseMove, validateMove } from '@playhex/move-notation';
+import { GameView } from '@playhex/pixi-board';
+import { useCoordsMarks, renderMessageWithCoords } from '../composables/useCoordsMarks.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
 import { useStickToBottom } from '../composables/useStickToBottom.js';
@@ -187,57 +187,7 @@ watch(chatInput, () => {
     chatInputElement.value.focus();
 });
 
-let marksTimeout: null | NodeJS.Timeout = null;
-
-const clearMarksTimeout = () => {
-    if (marksTimeout === null) {
-        return;
-    }
-
-    clearTimeout(marksTimeout);
-    marksTimeout = null;
-};
-
-const removeMarksLater = () => {
-    clearMarksTimeout();
-
-    marksTimeout = setTimeout(() => {
-        gameView.value.removeEntitiesGroup('coords-show');
-        clearMarksTimeout();
-    }, 3000);
-};
-
-const chatClick = (e: PointerEvent) => {
-    const { target } = e;
-
-    if (!(target instanceof HTMLSpanElement)) {
-        return;
-    }
-
-    if (!target.classList.contains('coords')) {
-        return;
-    }
-
-    const move = target.innerText.toLowerCase();
-
-    if (!validateMove(move)) {
-        throw new Error(`Highlighted move is invalid: "${move}"`);
-    }
-
-    const mark = new TriangleMark(0x0dcaf0);
-    mark.setCoords(parseMove(move));
-
-    // ctrl click to show multiple marks when click on multiple coords in chat
-    if (!(e.ctrlKey || e.metaKey)) {
-        gameView.value.removeEntitiesGroup('coords-show');
-    }
-
-    gameView.value.addEntity(mark, 'coords-show');
-
-    removeMarksLater();
-
-    e.stopPropagation();
-};
+const { coordsClick: chatClick } = useCoordsMarks(gameView);
 
 
 /**
@@ -354,16 +304,7 @@ const shareGameLinkAndShowResult = async (): Promise<void> => {
     }, 30000);
 };
 
-const renderMessage = (str: string): string => {
-    const { boardsize } = game.value;
-
-    str = sanitizeMessage(str);
-    str = makeLinksClickable(str);
-    str = relCoordsTranslate(str, boardsize);
-    str = makesCoordsInteractive(str, boardsize);
-
-    return str;
-};
+const renderMessage = (str: string): string => renderMessageWithCoords(str, game.value.boardsize);
 
 /*
  * Game analyze
@@ -1269,14 +1210,4 @@ watch(gameUIMode, () => {
         position absolute
         left 0.25em
         top 0
-</style>
-
-<!-- Unscoped because .coords class is added by javascript -->
-<style lang="stylus">
-.chat-messages
-    .chat-message
-        .coords
-            font-weight bold
-            color var(--bs-info)
-            cursor pointer
 </style>
