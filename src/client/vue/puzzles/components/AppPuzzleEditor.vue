@@ -18,6 +18,7 @@ import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
 import ImportGameOverlay from '../../components/overlay/ImportGameOverlay.vue';
 import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconAspectRatio, IconAsterisk, IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconCrosshair, IconDiagram2, IconEraser, IconExclamationTriangle, IconEye, IconHexagonFill, IconHouseFill, IconInfoCircle, IconMagic, IconPlayFill, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconXLg, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
+import { downloadString } from '../../../services/fileDownload.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { createKatahexAnalyzers, useAnalysisEngines } from '../../hexplorer/composables/useAnalysisEngines.js';
 import type { PuzzleCheckEngine } from '../../../../shared/app/puzzles/puzzleCheck.js';
@@ -106,6 +107,8 @@ const {
     draftErrors,
     nodeErrors,
     selectErrorNode,
+    exportTree,
+    importTree,
     puzzleCheck,
     puzzleCheckError,
     puzzleChecking,
@@ -368,6 +371,41 @@ const isVisibleInTree = (element: Element): boolean => {
  * Node clicked in tree is usually already visible: scroll only if not, e.g transposition link.
  */
 let selectedFromTree = false;
+
+/*
+ * Export tree as JSON, to edit it by hand or with a script, then import it back
+ */
+
+const treeFileInput = useTemplateRef('tree-file-input');
+const treeImportError = ref<null | string>(null);
+
+const downloadTreeJson = (): void => {
+    downloadString(exportTree(), 'puzzle-tree.json', 'application/json');
+};
+
+const onTreeFileSelected = async (event: Event): Promise<void> => {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    // Allows selecting same file again, e.g after fixing it
+    input.value = '';
+
+    if (!file) {
+        return;
+    }
+
+    treeImportError.value = null;
+
+    if (tree.value.children?.length && !confirm(t('puzzles.editor.tree_import_confirm'))) {
+        return;
+    }
+
+    try {
+        importTree(await file.text());
+    } catch (e) {
+        treeImportError.value = e instanceof Error ? e.message : String(e);
+    }
+};
 
 const selectFromTree = (path: Parameters<typeof selectPath>[0]): void => {
     selectedFromTree = true;
@@ -881,18 +919,27 @@ const deletePuzzle = async (): Promise<void> => {
                         </div>
 
                         <div class="move-tree-block position-relative mb-3">
-                            <div ref="tree-wrapper-element" class="move-tree-wrapper bg-body">
-                                <AppPuzzleTreeNode
-                                    :node="tree"
-                                    :path="[]"
-                                    :selectedNode
-                                    :playerColor
-                                    :firstColor
-                                    :transpositions
-                                    :nodeErrors
-                                    :compact="expertMode && treeZoomedOut"
-                                    @select="selectFromTree"
-                                />
+                            <div class="move-tree-frame position-relative">
+                                <div ref="tree-wrapper-element" class="move-tree-wrapper bg-body">
+                                    <AppPuzzleTreeNode
+                                        :node="tree"
+                                        :path="[]"
+                                        :selectedNode
+                                        :playerColor
+                                        :firstColor
+                                        :transpositions
+                                        :nodeErrors
+                                        :compact="expertMode && treeZoomedOut"
+                                        @select="selectFromTree"
+                                    />
+                                </div>
+
+                                <!-- Tree as JSON, for manual edits or scripts -->
+                                <div v-if="expertMode" class="tree-json-links d-flex gap-2 small bg-body">
+                                    <a href="#" class="link-secondary" :title="$t('puzzles.editor.tree_export_json')" @click.prevent="downloadTreeJson()">{{ $t('puzzles.editor.tree_export') }}</a>
+                                    <a href="#" class="link-secondary" :title="$t('puzzles.editor.tree_import_json')" @click.prevent="treeFileInput?.click()">{{ $t('puzzles.editor.tree_import') }}</a>
+                                    <input ref="tree-file-input" type="file" accept="application/json,.json" class="d-none" @change="onTreeFileSelected">
+                                </div>
                             </div>
 
                             <div class="tree-buttons d-flex gap-1">
@@ -927,6 +974,7 @@ const deletePuzzle = async (): Promise<void> => {
                             </div>
 
                             <div v-if="alternativesCount > 0" class="small text-body-secondary text-end">{{ $t('puzzles.editor.variations_count', { count: alternativesCount }) }}</div>
+                            <p v-if="treeImportError" class="text-danger small mb-0 tree-import-error">{{ treeImportError }}</p>
                         </div>
 
                         <!-- Selected node -->
@@ -971,6 +1019,7 @@ const deletePuzzle = async (): Promise<void> => {
                                 </div>
                             </div>
                         </div>
+
 
                     </template>
 
@@ -1294,11 +1343,22 @@ const deletePuzzle = async (): Promise<void> => {
     height 0.5rem
     border-radius 50%
 
+// One line per validation error
+.tree-import-error
+    white-space pre-line
+
 // Tree takes remaining panel height, panel scrolls only on short screens
 .move-tree-block
     display flex
     flex-direction column
     flex 1 1 0
+
+// Wrapper and links over it, takes remaining block height
+.move-tree-frame
+    display flex
+    flex-direction column
+    flex 1 1 0
+    min-height 5rem
 
 // Same as Hexplorer move tree
 .move-tree-wrapper
@@ -1324,6 +1384,15 @@ const deletePuzzle = async (): Promise<void> => {
     top 0.25rem
     right 0.25rem
     z-index 2
+
+// Inside tree frame border, bottom right
+.tree-json-links
+    position absolute
+    bottom 1px
+    right 1px
+    z-index 2
+    padding 0 0.5rem
+    border-radius var(--bs-border-radius)
 
 // Like result nodes in tree
 .result-icon

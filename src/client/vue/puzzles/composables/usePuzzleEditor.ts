@@ -17,6 +17,7 @@ import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import type { ImportedGame } from '../../../../shared/app/hex-game-importer/types.js';
 import { fillForKatahex, getEdgePaths, getReachableEdges, getSolverFilledPosition, type PuzzleEdgeConnection, type PuzzleFixedFill } from '../../../../shared/app/puzzles/edgeConnections.js';
 import Board from '../../../../shared/game-engine/Board.js';
+import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 
 export type EditorStep = 'position' | 'tree' | 'engines' | 'info' | 'publish' | 'display';
 
@@ -1323,6 +1324,41 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     const draftErrors = computed(() => errors.value.filter(isDraftBlockingError));
 
     /**
+     * Tree as JSON, e.g to be edited by hand or with a script, then imported back.
+     */
+    const exportTree = (): string => JSON.stringify(cleanNode(tree.value), null, 4);
+
+    /**
+     * Replaces whole tree by this JSON, see exportTree().
+     *
+     * @throws Error with translated message when JSON is invalid, or tree cannot be saved even as a draft
+     */
+    const importTree = (json: string): void => {
+        let imported: unknown;
+
+        try {
+            imported = JSON.parse(json);
+        } catch (e) {
+            throw new Error(t('puzzles.editor.tree_import_invalid_json', { error: e instanceof Error ? e.message : String(e) }));
+        }
+
+        const importedTree = imported as PuzzleNode;
+        const blockingErrors = validatePuzzle({ ...toInput(published), tree: importedTree }).filter(isDraftBlockingError);
+
+        if (blockingErrors.length > 0) {
+            throw new Error(blockingErrors.map(translatePuzzleError).join('\n'));
+        }
+
+        tree.value = importedTree;
+
+        if (hasComputerAlternatives(importedTree, computerPlaysFirst.value)) {
+            alternativesEnabled.value = true;
+        }
+
+        selectPath([]);
+    };
+
+    /**
      * Errors by tree node, to highlight nodes and show their errors.
      */
     const nodeErrors = computed(() => {
@@ -1602,6 +1638,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         draftErrors,
         nodeErrors,
         selectErrorNode,
+        exportTree,
+        importTree,
         toInput,
 
         puzzleCheck,
