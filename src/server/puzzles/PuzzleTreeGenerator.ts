@@ -81,6 +81,7 @@ const countNodes = (node: PuzzleNode): number => [...node.children ?? [], ...nod
  *   Winning intrusions in an opponent bridge are parallel sequences instead of main moves,
  *   unless main sequence uses their cells.
  * - computer answer: best katahex policy move.
+ *   To factorize tree, a plausible answer reaching a position already in tree, or same answer as main line, is preferred.
  *
  * Puzzle ends once player is connected with acquired templates, see findTemplateConnection().
  * Nodes that could not be generated (not proven, budget exceeded) are left without children, and warned.
@@ -546,12 +547,20 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
             && winning.has(child.move!),
         );
 
+        // Computer answer on main line, existing or best by policy, also played after other winning moves when plausible:
+        // player then often reaches same positions in another order, making transpositions instead of new branches
+        const main = [...toContinue].sort((a, b) => byPolicy(a.move!, b.move!))[0];
+        const mainAnswer = main === undefined
+            ? undefined
+            : ((main.children ?? []).filter(child => !isElseNode(child) && child.result === undefined) as PuzzleNode[])[0]?.move
+                ?? await findComputerMove(play(position, main.move!), [...moves, main.move!], avoid, blocked, winning.get(main.move!)!.pv[0] as undefined | Move);
+
         await Promise.all(toContinue.map(child => {
             const childMoves = [...moves, child.move!];
 
             paths.set(child, childMoves);
 
-            return generatePlayerMove(child, childMoves, play(position, child.move!), winning.get(child.move!)!.pv, avoid, blocked);
+            return generatePlayerMove(child, childMoves, play(position, child.move!), winning.get(child.move!)!.pv, avoid, blocked, mainAnswer);
         }));
     };
 
@@ -559,25 +568,35 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
      * Player just played a winning move.
      *
      * @param pv Solver proof after player move, its first move is a computer answer
+     * @param mainAnswer Computer answer on main line, see findComputerMove()
      */
-    const generatePlayerMove = async (node: PuzzleNode, moves: Move[], position: Position, pv: string[], avoid: Set<Move>, blocked: Set<Move>): Promise<void> => {
+    const generatePlayerMove = async (node: PuzzleNode, moves: Move[], position: Position, pv: string[], avoid: Set<Move>, blocked: Set<Move>, mainAnswer?: Move): Promise<void> => {
         if (isPuzzleEnded(position) || isTransposition(node, moves)) {
             return;
         }
 
-        await generateComputerAnswers(node, moves, position, avoid, blocked, pv[0] as undefined | Move);
+        await generateComputerAnswers(node, moves, position, avoid, blocked, pv[0] as undefined | Move, mainAnswer);
     };
 
     /**
-     * Computer move after a winning player move: all moves lose, so plays the most natural one,
-     * best by katahex policy.
+     * Computer move after a winning player move: all moves lose, so plays a natural one, by katahex policy.
+     * Among plausible moves, to factorize tree, prefers one reaching a position already in tree (transposition),
+     * then mainAnswer, else best one.
      * Without katahex, solver proof move, else cell closest to last move.
+     *
+     * @param mainAnswer Computer answer after main line winning move, from same player choice
      */
-    const findComputerMove = async (position: Position, moves: Move[], avoid: Set<Move>, blocked: Set<Move>, fallback?: Move): Promise<undefined | Move> => {
-        const best = (await candidateMoves(position, blocked)).find(({ move }) => !avoid.has(move));
+    const findComputerMove = async (position: Position, moves: Move[], avoid: Set<Move>, blocked: Set<Move>, fallback?: Move, mainAnswer?: Move): Promise<undefined | Move> => {
+        const candidates = (await candidateMoves(position, blocked)).filter(({ move }) => !avoid.has(move));
+        const best = candidates[0];
 
         if (best !== undefined) {
-            return best.move;
+            const plausible = candidates.filter(({ policy }) => policy >= best.policy * KATAHEX_PLAUSIBLE_POLICY_RATIO);
+
+            return (plausible.find(({ move }) => positions.has(getPositionKey([...moves, move])))
+                ?? plausible.find(({ move }) => move === mainAnswer)
+                ?? best
+            ).move;
         }
 
         if (isPlayable(position, fallback, blocked) && !avoid.has(fallback)) {
@@ -609,14 +628,15 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
      * Existing answers are continued, else best one is added.
      *
      * @param fallback Computer answer when katahex is not available, from solver proof
+     * @param mainAnswer See findComputerMove()
      */
-    const generateComputerAnswers = async (node: PuzzleNode, moves: Move[], position: Position, avoid: Set<Move>, blocked: Set<Move>, fallback?: Move): Promise<void> => {
+    const generateComputerAnswers = async (node: PuzzleNode, moves: Move[], position: Position, avoid: Set<Move>, blocked: Set<Move>, fallback?: Move, mainAnswer?: Move): Promise<void> => {
         blocked = withParallelCells(blocked, node);
 
         let children = (node.children ?? []).filter(child => !isElseNode(child) && child.result === undefined) as PuzzleNode[];
 
         if (children.length === 0 && !node.children?.length) {
-            const answer = await findComputerMove(position, moves, avoid, blocked, fallback);
+            const answer = await findComputerMove(position, moves, avoid, blocked, fallback, mainAnswer);
 
             if (answer === undefined) {
                 warn('generator_unproven', moves);

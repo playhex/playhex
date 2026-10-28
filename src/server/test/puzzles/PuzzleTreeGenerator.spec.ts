@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { coordsToMove, type Move } from '@playhex/move-notation';
 import { generatePuzzleTree, type PolicyAnalyzer } from '../../puzzles/PuzzleTreeGenerator.js';
 import type { SolvePositionInput, SolvePositionOutput, SolveResult } from '../../ai-jobs/protocol.js';
-import { createNodeResolver, createParallelsFinder, findSolution, isElseNode, validatePuzzle, type PuzzleDefinition, type PuzzleNode } from '../../../shared/app/puzzles/puzzleTree.js';
+import { createNodeResolver, createParallelsFinder, findSolution, findTranspositions, isElseNode, validatePuzzle, type PuzzleDefinition, type PuzzleNode } from '../../../shared/app/puzzles/puzzleTree.js';
 import type { PuzzleGenerateInput } from '../../../shared/app/puzzles/puzzleGenerate.js';
 import { getWinner } from '../../puzzles/puzzleCheckUtils.js';
 
@@ -306,6 +306,29 @@ describe('PuzzleTreeGenerator', () => {
         const { tree } = await generate(input, createAnalyzer(preferred));
 
         assert.deepStrictEqual(mainMoves(tree), ['b4']);
+    });
+
+    it('answers other winning moves like main line, or to a known position, to factorize tree', async () => {
+        // All cells plausible for katahex, b2 first
+        const { tree } = await generate(createInput({}), createAnalyzer(['b2', 'a2', 'c2', 'b1', 'b3', 'a3', 'c1', 'a1', 'c3']));
+        const accepted = (tree.children ?? []).filter(child => !isElseNode(child) && child.result === undefined) as PuzzleNode[];
+        const transpositions = findTranspositions(tree);
+        const answerOf = (node: PuzzleNode): PuzzleNode => node.children![0];
+        const mainAnswer = answerOf(accepted[0]).move;
+
+        assert.strictEqual(accepted[0].move, 'b2');
+        assert.strictEqual(mainAnswer, 'a2');
+
+        // c2 then best katahex answer would be b2
+        assert.ok(accepted.some(child => child.move === 'c2'));
+
+        for (const child of accepted.slice(1)) {
+            const answer = answerOf(child);
+
+            assert.ok(answer.move === mainAnswer || child.move === mainAnswer || transpositions.has(answer), `${child.move} answered by ${answer.move}`);
+        }
+
+        assert.ok(transpositions.size > 0);
     });
 
     it('generates from a node, keeping the rest of tree', async () => {
