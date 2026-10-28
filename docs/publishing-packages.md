@@ -13,13 +13,18 @@ They live in `src/packages/<name>`, and are pnpm workspaces (see `pnpm-workspace
 
 ## Prerequisites (once)
 
-- Have access to the `playhex` npm organization: create it on <https://www.npmjs.com/org/create> (free for public packages), or ask to be added to it.
-- Log in and enable 2FA:
+- Be a member of the [`playhex` npm organization](https://www.npmjs.com/org/playhex), with publish rights
+  (the owner adds members in organization settings > Members).
+- Enable 2FA on your npm account (Account settings > Two-Factor Authentication).
+- Log in on your machine (the token is stored in `~/.npmrc`):
 
 ``` bash
 npm login
-npm whoami
+npm whoami # should print your npm username
 ```
+
+Packages are published with public access (`publishConfig.access: "public"`),
+so publishing to the free organization works, also for the first version.
 
 ## How a package works
 
@@ -118,6 +123,28 @@ pnpm lint && pnpm test
 
 ## Publish
 
+All packages are published together from the repo root with `pnpm -r publish`:
+it publishes every package whose current version is not on npm yet, dependencies first
+(`move-notation`, then `shading-patterns` and `conditional-moves`, then `pixi-board`),
+and skips the others. Root `package.json` is `private`, so it is never published.
+
+Each package has its own version: only bump the packages that changed.
+
+### First publication
+
+All packages are at `1.0.0` and not on npm yet, so skip the version bump:
+
+``` bash
+npm whoami
+git status # must be clean, on master, pushed
+pnpm -r publish --dry-run
+pnpm -r publish
+```
+
+Then tag (see step 6 below) with the 4 packages at `1.0.0`.
+
+### Release new versions
+
 1. Bump version of the packages that changed:
 
 ``` bash
@@ -125,8 +152,12 @@ cd src/packages/<name>
 pnpm version patch --no-git-tag-version # or minor, major
 ```
 
-If you bump a package that other packages depend on (e.g `move-notation`), nothing else to do:
-`workspace:^` is replaced with the new version on publish.
+If you bump a package that other packages depend on (e.g `move-notation`):
+
+- patch or minor: nothing else to do. Published dependents require `^1.0.0`, which accepts the new version,
+  and `workspace:^` is replaced with the new version on next publish of dependents.
+- major: also bump and publish the packages depending on it (`conditional-moves`, `pixi-board`),
+  else their published version still requires the previous major.
 
 2. Check what will be published:
 
@@ -144,24 +175,44 @@ npm install /tmp/playhex-<name>-<version>.tgz # plus its peer dependencies, and 
 # then write a small index.ts importing the package, and check it with: npx tsc --noEmit index.ts
 ```
 
-4. Commit the version bump (publishing requires a clean git working tree, on `master` branch):
+4. Commit and push the version bump
+   (pnpm refuses to publish if git working tree is not clean, not on `master`, or not up to date with remote):
 
 ``` bash
 git commit -am "release @playhex/<name>@<version>"
+git push
 ```
 
 5. Publish, from the repo root:
 
 ``` bash
-pnpm -r publish --dry-run
+pnpm -r publish --dry-run # lists the packages that will be published
 pnpm -r publish
 ```
 
-`pnpm -r publish` publishes all packages whose version is not yet on npm, dependencies first.
+With 2FA, npm asks for a one-time password, or opens a browser to confirm.
+To pass it directly: `pnpm -r publish --otp <code>`.
+If it fails in the middle (e.g expired code), just run it again: already published packages are skipped.
 
-6. Tag and push:
+Check on npm:
+
+``` bash
+npm view @playhex/<name> version
+```
+
+A published version cannot be republished, even after unpublishing it.
+If something is wrong, fix it and publish a new patch version.
+
+6. Tag each published package and push tags:
 
 ``` bash
 git tag @playhex/<name>@<version>
-git push --follow-tags
+git push --tags
+```
+
+For example, after first publication:
+
+``` bash
+for p in move-notation shading-patterns conditional-moves pixi-board; do git tag "@playhex/$p@1.0.0"; done
+git push --tags
 ```
