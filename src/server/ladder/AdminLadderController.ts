@@ -11,7 +11,7 @@ import LadderService from './LadderService.js';
 class ReportCheatInput
 {
     /**
-     * Displayed to players on cheater badge.
+     * Sent to the cheater in their notification.
      */
     @IsString()
     @IsNotEmpty()

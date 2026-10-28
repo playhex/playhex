@@ -146,7 +146,7 @@ const minutes = (ms: number): number => Math.round(ms / MINUTE);
         <h2 class="h4 mt-4">Cheating</h2>
         <ul>
             <li>If a player cheated in a game, a moderator cancels its result: the cheater goes to the last seat, and their opponent gets back the seat they had before the game, unless they now sit higher.</li>
-            <li>The cheater gets a <strong>Cheater</strong> badge for {{ days(config.cheatWarningWindowMs) }} days.</li>
+            <li>Only both players are notified. The ladder history shows that the player was moved to the bottom for cheating.</li>
             <li>A moderator can also exclude a player, who can rejoin at the bottom after {{ days(config.rejoinAfterStrikesMs) }} days.</li>
         </ul>
 

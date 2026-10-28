@@ -1558,8 +1558,6 @@
         "incoming_slots_setting": "Max challenges I accept at once",
         "incoming_slots_help": "Your seat requires at least {{min}}. Maximum is {{max}}.",
         "strikes": "Strikes: {{count}}",
-        "cheater": "Cheater",
-        "cheater_reason": "Cheating: {{reason}}",
         "strike_warning": "You timed out a King of the Hill game. A second timeout within 60 days removes you from the ladder. Resigning is never a strike.",
         "no_running_challenges": "No running challenge.",
         "vs": "vs",
@@ -1610,7 +1608,7 @@
             "giant_slayer": "{{player}} is a Giant Slayer: dethroned {{opponent}}!",
             "climber": "{{player}} won {{wins}} challenges in a row!",
             "strike": "{{player}} timed out a game (strike {{strikes}})",
-            "cheat": "{{player}} cheated against {{opponent}}: game canceled, {{player}} moved to the bottom",
+            "cheat": "{{player}} moved to the bottom for cheating, game against {{opponent}} canceled",
             "excluded": "{{player}} was excluded by a moderator from seat #{{position}}"
         },
         "load_more": "Load more",

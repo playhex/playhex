@@ -7,7 +7,6 @@ import { apiGetLadderPlayerStatus } from '../../../apiClient.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppLadderSlots from './AppLadderSlots.vue';
 import AppLadderTitles from './AppLadderTitles.vue';
-import AppLadderCheaterBadge from './AppLadderCheaterBadge.vue';
 import AppLadderPlayerStats from './AppLadderPlayerStats.vue';
 import AppLadderLastChallenges from './AppLadderLastChallenges.vue';
 import { IconExclamationTriangleFill, IconShieldFill, IconSword } from '../../icons.js';
@@ -62,7 +61,7 @@ const incomingChallenges = computed((): LadderChallenge[] => status.value
                         <template v-else-if="status.ladderPlayer">
                             <h4 v-if="status.ladderPlayer.position !== null">{{ $t('ladder.player_position', { position: status.ladderPlayer.position }) }}</h4>
 
-                            <p class="mb-2"><AppLadderTitles :ladderPlayer="status.ladderPlayer" /> <AppLadderCheaterBadge :reasons="status.cheats" /></p>
+                            <p class="mb-2"><AppLadderTitles :ladderPlayer="status.ladderPlayer" /></p>
 
                             <div v-if="status.strikes > 0" class="alert alert-warning">
                                 <IconExclamationTriangleFill /> {{ $t('ladder.strikes', { count: status.strikes }) }}

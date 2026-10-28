@@ -4,7 +4,6 @@ import { LadderChallenge, LadderPlayer, Player } from '../../../../shared/app/mo
 import { LadderChallengeCandidateDto, LadderMeDto } from '../../../../shared/app/models/LadderDto.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppLadderTitles from './AppLadderTitles.vue';
-import AppLadderCheaterBadge from './AppLadderCheaterBadge.vue';
 import LadderChallengeRefusalOverlay from './LadderChallengeRefusalOverlay.vue';
 import LadderPlayerStatusOverlay from './LadderPlayerStatusOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
@@ -29,10 +28,6 @@ const props = defineProps({
     },
     strikes: {
         type: Object as PropType<{ [playerPublicId: string]: number }>,
-        required: true,
-    },
-    cheats: {
-        type: Object as PropType<{ [playerPublicId: string]: string[] }>,
         required: true,
     },
     me: {
@@ -142,7 +137,6 @@ const isMe = (ladderPlayer: LadderPlayer): boolean => props.me?.ladderPlayer?.pl
                     <td>
                         <AppPseudo :player="ladderPlayer.player" rating flag onlineStatus />
                         <span v-if="strikes[ladderPlayer.player.publicId]" class="text-warning ms-1" :title="$t('ladder.strikes', { count: strikes[ladderPlayer.player.publicId] })"><IconExclamationTriangleFill /></span>
-                        <AppLadderCheaterBadge v-if="cheats[ladderPlayer.player.publicId]" :reasons="cheats[ladderPlayer.player.publicId]" class="ms-1" />
                     </td>
                     <td>
                         <small class="text-secondary text-nowrap">

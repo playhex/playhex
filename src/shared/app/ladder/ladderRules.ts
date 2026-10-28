@@ -251,9 +251,6 @@ export type LadderRulesConfig = {
     /** Can rejoin after this delay when removed because of strikes, or excluded by an admin */
     rejoinAfterStrikesMs: number;
 
-    /** Cheat warning is displayed during this delay after cheat has been reported */
-    cheatWarningWindowMs: number;
-
     /** Removed if no ladder game during this delay */
     inactivityMs: number;
 
@@ -293,7 +290,6 @@ export const defaultLadderRulesConfig: LadderRulesConfig = {
     strikesToRemove: 2,
     strikesWindowMs: 60 * DAY,
     rejoinAfterStrikesMs: 30 * DAY,
-    cheatWarningWindowMs: 60 * DAY,
     inactivityMs: 60 * DAY,
     rejoinAfterLeaveMs: 7 * DAY,
     liveProposalAnswerMs: 10 * MINUTE,

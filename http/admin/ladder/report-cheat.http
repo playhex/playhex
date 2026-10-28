@@ -4,7 +4,7 @@
 # Game must be over: cancel or forfeit it before if still playing.
 # Both players are notified, game becomes unranked (ratings not recomputed),
 # and a system message is posted in game chat.
-# Reason is displayed to players on hover of the cheater badge.
+# Reason is sent to the cheater in their notification, not displayed publicly.
 
 @gamePublicId=df9f9c07-3afc-490d-9727-fcf8f176e4d8
 @playerPublicId=357cc45f-41c8-439e-a1aa-a6a155ae0069

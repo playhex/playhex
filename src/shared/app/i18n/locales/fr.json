@@ -1566,8 +1566,6 @@
         "incoming_slots_setting": "Nombre max de défis reçus en même temps",
         "incoming_slots_help": "Votre place impose au moins {{min}}. Maximum {{max}}.",
         "strikes": "Avertissements : {{count}}",
-        "cheater": "Tricheur",
-        "cheater_reason": "Triche : {{reason}}",
         "strike_warning": "Vous avez perdu au temps une partie du Roi de la colline. Un second dépassement de temps dans les 60 jours vous retire du classement. Abandonner ne donne jamais d'avertissement.",
         "no_running_challenges": "Aucun défi en cours.",
         "vs": "contre",
@@ -1618,7 +1616,7 @@
             "giant_slayer": "{{player}} est un Régicide : a détrôné {{opponent}} !",
             "climber": "{{player}} a gagné {{wins}} défis d'affilée !",
             "strike": "{{player}} a perdu une partie au temps (avertissement {{strikes}})",
-            "cheat": "{{player}} a triché contre {{opponent}} : partie annulée, {{player}} renvoyé tout en bas",
+            "cheat": "{{player}} renvoyé tout en bas pour triche, partie contre {{opponent}} annulée",
             "excluded": "{{player}} a été exclu par un modérateur depuis la place n°{{position}}"
         },
         "load_more": "Voir plus",

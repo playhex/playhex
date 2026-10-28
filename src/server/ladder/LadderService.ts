@@ -128,11 +128,11 @@ export default class LadderService
             .sort((a, b) => a.position! - b.position!)
         ;
 
-        const playerIds = standings.map(p => p.playerId);
-        const [strikeDates, cheatReasons] = await Promise.all([
-            this.ladderRepository.findStrikeDates(ladder.id, playerIds, new Date(now.getTime() - this.config.strikesWindowMs)),
-            this.ladderRepository.findCheatReasons(ladder.id, playerIds, new Date(now.getTime() - this.config.cheatWarningWindowMs)),
-        ]);
+        const strikeDates = await this.ladderRepository.findStrikeDates(
+            ladder.id,
+            standings.map(p => p.playerId),
+            new Date(now.getTime() - this.config.strikesWindowMs),
+        );
 
         const dto = new LadderDto();
 
@@ -141,19 +141,12 @@ export default class LadderService
         dto.runningChallenges = runningChallenges;
         dto.currentReign = currentReign;
         dto.strikes = {};
-        dto.cheats = {};
 
         for (const ladderPlayer of standings) {
             const count = strikeDates[ladderPlayer.playerId]?.length ?? 0;
 
             if (count > 0) {
                 dto.strikes[ladderPlayer.player.publicId] = count;
-            }
-
-            const reasons = cheatReasons[ladderPlayer.playerId];
-
-            if (reasons) {
-                dto.cheats[ladderPlayer.player.publicId] = reasons;
             }
         }
 
@@ -241,16 +234,14 @@ export default class LadderService
     ): Promise<void> {
         const ladderSize = players.filter(p => p.state === 'active').length;
         const playersById = new Map(players.map(p => [p.playerId, p]));
-        const [strikeDates, cheatReasons, lastChallenges] = await Promise.all([
+        const [strikeDates, lastChallenges] = await Promise.all([
             this.ladderRepository.findStrikeDates(ladder.id, [playerId], new Date(now.getTime() - this.config.strikesWindowMs)),
-            this.ladderRepository.findCheatReasons(ladder.id, [playerId], new Date(now.getTime() - this.config.cheatWarningWindowMs)),
             this.ladderRepository.findLastEndedChallenges(ladder.id, playerId, LAST_CHALLENGES_COUNT),
         ]);
 
         dto.ladderPlayer = ladderPlayer;
         dto.lastChallenges = lastChallenges;
         dto.strikes = strikeDates[playerId]?.length ?? 0;
-        dto.cheats = cheatReasons[playerId] ?? [];
         dto.runningChallenges = runningChallenges.filter(c => c.challengerId === playerId || c.defenderId === playerId);
         dto.outgoingUsed = countOutgoingChallenges(playerId, challenges);
         dto.incomingUsed = countIncomingChallenges(playerId, challenges);
@@ -787,7 +778,7 @@ export default class LadderService
      * cheater moves to the last seat, victim gets back their seat.
      * Game must be over (cancel or forfeit it before if needed).
      *
-     * @param reason Free text, displayed to players
+     * @param reason Free text, sent to the cheater in their notification
      */
     async reportCheat(gamePublicId: string, cheaterPublicId: string, reason: string, now = new Date()): Promise<{ challenge: LadderChallenge, cheater: Player }>
     {
@@ -852,7 +843,7 @@ export default class LadderService
                 current,
                 ...changedPlayers(players, snapshot),
                 playerCheat,
-                this.createEvent(ladder, 'cheat', cheater.player, victim.player, current, { reason, ...report }, now),
+                this.createEvent(ladder, 'cheat', cheater.player, victim.player, current, report, now),
                 ...await this.syncReign(ladder, kingBefore, players, now),
             ]);
 

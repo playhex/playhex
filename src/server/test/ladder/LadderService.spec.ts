@@ -55,19 +55,6 @@ class InMemoryLadderRepository implements LadderRepositoryInterface
         return strikes;
     }
 
-    async findCheatReasons(_: number, playerIds: number[], since: Date)
-    {
-        const cheats: { [playerId: number]: string[] } = {};
-
-        for (const e of this.events) {
-            if (e.type === 'cheat' && playerIds.includes(e.player.id!) && e.createdAt >= since) {
-                (cheats[e.player.id!] ??= []).push(String(e.parameters.reason));
-            }
-        }
-
-        return cheats;
-    }
-
     async hasCheatReport(challengeId: number)
     {
         return this.events.some(e => e.type === 'cheat' && e.challenge?.id === challengeId);
@@ -388,11 +375,11 @@ describe('LadderService', () => {
         assert.strictEqual(repository.playerCheats[0].playerId, 3);
         assert.strictEqual(repository.playerCheats[0].reason, 'Used an AI');
 
-        const view = await service.getLadderView(ladder);
+        const cheatEvent = repository.events.find(e => e.type === 'cheat');
 
-        assert.deepStrictEqual(view.cheats, { [players[2].publicId]: ['Used an AI'] });
-        assert.deepStrictEqual((await service.getPlayerStatus(ladder, players[2].publicId)).cheats, ['Used an AI']);
-        assert.deepStrictEqual((await service.getPlayerStatus(ladder, players[0].publicId)).cheats, []);
+        assert.ok(cheatEvent);
+        assert.strictEqual(cheatEvent.player.id, 3);
+        assert.strictEqual('reason' in cheatEvent.parameters, false, 'reason must not be public');
     });
 
     it('cheat: refused twice, on running game, or for a player not in the game', async () => {

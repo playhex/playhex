@@ -123,7 +123,7 @@ const eventText = (event: LadderEvent): string => {
                 <IconShieldFill v-else-if="event.type === 'challenge_result' && event.parameters.result === 'defender_won'" class="text-primary me-1" />
                 <IconTablerSwords v-else-if="event.type === 'challenge_result'" class="me-1" />
 
-                <span :class="{ 'fw-bold': event.type === 'new_king' }" :title="event.type === 'cheat' ? t('ladder.cheater_reason', { reason: event.parameters.reason }) : undefined">{{ eventText(event) }}</span>
+                <span :class="{ 'fw-bold': event.type === 'new_king' }">{{ eventText(event) }}</span>
                 <small class="text-secondary ms-2">{{ formatDistanceToNowStrict(event.createdAt, { addSuffix: true }) }}</small>
             </span>
 

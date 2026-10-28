@@ -14,7 +14,6 @@ import AppLadderSlots from './AppLadderSlots.vue';
 import AppLadderPlayerStats from './AppLadderPlayerStats.vue';
 import AppLadderLastChallenges from './AppLadderLastChallenges.vue';
 import AppLadderTitles from './AppLadderTitles.vue';
-import AppLadderCheaterBadge from './AppLadderCheaterBadge.vue';
 import { IconExclamationTriangleFill, IconShieldFill, IconSword } from '../../icons.js';
 import { useRouter } from 'vue-router';
 
@@ -134,7 +133,7 @@ const answerLive = async (challenge: LadderChallenge, accept: boolean) => {
                 <template v-else-if="me.ladderPlayer && position !== null">
                     <h4>{{ $t('ladder.your_position', { position }) }}</h4>
 
-                    <p class="mb-2"><AppLadderTitles :ladderPlayer="me.ladderPlayer" /> <AppLadderCheaterBadge :reasons="me.cheats" /></p>
+                    <p class="mb-2"><AppLadderTitles :ladderPlayer="me.ladderPlayer" /></p>
 
                     <div v-if="me.strikes > 0" class="alert alert-warning">
                         <IconExclamationTriangleFill /> {{ $t('ladder.strikes', { count: me.strikes }) }}

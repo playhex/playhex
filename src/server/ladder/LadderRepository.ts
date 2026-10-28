@@ -55,11 +55,6 @@ export interface LadderRepositoryInterface
     findStrikeDates(ladderId: number, playerIds: number[], since: Date): Promise<{ [playerId: number]: Date[] }>;
 
     /**
-     * Reasons of cheats reported on ladder games of these players since a date, most recent first.
-     */
-    findCheatReasons(ladderId: number, playerIds: number[], since: Date): Promise<{ [playerId: number]: string[] }>;
-
-    /**
      * Whether a cheat has already been reported on this challenge.
      */
     hasCheatReport(challengeId: number): Promise<boolean>;
@@ -241,32 +236,6 @@ export default class LadderRepository implements LadderRepositoryInterface
         }
 
         return strikes;
-    }
-
-    async findCheatReasons(ladderId: number, playerIds: number[], since: Date): Promise<{ [playerId: number]: string[] }>
-    {
-        const cheats: { [playerId: number]: string[] } = {};
-
-        if (playerIds.length === 0) {
-            return cheats;
-        }
-
-        const events = await this.ladderEventRepository.find({
-            relations: { player: true },
-            where: {
-                ladderId,
-                type: 'cheat',
-                player: { id: In(playerIds) },
-                createdAt: MoreThanOrEqual(since),
-            },
-            order: { createdAt: 'desc' },
-        });
-
-        for (const { player, parameters } of events) {
-            (cheats[player.id!] ??= []).push(String(parameters.reason ?? ''));
-        }
-
-        return cheats;
     }
 
     async hasCheatReport(challengeId: number): Promise<boolean>

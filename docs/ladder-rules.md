@@ -166,8 +166,8 @@ Admin endpoints, see `src/server/ladder/AdminLadderController.ts`.
   - the cheater moves to the last seat;
   - the victim gets back the seat they held before the game, unless they sit higher now;
   - streaks and titles are not changed;
-  - a "Cheater" badge is displayed in the ladder for **60 days**, reason shown on hover.
-    A cheat reported outside the ladder is not displayed in the ladder.
+  - no public badge: only both players are notified (the cheater gets the reason);
+    the ladder history says the cheater was moved to the bottom for cheating, without the reason.
 - **Exclusion**: player is removed, can rejoin at the bottom after **30 days** (same as strikes).
 
 ### 2.7 Leaving and removal
