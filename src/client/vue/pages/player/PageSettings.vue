@@ -25,6 +25,8 @@ import { PlayerSettingsFacade } from '../../../services/board-view-facades/Playe
 import AppPlayerModerationActionList from '../../components/AppPlayerModerationActionList.vue';
 import AppFlagSelector from '../../components/AppFlagSelector.vue';
 import copy from 'copy-to-clipboard';
+import useServerDateStore from '../../../stores/serverDateStore.js';
+import useSocketStore from '../../../stores/socketStore.js';
 
 const head = injectHead();
 
@@ -278,7 +280,7 @@ const formatThemeReleaseDate = (releaseDate: string): string => intlFormat(
 /*
  * Panels
  */
-type Panel = 'interface' | 'account' | 'game' | 'board' | 'notifications' | 'ai_workers' | 'connected_applications';
+type Panel = 'interface' | 'account' | 'game' | 'board' | 'notifications' | 'ai_workers' | 'connected_applications' | 'technical_info';
 
 /*
  * AI worker keys, only a few players have one: panel is hidden if player has none.
@@ -338,6 +340,7 @@ const panels = computed((): Panel[] => [
     'notifications',
     ...(aiWorkerKeys.value.length > 0 ? ['ai_workers' as const] : []),
     ...(connectedApplications.value.length > 0 ? ['connected_applications' as const] : []),
+    'technical_info',
 ]);
 
 /*
@@ -398,6 +401,7 @@ const sectionPanels: { [sectionId: string]: Panel } = {
     'push-notifications': 'notifications',
     'ai-worker-keys': 'ai_workers',
     'connected-applications': 'connected_applications',
+    'technical-info': 'technical_info',
 };
 
 const currentPanel = ref<Panel>('interface');
@@ -433,6 +437,45 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('hashchange', openPanelFromHash);
 });
+
+/*
+ * Technical info
+ */
+const { pingTime, medianShift } = storeToRefs(useServerDateStore());
+
+const socketStore = useSocketStore();
+const { connected: socketConnected } = storeToRefs(socketStore);
+const { socket } = socketStore;
+
+/**
+ * "websocket" or "polling". Not reactive in socket.io, so updated on connect and transport upgrade.
+ */
+const socketTransport = ref<null | string>(null);
+
+const updateSocketTransport = () => {
+    socketTransport.value = socket.io.engine?.transport.name ?? null;
+};
+
+/**
+ * Engine is recreated on each reconnection, so listen to upgrade on the current one.
+ */
+const listenSocketTransport = () => {
+    updateSocketTransport();
+    socket.io.engine?.on('upgrade', updateSocketTransport);
+};
+
+onMounted(() => {
+    listenSocketTransport();
+    socket.on('connect', listenSocketTransport);
+});
+
+onUnmounted(() => {
+    socket.off('connect', listenSocketTransport);
+    socket.io.engine?.off('upgrade', updateSocketTransport);
+});
+
+const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const browserLanguage = typeof navigator === 'undefined' ? null : navigator.language;
 
 /*
  * Custom message for player when his locale is not yet translated
@@ -986,6 +1029,55 @@ const {
                     </section>
                 </div>
 
+                <!-- Technical info -->
+                <div v-show="'technical_info' === currentPanel">
+                    <section id="technical-info">
+                        <h3>{{ $t('player_settings.panel.technical_info') }}</h3>
+
+                        <p>{{ $t('technical_info.description') }}</p>
+
+                        <dl class="technical-info">
+                            <dt>{{ $t('technical_info.public_id') }}</dt>
+                            <dd>
+                                <code>{{ loggedInPlayer?.publicId ?? '…' }}</code>
+                                <small class="d-block text-body-secondary">{{ $t('technical_info.public_id_help') }}</small>
+                            </dd>
+
+                            <dt>{{ $t('technical_info.ping') }}</dt>
+                            <dd>
+                                {{ null === pingTime ? '…' : `${pingTime} ms` }}
+                                <small class="d-block text-body-secondary">{{ $t('technical_info.ping_help') }}</small>
+                            </dd>
+
+                            <dt>{{ $t('technical_info.time_shift') }}</dt>
+                            <dd>
+                                {{ medianShift }} ms
+                                <small class="d-block text-body-secondary">{{ $t('technical_info.time_shift_help') }}</small>
+                            </dd>
+
+                            <dt>{{ $t('technical_info.connection') }}</dt>
+                            <dd>
+                                <span v-if="socketConnected" class="text-success">{{ $t('technical_info.connected') }}</span>
+                                <span v-else class="text-danger">{{ $t('technical_info.disconnected') }}</span>
+                                <template v-if="socketConnected && socketTransport"> ({{ socketTransport }})</template>
+                                <small class="d-block text-body-secondary">{{ $t('technical_info.connection_help') }}</small>
+                            </dd>
+
+                            <dt>{{ $t('technical_info.time_zone') }}</dt>
+                            <dd>
+                                {{ timeZone }}
+                                <small class="d-block text-body-secondary">{{ $t('technical_info.time_zone_help') }}</small>
+                            </dd>
+
+                            <dt>{{ $t('technical_info.language') }}</dt>
+                            <dd>
+                                {{ i18n.language }}<template v-if="browserLanguage"> / {{ browserLanguage }}</template>
+                                <small class="d-block text-body-secondary">{{ $t('technical_info.language_help') }}</small>
+                            </dd>
+                        </dl>
+                    </section>
+                </div>
+
             </div>
         </div>
     </div>
@@ -1020,6 +1112,9 @@ section
 
     &:last-child
         margin-bottom 3em
+
+.technical-info dd
+    margin-bottom 1em
 
 .move-settings-help
     font-size 0.9em

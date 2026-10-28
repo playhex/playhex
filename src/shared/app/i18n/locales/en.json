@@ -65,7 +65,8 @@
             "board": "Board",
             "notifications": "Notifications",
             "ai_workers": "AI workers",
-            "connected_applications": "Connected applications"
+            "connected_applications": "Connected applications",
+            "technical_info": "Technical info"
         },
         "audio": "Audio",
         "moderation": "Moderation"
@@ -784,9 +785,22 @@
             "cancelLabel": "Oops no, keep playing"
         }
     },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Time shift: {{ms}}ms"
+    "technical_info": {
+        "description": "Technical information about your account and your connection to PlayHex. Useful when reporting a bug.",
+        "public_id": "Player public ID",
+        "public_id_help": "Unique and permanent identifier of your account. Used by the API.",
+        "ping": "Ping",
+        "ping_help": "Round-trip time between your device and the server, measured every 5 seconds. A high ping delays the moves you play and receive.",
+        "time_shift": "Time shift",
+        "time_shift_help": "Difference between your device clock and the server clock. It is compensated so that game clocks display the right remaining time.",
+        "connection": "Real-time connection",
+        "connection_help": "Channel used to receive moves, chat messages and notifications instantly. \"polling\" is a slower fallback when websocket is not available.",
+        "connected": "Connected",
+        "disconnected": "Disconnected",
+        "time_zone": "Time zone",
+        "time_zone_help": "Detected from your device, used to display game and tournament dates in your local time.",
+        "language": "Language",
+        "language_help": "Language of the interface, and language of your browser, which is used to choose the interface language by default."
     },
     "time_cadency": {
         "blitz": "Blitz",

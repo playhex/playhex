@@ -23,7 +23,6 @@ import { injectHead, useSeoMeta } from '@unhead/vue';
 import { definePerson, useSchemaOrg } from '@unhead/schema-org';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { formatDistanceToNowStrict } from 'date-fns';
-import useServerDateStore from '../../../stores/serverDateStore.js';
 import { watchEffect } from 'vue';
 import { RatingCategory } from '../../../../shared/app/ratingUtils.js';
 import { Directive } from 'vue';
@@ -223,11 +222,6 @@ const clickLogout = async () => {
         },
     });
 };
-
-/**
- * ping and date shift
- */
-const { pingTime, medianShift } = storeToRefs(useServerDateStore());
 
 /*
  * Player stats
@@ -531,14 +525,6 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                     : '…' })
                 }}</p>
 
-                <p v-if="player && isMe(player)" class="text-body-secondary">
-                    <small>
-                        {{ $t('ping.ping_ms', { ms: pingTime }) }}
-                        –
-                        {{ $t('ping.date_shift_ms', { ms: medianShift }) }}
-                    </small>
-                </p>
-
                 <div v-if="player && isMe(player)" class="player-btns mt-3">
                     <template v-if="player.isGuest">
                         <router-link
@@ -777,6 +763,8 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                 </div>
             </div>
         </template>
+
+        <p v-if="player" class="text-body-secondary text-end mt-4"><small>{{ $t('technical_info.public_id') }}: <code>{{ player.publicId }}</code></small></p>
     </div>
 
     <div v-else class="container">

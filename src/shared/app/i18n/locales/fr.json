@@ -49,7 +49,8 @@
             "board": "Plateau",
             "notifications": "Notifications",
             "ai_workers": "Workers IA",
-            "connected_applications": "Applications connectées"
+            "connected_applications": "Applications connectées",
+            "technical_info": "Infos techniques"
         },
         "audio": "Audio",
         "moderation": "Modération"
@@ -652,9 +653,22 @@
     "old_password": "Ancien mot de passe",
     "new_password": "Nouveau mot de passe",
     "confirm_new_password": "Confirmer le mot de passe",
-    "ping": {
-        "ping_ms": "Ping : {{ms}}ms",
-        "date_shift_ms": "Décalage de date : {{ms}}ms"
+    "technical_info": {
+        "description": "Informations techniques sur votre compte et votre connexion à PlayHex. Utiles pour signaler un bug.",
+        "public_id": "Identifiant public du joueur",
+        "public_id_help": "Identifiant unique et permanent de votre compte. Utilisé par l'API.",
+        "ping": "Ping",
+        "ping_help": "Temps d'aller-retour entre votre appareil et le serveur, mesuré toutes les 5 secondes. Un ping élevé retarde les coups joués et reçus.",
+        "time_shift": "Décalage de date",
+        "time_shift_help": "Écart entre l'horloge de votre appareil et celle du serveur. Il est compensé pour que les pendules des parties affichent le bon temps restant.",
+        "connection": "Connexion temps réel",
+        "connection_help": "Canal utilisé pour recevoir instantanément les coups, messages et notifications. \"polling\" est une alternative plus lente quand le websocket n'est pas disponible.",
+        "connected": "Connecté",
+        "disconnected": "Déconnecté",
+        "time_zone": "Fuseau horaire",
+        "time_zone_help": "Détecté depuis votre appareil, utilisé pour afficher les dates des parties et tournois à votre heure locale.",
+        "language": "Langue",
+        "language_help": "Langue de l'interface, et langue de votre navigateur, utilisée pour choisir la langue de l'interface par défaut."
     },
     "time_cadency": {
         "blitz": "Blitz",
