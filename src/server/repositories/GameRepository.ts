@@ -95,6 +95,11 @@ export default class GameRepository
         logger.info('Deleted.', { publicId: game.publicId, game });
     }
 
+    async setRanked(publicId: string, ranked: boolean): Promise<void>
+    {
+        await this.gameRepository.update({ publicId }, { ranked });
+    }
+
     async findUnique(publicId: string): Promise<null | Game>
     {
         return await this.gameRepository.findOne({

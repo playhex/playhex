@@ -1,9 +1,13 @@
 import { Inject, Service } from 'typedi';
 import { In, IsNull, MoreThanOrEqual, Repository } from 'typeorm';
-import { Ladder, LadderChallenge, LadderEvent, LadderPlayer, LadderReign } from '../../shared/app/models/index.js';
+import { Ladder, LadderChallenge, LadderEvent, LadderPlayer, LadderReign, PlayerCheat } from '../../shared/app/models/index.js';
 import { AppDataSource } from '../data-source.js';
 
-export type LadderEntity = LadderPlayer | LadderChallenge | LadderReign | LadderEvent;
+/**
+ * PlayerCheat is not a ladder entity,
+ * but is saved in same transaction when a cheat is reported on a ladder game.
+ */
+export type LadderEntity = LadderPlayer | LadderChallenge | LadderReign | LadderEvent | PlayerCheat;
 
 /**
  * All ladder database access.
@@ -49,6 +53,16 @@ export interface LadderRepositoryInterface
      * Dates of strikes received by these players since a date.
      */
     findStrikeDates(ladderId: number, playerIds: number[], since: Date): Promise<{ [playerId: number]: Date[] }>;
+
+    /**
+     * Reasons of cheats reported on ladder games of these players since a date, most recent first.
+     */
+    findCheatReasons(ladderId: number, playerIds: number[], since: Date): Promise<{ [playerId: number]: string[] }>;
+
+    /**
+     * Whether a cheat has already been reported on this challenge.
+     */
+    hasCheatReport(challengeId: number): Promise<boolean>;
 
     findCurrentReign(ladderId: number): Promise<null | LadderReign>;
     findReigns(ladderId: number): Promise<LadderReign[]>;
@@ -227,6 +241,40 @@ export default class LadderRepository implements LadderRepositoryInterface
         }
 
         return strikes;
+    }
+
+    async findCheatReasons(ladderId: number, playerIds: number[], since: Date): Promise<{ [playerId: number]: string[] }>
+    {
+        const cheats: { [playerId: number]: string[] } = {};
+
+        if (playerIds.length === 0) {
+            return cheats;
+        }
+
+        const events = await this.ladderEventRepository.find({
+            relations: { player: true },
+            where: {
+                ladderId,
+                type: 'cheat',
+                player: { id: In(playerIds) },
+                createdAt: MoreThanOrEqual(since),
+            },
+            order: { createdAt: 'desc' },
+        });
+
+        for (const { player, parameters } of events) {
+            (cheats[player.id!] ??= []).push(String(parameters.reason ?? ''));
+        }
+
+        return cheats;
+    }
+
+    async hasCheatReport(challengeId: number): Promise<boolean>
+    {
+        return await this.ladderEventRepository.existsBy({
+            type: 'cheat',
+            challenge: { id: challengeId },
+        });
     }
 
     async findCurrentReign(ladderId: number): Promise<null | LadderReign>

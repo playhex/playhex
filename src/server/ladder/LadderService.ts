@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
-import { Game, Ladder, LadderChallenge, LadderEvent, LadderPlayer, LadderReign, Player } from '../../shared/app/models/index.js';
+import { Game, Ladder, LadderChallenge, LadderEvent, LadderPlayer, LadderReign, Player, PlayerCheat } from '../../shared/app/models/index.js';
 import { LadderChallengeCandidateDto, LadderDto, LadderHallOfFameDto, LadderHallOfFamePlayerDto, LadderHallOfFameReignDto, LadderMeDto, LadderPlayerStatusDto } from '../../shared/app/models/LadderDto.js';
 import {
     canChallenge,
@@ -25,6 +25,7 @@ import {
     type LadderGameEnd,
     type LadderRulesConfig,
     listChallengeCandidates,
+    penalizeCheat,
     removeFromLadder,
 } from '../../shared/app/ladder/ladderRules.js';
 import type TimeControlType from '../../shared/time-control/TimeControlType.js';
@@ -127,11 +128,11 @@ export default class LadderService
             .sort((a, b) => a.position! - b.position!)
         ;
 
-        const strikeDates = await this.ladderRepository.findStrikeDates(
-            ladder.id,
-            standings.map(p => p.playerId),
-            new Date(now.getTime() - this.config.strikesWindowMs),
-        );
+        const playerIds = standings.map(p => p.playerId);
+        const [strikeDates, cheatReasons] = await Promise.all([
+            this.ladderRepository.findStrikeDates(ladder.id, playerIds, new Date(now.getTime() - this.config.strikesWindowMs)),
+            this.ladderRepository.findCheatReasons(ladder.id, playerIds, new Date(now.getTime() - this.config.cheatWarningWindowMs)),
+        ]);
 
         const dto = new LadderDto();
 
@@ -140,12 +141,19 @@ export default class LadderService
         dto.runningChallenges = runningChallenges;
         dto.currentReign = currentReign;
         dto.strikes = {};
+        dto.cheats = {};
 
         for (const ladderPlayer of standings) {
             const count = strikeDates[ladderPlayer.playerId]?.length ?? 0;
 
             if (count > 0) {
                 dto.strikes[ladderPlayer.player.publicId] = count;
+            }
+
+            const reasons = cheatReasons[ladderPlayer.playerId];
+
+            if (reasons) {
+                dto.cheats[ladderPlayer.player.publicId] = reasons;
             }
         }
 
@@ -233,14 +241,16 @@ export default class LadderService
     ): Promise<void> {
         const ladderSize = players.filter(p => p.state === 'active').length;
         const playersById = new Map(players.map(p => [p.playerId, p]));
-        const [strikeDates, lastChallenges] = await Promise.all([
+        const [strikeDates, cheatReasons, lastChallenges] = await Promise.all([
             this.ladderRepository.findStrikeDates(ladder.id, [playerId], new Date(now.getTime() - this.config.strikesWindowMs)),
+            this.ladderRepository.findCheatReasons(ladder.id, [playerId], new Date(now.getTime() - this.config.cheatWarningWindowMs)),
             this.ladderRepository.findLastEndedChallenges(ladder.id, playerId, LAST_CHALLENGES_COUNT),
         ]);
 
         dto.ladderPlayer = ladderPlayer;
         dto.lastChallenges = lastChallenges;
         dto.strikes = strikeDates[playerId]?.length ?? 0;
+        dto.cheats = cheatReasons[playerId] ?? [];
         dto.runningChallenges = runningChallenges.filter(c => c.challengerId === playerId || c.defenderId === playerId);
         dto.outgoingUsed = countOutgoingChallenges(playerId, challenges);
         dto.incomingUsed = countIncomingChallenges(playerId, challenges);
@@ -354,9 +364,22 @@ export default class LadderService
 
     async leave(ladder: Ladder, player: Player, now = new Date()): Promise<void>
     {
-        await this.mutex.runExclusive(ladder.id, async () => {
+        await this.removeMember(ladder, player.publicId, 'left', 'leave', now);
+    }
+
+    /**
+     * Removes an active player from the ladder, on their own or by an admin.
+     */
+    private async removeMember(
+        ladder: Ladder,
+        playerPublicId: string,
+        state: 'left' | 'excluded',
+        eventType: 'leave' | 'excluded',
+        now: Date,
+    ): Promise<LadderPlayer> {
+        return await this.mutex.runExclusive(ladder.id, async () => {
             const players = await this.ladderRepository.findPlayers(ladder.id);
-            const ladderPlayer = players.find(p => p.playerId === player.id);
+            const ladderPlayer = players.find(p => p.player.publicId === playerPublicId);
 
             if (!ladderPlayer || ladderPlayer.state !== 'active') {
                 throw new LadderRefusalError('not_member');
@@ -366,13 +389,15 @@ export default class LadderService
             const position = ladderPlayer.position;
             const snapshot = snapshotPlayers(players);
 
-            removeFromLadder(players, ladderPlayer, 'left', now, this.config);
+            removeFromLadder(players, ladderPlayer, state, now, this.config);
 
             await this.ladderRepository.saveAll([
                 ...changedPlayers(players, snapshot),
-                this.createEvent(ladder, 'leave', player, null, null, { position }, now),
+                this.createEvent(ladder, eventType, ladderPlayer.player, null, null, { position }, now),
                 ...await this.syncReign(ladder, kingBefore, players, now),
             ]);
+
+            return ladderPlayer;
         });
     }
 
@@ -750,6 +775,107 @@ export default class LadderService
         }
 
         return null;
+    }
+
+    /*
+     * ==================== Moderation ====================
+     */
+
+    /**
+     * Admin found that a player cheated in a ladder game:
+     * player is tagged as cheater, game result is voided,
+     * cheater moves to the last seat, victim gets back their seat.
+     * Game must be over (cancel or forfeit it before if needed).
+     *
+     * @param reason Free text, displayed to players
+     */
+    async reportCheat(gamePublicId: string, cheaterPublicId: string, reason: string, now = new Date()): Promise<{ challenge: LadderChallenge, cheater: Player }>
+    {
+        const challenge = await this.ladderRepository.findChallengeByGamePublicId(gamePublicId);
+
+        if (challenge === null) {
+            throw new LadderError('ladder.challenge_not_found', 404);
+        }
+
+        const { current, cheater, victim } = await this.mutex.runExclusive(challenge.ladderId, async () => {
+            const current = await this.ladderRepository.findChallengeByGamePublicId(gamePublicId);
+
+            if (current === null || current.game === null) {
+                throw new LadderError('ladder.challenge_not_found', 404);
+            }
+
+            if (current.state !== 'ended') {
+                throw new LadderError('ladder.challenge_not_ended', 409);
+            }
+
+            if (await this.ladderRepository.hasCheatReport(current.id)) {
+                throw new LadderError('ladder.cheat_already_reported', 409);
+            }
+
+            const ladder = current.ladder;
+            const players = await this.ladderRepository.findPlayers(ladder.id);
+            const cheaterIsChallenger = current.challenger.publicId === cheaterPublicId;
+
+            if (!cheaterIsChallenger && current.defender.publicId !== cheaterPublicId) {
+                throw new LadderError('ladder.player_not_in_challenge', 400);
+            }
+
+            const cheater = players.find(p => p.playerId === (cheaterIsChallenger ? current.challengerId : current.defenderId));
+            const victim = players.find(p => p.playerId === (cheaterIsChallenger ? current.defenderId : current.challengerId));
+
+            if (!cheater || !victim) {
+                throw new LadderError('ladder.player_not_found', 404);
+            }
+
+            const kingBefore = getKing(players);
+            const snapshot = snapshotPlayers(players);
+
+            const report = penalizeCheat({
+                players,
+                cheater,
+                victim,
+                victimSeatBefore: cheaterIsChallenger ? current.defenderPositionBefore : current.challengerPositionBefore,
+            });
+
+            current.result = 'voided';
+
+            const playerCheat = new PlayerCheat();
+
+            playerCheat.player = cheater.player;
+            playerCheat.playerId = cheater.playerId;
+            playerCheat.game = current.game;
+            playerCheat.gameId = current.game.id ?? null;
+            playerCheat.reason = reason;
+            playerCheat.createdAt = now;
+
+            await this.ladderRepository.saveAll([
+                current,
+                ...changedPlayers(players, snapshot),
+                playerCheat,
+                this.createEvent(ladder, 'cheat', cheater.player, victim.player, current, { reason, ...report }, now),
+                ...await this.syncReign(ladder, kingBefore, players, now),
+            ]);
+
+            return { current, cheater, victim };
+        });
+
+        notifier.emit('ladderCheatReported', cheater.player, victim.player, reason);
+
+        return { challenge: current, cheater: cheater.player };
+    }
+
+    /**
+     * Admin excludes a player from the ladder,
+     * they can rejoin after the same delay as when removed for strikes.
+     * Running games stay ladder games.
+     */
+    async exclude(ladder: Ladder, playerPublicId: string, now = new Date()): Promise<LadderPlayer>
+    {
+        const ladderPlayer = await this.removeMember(ladder, playerPublicId, 'excluded', 'excluded', now);
+
+        notifier.emit('ladderExcluded', ladderPlayer.player);
+
+        return ladderPlayer;
     }
 
     /*

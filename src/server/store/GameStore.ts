@@ -280,6 +280,21 @@ export default class GameStore
         return this.activeGames[gameId] ?? null;
     }
 
+    /**
+     * Makes a game unranked, e.g. when a cheat has been detected.
+     * Does not recompute ratings.
+     */
+    async unrankGame(publicId: string): Promise<void>
+    {
+        const gameServer = this.activeGames[publicId];
+
+        if (gameServer) {
+            gameServer.getGame().ranked = false;
+        }
+
+        await this.gameRepository.setRanked(publicId, false);
+    }
+
     getActiveGamesData(): Game[]
     {
         return Object.values(this.activeGames)

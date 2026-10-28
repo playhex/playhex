@@ -156,10 +156,25 @@ Precisely:
 - Applies to both kinds of strike: losing on time, and game canceled because the player did not play their first move.
 - The player's other running games are not canceled, as for any removal.
 
-### 2.6 Leaving and removal
+### 2.6 Cheating and exclusion (moderation)
+
+Admin endpoints, see `src/server/ladder/AdminLadderController.ts`.
+
+- **Cheat reported on a ladder game** (game must be over, cancel or forfeit it first), with a free text reason:
+  - the player is tagged as cheater (`PlayerCheat`, not specific to the ladder, can be displayed elsewhere later);
+  - the game result is voided (no cooldown or diversity effect anymore);
+  - the cheater moves to the last seat;
+  - the victim gets back the seat they held before the game, unless they sit higher now;
+  - streaks and titles are not changed;
+  - a "Cheater" badge is displayed in the ladder for **60 days**, reason shown on hover.
+    A cheat reported outside the ladder is not displayed in the ladder.
+- **Exclusion**: player is removed, can rejoin at the bottom after **30 days** (same as strikes).
+
+### 2.7 Leaving and removal
 
 - **Leave** anytime, rejoin at the bottom after **7 days**.
 - **Strikes**: see above, rejoin after 30 days.
+- **Excluded by a moderator**: rejoin after 30 days.
 - **Inactivity**: no ladder game ended for **60 days** (from the last game end, even canceled, or from joining) → removed, can rejoin immediately.
   Never removed while a challenge (sent or received) is running.
 
@@ -173,13 +188,14 @@ When a player leaves or is removed:
 
 Expired live proposals are processed every minute, inactivity removals every few minutes.
 
-### 2.7 Changes since the original design
+### 2.8 Changes since the original design
 
 The original design is `ladder-rules/LADDER_RULES.md` (outside this repo). Differences:
 
 - Cooling-down is **2 hours**, not 8.
 - Canceled games: explicit rule (no result, strike to the player who did not play their first move, no strike when canceled by a moderator).
 - Removal on the first strike when the player has not finished any game since joining (2026-09-29), see 2.5.
+- Cheat reports and exclusion by moderators (2026-10-28), see 2.6.
 - Cooldown and diversity history limited to 120 days.
 - Live option detailed: defender must be active, 10 minutes to answer, pending proposal takes slots, cannot be withdrawn.
 - Not implemented: multiple user-created ladders, open defenses (see below).

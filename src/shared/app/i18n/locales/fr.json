@@ -1552,6 +1552,8 @@
         "incoming_slots_setting": "Nombre max de défis reçus en même temps",
         "incoming_slots_help": "Votre place impose au moins {{min}}. Maximum {{max}}.",
         "strikes": "Avertissements : {{count}}",
+        "cheater": "Tricheur",
+        "cheater_reason": "Triche : {{reason}}",
         "strike_warning": "Vous avez perdu au temps une partie du Roi de la colline. Un second dépassement de temps dans les 60 jours vous retire du classement. Abandonner ne donne jamais d'avertissement.",
         "no_running_challenges": "Aucun défi en cours.",
         "vs": "contre",
@@ -1601,7 +1603,9 @@
             "new_king": "{{player}} est le nouveau Roi !",
             "giant_slayer": "{{player}} est un Régicide : a détrôné {{opponent}} !",
             "climber": "{{player}} a gagné {{wins}} défis d'affilée !",
-            "strike": "{{player}} a perdu une partie au temps (avertissement {{strikes}})"
+            "strike": "{{player}} a perdu une partie au temps (avertissement {{strikes}})",
+            "cheat": "{{player}} a triché contre {{opponent}} : partie annulée, {{player}} renvoyé tout en bas",
+            "excluded": "{{player}} a été exclu par un modérateur depuis la place n°{{position}}"
         },
         "load_more": "Voir plus",
         "load_error": "Impossible de charger le Roi de la colline",
@@ -1631,6 +1635,10 @@
         "not_found": "Roi de la colline introuvable.",
         "invalid_incoming_slots": "Nombre de défis invalide.",
         "challenge_not_found": "Défi introuvable.",
+        "challenge_not_ended": "Cette partie n'est pas encore terminée.",
+        "cheat_already_reported": "La triche a déjà été signalée sur cette partie.",
+        "player_not_in_challenge": "Ce joueur n'a pas joué cette partie.",
+        "cheat_chat_message": "Un modérateur a détecté une triche de {{player}}. Cette partie n'est plus classée, et son résultat au Roi de la colline a été annulé.",
         "not_your_challenge": "Ce défi ne vous concerne pas.",
         "live_proposal_already_answered": "Cette proposition a déjà reçu une réponse ou a expiré.",
         "game_creation_failed": "Impossible de créer la partie, veuillez réessayer.",
@@ -1640,7 +1648,10 @@
             "strike": "Vous avez perdu au temps une partie du Roi de la colline (avertissement {{strikes}}).",
             "strike_removed": "Vous avez perdu au temps une partie du Roi de la colline et avez été retiré après {{strikes}} avertissements.",
             "strike_removed_before_first_game": "Vous avez perdu au temps une partie du Roi de la colline sans avoir terminé aucune partie auparavant, et avez été retiré.",
-            "removed_inactive": "Vous avez été retiré du Roi de la colline après 60 jours sans partie."
+            "removed_inactive": "Vous avez été retiré du Roi de la colline après 60 jours sans partie.",
+            "cheater": "Une triche a été détectée dans une de vos parties du Roi de la colline ({{reason}}). Vous avez été déplacé tout en bas du classement.",
+            "excluded": "Vous avez été exclu du Roi de la colline par un modérateur. Vous pourrez revenir dans 30 jours.",
+            "cheat_victim": "Votre adversaire {{player}} a triché dans une partie du Roi de la colline. Le résultat a été annulé et vous avez retrouvé votre place."
         },
         "account_age_one": "Votre compte a {{count}} jour.",
         "account_age_other": "Votre compte a {{count}} jours.",

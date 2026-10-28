@@ -30,6 +30,9 @@ export const ladderPlayerStates = [
 
     /** Removed after too many timeout strikes */
     'removed_strikes',
+
+    /** Excluded by an admin */
+    'excluded',
 ] as const;
 
 export type LadderPlayerState = typeof ladderPlayerStates[number];
@@ -68,6 +71,8 @@ export const ladderEventTypes = [
     'giant_slayer',
     'climber',
     'strike',
+    'cheat',
+    'excluded',
 ] as const;
 
 export type LadderEventType = typeof ladderEventTypes[number];
@@ -243,8 +248,11 @@ export type LadderRulesConfig = {
     strikesToRemove: number;
     strikesWindowMs: number;
 
-    /** Can rejoin after this delay when removed because of strikes */
+    /** Can rejoin after this delay when removed because of strikes, or excluded by an admin */
     rejoinAfterStrikesMs: number;
+
+    /** Cheat warning is displayed during this delay after cheat has been reported */
+    cheatWarningWindowMs: number;
 
     /** Removed if no ladder game during this delay */
     inactivityMs: number;
@@ -285,6 +293,7 @@ export const defaultLadderRulesConfig: LadderRulesConfig = {
     strikesToRemove: 2,
     strikesWindowMs: 60 * DAY,
     rejoinAfterStrikesMs: 30 * DAY,
+    cheatWarningWindowMs: 60 * DAY,
     inactivityMs: 60 * DAY,
     rejoinAfterLeaveMs: 7 * DAY,
     liveProposalAnswerMs: 10 * MINUTE,
@@ -486,7 +495,9 @@ export const canJoin = ({ account, ladderPlayer, now, config = defaultLadderRule
 export const getRejoinableAt = (reason: Exclude<LadderPlayerState, 'active'>, date: Date, config: LadderRulesConfig = defaultLadderRulesConfig): null | Date => {
     switch (reason) {
         case 'left': return new Date(date.getTime() + config.rejoinAfterLeaveMs);
-        case 'removed_strikes': return new Date(date.getTime() + config.rejoinAfterStrikesMs);
+        case 'removed_strikes':
+        case 'excluded':
+            return new Date(date.getTime() + config.rejoinAfterStrikesMs);
         case 'removed_inactive': return null;
     }
 };
@@ -540,6 +551,25 @@ export const removeFromLadder = (
             --player.position;
         }
     }
+};
+
+/**
+ * Moves an active player to the last seat, everyone below moves up one seat.
+ */
+export const moveToBottom = (players: LadderRulesPlayer[], movedPlayer: LadderRulesPlayer): void => {
+    const movedPosition = movedPlayer.position;
+
+    if (movedPlayer.state !== 'active' || movedPosition === null) {
+        return;
+    }
+
+    for (const player of players) {
+        if (player.state === 'active' && player.position !== null && player.position > movedPosition) {
+            --player.position;
+        }
+    }
+
+    movedPlayer.position = players.filter(p => p.state === 'active').length;
 };
 
 /**
@@ -1107,6 +1137,58 @@ export const endChallenge = ({
         kingDefended,
         giantSlayer,
         climber,
+    };
+};
+
+export type LadderCheatContext = {
+    /** All ladder members, positions will be updated */
+    players: LadderRulesPlayer[];
+
+    cheater: LadderRulesPlayer;
+    victim: LadderRulesPlayer;
+
+    /**
+     * Seat victim held before the cheated game.
+     */
+    victimSeatBefore: null | number;
+};
+
+export type LadderCheatReport = {
+    cheaterPositionBefore: null | number;
+    cheaterPositionAfter: null | number;
+    victimPositionBefore: null | number;
+    victimPositionAfter: null | number;
+};
+
+/**
+ * Cheat reported on a challenge game:
+ * cheater moves to the last seat,
+ * victim gets back the seat they held before the game, unless they now sit higher.
+ * Streaks and titles are not changed.
+ */
+export const penalizeCheat = ({ players, cheater, victim, victimSeatBefore }: LadderCheatContext): LadderCheatReport => {
+    const cheaterPositionBefore = cheater.position;
+    const victimPositionBefore = victim.position;
+
+    moveToBottom(players, cheater);
+
+    if (victim.state === 'active' && victim.position !== null && victimSeatBefore !== null && victimSeatBefore < victim.position) {
+        const victimPosition = victim.position;
+
+        for (const player of players) {
+            if (player.state === 'active' && player.position !== null && player.position >= victimSeatBefore && player.position < victimPosition) {
+                ++player.position;
+            }
+        }
+
+        victim.position = victimSeatBefore;
+    }
+
+    return {
+        cheaterPositionBefore,
+        cheaterPositionAfter: cheater.position,
+        victimPositionBefore,
+        victimPositionAfter: victim.position,
     };
 };
 

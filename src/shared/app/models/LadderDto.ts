@@ -39,6 +39,13 @@ export class LadderDto
      */
     @Expose()
     strikes: { [playerPublicId: string]: number };
+
+    /**
+     * Reasons of cheats reported on ladder games within the cheat warning window,
+     * keyed by player public id, most recent first
+     */
+    @Expose()
+    cheats: { [playerPublicId: string]: string[] };
 }
 
 export class LadderChallengeCandidateDto
@@ -90,6 +97,12 @@ export class LadderPlayerStatusDto
 
     @Expose()
     strikes: number;
+
+    /**
+     * Reasons of cheats reported on ladder games within the cheat warning window, most recent first
+     */
+    @Expose()
+    cheats: string[];
 
     /**
      * For each of player running challenges, by challenge publicId:

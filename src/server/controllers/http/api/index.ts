@@ -39,6 +39,7 @@ import HexplorerController from './HexplorerController.js';
 import ClientErrorReportController from './ClientErrorReportController.js';
 import HexGameImporterController from './HexGameImporterController.js';
 import LadderController from '../../../ladder/LadderController.js';
+import AdminLadderController from '../../../ladder/AdminLadderController.js';
 import PuzzleController from '../../../puzzles/PuzzleController.js';
 import PuzzleCollectionController from '../../../puzzles/PuzzleCollectionController.js';
 import VideoController from '../../../videos/VideoController.js';
@@ -115,6 +116,7 @@ export const registerApi = (app: Express) => {
             PlayerFavoriteTimeControlController,
             AdminController,
             AdminModerationController,
+            AdminLadderController,
             PlayerModerationController,
             PlayerAvatarController,
             PlayerCountryFlagController,

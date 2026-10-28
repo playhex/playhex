@@ -98,6 +98,8 @@ const eventText = (event: LadderEvent): string => {
         case 'giant_slayer': return t('ladder.event.giant_slayer', { player, opponent });
         case 'climber': return t('ladder.event.climber', { player, wins: p.wins });
         case 'strike': return t('ladder.event.strike', { player, strikes: p.strikes });
+        case 'cheat': return t('ladder.event.cheat', { player, opponent });
+        case 'excluded': return t('ladder.event.excluded', { player, position: p.position });
     }
 };
 </script>
@@ -117,10 +119,11 @@ const eventText = (event: LadderEvent): string => {
                 <IconSword v-else-if="event.type === 'giant_slayer'" class="text-danger me-1" />
                 <IconStairsUp v-else-if="event.type === 'climber'" class="text-success me-1" />
                 <IconExclamationTriangleFill v-else-if="event.type === 'strike' || event.type === 'removed_strikes'" class="text-warning me-1" />
+                <IconExclamationTriangleFill v-else-if="event.type === 'cheat' || event.type === 'excluded'" class="text-danger me-1" />
                 <IconShieldFill v-else-if="event.type === 'challenge_result' && event.parameters.result === 'defender_won'" class="text-primary me-1" />
                 <IconTablerSwords v-else-if="event.type === 'challenge_result'" class="me-1" />
 
-                <span :class="{ 'fw-bold': event.type === 'new_king' }">{{ eventText(event) }}</span>
+                <span :class="{ 'fw-bold': event.type === 'new_king' }" :title="event.type === 'cheat' ? t('ladder.cheater_reason', { reason: event.parameters.reason }) : undefined">{{ eventText(event) }}</span>
                 <small class="text-secondary ms-2">{{ formatDistanceToNowStrict(event.createdAt, { addSuffix: true }) }}</small>
             </span>
 

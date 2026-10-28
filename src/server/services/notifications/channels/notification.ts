@@ -281,6 +281,35 @@ notifier.on('ladderStrike', async (player, strikes, removed, beforeFirstGame) =>
     await playerNotificationService.addNotification(playerNotification);
 });
 
+/**
+ * Tells cheater they have been moved to the bottom,
+ * and victim they got back their seat.
+ */
+notifier.on('ladderCheatReported', async (cheater, victim, reason) => {
+    await playerNotificationService.addNotification(createPlayerNotification(
+        'ladderCheater',
+        { reason },
+        cheater,
+        null,
+    ));
+
+    await playerNotificationService.addNotification(createPlayerNotification(
+        'ladderCheatVictim',
+        { player: pseudoString(cheater) },
+        victim,
+        null,
+    ));
+});
+
+notifier.on('ladderExcluded', async player => {
+    await playerNotificationService.addNotification(createPlayerNotification(
+        'ladderExcluded',
+        null,
+        player,
+        null,
+    ));
+});
+
 notifier.on('ladderRemovedInactive', async player => {
     const playerNotification = createPlayerNotification(
         'ladderRemovedInactive',

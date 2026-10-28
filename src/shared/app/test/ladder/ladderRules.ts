@@ -22,6 +22,8 @@ import {
     type LadderRulesChallenge,
     type LadderRulesPlayer,
     listChallengeCandidates,
+    moveToBottom,
+    penalizeCheat,
     removeFromLadder,
     resolveChallengeOutcome,
     shouldRemoveForStrikes,
@@ -212,6 +214,69 @@ describe('ladderRules', () => {
 
             assert.deepStrictEqual(players.map(p => p.position), [1, null, 2, 3]);
             assert.strictEqual(players[1].rejoinableAt?.getTime(), now.getTime() + 7 * DAY);
+        });
+
+        it('excluded player can rejoin after same delay as strikes', () => {
+            const players = createLadder(3);
+
+            removeFromLadder(players, players[0], 'excluded', now);
+
+            assert.deepStrictEqual(players.map(p => p.position), [null, 1, 2]);
+            assert.strictEqual(players[0].rejoinableAt?.getTime(), now.getTime() + defaultLadderRulesConfig.rejoinAfterStrikesMs);
+        });
+    });
+
+    describe('cheat', () => {
+        it('moves player to the bottom', () => {
+            const players = [...createLadder(4), createPlayer(5, null)];
+
+            moveToBottom(players, players[1]);
+
+            assert.deepStrictEqual(players.map(p => p.position), [1, 4, 2, 3, null]);
+        });
+
+        it('cheater challenger moves to the bottom, victim gets their seat back', () => {
+            const players = createLadder(5);
+
+            // 4 beat 2 by cheating: 1, 4, 2, 3, 5
+            applyChallengeResult(players, players[3], players[1], 'challenger_won');
+            assert.deepStrictEqual(players.map(p => p.position), [1, 3, 4, 2, 5]);
+
+            const report = penalizeCheat({ players, cheater: players[3], victim: players[1], victimSeatBefore: 2 });
+
+            assert.deepStrictEqual(players.map(p => p.position), [1, 2, 3, 5, 4]);
+            assert.deepStrictEqual(report, {
+                cheaterPositionBefore: 2,
+                cheaterPositionAfter: 5,
+                victimPositionBefore: 3,
+                victimPositionAfter: 2,
+            });
+        });
+
+        it('victim keeps a better seat obtained meanwhile', () => {
+            const players = createLadder(5);
+
+            // 3 cheated against 1 and moved to seat 1, victim then climbed back to seat 1
+            const report = penalizeCheat({ players, cheater: players[2], victim: players[0], victimSeatBefore: 2 });
+
+            assert.deepStrictEqual(players.map(p => p.position), [1, 2, 5, 3, 4]);
+            assert.strictEqual(report.victimPositionAfter, 1);
+        });
+
+        it('cheater defender moves to the bottom, challenger victim keeps their seat', () => {
+            const players = createLadder(5);
+
+            penalizeCheat({ players, cheater: players[1], victim: players[3], victimSeatBefore: 4 });
+
+            assert.deepStrictEqual(players.map(p => p.position), [1, 5, 2, 3, 4]);
+        });
+
+        it('cheater not in ladder anymore: only victim moves', () => {
+            const players = [...createLadder(4), createPlayer(5, null)];
+
+            penalizeCheat({ players, cheater: players[4], victim: players[3], victimSeatBefore: 2 });
+
+            assert.deepStrictEqual(players.map(p => p.position), [1, 3, 4, 2, null]);
         });
     });
 

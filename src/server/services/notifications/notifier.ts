@@ -81,6 +81,19 @@ type NotifiableEvents = {
      * A player has been removed from a ladder because of inactivity.
      */
     ladderRemovedInactive: (player: Player) => void;
+
+    /**
+     * Admin reported that a player cheated in a ladder game.
+     * Cheater has been moved to the last seat, victim got back their seat.
+     *
+     * @param reason Free text written by admin
+     */
+    ladderCheatReported: (cheater: Player, victim: Player, reason: string) => void;
+
+    /**
+     * Admin excluded a player from a ladder.
+     */
+    ladderExcluded: (player: Player) => void;
 };
 
 export const notifier = new TypedEmitter<NotifiableEvents>();

@@ -31,6 +31,7 @@ import OAuthPayload from './OAuthPayload.js';
 import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers.js';
 import Player from './Player.js';
 import PlayerAccountPassword from './PlayerAccountPassword.js';
+import PlayerCheat from './PlayerCheat.js';
 import PlayerModerationAction from './PlayerModerationAction.js';
 import PlayerNotification from './PlayerNotification.js';
 import PlayerAiWorkerKey from './PlayerAiWorkerKey.js';
@@ -93,6 +94,7 @@ export {
     OnlinePlayer,
     Player,
     PlayerAccountPassword,
+    PlayerCheat,
     PlayerFavoriteTimeControl,
     PlayerIp,
     PlayerLittleGolemAccount,
@@ -154,6 +156,7 @@ export const entities = {
     OnlinePlayers,
     Player,
     PlayerAccountPassword,
+    PlayerCheat,
     PlayerFavoriteTimeControl,
     PlayerIp,
     PlayerLittleGolemAccount,

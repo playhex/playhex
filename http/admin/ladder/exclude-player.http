@@ -1,0 +1,8 @@
+# Excludes a player from King of the Hill.
+# Can rejoin at the bottom after the same delay as when removed for timeouts (30 days).
+
+@ladderSlug=main
+@playerPublicId=d1d15a0c-272f-413f-aa84-c480c69ac34f
+
+POST /api/admin/ladders/{{ ladderSlug }}/players/{{ playerPublicId }}/exclude
+Authorization: Bearer {{ adminPassword }}

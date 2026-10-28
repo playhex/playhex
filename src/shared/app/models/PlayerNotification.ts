@@ -113,6 +113,31 @@ type PlayerNotificationTypes = {
     ladderRemovedInactive: null;
 
     /**
+     * Cheating detected in one of my ladder games, I have been moved to the bottom of the ladder
+     */
+    ladderCheater: {
+        /**
+         * Free text written by admin
+         */
+        reason: string;
+    };
+
+    /**
+     * My opponent cheated in a ladder game, I got back my seat
+     */
+    ladderCheatVictim: {
+        /**
+         * Nickname of the cheater
+         */
+        player: string;
+    };
+
+    /**
+     * I have been excluded from a ladder by a moderator
+     */
+    ladderExcluded: null;
+
+    /**
      * Custom notification to display any text
      */
     custom: {

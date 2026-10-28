@@ -71,6 +71,7 @@ const onChallenge = async (defender: Player): Promise<void> => {
                     :standings="ladderDto.standings"
                     :runningChallenges="ladderDto.runningChallenges"
                     :strikes="ladderDto.strikes"
+                    :cheats="ladderDto.cheats"
                     :me
                     @challenge="onChallenge"
                 />

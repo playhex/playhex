@@ -1544,6 +1544,8 @@
         "incoming_slots_setting": "Max challenges I accept at once",
         "incoming_slots_help": "Your seat requires at least {{min}}. Maximum is {{max}}.",
         "strikes": "Strikes: {{count}}",
+        "cheater": "Cheater",
+        "cheater_reason": "Cheating: {{reason}}",
         "strike_warning": "You timed out a King of the Hill game. A second timeout within 60 days removes you from the ladder. Resigning is never a strike.",
         "no_running_challenges": "No running challenge.",
         "vs": "vs",
@@ -1593,7 +1595,9 @@
             "new_king": "{{player}} is the new King of the Hill!",
             "giant_slayer": "{{player}} is a Giant Slayer: dethroned {{opponent}}!",
             "climber": "{{player}} won {{wins}} challenges in a row!",
-            "strike": "{{player}} timed out a game (strike {{strikes}})"
+            "strike": "{{player}} timed out a game (strike {{strikes}})",
+            "cheat": "{{player}} cheated against {{opponent}}: game canceled, {{player}} moved to the bottom",
+            "excluded": "{{player}} was excluded by a moderator from seat #{{position}}"
         },
         "load_more": "Load more",
         "load_error": "Could not load King of the Hill",
@@ -1623,6 +1627,10 @@
         "not_found": "King of the Hill not found.",
         "invalid_incoming_slots": "Invalid number of challenges.",
         "challenge_not_found": "Challenge not found.",
+        "challenge_not_ended": "This game is not over yet.",
+        "cheat_already_reported": "Cheating has already been reported on this game.",
+        "player_not_in_challenge": "This player did not play this game.",
+        "cheat_chat_message": "A moderator detected cheating by {{player}}. This game is no longer ranked, and its King of the Hill result has been canceled.",
         "not_your_challenge": "This is not your challenge.",
         "live_proposal_already_answered": "This proposal has already been answered or has expired.",
         "game_creation_failed": "Could not create the game, please try again.",
@@ -1632,7 +1640,10 @@
             "strike": "You timed out a King of the Hill game (strike {{strikes}}).",
             "strike_removed": "You timed out a King of the Hill game and have been removed after {{strikes}} strikes.",
             "strike_removed_before_first_game": "You timed out a King of the Hill game before finishing any game, and have been removed.",
-            "removed_inactive": "You have been removed from King of the Hill after 60 days without a game."
+            "removed_inactive": "You have been removed from King of the Hill after 60 days without a game.",
+            "cheater": "Cheating has been detected in one of your King of the Hill games ({{reason}}). You have been moved to the bottom of the ladder.",
+            "excluded": "You have been excluded from King of the Hill by a moderator. You can rejoin in 30 days.",
+            "cheat_victim": "Your opponent {{player}} cheated in a King of the Hill game. The result has been canceled and you got your seat back."
         },
         "account_age_one": "Your account is {{count}} day old.",
         "account_age_other": "Your account is {{count}} days old.",

@@ -143,6 +143,13 @@ const minutes = (ms: number): number => Math.round(ms / MINUTE);
             <li>Resigning never gives a strike.</li>
         </ul>
 
+        <h2 class="h4 mt-4">Cheating</h2>
+        <ul>
+            <li>If a player cheated in a game, a moderator cancels its result: the cheater goes to the last seat, and their opponent gets back the seat they had before the game, unless they now sit higher.</li>
+            <li>The cheater gets a <strong>Cheater</strong> badge for {{ days(config.cheatWarningWindowMs) }} days.</li>
+            <li>A moderator can also exclude a player, who can rejoin at the bottom after {{ days(config.rejoinAfterStrikesMs) }} days.</li>
+        </ul>
+
         <h2 class="h4 mt-4">Leaving and removal</h2>
         <p>A player leaves the ladder in three cases:</p>
         <ul>

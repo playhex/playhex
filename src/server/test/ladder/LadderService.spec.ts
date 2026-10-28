@@ -1,7 +1,7 @@
 /* eslint-disable require-await, @typescript-eslint/require-await -- in memory fakes of async interfaces */
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { Game, GameToPlayer, Ladder, LadderChallenge, LadderEvent, LadderPlayer, LadderReign, Player } from '../../../shared/app/models/index.js';
+import { Game, GameToPlayer, Ladder, LadderChallenge, LadderEvent, LadderPlayer, LadderReign, Player, PlayerCheat } from '../../../shared/app/models/index.js';
 import LadderService from '../../ladder/LadderService.js';
 import type { LadderEntity, LadderRepositoryInterface } from '../../ladder/LadderRepository.js';
 import type { LadderGameCreatorInterface } from '../../ladder/LadderGameCreator.js';
@@ -16,6 +16,7 @@ class InMemoryLadderRepository implements LadderRepositoryInterface
     challenges: LadderChallenge[] = [];
     reigns: LadderReign[] = [];
     events: LadderEvent[] = [];
+    playerCheats: PlayerCheat[] = [];
 
     constructor(private ladder: Ladder) {}
 
@@ -54,14 +55,37 @@ class InMemoryLadderRepository implements LadderRepositoryInterface
         return strikes;
     }
 
+    async findCheatReasons(_: number, playerIds: number[], since: Date)
+    {
+        const cheats: { [playerId: number]: string[] } = {};
+
+        for (const e of this.events) {
+            if (e.type === 'cheat' && playerIds.includes(e.player.id!) && e.createdAt >= since) {
+                (cheats[e.player.id!] ??= []).push(String(e.parameters.reason));
+            }
+        }
+
+        return cheats;
+    }
+
+    async hasCheatReport(challengeId: number)
+    {
+        return this.events.some(e => e.type === 'cheat' && e.challenge?.id === challengeId);
+    }
+
     async saveAll(entities: LadderEntity[])
     {
         for (const entity of entities) {
             const list: LadderEntity[] = entity instanceof LadderPlayer ? this.players
                 : entity instanceof LadderChallenge ? this.challenges
                     : entity instanceof LadderReign ? this.reigns
-                        : this.events
+                        : entity instanceof PlayerCheat ? this.playerCheats
+                            : this.events
             ;
+
+            if (entity instanceof LadderChallenge && entity.id === undefined) {
+                entity.id = this.challenges.length + 1;
+            }
 
             if (!list.includes(entity)) {
                 list.push(entity);
@@ -345,5 +369,55 @@ describe('LadderService', () => {
 
         assert.deepStrictEqual(positions(), [null, 1, 2]);
         assert.strictEqual(repository.reigns.find(r => r.endedAt === null)?.playerId, 2);
+    });
+
+    it('cheat: voids result, cheater to the bottom, victim back to their seat, cheater tagged', async () => {
+        const { service, ladder, players, positions, gameCreator, endGame, repository } = await setup(4);
+
+        await service.challenge(ladder, players[2], players[0].publicId, 13, null);
+        await endGame(gameCreator.games[0], 0);
+
+        assert.deepStrictEqual(positions(), [2, 3, 1, 4]);
+
+        const { challenge } = await service.reportCheat(gameCreator.games[0].publicId, players[2].publicId, 'Used an AI');
+
+        assert.deepStrictEqual(positions(), [1, 2, 4, 3]);
+        assert.strictEqual(challenge.result, 'voided');
+        assert.strictEqual(repository.reigns.find(r => r.endedAt === null)?.playerId, 1);
+        assert.strictEqual(repository.playerCheats.length, 1);
+        assert.strictEqual(repository.playerCheats[0].playerId, 3);
+        assert.strictEqual(repository.playerCheats[0].reason, 'Used an AI');
+
+        const view = await service.getLadderView(ladder);
+
+        assert.deepStrictEqual(view.cheats, { [players[2].publicId]: ['Used an AI'] });
+        assert.deepStrictEqual((await service.getPlayerStatus(ladder, players[2].publicId)).cheats, ['Used an AI']);
+        assert.deepStrictEqual((await service.getPlayerStatus(ladder, players[0].publicId)).cheats, []);
+    });
+
+    it('cheat: refused twice, on running game, or for a player not in the game', async () => {
+        const { service, ladder, players, gameCreator, endGame } = await setup(4);
+
+        await service.challenge(ladder, players[2], players[0].publicId, 13, null);
+
+        await assert.rejects(service.reportCheat(gameCreator.games[0].publicId, players[2].publicId, 'AI'), /challenge_not_ended/);
+
+        await endGame(gameCreator.games[0], 0);
+
+        await assert.rejects(service.reportCheat(gameCreator.games[0].publicId, players[1].publicId, 'AI'), /player_not_in_challenge/);
+        await service.reportCheat(gameCreator.games[0].publicId, players[2].publicId, 'AI');
+        await assert.rejects(service.reportCheat(gameCreator.games[0].publicId, players[2].publicId, 'AI'), /cheat_already_reported/);
+    });
+
+    it('exclude: removed, can rejoin after strikes delay', async () => {
+        const { service, ladder, players, positions, repository } = await setup(3);
+
+        await service.exclude(ladder, players[0].publicId);
+
+        assert.deepStrictEqual(positions(), [null, 1, 2]);
+        assert.strictEqual(repository.players[0].state, 'excluded');
+        assert.strictEqual(repository.reigns.find(r => r.endedAt === null)?.playerId, 2);
+        await assert.rejects(service.join(ladder, players[0]), (e: LadderRefusalError) => e.reason === 'rejoin_too_early');
+        await assert.rejects(service.exclude(ladder, players[0].publicId), LadderRefusalError);
     });
 });

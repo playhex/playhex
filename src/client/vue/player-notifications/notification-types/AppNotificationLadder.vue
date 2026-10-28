@@ -28,6 +28,9 @@ const text = computed((): string => {
             return t(removed ? 'ladder.notification.strike_removed' : 'ladder.notification.strike', { strikes });
         }
         case 'ladderRemovedInactive': return t('ladder.notification.removed_inactive');
+        case 'ladderCheater': return t('ladder.notification.cheater', parameters as PlayerNotification<'ladderCheater'>['parameters']);
+        case 'ladderExcluded': return t('ladder.notification.excluded');
+        case 'ladderCheatVictim': return t('ladder.notification.cheat_victim', parameters as PlayerNotification<'ladderCheatVictim'>['parameters']);
         default: return '';
     }
 });
