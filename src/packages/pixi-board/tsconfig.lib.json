@@ -17,6 +17,7 @@
         "entities/*.ts",
         "facades/*.ts",
         "conditional-moves/*.ts",
+        "shading-patterns/*.ts",
         "resize-observer-debounced/*.ts"
     ],
     "exclude": [

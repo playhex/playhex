@@ -1,6 +1,6 @@
 import { Assets } from 'pixi.js';
 import GameView from '../../GameView.js';
-import { ShadingPatternFacade } from '../../facades/ShadingPatternFacade.js';
+import { ShadingPatternFacade } from '../../shading-patterns/ShadingPatternFacade.js';
 import { Anchor44Facade } from '../../facades/Anchor44Facade.js';
 import { PlayingGameFacade } from '../../facades/PlayingGameFacade.js';
 import { resolveTheme } from '../../theming/resolveTheme.js';

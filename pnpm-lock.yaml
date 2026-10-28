@@ -460,16 +460,16 @@ importers:
 
   src/packages/pixi-board:
     dependencies:
-      '@playhex/conditional-moves':
-        specifier: workspace:^
-        version: link:../conditional-moves
       '@playhex/move-notation':
         specifier: workspace:^
         version: link:../move-notation
+    devDependencies:
+      '@playhex/conditional-moves':
+        specifier: workspace:^
+        version: link:../conditional-moves
       '@playhex/shading-patterns':
         specifier: workspace:^
         version: link:../shading-patterns
-    devDependencies:
       '@types/node':
         specifier: 26.6.2
         version: 26.6.2

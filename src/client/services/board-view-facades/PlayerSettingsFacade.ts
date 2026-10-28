@@ -7,7 +7,7 @@ import { getPlayerBoardTheme } from '../customBoardTheme.js';
 import { halloweenBoardTheme } from '../halloween.js';
 import { PlayerSettings } from '../../../shared/app/models/index.js';
 import { Anchor44Facade } from '@playhex/pixi-board';
-import { ShadingPatternFacade } from '@playhex/pixi-board';
+import { ShadingPatternFacade } from '@playhex/pixi-board/shading-patterns';
 import { AutoOrientationFacade, OrientationMode } from '@playhex/pixi-board';
 
 /**

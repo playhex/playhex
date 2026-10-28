@@ -41,11 +41,7 @@ export { GameMarksFacade } from './facades/GameMarksFacade.js';
 export { PlayingGameFacade } from './facades/PlayingGameFacade.js';
 export { PolicyOverlayFacade } from './facades/PolicyOverlayFacade.js';
 export { PreviewMoveFacade } from './facades/PreviewMoveFacade.js';
-export { ShadingPatternFacade } from './facades/ShadingPatternFacade.js';
 export { SimulatePlayingGameFacade } from './facades/SimulatePlayingGameFacade.js';
-
-// Conditional moves
-export { ConditionalMovesFacade } from './conditional-moves/ConditionalMovesFacade.js';
 
 // Utils
 export { ResizeObserverDebounced } from './resize-observer-debounced/ResizeObserverDebounced.js';

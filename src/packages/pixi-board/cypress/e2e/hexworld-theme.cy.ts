@@ -1,5 +1,5 @@
 import GameView from '../../GameView.js';
-import { ShadingPatternFacade } from '../../facades/ShadingPatternFacade.js';
+import { ShadingPatternFacade } from '../../shading-patterns/ShadingPatternFacade.js';
 import { resolveTheme } from '../../theming/resolveTheme.js';
 import { hexworldTheme } from '../../themes/hexworld/index.js';
 

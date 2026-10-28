@@ -4,7 +4,7 @@ Shading patterns for [Hex](https://en.wikipedia.org/wiki/Hex_(board_game)) board
 give a shading level to each cell, to help reading the board.
 
 Framework agnostic: it only computes levels, rendering is up to you
-(see [`@playhex/pixi-board`](../pixi-board) for a renderer using it).
+(see `ShadingPatternFacade` in [`@playhex/pixi-board`](https://github.com/playhex/playhex/tree/master/src/packages/pixi-board#shadingpatternfacade) for a renderer using it).
 
 ``` bash
 npm install @playhex/shading-patterns

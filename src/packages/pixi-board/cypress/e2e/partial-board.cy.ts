@@ -4,7 +4,7 @@ import { CellsMask } from '../../cells-mask/CellsMask.js';
 import { resolveTheme } from '../../theming/resolveTheme.js';
 import { gobanTheme } from '../../themes/goban/index.js';
 import { playhexTheme } from '../../themes/playhex/index.js';
-import { ShadingPatternFacade } from '../../facades/ShadingPatternFacade.js';
+import { ShadingPatternFacade } from '../../shading-patterns/ShadingPatternFacade.js';
 import TriangleMark from '../../entities/TriangleMark.js';
 
 // Board image url, as resolved by cypress webpack bundler, is not served.

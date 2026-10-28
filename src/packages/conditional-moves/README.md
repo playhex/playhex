@@ -49,7 +49,21 @@ editor.on('conditionalMovesSubmitted', conditionalMoves => {
 editor.submitConditionalMoves();
 ```
 
-To show and edit conditional moves on a board, see `ConditionalMovesFacade` in [`@playhex/pixi-board`](../pixi-board).
+## Show on a board
+
+To show and edit conditional moves on a board, use `ConditionalMovesFacade` from the optional entry point `@playhex/pixi-board/conditional-moves`
+(see [`@playhex/pixi-board`](https://github.com/playhex/playhex/tree/master/src/packages/pixi-board)):
+
+``` bash
+npm install @playhex/pixi-board @playhex/conditional-moves pixi.js tiny-typed-emitter
+```
+
+``` ts
+import { GameView, PlayingGameFacade } from '@playhex/pixi-board';
+import { ConditionalMovesFacade } from '@playhex/pixi-board/conditional-moves';
+
+const conditionalMovesFacade = new ConditionalMovesFacade(new PlayingGameFacade(gameView), editor);
+```
 
 ## License
 

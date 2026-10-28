@@ -1,6 +1,7 @@
 import { defineStore, storeToRefs } from 'pinia';
 import Game from '../../shared/app/models/Game.js';
-import { AnimatorFacade, ConditionalMovesFacade, GameView, PlayingGameFacade, SimulatePlayingGameFacade } from '@playhex/pixi-board';
+import { AnimatorFacade, GameView, PlayingGameFacade, SimulatePlayingGameFacade } from '@playhex/pixi-board';
+import { ConditionalMovesFacade } from '@playhex/pixi-board/conditional-moves';
 import { ConditionalMovesEditor, type ConditionalMovesState, createConditionalMovesState } from '@playhex/conditional-moves';
 import { addMove, cancelGame, canExplore, canPlayerUndo, cloneGame, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, hasPlayer, isChallengeTargetOf, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateGame } from '../../shared/app/gameUtils.js';
 import useAuthStore from './authStore.js';

@@ -10,12 +10,22 @@
     "url": "https://github.com/playhex/playhex.git",
     "directory": "src/packages/pixi-board"
   },
+  "keywords": [
+    "hex",
+    "board-game",
+    "pixi",
+    "pixijs"
+  ],
   "type": "module",
+  "sideEffects": false,
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./conditional-moves": "./conditional-moves.ts",
+    "./shading-patterns": "./shading-patterns.ts"
   },
   "files": [
-    "dist/index.js",
+    "dist/*.js",
+    "dist/assets",
     "dist/types",
     "THEMING.md"
   ],
@@ -29,15 +39,25 @@
     "prepack": "pnpm run build"
   },
   "dependencies": {
-    "@playhex/conditional-moves": "workspace:^",
-    "@playhex/move-notation": "workspace:^",
-    "@playhex/shading-patterns": "workspace:^"
+    "@playhex/move-notation": "workspace:^"
   },
   "peerDependencies": {
+    "@playhex/conditional-moves": "workspace:^",
+    "@playhex/shading-patterns": "workspace:^",
     "pixi.js": ">=8",
     "tiny-typed-emitter": ">=2"
   },
+  "peerDependenciesMeta": {
+    "@playhex/conditional-moves": {
+      "optional": true
+    },
+    "@playhex/shading-patterns": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@playhex/conditional-moves": "workspace:^",
+    "@playhex/shading-patterns": "workspace:^",
     "@types/node": "26.6.2",
     "@types/pngjs": "*",
     "@typescript/native": "npm:typescript@^7.0.2",
@@ -59,6 +79,14 @@
       ".": {
         "types": "./dist/types/index.d.ts",
         "default": "./dist/index.js"
+      },
+      "./conditional-moves": {
+        "types": "./dist/types/conditional-moves.d.ts",
+        "default": "./dist/conditional-moves.js"
+      },
+      "./shading-patterns": {
+        "types": "./dist/types/shading-patterns.d.ts",
+        "default": "./dist/shading-patterns.js"
       }
     }
   }

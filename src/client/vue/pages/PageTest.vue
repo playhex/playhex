@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, shallowRef } from 'vue';
-import { Anchor44Facade, AnimatorFacade, AutoOrientationFacade, ConditionalMovesFacade, GameView, PlayingGameFacade, ShadingPatternFacade, SimulatePlayingGameFacade, TextMark, playhexTheme, gobanTheme, resolveTheme } from '@playhex/pixi-board';
+import { Anchor44Facade, AnimatorFacade, AutoOrientationFacade, GameView, PlayingGameFacade, SimulatePlayingGameFacade, TextMark, playhexTheme, gobanTheme, resolveTheme } from '@playhex/pixi-board';
+import { ConditionalMovesFacade } from '@playhex/pixi-board/conditional-moves';
+import { ShadingPatternFacade } from '@playhex/pixi-board/shading-patterns';
 import { PlayerSettingsFacade } from '../../services/board-view-facades/PlayerSettingsFacade.js';
 import { ConditionalMovesEditor, ConditionalMovesState, createConditionalMovesState } from '@playhex/conditional-moves';
 

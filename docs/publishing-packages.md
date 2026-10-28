@@ -68,7 +68,11 @@ and in `references` of the tsconfig of each app part that imports it (`src/clien
   (pnpm does not let a package use a dependency it does not declare).
   Libraries that the app also uses (e.g `pixi.js`, `tiny-typed-emitter`) should be `peerDependencies` + `devDependencies`,
   so the app and the package share the same instance.
-- Everything the app needs must be exported from its `index.ts` (no deep imports like `@playhex/pixi-board/facades/...`).
+- Everything the app needs must be exported from its `index.ts` (no deep imports like `@playhex/pixi-board/facades/...`),
+  or from an entry point declared in `exports`.
+  Code that needs an optional dependency goes in its own entry point,
+  with the dependency in `peerDependencies` + `peerDependenciesMeta: { optional: true }`
+  (see `@playhex/pixi-board/conditional-moves` and `@playhex/pixi-board/shading-patterns`).
 - The server must only import packages that can run in Node:
   do not import `@playhex/pixi-board` from server or shared code, it would load `pixi.js`.
   Pure logic used by both server and board must be in its own package (like `conditional-moves` and `shading-patterns`).

@@ -19,6 +19,15 @@ npm install @playhex/pixi-board pixi.js tiny-typed-emitter
 
 `tiny-typed-emitter` relies on node `events` module: when bundling for the browser, also install `events` (`npm install events`) so your bundler can resolve it.
 
+### Optional entry points
+
+Some facades live in separate entry points, so their dependencies are only needed if you use them:
+
+| Entry point | Exports | Requires |
+|---|---|---|
+| `@playhex/pixi-board/conditional-moves` | `ConditionalMovesFacade` | `npm install @playhex/conditional-moves` |
+| `@playhex/pixi-board/shading-patterns` | `ShadingPatternFacade` | `npm install @playhex/shading-patterns` |
+
 ## Quick start
 
 ```html
@@ -327,10 +336,11 @@ This facade allows to register conditional moves.
 It will pause the view, let player simulates many lines, edit/remove lines, and submit it.
 On submit, it returns an array with conditional moves lines.
 
-State and editor come from [`@playhex/conditional-moves`](../conditional-moves), a dependency of this package.
+State and editor come from [`@playhex/conditional-moves`](https://github.com/playhex/playhex/tree/master/src/packages/conditional-moves), an optional peer dependency that must be installed to use this facade.
 
 ``` ts
-import { GameView, PlayingGameFacade, ConditionalMovesFacade } from '@playhex/pixi-board';
+import { GameView, PlayingGameFacade } from '@playhex/pixi-board';
+import { ConditionalMovesFacade } from '@playhex/pixi-board/conditional-moves';
 import { createConditionalMovesState, ConditionalMovesEditor } from '@playhex/conditional-moves';
 
 const gameView = new GameView(9);
@@ -370,6 +380,49 @@ editor.submitConditionalMoves();
  */
 conditionalMovesFacade.destroy();
 ```
+
+#### ShadingPatternFacade
+
+This facade applies a shading pattern on the board: each cell gets a shading level, to help reading the board.
+
+Patterns come from [`@playhex/shading-patterns`](https://github.com/playhex/playhex/tree/master/src/packages/shading-patterns), an optional peer dependency that must be installed to use this facade:
+
+``` bash
+npm install @playhex/shading-patterns
+```
+
+``` ts
+import { GameView } from '@playhex/pixi-board';
+import { ShadingPatternFacade } from '@playhex/pixi-board/shading-patterns';
+
+const gameView = new GameView(11);
+const shadingPatternFacade = new ShadingPatternFacade(gameView);
+
+/**
+ * Available patterns:
+ * 'tricolor_checkerboard', 'concentrical_rings', 'height_5_lines', 'single_ring', 'custom',
+ * or null to remove shading.
+ *
+ * Second argument is the intensity, in [0, 1], defaults to 0.5.
+ */
+shadingPatternFacade.setShadingPattern('concentrical_rings', 0.5);
+
+/**
+ * Custom pattern from a math expression,
+ * with variables: row, col, size, distToSide
+ */
+shadingPatternFacade.setShadingPattern('custom', 0.5, '(row + col) % 2');
+
+/**
+ * Remove shading.
+ */
+shadingPatternFacade.setShadingPattern(null);
+```
+
+<p>
+    <img src="cypress/screenshots-expected/hexworld-theme.cy.ts/framed-board.png" width="200" alt="concentrical rings shading pattern">
+    <img src="cypress/screenshots-expected/goban-theme.cy.ts/coords-shading-light.png" width="200" alt="tricolor checkerboard shading pattern on goban theme">
+</p>
 
 ## Testing
 
