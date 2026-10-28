@@ -4,7 +4,7 @@ import { coordsToMove, type Move } from '@playhex/move-notation';
 import { generatePuzzleTree, type PolicyAnalyzer } from '../../puzzles/PuzzleTreeGenerator.js';
 import type { SolvePositionInput, SolvePositionOutput, SolveResult } from '../../ai-jobs/protocol.js';
 import { createNodeResolver, createParallelsFinder, findSolution, isElseNode, validatePuzzle, type PuzzleDefinition, type PuzzleNode } from '../../../shared/app/puzzles/puzzleTree.js';
-import type { PuzzleGenerateInput } from '../../../shared/app/puzzles/puzzleGenerate.js';
+import { type PuzzleGenerateInput } from '../../../shared/app/puzzles/puzzleGenerate.js';
 import { getWinner } from '../../puzzles/puzzleCheckUtils.js';
 
 /**
@@ -145,25 +145,33 @@ describe('PuzzleTreeGenerator', () => {
         assert.deepStrictEqual(validatePuzzle(puzzle), []);
         assert.ok(findSolution(tree, createNodeResolver(tree)));
 
-        // Leaves of main sequence are completed connections, or transpositions
+        // Leaves of main sequence are completed connections, transpositions, or winning moves not continued
         const resolve = createNodeResolver(tree);
-        const walk = (node: PuzzleNode, red: Move[], blue: Move[], redToMove: boolean): void => {
+        const { solve } = createExactSolver();
+        const walk = async (node: PuzzleNode, red: Move[], blue: Move[], redToMove: boolean, depth: number): Promise<void> => {
             if (node.result !== undefined) {
                 return;
             }
 
             const children = (node.children ?? []).filter(child => !isElseNode(child)) as PuzzleNode[];
 
-            if (children.length === 0 && resolve(node) === node) {
-                assert.strictEqual(getWinner(3, { red, blue, toMove: 0 }), 0, `not connected: ${red.join(' ')} / ${blue.join(' ')}`);
+            if (children.length === 0 && resolve(node) === node && getWinner(3, { red, blue, toMove: 0 }) !== 0) {
+                const { winner } = await solve({ size: 3, black: red, white: blue, color: 'white' } as SolvePositionInput);
+
+                assert.strictEqual(winner, 'black', `not winning: ${red.join(' ')} / ${blue.join(' ')}`);
+            }
+
+            // After fullDepth, only one winning move is continued
+            if (redToMove && depth >= 1) {
+                assert.ok(children.filter(child => child.result === undefined && (child.children?.length ?? 0) > 0).length <= 1);
             }
 
             for (const child of children) {
-                walk(child, redToMove ? [...red, child.move!] : red, redToMove ? blue : [...blue, child.move!], !redToMove);
+                await walk(child, redToMove ? [...red, child.move!] : red, redToMove ? blue : [...blue, child.move!], !redToMove, redToMove ? depth + 1 : depth);
             }
         };
 
-        walk(tree, ['a1'], ['c3'], true);
+        await walk(tree, ['a1'], ['c3'], true, 0);
     });
 
     it('stops once connected with acquired templates', async () => {
@@ -232,6 +240,12 @@ describe('PuzzleTreeGenerator', () => {
         assert.deepStrictEqual(validatePuzzle(puzzle), []);
         assert.deepStrictEqual(mainMoves(tree).sort(), ['a4', 'b4']);
         assert.strictEqual(tree.parallel?.length, 1);
+
+        // Completing again keeps existing parallel sequence, without adding it twice
+        const again = await generate(createInput({ ...puzzle, tree }));
+
+        assert.deepStrictEqual(again.warnings, []);
+        assert.deepStrictEqual(again.tree, tree);
         assert.deepStrictEqual(
             [...tree.parallel[0].children!].sort((a, b) => (a as PuzzleNode).move!.localeCompare((b as PuzzleNode).move!)),
             [
@@ -290,46 +304,6 @@ describe('PuzzleTreeGenerator', () => {
         assert.strictEqual(mainMoves(tree).length, 1);
     });
 
-    it('stops on computer answers, left to puzzle author', async () => {
-        const input = createInput({ redStones: ['a1'], blueStones: ['c3'] }, { stopAtComputerMoves: true });
-        const { tree, puzzle, warnings, pending } = await generate(input);
-
-        assert.deepStrictEqual(warnings, []);
-        assert.deepStrictEqual(validatePuzzle(puzzle), []);
-
-        // Accepted moves not ending the puzzle wait for a computer answer, in tree order
-        const accepted = (tree.children ?? []).filter(child => !isElseNode(child) && child.result === undefined) as PuzzleNode[];
-
-        assert.ok(pending.length > 0);
-        assert.deepStrictEqual(pending, accepted.filter(child => pending.some(([move]) => move === child.move)).map(child => [child.move!]));
-
-        for (const child of accepted) {
-            assert.strictEqual(child.children, undefined);
-        }
-
-        // Then continues from author answer
-        const [path] = pending;
-        const node = accepted.find(child => child.move === path[0])!;
-        const answer = allCells(3).find(move => !['a1', 'c3', path[0]].includes(move))!;
-
-        node.children = [{ move: answer }];
-
-        const next = await generate(createInput({ redStones: ['a1'], blueStones: ['c3'], tree }, { stopAtComputerMoves: true, fromPath: [path[0], answer] }));
-
-        assert.deepStrictEqual(next.warnings, []);
-        assert.ok((next.subtree.children?.length ?? 0) > 0);
-        assert.ok(next.pending.every(nextPath => nextPath.length === 3 && nextPath[0] === path[0] && nextPath[1] === answer));
-    });
-
-    it('stops on start node when computer plays first', async () => {
-        const input = createInput({ redStones: ['b2'], computerPlaysFirst: true }, { stopAtComputerMoves: true });
-        const { tree, warnings, pending } = await generate(input);
-
-        assert.deepStrictEqual(warnings, []);
-        assert.deepStrictEqual(pending, [[]]);
-        assert.strictEqual(tree.children, undefined);
-    });
-
     it('answers with katahex best move', async function () {
         // Exact solver on 4x4
         this.timeout(30_000);
@@ -357,6 +331,83 @@ describe('PuzzleTreeGenerator', () => {
 
         // Input tree is not modified
         assert.strictEqual((tree.children![0] as PuzzleNode).children![0].hasOwnProperty('children'), false);
+    });
+
+    it('completes an existing tree, keeping its moves', async () => {
+        const position = { redStones: ['a1'] as Move[], blueStones: ['c3'] as Move[] };
+        const full = await generate(createInput(position));
+        const [removed, ...kept] = (full.tree.children ?? []).filter(child => !isElseNode(child) && child.result === undefined) as PuzzleNode[];
+
+        assert.ok(removed);
+
+        // Author removed a winning move, and replaced a computer answer
+        const tree: PuzzleNode = structuredClone({ children: full.tree.children!.filter(child => child !== removed) });
+        const replaced = tree.children!.find(child => !isElseNode(child) && kept.some(({ move }) => move === child.move) && child.children?.length) as PuzzleNode;
+
+        assert.ok(replaced);
+
+        const otherAnswer = allCells(3).find(move => ![...position.redStones, ...position.blueStones, replaced.move!, (replaced.children![0] as PuzzleNode).move!].includes(move))!;
+
+        replaced.children = [{ move: otherAnswer }];
+
+        const { tree: completed, puzzle, warnings } = await generate(createInput({ ...position, tree }));
+
+        assert.deepStrictEqual(warnings, []);
+        assert.deepStrictEqual(validatePuzzle(puzzle), []);
+        assert.ok(mainMoves(completed).includes(removed.move!));
+
+        const answer = (completed.children!.find(child => !isElseNode(child) && child.move === replaced.move) as PuzzleNode).children![0] as PuzzleNode;
+
+        assert.strictEqual(answer.move, otherAnswer);
+        assert.ok((answer.children?.length ?? 0) > 0, 'author answer is continued');
+    });
+
+    it('changes nothing when tree is complete', async () => {
+        const position = { redStones: ['a1'] as Move[], blueStones: ['c3'] as Move[] };
+        const full = await generate(createInput(position));
+        const again = await generate(createInput({ ...position, tree: full.tree }));
+
+        assert.deepStrictEqual(again.warnings, []);
+        assert.deepStrictEqual(again.tree, full.tree);
+    });
+
+    it('warns on existing moves contradicting solver', async () => {
+        // On 3x3 with red a1 and blue c3, b2 wins
+        const tree: PuzzleNode = { children: [{ move: 'b2', result: 'failed' }] };
+        const { warnings } = await generate(createInput({ redStones: ['a1'], blueStones: ['c3'], tree }));
+
+        assert.ok(warnings.some(({ code, path }) => code === 'generator_failed_winning' && path?.join(' ') === 'b2'));
+    });
+
+    it('continues all winning moves within fullDepth', async () => {
+        // Empty 3x3: red has several winning moves
+        const { tree } = await generate(createInput({}, { fullDepth: 1 }), createAnalyzer(['b2']));
+        const accepted = (tree.children ?? []).filter(child => !isElseNode(child) && child.result === undefined) as PuzzleNode[];
+
+        assert.ok(accepted.length > 1);
+        assert.ok(accepted.every(child => (child.children?.length ?? 0) > 0));
+    });
+
+    it('continues only most natural winning move after fullDepth', async () => {
+        const { tree } = await generate(createInput({}, { fullDepth: 0 }), createAnalyzer(['b2']));
+        const accepted = (tree.children ?? []).filter(child => !isElseNode(child) && child.result === undefined) as PuzzleNode[];
+        const continued = accepted.filter(child => (child.children?.length ?? 0) > 0);
+
+        assert.ok(accepted.length > 1);
+
+        // b2 has best policy, others winning moves are leaves
+        assert.deepStrictEqual(continued.map(child => child.move), ['b2']);
+    });
+
+    it('continues best winning move even if not plausible', async () => {
+        // Katahex prefers a losing move: no winning move is plausible, but best one is still continued
+        const { tree } = await generate(createInput({ redStones: ['a1'], blueStones: ['c3'] }, { fullDepth: 0 }), createAnalyzer(['c2']));
+        const children = (tree.children ?? []).filter(child => !isElseNode(child)) as PuzzleNode[];
+        const accepted = children.filter(child => child.result === undefined);
+
+        assert.strictEqual(children.find(child => child.move === 'c2')?.result, 'failed');
+        assert.ok(accepted.length > 1);
+        assert.strictEqual(accepted.filter(child => (child.children?.length ?? 0) > 0).length, 1);
     });
 
     it('makes transpositions to the rest of tree', async function () {

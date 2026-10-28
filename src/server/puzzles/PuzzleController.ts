@@ -32,7 +32,7 @@ import { SimilarPlayingPositionChecker } from '../services/anti-cheat/SimilarPla
 import { SimilarPositionDetectedError, similarPositionDetectedToTranslatableHttpError } from '../services/anti-cheat/SimilarPositionDetectedError.js';
 import { InvalidPositionError } from '../../shared/position-comparator/position-comparator.js';
 import { rateLimiterConsumePuzzleCheck, rateLimiterConsumePuzzleGenerate, rateLimiterConsumePuzzleMonitor, rateLimiterConsumePuzzleSolvePosition } from '../services/rate-limiters.js';
-import { findGenerateStartNode, type PuzzleGenerateInput, type PuzzleGenerateState } from '../../shared/app/puzzles/puzzleGenerate.js';
+import { findGenerateStartNode, GENERATOR_MAX_FULL_DEPTH, type PuzzleGenerateInput, type PuzzleGenerateState } from '../../shared/app/puzzles/puzzleGenerate.js';
 import { HEX_TEMPLATES } from '../../shared/hex-templates/hex-templates.js';
 import PuzzleGenerateService, { getPuzzleGenerateKey } from './PuzzleGenerateService.js';
 import { ROLE_ADMIN } from '../services/roles.js';
@@ -546,7 +546,7 @@ export default class PuzzleController
         @Body(BODY_OPTIONS) input: PuzzleGenerateInput,
         @Req() request: Request,
     ): Promise<PuzzleGenerateState> {
-        const { puzzle, fromPath, templateIds, stopAtComputerMoves } = input;
+        const { puzzle, fromPath, templateIds, fullDepth } = input;
 
         // Tree can be incomplete, only position must be valid
         const errors = validatePuzzle(puzzle).filter(error => isDraftBlockingError(error)
@@ -566,8 +566,8 @@ export default class PuzzleController
             throw new BadRequestError('Invalid templateIds');
         }
 
-        if (stopAtComputerMoves !== undefined && typeof stopAtComputerMoves !== 'boolean') {
-            throw new BadRequestError('Invalid stopAtComputerMoves');
+        if (fullDepth !== undefined && (!Number.isInteger(fullDepth) || fullDepth < 0 || fullDepth > GENERATOR_MAX_FULL_DEPTH)) {
+            throw new BadRequestError('Invalid fullDepth');
         }
 
         if (puzzle.boardsize > MOHEX_MAX_BOARDSIZE) {

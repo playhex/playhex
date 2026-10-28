@@ -9,11 +9,11 @@ import { createParallelsFinder, filterMoveNodes, findChild, findElseNode, findEr
 import { type OverrideSettings, PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
 import { drawPuzzlePosition, type ColoredMove, type SolverFillStone } from '../services/puzzleBoard.js';
 import type { AnalyzerInterface } from '../../hexplorer/analyzers/AnalyzerInterface.js';
-import { AnalysisEngineUnavailableError, type AnalysisInput, type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
+import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
 import type { PuzzleCheckEngine, PuzzleCheckState, PuzzleSolvePositionOutput } from '../../../../shared/app/puzzles/puzzleCheck.js';
 import { isValidBoardsize, MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
 import { apiPuzzleCheck, apiPuzzleGenerateTree, apiPuzzleSolvePosition } from '../../../apiClient.js';
-import { createPuzzleEndChecker, type GeneratePosition, type PuzzleGenerateInput, type PuzzleGenerateOutput, type PuzzleGenerateState, type PuzzleGenerateWarning } from '../../../../shared/app/puzzles/puzzleGenerate.js';
+import { type PuzzleGenerateInput, type PuzzleGenerateState, type PuzzleGenerateWarning } from '../../../../shared/app/puzzles/puzzleGenerate.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import type { ImportedGame } from '../../../../shared/app/hex-game-importer/types.js';
 import { fillForKatahex, getEdgePaths, getReachableEdges, getSolverFilledPosition, type PuzzleEdgeConnection, type PuzzleFixedFill } from '../../../../shared/app/puzzles/edgeConnections.js';
@@ -64,11 +64,6 @@ const PLANNED_MOVES_GROUP = 'planned_moves';
 const SOLVER_MARKS_GROUP = 'solver_marks';
 const HIGHLIGHTED_MOVE_GROUP = 'highlighted_move';
 const KATAHEX_CHECK_POLL_INTERVAL_MS = 2000;
-
-/**
- * Tree generations running at same time, see PuzzleGenerateService.
- */
-const GENERATE_CONCURRENCY = 2;
 const AI_EVAL_COLOR = 0x22bb55;
 
 /**
@@ -679,26 +674,15 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         const canAddAlternative = alternativesEnabled.value && !isInContinuation.value && node.result === undefined && !isInParallel.value;
 
         if (nextColor.value === computerColor.value && node.children.length > 0 && !canAddAlternative) {
-            // Answer played during assisted generation
-            if (answeredPending.value.some(path => pathKey(path) === pathKey(selectedMainMoves()))) {
-                replaceAnswer(move);
-                return;
-            }
-
             boardError.value = 'only_one_answer';
             return;
         }
 
         // Insert before "else" node, which must stay last
         const index = findElseNode(node) === null ? node.children.length : node.children.length - 1;
-        const pendingMoves = isAwaitingComputerMove.value ? selectedMainMoves() : null;
 
         node.children.splice(index, 0, { move });
         selectChild(node.children[index]);
-
-        if (pendingMoves !== null) {
-            answerPending(pendingMoves, node.children[index]);
-        }
     };
 
     /*
@@ -1162,55 +1146,6 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     // Incremented on every analysis, so a slow request can detect a newer one started and discard its result
     let analysisRequestId = 0;
 
-    /**
-     * Katahex input, disabled cells filled like katahex check does, see PuzzleKatahexChecker.
-     * Null when fill already connects a player: katahex has no move to analyze.
-     */
-    const getKatahexInput = (red: Move[], blue: Move[], color: 'black' | 'white'): null | AnalysisInput => {
-        const edgePaths = getEdgePaths({ boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value, fixedFill: fixedFill.value }, edgeConnections.value);
-        const filled = fillForKatahex(red, blue, disabledCells.value, playerColor.value === 0 ? 'black' : 'white', edgePaths, fixedFill.value);
-        const filledBoard = new Board(boardsize.value);
-
-        filled.black.forEach(move => filledBoard.setCell(move, 0));
-        filled.white.forEach(move => filledBoard.setCell(move, 1));
-
-        if (filledBoard.calculateWinner() !== null) {
-            return null;
-        }
-
-        return { size: boardsize.value, color, ...filled };
-    };
-
-    /**
-     * Analyses by position, for current analyzer, to show prefetched ones immediately, see prefetchAnalysis().
-     */
-    const analysisCache = new Map<string, Promise<AnalysisOutput>>();
-    let analysisCacheAnalyzer: null | AnalyzerInterface = null;
-
-    const analyzeCached = (currentAnalyzer: AnalyzerInterface, input: AnalysisInput): Promise<AnalysisOutput> => {
-        if (analysisCacheAnalyzer !== currentAnalyzer) {
-            analysisCache.clear();
-            analysisCacheAnalyzer = currentAnalyzer;
-        }
-
-        const key = JSON.stringify(input);
-        let analysis = analysisCache.get(key);
-
-        if (analysis === undefined) {
-            analysis = currentAnalyzer.analyzePosition(input);
-            analysisCache.set(key, analysis);
-
-            // Retried next time
-            analysis.catch(() => {
-                if (analysisCache.get(key) === analysis) {
-                    analysisCache.delete(key);
-                }
-            });
-        }
-
-        return analysis;
-    };
-
     const updateAnalysis = async (): Promise<void> => {
         policyOverlayFacade.clear();
         gameView.removeEntitiesGroup(SOLVER_MARKS_GROUP);
@@ -1243,9 +1178,16 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
             return;
         }
 
-        const input = getKatahexInput(red, blue, color);
+        // Disabled cells filled like katahex check does, see PuzzleKatahexChecker
+        const edgePaths = getEdgePaths({ boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value, fixedFill: fixedFill.value }, edgeConnections.value);
+        const filled = fillForKatahex(red, blue, disabledCells.value, playerColor.value === 0 ? 'black' : 'white', edgePaths, fixedFill.value);
+        const filledBoard = new Board(boardsize.value);
 
-        if (input === null) {
+        filled.black.forEach(move => filledBoard.setCell(move, 0));
+        filled.white.forEach(move => filledBoard.setCell(move, 1));
+
+        // Fill already connects a player: katahex has no move to analyze
+        if (filledBoard.calculateWinner() !== null) {
             analysisLoading.value = false;
             return;
         }
@@ -1253,7 +1195,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         let policy: undefined | number[][];
 
         try {
-            ({ policy } = await analyzeCached(currentAnalyzer, input));
+            ({ policy } = await currentAnalyzer.analyzePosition({ size: boardsize.value, color, ...filled }));
         } catch (e) {
             if (requestId !== analysisRequestId) {
                 return;
@@ -1611,206 +1553,39 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     };
 
     /*
-     * Tree generation with Mohex solver, resumed from tree leaves:
-     * player moves are generated in background on leaves where player is to move,
-     * author plays computer answers on leaves where computer is to move, see PuzzleGenerateInput.stopAtComputerMoves.
+     * Tree generation with Mohex solver from selected node, see PuzzleGenerateInput:
+     * player winning moves from solver, computer answers from katahex policy.
      */
-
-    type GenerateJob = {
-        path: Move[];
-
-        /**
-         * Null while queued.
-         */
-        state: null | PuzzleGenerateState;
-    };
 
     /**
-     * Generations queued or running.
+     * State of running generation, null if none.
      */
-    const generateJobs = ref<GenerateJob[]>([]);
+    const generateState = ref<null | PuzzleGenerateState>(null);
 
-    const puzzleGenerating = computed(() => generateJobs.value.length > 0);
+    const puzzleGenerating = computed(() => generateState.value !== null);
 
-    const generateProgress = computed(() => generateJobs.value.reduce(
-        (progress, { state }) => ({ done: progress.done + (state?.done ?? 0), total: progress.total + (state?.total ?? 0) }),
-        { done: 0, total: 0 },
-    ));
+    const generateProgress = computed(() => ({
+        done: generateState.value?.done ?? 0,
+        total: generateState.value?.total ?? 0,
+    }));
 
     const puzzleGenerateError = ref<null | string>(null);
 
     /**
-     * Main sequence moves of leaves waiting for a computer answer from author, ready to be answered.
-     */
-    const generatePending = ref<Move[][]>([]);
-
-    /**
-     * Author answered all ready positions: jumps to next one once generated.
-     */
-    const waitingForPending = ref(false);
-
-    /**
-     * Main sequence moves of positions answered by author, last answered last, to undo answers.
-     */
-    const answeredPending = ref<Move[][]>([]);
-
-    /**
-     * Generation started, and nothing left to generate nor to answer.
+     * Last generation finished and its subtree inserted.
      */
     const generateDone = ref(false);
 
     /**
-     * Incremented to stop running generations.
+     * Incremented to stop running generation.
      */
     let generateSession = 0;
 
-    let generateOptions: Pick<PuzzleGenerateInput, 'templateIds'> = { templateIds: [] };
-    let puzzleEndChecker: null | ReturnType<typeof createPuzzleEndChecker> = null;
-
-    const pathKey = (moves: Move[]): string => moves.join(' ');
-
-    /**
-     * Whether moves continue from these other moves.
-     */
-    const isBelow = (moves: Move[], parent: Move[]): boolean => moves.length > parent.length
-        && parent.every((move, index) => moves[index] === move);
-
     const selectedMainMoves = (): Move[] => selectedMoveNodes.value.map(moveNode => (moveNode as PuzzleNode).move!);
-
-    const positionAfter = (moves: Move[]): GeneratePosition => {
-        const position: GeneratePosition = { red: [...redStones.value], blue: [...blueStones.value] };
-
-        moves.forEach((move, index) => (index % 2 === 0 ? firstColor.value : secondColor.value) === 0
-            ? position.red.push(move)
-            : position.blue.push(move),
-        );
-
-        return position;
-    };
-
-    /**
-     * Selected node is a ready position, waiting for author to play computer answer.
-     */
-    const isAwaitingComputerMove = computed(() => step.value === 'tree'
-        && generatePending.value.some(path => pathKey(path) === pathKey(selectedMainMoves())),
-    );
-
-    /**
-     * Katahex policy of computer answer, fetched in background so it shows as soon as author jumps there.
-     */
-    const prefetchAnalysis = (moves: Move[]): void => {
-        const currentAnalyzer = analyzer.value;
-
-        if (currentAnalyzer === null) {
-            return;
-        }
-
-        const { red, blue } = positionAfter(moves);
-        const input = getKatahexInput(red, blue, computerColor.value === 0 ? 'black' : 'white');
-
-        if (input !== null) {
-            analyzeCached(currentAnalyzer, input).catch(() => {});
-        }
-    };
-
-    watch(analyzer, () => generatePending.value.forEach(prefetchAnalysis));
-
-    /**
-     * Queues generation of a leaf if player is to move, else waits for author answer.
-     * Nothing to do when puzzle ended there, or already queued.
-     */
-    const addGenerateLeaf = (moves: Move[]): void => {
-        const key = pathKey(moves);
-
-        if (generatePending.value.some(path => pathKey(path) === key) || generateJobs.value.some(({ path }) => pathKey(path) === key)) {
-            return;
-        }
-
-        if (puzzleEndChecker?.isPuzzleEnded(positionAfter(moves))) {
-            return;
-        }
-
-        const color = moves.length % 2 === 0 ? firstColor.value : secondColor.value;
-
-        if (color === computerColor.value) {
-            generatePending.value.push(moves);
-            prefetchAnalysis(moves);
-        } else {
-            generateJobs.value.push({ path: moves, state: null });
-        }
-    };
-
-    /**
-     * Leaves of main sequence below this node. Skips continuations, transpositions and parallel sequences.
-     */
-    const scanGenerateLeaves = (node: PuzzleNode, moves: Move[]): void => {
-        if (node.result !== undefined || transpositions.value.has(node)) {
-            return;
-        }
-
-        if (!node.children?.length) {
-            addGenerateLeaf(moves);
-            return;
-        }
-
-        for (const child of node.children) {
-            if (!isElseNode(child)) {
-                scanGenerateLeaves(child, [...moves, child.move!]);
-            }
-        }
-    };
-
-    /**
-     * Leaf still in tree and not continued by author meanwhile.
-     */
-    const findGenerateLeaf = (moves: Move[]): null | { path: PuzzleNode[], node: PuzzleNode } => {
-        const path = findMainPath(moves);
-        const node = path === null ? null : path[path.length - 1] ?? tree.value;
-
-        if (path === null || node === null || node.result !== undefined || node.children?.length || node.parallel?.length) {
-            return null;
-        }
-
-        return { path, node };
-    };
-
-    /**
-     * Selects first ready position, dropping the ones answered or removed by author meanwhile.
-     * If none is ready yet, jumps to next one once generated.
-     */
-    const selectNextPending = (): void => {
-        while (generatePending.value.length > 0) {
-            const leaf = findGenerateLeaf(generatePending.value[0]);
-
-            if (leaf !== null) {
-                waitingForPending.value = false;
-                setStep('tree');
-                selectPath(leaf.path);
-                return;
-            }
-
-            generatePending.value.shift();
-        }
-
-        waitingForPending.value = generateJobs.value.length > 0;
-        generateDone.value = generateJobs.value.length === 0;
-    };
-
-    const skipPending = (): void => {
-        const selected = pathKey(selectedMainMoves());
-        const index = generatePending.value.findIndex(path => pathKey(path) === selected);
-
-        generatePending.value.splice(Math.max(0, index), 1);
-        selectNextPending();
-    };
 
     const stopGenerate = (): void => {
         ++generateSession;
-        generateJobs.value = [];
-        generatePending.value = [];
-        answeredPending.value = [];
-        stopBrowsingAnswered();
-        waitingForPending.value = false;
+        generateState.value = null;
     };
 
     /**
@@ -1827,197 +1602,40 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     });
 
     /**
-     * Author played computer answer on a ready position: generates player moves from there in background,
-     * and jumps to next ready position.
+     * Generates tree from selected node on server, or completes it, polls until done,
+     * then sets its children and parallel sequences, existing and added ones.
+     * Result is dropped if node has been changed meanwhile.
      */
-    const answerPending = (moves: Move[], answer: PuzzleNode): void => {
-        generatePending.value = generatePending.value.filter(path => pathKey(path) !== pathKey(moves));
-        answeredPending.value.push(moves);
-
-        // Not when answer reached a position already in tree, then selection jumped to it
-        if (selectedNode.value === answer && canGenerate.value) {
-            addGenerateLeaf([...moves, answer.move!]);
-            pumpGenerateJobs();
-        }
-
-        selectNextPending();
-    };
-
-    /**
-     * Removes computer answer played by author on this position, and what was generated after it.
-     * Returns false if position is not in tree anymore.
-     */
-    const removeAnswer = (moves: Move[]): boolean => {
-        const path = findMainPath(moves);
-
-        answeredPending.value = answeredPending.value.filter(other => pathKey(other) !== pathKey(moves) && !isBelow(other, moves));
-
-        if (path === null) {
-            return false;
-        }
-
-        const node = path[path.length - 1] ?? tree.value;
-
-        delete node.children;
-        delete node.parallel;
-
-        // Generations below are stopped, their result would not be inserted anyway
-        generateJobs.value = generateJobs.value.filter(job => !isBelow(job.path, moves));
-        generatePending.value = generatePending.value.filter(other => !isBelow(other, moves) && pathKey(other) !== pathKey(moves));
-        generateWarnings.value = generateWarnings.value.filter(warning => warning.path === undefined || !isBelow(warning.path, moves));
-        generateDone.value = false;
-
-        return true;
-    };
-
-    /**
-     * Index in answeredPending of position shown by "back", null when not browsing answered positions.
-     */
-    const backIndex = ref<null | number>(null);
-
-    /**
-     * Selected moves before going back, to come back there with "forward".
-     */
-    let backFrom: Move[] = [];
-
-    const canGoBack = computed(() => answeredPending.value.length > 0 && backIndex.value !== 0);
-    const canGoForward = computed(() => backIndex.value !== null);
-
-    const stopBrowsingAnswered = (): void => {
-        backIndex.value = null;
-        backFrom = [];
-    };
-
-    /**
-     * Selects previous position answered by author, to check or replace its answer.
-     */
-    const goBack = (): void => {
-        if (backIndex.value === null) {
-            backFrom = selectedMainMoves();
-        }
-
-        for (let index = (backIndex.value ?? answeredPending.value.length) - 1; index >= 0; --index) {
-            const path = findMainPath(answeredPending.value[index]);
-
-            // Removed by author meanwhile
-            if (path !== null) {
-                backIndex.value = index;
-                setStep('tree');
-                selectPath(path);
-                return;
-            }
-        }
-    };
-
-    /**
-     * Selects next answered position, or, after the last one, the position selected before going back.
-     */
-    const goForward = (): void => {
-        if (backIndex.value === null) {
-            return;
-        }
-
-        for (let index = backIndex.value + 1; index < answeredPending.value.length; ++index) {
-            const path = findMainPath(answeredPending.value[index]);
-
-            if (path !== null) {
-                backIndex.value = index;
-                selectPath(path);
-                return;
-            }
-        }
-
-        const path = findMainPath(backFrom);
-
-        stopBrowsingAnswered();
-
-        if (path !== null) {
-            selectPath(path);
-        } else {
-            selectNextPending();
-        }
-    };
-
-    const countDescendants = (node: PuzzleNode): number => [...node.children ?? [], ...node.parallel ?? []]
-        .reduce((count, child) => count + 1 + (isElseNode(child) ? 0 : countDescendants(child)), 0);
-
-    /**
-     * Replaces computer answer played by author on selected position,
-     * after confirmation if nodes were generated after it.
-     */
-    const replaceAnswer = (move: Move): void => {
-        const moves = selectedMainMoves();
+    const runPuzzleGenerate = async (options: Pick<PuzzleGenerateInput, 'templateIds' | 'fullDepth'>): Promise<void> => {
         const node = selectedNode.value;
 
-        if (isElseNode(node)) {
+        if (!canGenerate.value || isElseNode(node) || generateState.value !== null) {
             return;
         }
 
-        const count = (node.children ?? []).reduce((total, child) => total + (isElseNode(child) ? 0 : countDescendants(child)), 0);
+        const session = ++generateSession;
+        const path = selectedMainMoves();
+        const snapshot = JSON.stringify([node.children, node.parallel]);
+        const input: PuzzleGenerateInput = { puzzle: toDefinition(), fromPath: path, ...options };
 
-        if (count > 0 && !confirm(t('puzzles.editor.generate_replace_confirm', { count }))) {
-            return;
-        }
+        generateState.value = { status: 'running', done: 0, total: 0 };
+        generateWarnings.value = [];
+        puzzleGenerateError.value = null;
+        generateDone.value = false;
 
-        if (!removeAnswer(moves)) {
-            return;
-        }
-
-        stopBrowsingAnswered();
-
-        node.children = [{ move }];
-        selectChild(node.children[0]);
-        answerPending(moves, node.children[0]);
-    };
-
-    /**
-     * Inserts generated subtree, unless author continued this leaf meanwhile.
-     */
-    const applyGenerated = (moves: Move[], { subtree, warnings, pending }: PuzzleGenerateOutput): void => {
-        const leaf = findGenerateLeaf(moves);
-
-        if (leaf === null) {
-            return;
-        }
-
-        if (subtree.children) {
-            leaf.node.children = subtree.children;
-        }
-
-        if (subtree.parallel) {
-            leaf.node.parallel = subtree.parallel;
-        }
-
-        redraw();
-        generateWarnings.value = [...generateWarnings.value, ...warnings];
-        pending.forEach(addGenerateLeaf);
-    };
-
-    /**
-     * Generates player moves of a leaf on server, polls until done.
-     */
-    const runGenerateJob = async (job: GenerateJob, session: number): Promise<void> => {
-        job.state = { status: 'running', done: 0, total: 0 };
-
-        const input: PuzzleGenerateInput = {
-            puzzle: toDefinition(),
-            fromPath: job.path,
-            ...generateOptions,
-            stopAtComputerMoves: true,
-        };
-
-        // Stopped, or answer it continues undone
-        const isStopped = (): boolean => session !== generateSession || !generateJobs.value.includes(job);
+        const isStopped = (): boolean => session !== generateSession;
 
         try {
+            let state: PuzzleGenerateState;
+
             for (;;) {
-                const state = await apiPuzzleGenerateTree(input);
+                state = await apiPuzzleGenerateTree(input);
 
                 if (isStopped()) {
                     return;
                 }
 
-                job.state = state;
+                generateState.value = state;
 
                 if (state.status !== 'running') {
                     break;
@@ -2030,60 +1648,43 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
                 }
             }
 
-            if (job.state.status === 'failed') {
-                puzzleGenerateError.value = job.state.error ?? null;
-            } else {
-                applyGenerated(job.path, job.state.output!);
+            if (state.status === 'failed') {
+                puzzleGenerateError.value = state.error ?? null;
+                return;
             }
+
+            const mainPath = findMainPath(path);
+            const target = mainPath === null ? null : mainPath[mainPath.length - 1] ?? tree.value;
+
+            if (target === null || JSON.stringify([target.children, target.parallel]) !== snapshot) {
+                puzzleGenerateError.value = t('puzzles.editor.generate_tree_changed');
+                return;
+            }
+
+            const { subtree, warnings } = state.output!;
+
+            delete target.children;
+            delete target.parallel;
+
+            if (subtree.children) {
+                target.children = subtree.children;
+            }
+
+            if (subtree.parallel) {
+                target.parallel = subtree.parallel;
+            }
+
+            redraw();
+            generateWarnings.value = warnings;
+            generateDone.value = true;
         } catch (e) {
             if (!isStopped()) {
                 puzzleGenerateError.value = apiErrorMessage(e);
             }
         } finally {
             if (!isStopped()) {
-                generateJobs.value = generateJobs.value.filter(other => other !== job);
-                pumpGenerateJobs();
-
-                if (waitingForPending.value || (generateJobs.value.length === 0 && generatePending.value.length === 0)) {
-                    selectNextPending();
-                }
+                generateState.value = null;
             }
-        }
-    };
-
-    const pumpGenerateJobs = (): void => {
-        const running = generateJobs.value.filter(({ state }) => state !== null).length;
-
-        for (const job of generateJobs.value.filter(({ state }) => state === null).slice(0, Math.max(0, GENERATE_CONCURRENCY - running))) {
-            void runGenerateJob(job, generateSession);
-        }
-    };
-
-    /**
-     * Resumes generation from selected node: generates player moves on leaves where player is to move,
-     * and asks author computer answers on the other ones. Existing moves are kept.
-     */
-    const runPuzzleGenerate = (options: Pick<PuzzleGenerateInput, 'templateIds'>): void => {
-        const node = selectedNode.value;
-
-        if (!canGenerate.value || isElseNode(node)) {
-            return;
-        }
-
-        if (generateJobs.value.length === 0 && generatePending.value.length === 0) {
-            generateWarnings.value = [];
-        }
-
-        generateOptions = options;
-        puzzleEndChecker = createPuzzleEndChecker(toDefinition(), options.templateIds);
-        puzzleGenerateError.value = null;
-        generateDone.value = false;
-
-        scanGenerateLeaves(node, selectedMainMoves());
-        pumpGenerateJobs();
-
-        if (!isAwaitingComputerMove.value) {
-            selectNextPending();
         }
     };
 
@@ -2129,25 +1730,6 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     onKeyDown('ArrowRight', arrowShortcut(rewind(1), selectFirstChild));
     onKeyDown('ArrowUp', arrowShortcut(null, () => selectSibling(-1)));
     onKeyDown('ArrowDown', arrowShortcut(null, () => selectSibling(1)));
-
-    // Assisted generation: browse positions answered by author
-    onKeyDown(['z', 'Z', 'y'], (e: KeyboardEvent): void => {
-        if (!(e.ctrlKey || e.metaKey) || isTyping(e)) {
-            return;
-        }
-
-        const forward = e.key === 'y' || e.shiftKey;
-
-        if (forward ? canGoForward.value : canGoBack.value) {
-            e.preventDefault();
-
-            if (forward) {
-                goForward();
-            } else {
-                goBack();
-            }
-        }
-    });
 
     createGameView();
 
@@ -2257,17 +1839,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         generateProgress,
         generateWarnings,
         runPuzzleGenerate,
-        generatePending,
-        waitingForPending,
         generateDone,
-        isAwaitingComputerMove,
-        selectNextPending,
-        skipPending,
         stopGenerate,
-        canGoBack,
-        canGoForward,
-        goBack,
-        goForward,
 
         analyzer,
         setAnalyzer,

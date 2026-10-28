@@ -2,9 +2,9 @@ import { coordsToMove, parseMove, validateMove, type Move } from '@playhex/move-
 import type { SolvePositionOutput, SolveResult } from '../ai-jobs/protocol.js';
 import { solveCacheKey } from '../ai-jobs/PositionSolveCache.js';
 import { analysisCacheKey, type AnalysisInput, type AnalysisOutput } from '../../shared/app/hexplorer.js';
-import { collectCells, createParallelsFinder, findTranspositions, getFirstColor, getParallelKey, getPositionKey, isElseNode, puzzleErrorToString, PUZZLE_MAX_NODES, validatePuzzle, type PuzzleElseNode, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
+import { collectCells, createParallelsFinder, findElseNode, findTranspositions, getFirstColor, getParallelKey, getPositionKey, isElseNode, puzzleErrorToString, PUZZLE_MAX_NODES, validatePuzzle, type PuzzleElseNode, type PuzzleNode } from '../../shared/app/puzzles/puzzleTree.js';
 import { KATAHEX_MAX_PLAUSIBLE_MOVES, KATAHEX_PLAUSIBLE_POLICY_RATIO, SOLVER_CHILDREN_MAX_TIME_SECONDS } from '../../shared/app/puzzles/puzzleCheck.js';
-import { createPuzzleEndChecker, findGenerateStartNode, GENERATOR_MAX_PLAUSIBLE_FAILURES, GENERATOR_MAX_SOLVES, type PuzzleGenerateInput, type PuzzleGenerateOutput, type PuzzleGenerateWarning, type PuzzleGenerateWarningCode } from '../../shared/app/puzzles/puzzleGenerate.js';
+import { createPuzzleEndChecker, findGenerateStartNode, GENERATOR_DEFAULT_FULL_DEPTH, GENERATOR_MAX_PLAUSIBLE_FAILURES, GENERATOR_MAX_SOLVES, type PuzzleGenerateInput, type PuzzleGenerateOutput, type PuzzleGenerateWarning, type PuzzleGenerateWarningCode } from '../../shared/app/puzzles/puzzleGenerate.js';
 import { findTemplateInstances } from '../../shared/hex-templates/template-connection.js';
 import { fillForKatahex, getEdgePaths, type EdgePaths } from '../../shared/app/puzzles/edgeConnections.js';
 import { createLimiter, getPolicyCandidates, getSolveEdgePaths, play, toColor, toSolveInput, type Position, type SolveClaim } from './puzzleCheckUtils.js';
@@ -60,6 +60,16 @@ type ParallelCandidates = {
      */
     avoid: Set<Move>;
 
+    /**
+     * Cells of parallel sequences already in tree, see generatePlayerChoice().
+     */
+    blocked: Set<Move>;
+
+    /**
+     * Player choices from start node, see generatePlayerChoice().
+     */
+    depth: number;
+
     bridges: BridgeIntrusions[];
 };
 
@@ -67,13 +77,17 @@ const countNodes = (node: PuzzleNode): number => [...node.children ?? [], ...nod
     .reduce((count, child) => count + 1 + (isElseNode(child) ? 0 : countNodes(child)), 0);
 
 /**
- * Generates children and parallel sequences of a node, with Mohex solver, see PuzzleGenerateInput.
+ * Completes tree from a node, with Mohex solver, see PuzzleGenerateInput.
+ * Existing nodes are kept: missing moves are added, and existing moves contradicting solver are warned.
+ * From a leaf, generates whole subtree.
  *
  * - player choice: proven winning moves are accepted, plausible (katahex policy) proven losing moves fail
  *   and are followed by a refutation from solver, other moves are answered by an "else" node.
+ *   All winning moves are continued on first fullDepth player choices, then only the most natural one (katahex policy),
+ *   others are leaves: puzzle solved.
  *   Winning intrusions in an opponent bridge are parallel sequences instead of main moves,
  *   unless main sequence uses their cells.
- * - computer answer: best katahex move, or left to puzzle author with stopAtComputerMoves.
+ * - computer answer: best katahex policy move.
  *
  * Puzzle ends once player is connected with acquired templates, see findTemplateConnection().
  * Nodes that could not be generated (not proven, budget exceeded) are left without children, and warned.
@@ -82,7 +96,7 @@ const countNodes = (node: PuzzleNode): number => [...node.children ?? [], ...nod
  * @throws Errors from solve and analyze
  */
 export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: PuzzleTreeGeneratorOptions): Promise<PuzzleGenerateOutput> => {
-    const { puzzle, fromPath, templateIds, stopAtComputerMoves = false } = input;
+    const { puzzle, fromPath, templateIds, fullDepth = GENERATOR_DEFAULT_FULL_DEPTH } = input;
     const { boardsize, playerColor } = puzzle;
     const disabledCells = puzzle.disabledCells ?? [];
     const player = toColor(playerColor);
@@ -107,8 +121,14 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
     const inheritedParallels = parent === null ? [] : createParallelsFinder(tree)(parent);
     const inheritedCells = collectCells({ parallel: inheritedParallels }) as Set<Move>;
 
-    delete start.children;
-    delete start.parallel;
+    /**
+     * Adds cells of parallel sequences declared on this node.
+     * Called before generating, so only existing ones are there.
+     */
+    const withParallelCells = (blocked: Set<Move>, node: PuzzleNode): Set<Move> => node.parallel?.length
+        ? new Set([...blocked, ...collectCells({ parallel: node.parallel }) as Set<Move>])
+        : blocked
+    ;
 
     let remainingNodes = PUZZLE_MAX_NODES - countNodes(tree);
 
@@ -174,7 +194,7 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
     /**
      * Moves katahex would play, best first. Empty without katahex.
      */
-    const candidateMoves = async (position: Position): Promise<{ move: Move, policy: number }[]> => {
+    const candidateMoves = async (position: Position, blocked: Set<Move>): Promise<{ move: Move, policy: number }[]> => {
         const { analyze } = options;
 
         if (analyze === null) {
@@ -200,7 +220,7 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
             return [];
         }
 
-        return getPolicyCandidates(policy, boardsize, new Set([...position.red, ...position.blue]), new Set([...disabledCells, ...inheritedCells]));
+        return getPolicyCandidates(policy, boardsize, new Set([...position.red, ...position.blue]), new Set([...disabledCells, ...blocked]));
     };
 
     /*
@@ -210,8 +230,8 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
     const opponentColor = playerColor === 0 ? 1 : 0;
     const { templateStones, templateDisabledCells, isOpponentConnected, isPuzzleEnded } = createPuzzleEndChecker(puzzle, templateIds);
 
-    const emptyCells = (position: Position): Move[] => {
-        const unavailable = new Set<Move>([...position.red, ...position.blue, ...disabledCells, ...inheritedCells]);
+    const emptyCells = (position: Position, blocked: Set<Move>): Move[] => {
+        const unavailable = new Set<Move>([...position.red, ...position.blue, ...disabledCells, ...blocked]);
         const cells: Move[] = [];
 
         for (let row = 0; row < boardsize; ++row) {
@@ -297,23 +317,18 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
     const paths = new Map<PuzzleNode, Move[]>([[start, fromPath]]);
 
     /**
-     * Nodes waiting for a computer answer from puzzle author, see stopAtComputerMoves.
-     */
-    const pendingNodes = new Set<PuzzleNode>();
-
-    /**
      * Bridges intrusions not played in main sequence, to declare as parallel sequences once tree is generated.
      */
     const parallelCandidates = new Map<PuzzleNode, ParallelCandidates>();
 
     /**
-     * Whether position has already been reached: then node is a transposition leaf.
+     * Whether position has already been reached by another node: then node is a transposition leaf.
      */
     const isTransposition = (node: PuzzleNode, moves: Move[]): boolean => {
         const key = getPositionKey(moves);
 
         if (positions.has(key)) {
-            return true;
+            return positions.get(key) !== node;
         }
 
         positions.set(key, node);
@@ -337,17 +352,17 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
         return 'generator_unproven';
     };
 
-    const isPlayable = (position: Position, move: unknown): move is Move =>
-        typeof move === 'string' && validateMove(move) && emptyCells(position).includes(move);
+    const isPlayable = (position: Position, move: unknown, blocked: Set<Move>): move is Move =>
+        typeof move === 'string' && validateMove(move) && emptyCells(position, blocked).includes(move);
 
     /**
      * Computer move proven winning, computer to move, best by katahex policy.
      * Undefined if none is proven, or budget exceeded.
      */
-    const findWinningComputerMove = async (position: Position, avoid: Set<Move> = new Set()): Promise<undefined | Move> => {
+    const findWinningComputerMove = async (position: Position, blocked: Set<Move>, avoid: Set<Move> = new Set()): Promise<undefined | Move> => {
         const output = await solve(position, 'notWin', true);
         const winningMoves = (Object.entries(output?.children ?? {}) as [Move, SolveResult][])
-            .filter(([move, { winner }]) => winner === opponent && !avoid.has(move) && !inheritedCells.has(move))
+            .filter(([move, { winner }]) => winner === opponent && !avoid.has(move) && !blocked.has(move))
             .map(([move]) => move)
             .sort();
 
@@ -355,7 +370,7 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
             return undefined;
         }
 
-        return (await candidateMoves(position)).find(({ move }) => winningMoves.includes(move))?.move ?? winningMoves[0];
+        return (await candidateMoves(position, blocked)).find(({ move }) => winningMoves.includes(move))?.move ?? winningMoves[0];
     };
 
     /**
@@ -365,22 +380,29 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
      *
      * @param position After failed move, computer to move
      */
-    const createRefutation = async (position: Position, pv: string[]): Promise<undefined | Move> => {
+    const createRefutation = async (position: Position, pv: string[], blocked: Set<Move>): Promise<undefined | Move> => {
         if (isOpponentConnected(position)) {
             return undefined;
         }
 
-        return isPlayable(position, pv[0])
+        return isPlayable(position, pv[0], blocked)
             ? pv[0]
-            : await findWinningComputerMove(position);
+            : await findWinningComputerMove(position, blocked);
     };
 
     /**
-     * Player to move.
+     * Player to move. Existing children are kept, and checked with solver:
+     * missing winning moves, plausible failures with their refutation, and "else" node are added,
+     * then accepted moves are continued: all on first fullDepth choices, then only the most natural one.
+     * Accepted moves not continued are leaves: puzzle solved. Existing continued moves are always completed.
      *
      * @param avoid Cells of bridges intrusions found on ancestors, to keep them free for parallel sequences
+     * @param blocked Cells of parallel sequences already in tree, declared on ancestors: not played
+     * @param depth Player choices from start node, 0 on first one
      */
-    const generatePlayerChoice = async (node: PuzzleNode, moves: Move[], position: Position, avoid: Set<Move>): Promise<void> => {
+    const generatePlayerChoice = async (node: PuzzleNode, moves: Move[], position: Position, avoid: Set<Move>, blocked: Set<Move>, depth: number): Promise<void> => {
+        blocked = withParallelCells(blocked, node);
+
         const [winSolve, notWinSolve] = await Promise.all([
             solve(position, 'win', true),
             solve(position, 'notWin', true),
@@ -395,13 +417,13 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
         const losing = new Map<Move, SolveResult>();
 
         for (const [move, result] of Object.entries(winSolve.children ?? {}) as [Move, SolveResult][]) {
-            if (result.winner === player && !inheritedCells.has(move)) {
+            if (result.winner === player && !blocked.has(move)) {
                 winning.set(move, result);
             }
         }
 
         for (const [move, result] of Object.entries(notWinSolve.children ?? {}) as [Move, SolveResult][]) {
-            if (result.winner === opponent && !inheritedCells.has(move)) {
+            if (result.winner === opponent && !blocked.has(move)) {
                 losing.set(move, result);
             }
         }
@@ -411,25 +433,42 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
             return;
         }
 
-        const candidates = await candidateMoves(position);
+        const existing = (node.children ?? []).filter(child => !isElseNode(child)) as PuzzleNode[];
+        const existingElse = findElseNode(node);
+        const existingMoves = new Set(existing.map(child => child.move!));
+
+        for (const child of existing) {
+            if (child.result === 'failed' && winning.has(child.move!)) {
+                warn('generator_failed_winning', [...moves, child.move!]);
+            } else if (child.result !== 'failed' && losing.has(child.move!)) {
+                warn('generator_accepted_losing', [...moves, child.move!]);
+            }
+        }
+
+        const candidates = await candidateMoves(position, blocked);
         const policies = new Map(candidates.map(({ move, policy }) => [move, policy]));
         const byPolicy = (a: Move, b: Move): number => (policies.get(b) ?? 0) - (policies.get(a) ?? 0) || a.localeCompare(b);
 
         // Intrusions in opponent bridges are parallel sequences, unless there is nothing else to play
         const intrusions = findBridgeIntrusions(position, winning);
         const mainWinning = [...winning.keys()].filter(move => !intrusions.has(move));
-        const accepted = (mainWinning.length > 0 ? mainWinning : [...winning.keys()]).sort(byPolicy);
+        const acceptable = (mainWinning.length > 0 ? mainWinning : [...winning.keys()]).sort(byPolicy);
+        const accepted = acceptable.filter(move => !existingMoves.has(move));
+        const best = candidates[0]?.policy ?? 0;
+
+        // Further fullDepth, a single line: tree grows linearly with depth
+        const continued = new Set(depth < fullDepth ? acceptable : acceptable.slice(0, 1));
 
         if (mainWinning.length > 0 && intrusions.size > 0) {
-            parallelCandidates.set(node, { position, winning, avoid, bridges: [...new Set(intrusions.values())] });
+            parallelCandidates.set(node, { position, winning, avoid, blocked, depth, bridges: [...new Set(intrusions.values())] });
             avoid = new Set([...avoid, ...[...intrusions.values()].flatMap(({ sequences }) => sequences.flat())]);
         }
 
-        const best = candidates[0]?.policy ?? 0;
+        const existingFailures = existing.filter(child => child.result === 'failed').length;
         const failures = candidates
             .slice(0, KATAHEX_MAX_PLAUSIBLE_MOVES)
-            .filter(({ move, policy }) => policy >= best * KATAHEX_PLAUSIBLE_POLICY_RATIO && losing.has(move) && !avoid.has(move))
-            .slice(0, GENERATOR_MAX_PLAUSIBLE_FAILURES)
+            .filter(({ move, policy }) => policy >= best * KATAHEX_PLAUSIBLE_POLICY_RATIO && losing.has(move) && !avoid.has(move) && !existingMoves.has(move))
+            .slice(0, Math.max(0, GENERATOR_MAX_PLAUSIBLE_FAILURES - existingFailures))
             .map(({ move }) => move)
         ;
 
@@ -448,7 +487,7 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
             acceptedNodes.push(child);
         }
 
-        const refutations = await Promise.all(failures.map(move => createRefutation(play(position, move), losing.get(move)!.pv)));
+        const refutations = await Promise.all(failures.map(move => createRefutation(play(position, move), losing.get(move)!.pv, blocked)));
 
         for (const [index, move] of failures.entries()) {
             const failureMoves = [...moves, move];
@@ -475,33 +514,55 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
             children.push(failed);
         }
 
-        // Other moves are answered by the most common refutation
-        const covered = new Set<Move>([...accepted, ...failures, ...intrusions.keys()]);
-        const answers = new Map<Move, number>();
+        // Existing failed moves without refutation
+        await Promise.all(existing
+            .filter(child => child.result === 'failed' && !child.children?.length && losing.has(child.move!))
+            .map(async child => {
+                const refutation = await createRefutation(play(position, child.move!), losing.get(child.move!)!.pv, blocked);
 
-        for (const [move, { pv }] of losing) {
-            if (!covered.has(move) && isPlayable(position, pv[0]) && !avoid.has(pv[0])) {
-                answers.set(pv[0], (answers.get(pv[0]) ?? 0) + 1);
+                if (refutation !== undefined && reserveNodes(1)) {
+                    child.children = [{ move: refutation }];
+                }
+            }),
+        );
+
+        let elseNode = existingElse;
+
+        if (elseNode === null) {
+            // Other moves are answered by the most common refutation
+            const covered = new Set<Move>([...existingMoves, ...accepted, ...failures, ...intrusions.keys()]);
+            const answers = new Map<Move, number>();
+
+            for (const [move, { pv }] of losing) {
+                if (!covered.has(move) && isPlayable(position, pv[0], blocked) && !avoid.has(pv[0])) {
+                    answers.set(pv[0], (answers.get(pv[0]) ?? 0) + 1);
+                }
+            }
+
+            // Without proofs, computer plays the move that would win if player passed
+            const elseAnswer = [...answers.entries()].sort(([a, countA], [b, countB]) => countB - countA || a.localeCompare(b))[0]?.[0]
+                ?? refutations.find(refutation => refutation !== undefined && !avoid.has(refutation))
+                ?? (losing.size > 0 ? await findWinningComputerMove({ ...position, toMove: playerColor === 0 ? 1 : 0 }, blocked, avoid) : undefined);
+
+            if (elseAnswer !== undefined && emptyCells(position, blocked).some(move => !covered.has(move)) && reserveNodes(1)) {
+                elseNode = { else: elseAnswer };
             }
         }
 
-        // Without proofs, computer plays the move that would win if player passed
-        const elseAnswer = [...answers.entries()].sort(([a, countA], [b, countB]) => countB - countA || a.localeCompare(b))[0]?.[0]
-            ?? refutations.find(refutation => refutation !== undefined && !avoid.has(refutation))
-            ?? (losing.size > 0 ? await findWinningComputerMove({ ...position, toMove: playerColor === 0 ? 1 : 0 }, avoid) : undefined);
+        node.children = [...existing, ...children, ...elseNode === null ? [] : [elseNode]];
 
-        if (elseAnswer !== undefined && emptyCells(position).some(move => !covered.has(move)) && reserveNodes(1)) {
-            children.push({ else: elseAnswer });
-        }
+        // Existing accepted moves are continued only if winning, else warned above
+        const toContinue = [...existing, ...acceptedNodes].filter(child => child.result === undefined
+            && winning.has(child.move!)
+            && (continued.has(child.move!) || (child.children?.length ?? 0) > 0),
+        );
 
-        node.children = children;
-
-        await Promise.all(acceptedNodes.map(child => {
+        await Promise.all(toContinue.map(child => {
             const childMoves = [...moves, child.move!];
 
             paths.set(child, childMoves);
 
-            return generatePlayerMove(child, childMoves, play(position, child.move!), winning.get(child.move!)!.pv, avoid);
+            return generatePlayerMove(child, childMoves, play(position, child.move!), winning.get(child.move!)!.pv, avoid, blocked, depth + 1);
         }));
     };
 
@@ -510,17 +571,12 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
      *
      * @param pv Solver proof after player move, its first move is a computer answer
      */
-    const generatePlayerMove = async (node: PuzzleNode, moves: Move[], position: Position, pv: string[], avoid: Set<Move>): Promise<void> => {
+    const generatePlayerMove = async (node: PuzzleNode, moves: Move[], position: Position, pv: string[], avoid: Set<Move>, blocked: Set<Move>, depth: number): Promise<void> => {
         if (isPuzzleEnded(position) || isTransposition(node, moves)) {
             return;
         }
 
-        if (stopAtComputerMoves) {
-            pendingNodes.add(node);
-            return;
-        }
-
-        await generateComputerAnswers(node, moves, position, avoid, pv[0] as undefined | Move);
+        await generateComputerAnswers(node, moves, position, avoid, blocked, depth, pv[0] as undefined | Move);
     };
 
     /**
@@ -528,18 +584,18 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
      * best by katahex policy.
      * Without katahex, solver proof move, else cell closest to last move.
      */
-    const findComputerMove = async (position: Position, moves: Move[], avoid: Set<Move>, fallback?: Move): Promise<undefined | Move> => {
-        const best = (await candidateMoves(position)).find(({ move }) => !avoid.has(move));
+    const findComputerMove = async (position: Position, moves: Move[], avoid: Set<Move>, blocked: Set<Move>, fallback?: Move): Promise<undefined | Move> => {
+        const best = (await candidateMoves(position, blocked)).find(({ move }) => !avoid.has(move));
 
         if (best !== undefined) {
             return best.move;
         }
 
-        if (isPlayable(position, fallback) && !avoid.has(fallback)) {
+        if (isPlayable(position, fallback, blocked) && !avoid.has(fallback)) {
             return fallback;
         }
 
-        const empty = emptyCells(position);
+        const empty = emptyCells(position, blocked);
         const free = empty.filter(move => !avoid.has(move));
         const lastMove = moves[moves.length - 1];
 
@@ -561,26 +617,32 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
 
     /**
      * Computer to move, after a player move, or on start node.
+     * Existing answers are continued, else best one is added.
      *
      * @param fallback Computer answer when katahex is not available, from solver proof
      */
-    const generateComputerAnswers = async (node: PuzzleNode, moves: Move[], position: Position, avoid: Set<Move>, fallback?: Move): Promise<void> => {
-        const answer = await findComputerMove(position, moves, avoid, fallback);
+    const generateComputerAnswers = async (node: PuzzleNode, moves: Move[], position: Position, avoid: Set<Move>, blocked: Set<Move>, depth: number, fallback?: Move): Promise<void> => {
+        blocked = withParallelCells(blocked, node);
 
-        if (answer === undefined) {
-            warn('generator_unproven', moves);
-            return;
+        let children = (node.children ?? []).filter(child => !isElseNode(child) && child.result === undefined) as PuzzleNode[];
+
+        if (children.length === 0 && !node.children?.length) {
+            const answer = await findComputerMove(position, moves, avoid, blocked, fallback);
+
+            if (answer === undefined) {
+                warn('generator_unproven', moves);
+                return;
+            }
+
+            if (!reserveNodes(1)) {
+                warn('generator_budget_exceeded', moves);
+                return;
+            }
+
+            // Only one answer: author can add a variation, and generate again from it
+            children = [{ move: answer }];
+            node.children = children;
         }
-
-        if (!reserveNodes(1)) {
-            warn('generator_budget_exceeded', moves);
-            return;
-        }
-
-        // Only one answer: author can add a variation, and generate again from it
-        const children: PuzzleNode[] = [{ move: answer }];
-
-        node.children = children;
 
         await Promise.all(children.map(child => {
             const childMoves = [...moves, child.move!];
@@ -592,7 +654,7 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
                 return Promise.resolve();
             }
 
-            return generatePlayerChoice(child, childMoves, childPosition, avoid);
+            return generatePlayerChoice(child, childMoves, childPosition, avoid, blocked, depth);
         }));
     };
 
@@ -604,12 +666,12 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
 
     if (isOpponentConnected(startPosition)) {
         warn('generator_initial_not_winning', fromPath);
-        return { subtree: {}, warnings, pending: [] };
+        return { subtree: {}, warnings };
     }
 
     if (isPuzzleEnded(startPosition)) {
         warn('generator_already_connected', fromPath);
-        return { subtree: {}, warnings, pending: [] };
+        return { subtree: {}, warnings };
     }
 
     if (fromPath.length > 0) {
@@ -617,7 +679,7 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
     }
 
     if (startPosition.toMove === playerColor) {
-        await generatePlayerChoice(start, fromPath, startPosition, new Set());
+        await generatePlayerChoice(start, fromPath, startPosition, new Set(), inheritedCells, 0);
     } else {
         // Computer plays first: check it cannot win
         const [output, notWinOutput] = await Promise.all([
@@ -629,11 +691,7 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
             warn(notWinningCode(output, notWinOutput), fromPath);
         }
 
-        if (stopAtComputerMoves) {
-            pendingNodes.add(start);
-        } else {
-            await generateComputerAnswers(start, fromPath, startPosition, new Set(), output?.pv[0] as undefined | Move);
-        }
+        await generateComputerAnswers(start, fromPath, startPosition, new Set(), inheritedCells, 0, output?.pv[0] as undefined | Move);
     }
 
     /*
@@ -660,6 +718,8 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
      */
     const declareParallels = (node: PuzzleNode, declaredKeys: Set<string>, usedCells: Set<Move>): void => {
         const candidates = parallelCandidates.get(node);
+
+        usedCells = withParallelCells(usedCells, node);
 
         if (candidates !== undefined && (node.children?.length ?? 0) > 0) {
             const mainCells = collectCells({ children: node.children }) as Set<Move>;
@@ -696,7 +756,7 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
             }
 
             if (roots.length > 0) {
-                node.parallel = roots;
+                node.parallel = [...node.parallel ?? [], ...roots];
             }
         }
 
@@ -754,11 +814,16 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
 
     /**
      * Removes all declared parallel sequences, to declare them again once main sequence changed.
+     * Existing ones are kept.
      */
     const clearParallels = (): void => {
         for (const [root, { node }] of declaringNodes) {
             remainingNodes += countNodes({ parallel: [root] });
-            delete node.parallel;
+            node.parallel = node.parallel?.filter(other => other !== root);
+
+            if (node.parallel?.length === 0) {
+                delete node.parallel;
+            }
         }
 
         declaringNodes.clear();
@@ -800,7 +865,7 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
 
             paths.set(child, childMoves);
 
-            return generatePlayerMove(child, childMoves, play(candidates.position, child.move!), candidates.winning.get(child.move!)!.pv, avoid);
+            return generatePlayerMove(child, childMoves, play(candidates.position, child.move!), candidates.winning.get(child.move!)!.pv, avoid, candidates.blocked, candidates.depth + 1);
         }));
     };
 
@@ -830,28 +895,11 @@ export const generatePuzzleTree = async (input: PuzzleGenerateInput, options: Pu
         }
     }
 
-    const pending: Move[][] = [];
-
-    const collectPending = (node: PuzzleNode): void => {
-        if (pendingNodes.has(node)) {
-            pending.push(paths.get(node)!);
-        }
-
-        for (const child of node.children ?? []) {
-            if (!isElseNode(child) && child.result === undefined) {
-                collectPending(child);
-            }
-        }
-    };
-
-    collectPending(start);
-
     return {
         subtree: {
             ...(start.children ? { children: start.children } : {}),
             ...(start.parallel ? { parallel: start.parallel } : {}),
         },
         warnings,
-        pending,
     };
 };

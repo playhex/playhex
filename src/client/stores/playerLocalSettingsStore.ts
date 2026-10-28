@@ -71,6 +71,12 @@ export class LocalSettings
      */
     @Expose()
     puzzleGeneratorTemplateIds?: string[];
+
+    /**
+     * Puzzle tree generator option, see PuzzleGenerateInput.fullDepth.
+     */
+    @Expose()
+    puzzleGeneratorFullDepth?: number;
 }
 
 const loadLocalSettings = (): LocalSettings => {

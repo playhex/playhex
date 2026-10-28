@@ -1,6 +1,8 @@
 /**
- * Generates a puzzle tree with Mohex solver, from a position or a node of an existing tree:
+ * Generates or completes a puzzle tree with Mohex solver, from a position or a node of an existing tree:
  * proven winning moves are accepted, plausible losing ones fail with a refutation,
+ * winning moves are continued on first player choices, then only plausible ones, others end the puzzle as solved,
+ * computer answers are the best katahex policy move,
  * opponent bridges intrusions become parallel sequences.
  *
  * Puzzle ends once player connection is proven with acquired templates, see findTemplateConnection().
@@ -20,7 +22,7 @@ export type PuzzleGenerateInput = {
 
     /**
      * Main sequence moves to reach the node to generate from, empty for root.
-     * Its children and parallel sequences are replaced.
+     * Its existing children and parallel sequences are kept, and completed.
      */
     fromPath: Move[];
 
@@ -32,11 +34,11 @@ export type PuzzleGenerateInput = {
     templateIds: string[];
 
     /**
-     * Computer answers are chosen by puzzle author: generation stops on nodes where computer must answer,
-     * see PuzzleGenerateOutput.pending. Author plays them, then generation continues from there.
-     * Else computer answers are generated too, best by katahex policy.
+     * Player choices, from node to generate from, where all winning moves are continued.
+     * Further, only the most natural one (katahex policy) is, others are leaves: puzzle solved.
+     * Defaults to GENERATOR_DEFAULT_FULL_DEPTH.
      */
-    stopAtComputerMoves?: boolean;
+    fullDepth?: number;
 };
 
 export type PuzzleGenerateWarningCode =
@@ -72,6 +74,16 @@ export type PuzzleGenerateWarningCode =
     | 'generator_parallel_dropped'
 
     /**
+     * Existing move is accepted, but solver proves it loses.
+     */
+    | 'generator_accepted_losing'
+
+    /**
+     * Existing move fails, but solver proves it wins.
+     */
+    | 'generator_failed_winning'
+
+    /**
      * Generated tree is not valid, see params.error. Should not happen.
      */
     | 'generator_invalid_tree'
@@ -84,17 +96,11 @@ export type PuzzleGenerateWarning = PuzzleError<PuzzleGenerateWarningCode>;
 
 export type PuzzleGenerateOutput = {
     /**
-     * New children and parallel sequences of the node to generate from.
+     * Children and parallel sequences of the node to generate from, existing ones and added ones.
      */
     subtree: Pick<PuzzleNode, 'children' | 'parallel'>;
 
     warnings: PuzzleGenerateWarning[];
-
-    /**
-     * With stopAtComputerMoves, main sequence moves to reach each node waiting for a computer answer,
-     * in tree order. Empty otherwise.
-     */
-    pending: Move[][];
 };
 
 export type PuzzleGenerateState = {
@@ -127,6 +133,9 @@ export const GENERATOR_MAX_SOLVES = 8192;
  * Other ones are answered by "else" node.
  */
 export const GENERATOR_MAX_PLAUSIBLE_FAILURES = 3;
+
+export const GENERATOR_DEFAULT_FULL_DEPTH = 1;
+export const GENERATOR_MAX_FULL_DEPTH = 10;
 
 /**
  * Node to generate from: main sequence node reached by these moves, puzzle not ended yet.

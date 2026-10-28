@@ -1,74 +1,58 @@
 <script setup lang="ts">
 /*
- * Assisted tree generation from selected node with Mohex solver, expert mode only:
- * player moves are generated in background, author plays computer answers on ready positions.
+ * Tree generation from selected node with Mohex solver, expert mode only:
+ * player winning moves from solver, computer answers from katahex policy.
  * Options are saved on this device.
  */
 import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { HEX_TEMPLATES } from '../../../../shared/hex-templates/hex-templates.js';
-import { type PuzzleGenerateInput, type PuzzleGenerateWarning } from '../../../../shared/app/puzzles/puzzleGenerate.js';
+import { GENERATOR_DEFAULT_FULL_DEPTH, GENERATOR_MAX_FULL_DEPTH, type PuzzleGenerateInput, type PuzzleGenerateWarning } from '../../../../shared/app/puzzles/puzzleGenerate.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
-import { IconDiagram2, IconExclamationTriangle } from '../../icons.js';
+import { IconDiagram2, IconExclamationTriangle, IconInfoCircle } from '../../icons.js';
 
 const props = defineProps<{
     canGenerate: boolean;
     solverAvailable: boolean;
 
     /**
-     * Generations running in background.
+     * Generation running in background.
      */
     generating: boolean;
 
     /**
-     * Positions solved and solves started, of running generations.
+     * Positions solved and solves started, of running generation.
      */
     progress: { done: number, total: number };
 
     /**
-     * Nothing left to generate nor to answer.
+     * Last generation finished and inserted in tree.
      */
     done: boolean;
 
     error: null | string;
     warnings: PuzzleGenerateWarning[];
-
-    /**
-     * Positions ready, waiting for a computer answer from author.
-     */
-    pendingCount: number;
-
-    /**
-     * Selected node is a ready position.
-     */
-    awaitingComputerMove: boolean;
-
-    /**
-     * Author answered all ready positions, next ones are being generated.
-     */
-    waitingForPending: boolean;
-
-    /**
-     * Browse positions answered by author during this generation, to check or replace answers.
-     */
-    canGoBack: boolean;
-    canGoForward: boolean;
 }>();
 
 const emit = defineEmits<{
-    generate: [options: Pick<PuzzleGenerateInput, 'templateIds'>];
+    generate: [options: Pick<PuzzleGenerateInput, 'templateIds' | 'fullDepth'>];
     selectWarning: [warning: PuzzleGenerateWarning];
-    nextPending: [];
-    skipPending: [];
-    back: [];
-    forward: [];
     stop: [];
 }>();
 
 const { localSettings } = storeToRefs(usePlayerLocalSettingsStore());
 
 const templateIds = computed(() => localSettings.value.puzzleGeneratorTemplateIds ?? []);
+
+const fullDepth = computed({
+    get: () => localSettings.value.puzzleGeneratorFullDepth ?? GENERATOR_DEFAULT_FULL_DEPTH,
+    set: (value: number) => {
+        localSettings.value.puzzleGeneratorFullDepth = Number.isInteger(value)
+            ? Math.min(GENERATOR_MAX_FULL_DEPTH, Math.max(0, value))
+            : GENERATOR_DEFAULT_FULL_DEPTH;
+    },
+});
 
 const toggleTemplate = (id: string, enabled: boolean): void => {
     localSettings.value.puzzleGeneratorTemplateIds = enabled
@@ -85,6 +69,7 @@ const generate = (): void => {
     emit('generate', {
         // Ignore templates removed since saved
         templateIds: templateIds.value.filter(id => HEX_TEMPLATES.some(template => template.id === id)),
+        fullDepth: fullDepth.value,
     });
 };
 </script>
@@ -96,7 +81,10 @@ const generate = (): void => {
         <p class="form-text mt-1">{{ $t('puzzles.editor.generate_help') }}</p>
 
         <fieldset class="mb-2">
-            <legend class="form-label small mb-1">{{ $t('puzzles.editor.generate_templates') }}</legend>
+            <legend class="form-label small mb-1">
+                {{ $t('puzzles.editor.generate_templates') }}
+                <span class="text-body-secondary" :title="$t(templateIds.length === 0 ? 'puzzles.editor.generate_templates_none' : 'puzzles.editor.generate_templates_help')"><IconInfoCircle /></span>
+            </legend>
             <div v-for="template in HEX_TEMPLATES" :key="template.id" class="form-check form-check-inline">
                 <input
                     :id="`puzzle-generate-template-${template.id}`"
@@ -107,22 +95,37 @@ const generate = (): void => {
                 >
                 <label class="form-check-label small" :for="`puzzle-generate-template-${template.id}`">{{ template.name }}</label>
             </div>
-            <div class="form-text">{{ $t(templateIds.length === 0 ? 'puzzles.editor.generate_templates_none' : 'puzzles.editor.generate_templates_help') }}</div>
         </fieldset>
+
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <label class="form-label small mb-0" for="puzzle-generate-full-depth">
+                {{ $t('puzzles.editor.generate_full_depth') }}
+                <span class="text-body-secondary" :title="$t('puzzles.editor.generate_full_depth_help')"><IconInfoCircle /></span>
+            </label>
+            <input
+                id="puzzle-generate-full-depth"
+                v-model.number="fullDepth"
+                class="form-control form-control-sm"
+                style="width: 4.5em"
+                type="number"
+                min="0"
+                :max="GENERATOR_MAX_FULL_DEPTH"
+            >
+        </div>
 
         <div class="d-flex align-items-center gap-2">
             <button
                 type="button"
                 class="btn btn-outline-primary btn-sm"
-                :disabled="!canGenerate || !solverAvailable"
+                :disabled="!canGenerate || !solverAvailable || generating"
                 @click="generate()"
             ><IconDiagram2 /> {{ $t('puzzles.editor.generate_from_node') }}</button>
             <button
-                v-if="generating || pendingCount > 0"
+                v-if="generating"
                 type="button"
                 class="btn btn-outline-secondary btn-sm"
                 @click="emit('stop')"
-            >{{ $t('puzzles.editor.generate_pending_stop') }}</button>
+            >{{ $t('puzzles.editor.generate_stop') }}</button>
         </div>
 
         <p v-if="!solverAvailable" class="text-warning small mt-1 mb-0"><IconExclamationTriangle /> {{ $t('hexplorer.engine_unavailable') }}</p>
@@ -135,24 +138,9 @@ const generate = (): void => {
             <p class="small text-body-secondary mb-0">{{ $t('puzzles.editor.generate_progress', { done: progress.done, total: progress.total }) }}</p>
         </div>
 
-        <div v-if="pendingCount > 0 || waitingForPending || canGoBack || canGoForward" class="alert alert-info small p-2 mt-2 mb-0">
-            <p v-if="awaitingComputerMove" class="mb-1">{{ $t('puzzles.editor.generate_pending') }}</p>
-            <p v-else-if="pendingCount > 0" class="mb-1">{{ $t('puzzles.editor.generate_pending_elsewhere') }}</p>
-            <p v-else-if="waitingForPending" class="mb-1"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span> {{ $t('puzzles.editor.generate_pending_waiting') }}</p>
-            <p v-if="pendingCount > 0" class="mb-1 text-body-secondary">{{ $t('puzzles.editor.generate_pending_count', { count: pendingCount }) }}</p>
-            <div class="d-flex flex-wrap gap-2">
-                <button type="button" class="btn btn-outline-secondary btn-sm" :disabled="!canGoBack" :title="$t('puzzles.editor.generate_back_help')" @click="emit('back')">{{ $t('puzzles.editor.generate_back') }}</button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" :disabled="!canGoForward" :title="$t('puzzles.editor.generate_forward_help')" @click="emit('forward')">{{ $t('puzzles.editor.generate_forward') }}</button>
-                <template v-if="pendingCount > 0">
-                    <button v-if="!awaitingComputerMove" type="button" class="btn btn-primary btn-sm" @click="emit('nextPending')">{{ $t('puzzles.editor.generate_pending_go') }}</button>
-                    <button v-else type="button" class="btn btn-outline-secondary btn-sm" @click="emit('skipPending')">{{ $t('puzzles.editor.generate_pending_skip') }}</button>
-                </template>
-            </div>
-        </div>
-
         <p v-if="error" class="text-danger small mt-2 mb-0"><IconExclamationTriangle /> {{ error }}</p>
 
-        <p v-if="done && !generating && pendingCount === 0 && warnings.length === 0" class="text-success small mt-2 mb-0">{{ $t('puzzles.editor.generate_ok') }}</p>
+        <p v-if="done && !generating && warnings.length === 0" class="text-success small mt-2 mb-0">{{ $t('puzzles.editor.generate_ok') }}</p>
 
         <div v-if="warnings.length > 0" class="small text-warning-emphasis mt-2">
             <p class="mb-1"><IconExclamationTriangle /> {{ $t('puzzles.editor.generate_warnings', { count: warnings.length }) }}</p>

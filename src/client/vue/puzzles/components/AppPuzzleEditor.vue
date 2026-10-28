@@ -123,17 +123,8 @@ const {
     generateProgress,
     generateWarnings,
     runPuzzleGenerate,
-    generatePending,
-    waitingForPending,
     generateDone,
-    isAwaitingComputerMove,
-    selectNextPending,
-    skipPending,
     stopGenerate,
-    canGoBack,
-    canGoForward,
-    goBack,
-    goForward,
     redStones,
     blueStones,
     disabledCells,
@@ -969,17 +960,8 @@ const deletePuzzle = async (): Promise<void> => {
                             :done="generateDone"
                             :error="puzzleGenerateError"
                             :warnings="generateWarnings"
-                            :pendingCount="generatePending.length"
-                            :awaitingComputerMove="isAwaitingComputerMove"
-                            :waitingForPending
-                            :canGoBack
-                            :canGoForward
                             @generate="runPuzzleGenerate"
                             @selectWarning="selectErrorNode"
-                            @nextPending="selectNextPending"
-                            @skipPending="skipPending"
-                            @back="goBack"
-                            @forward="goForward"
                             @stop="stopGenerate"
                         />
 

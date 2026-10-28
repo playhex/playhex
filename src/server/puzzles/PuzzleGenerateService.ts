@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { Service } from 'typedi';
-import type { PuzzleGenerateInput, PuzzleGenerateState } from '../../shared/app/puzzles/puzzleGenerate.js';
+import { GENERATOR_DEFAULT_FULL_DEPTH, type PuzzleGenerateInput, type PuzzleGenerateState } from '../../shared/app/puzzles/puzzleGenerate.js';
 import AiJobService from '../ai-jobs/AiJobService.js';
 import PositionAnalysisCache from '../ai-jobs/PositionAnalysisCache.js';
 import PositionSolveCache from '../ai-jobs/PositionSolveCache.js';
@@ -16,7 +16,7 @@ const FINISHED_RUN_TTL_MS = 10 * 60_000;
  * Identifies a generation: same position, tree and options.
  * Messages are ignored, they don't change the generation.
  */
-export const getPuzzleGenerateKey = ({ puzzle, fromPath, templateIds, stopAtComputerMoves = false }: PuzzleGenerateInput): string => {
+export const getPuzzleGenerateKey = ({ puzzle, fromPath, templateIds, fullDepth = GENERATOR_DEFAULT_FULL_DEPTH }: PuzzleGenerateInput): string => {
     const definition = {
         boardsize: puzzle.boardsize,
         redStones: [...puzzle.redStones].sort(),
@@ -28,7 +28,7 @@ export const getPuzzleGenerateKey = ({ puzzle, fromPath, templateIds, stopAtComp
         tree: puzzle.tree,
         fromPath,
         templateIds: [...templateIds].sort(),
-        stopAtComputerMoves,
+        fullDepth,
     };
 
     const json = JSON.stringify(definition, (key, value: unknown) => key === 'message' ? undefined : value);
