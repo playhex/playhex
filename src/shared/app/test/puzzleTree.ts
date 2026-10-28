@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { countComputerAlternatives, createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findPlayedMovesPath, findSamePositionNode, findSolution, findTranspositions, getComputerAnswer, getComputerAnswers, getNodeResult, hasComputerAlternatives, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
+import { countComputerAlternatives, createNodeResolver, createParallelsFinder, findChild, findElseNode, findErrorNode, findPlayedMovesPath, findSamePositionNode, findSolution, findTranspositions, isPlayableLine, isUncoveredLine, getComputerAnswer, getComputerAnswers, getNodeResult, hasComputerAlternatives, getParallelNodeResult, getPositionKey, isDraftBlockingError, isParallelRoot, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type NodeResolver, type PuzzleDefinition, type PuzzleNode } from '../puzzles/puzzleTree.js';
 
 const noTransposition: NodeResolver = node => node;
 
@@ -307,6 +307,61 @@ describe('puzzleTree', () => {
             assert.deepStrictEqual(findPlayedMovesPath(tree, ['c3', 'a1']).path, [c3, parallel, a1]);
             assert.deepStrictEqual(findPlayedMovesPath(tree, ['c3', 'a1', 'a2']).path, [c3, parallel, a1, a1.children![0]]);
             assert.deepStrictEqual(findPlayedMovesPath(tree, ['a1', 'a2', 'c3', 'b3']).path, [c3, c3.children![0]], 'back to main sequence');
+        });
+    });
+
+    describe('isUncoveredLine', () => {
+        it('detects last move as first move out of tree', () => {
+            assert.strictEqual(isUncoveredLine(tree, ['c3', 'b3', 'e5']), true);
+            assert.strictEqual(isUncoveredLine({ children: [{ move: 'c3' }] }, ['e5']), true);
+        });
+
+        it('is covered when all moves are in tree', () => {
+            assert.strictEqual(isUncoveredLine(tree, []), false);
+            assert.strictEqual(isUncoveredLine(tree, ['c3', 'b3', 'd2']), false);
+        });
+
+        it('is covered by an "else" node', () => {
+            assert.strictEqual(isUncoveredLine(tree, ['e5']), false);
+        });
+
+        it('is not uncovered when an earlier move already left the tree', () => {
+            assert.strictEqual(isUncoveredLine(tree, ['c3', 'b3', 'e5', 'e4', 'a2']), false);
+        });
+
+        it('follows transpositions and parallel sequences', () => {
+            const target: PuzzleNode = { move: 'b4', children: [{ move: 'd4' }] };
+            const c3: PuzzleNode = { move: 'c3', children: [{ move: 'b3', children: [target] }] };
+            const b4: PuzzleNode = { move: 'b4', children: [{ move: 'b3', children: [{ move: 'c3' }] }] };
+            const parallel: PuzzleNode = { children: [{ move: 'a1', children: [{ move: 'a2' }] }] };
+            const tree: PuzzleNode = { parallel: [parallel], children: [c3, b4] };
+
+            assert.strictEqual(isUncoveredLine(tree, ['b4', 'b3', 'c3', 'd4']), false);
+            assert.strictEqual(isUncoveredLine(tree, ['b4', 'b3', 'c3', 'e5']), true);
+            assert.strictEqual(isUncoveredLine(tree, ['a1', 'a2']), false);
+            assert.strictEqual(isUncoveredLine(tree, ['a1', 'e5']), true);
+        });
+    });
+
+    describe('isPlayableLine', () => {
+        const definition: Pick<PuzzleDefinition, 'boardsize' | 'redStones' | 'blueStones' | 'disabledCells'> = { boardsize: 5, redStones: ['a1'], blueStones: ['b1'], disabledCells: ['c1'] };
+
+        it('accepts moves on free cells, last one by player', () => {
+            assert.strictEqual(isPlayableLine(definition, ['c3']), true);
+            assert.strictEqual(isPlayableLine(definition, ['c3', 'b3', 'e5']), true);
+            assert.strictEqual(isPlayableLine({ ...definition, computerPlaysFirst: true }, ['c3', 'e5']), true);
+        });
+
+        it('rejects lines whose last move is by computer', () => {
+            assert.strictEqual(isPlayableLine(definition, ['c3', 'e5']), false);
+            assert.strictEqual(isPlayableLine({ ...definition, computerPlaysFirst: true }, ['c3']), false);
+        });
+
+        it('rejects moves out of board or on occupied cells', () => {
+            assert.strictEqual(isPlayableLine(definition, ['f1']), false);
+            assert.strictEqual(isPlayableLine(definition, ['a1']), false);
+            assert.strictEqual(isPlayableLine(definition, ['c1']), false);
+            assert.strictEqual(isPlayableLine(definition, ['c3', 'b3', 'c3']), false);
         });
     });
 

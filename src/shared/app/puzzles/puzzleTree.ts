@@ -618,10 +618,48 @@ export const findPlayedMovesPath = (tree: PuzzleNode, moves: Move[]): PlayedMove
     return { path: getPath(), outOfTreeMove: null };
 };
 
+/**
+ * Whether last move of this line is the first one not covered by tree,
+ * i.e a player move that fails the puzzle because author did not plan it.
+ * A move answered by an "else" node is covered.
+ */
+export const isUncoveredLine = (tree: PuzzleNode, moves: Move[]): boolean => {
+    if (moves.length === 0) {
+        return false;
+    }
+
+    const { path, outOfTreeMove } = findPlayedMovesPath(tree, moves);
+    const last = path[path.length - 1];
+
+    return outOfTreeMove === moves[moves.length - 1]
+        && findPlayedMovesPath(tree, moves.slice(0, -1)).outOfTreeMove === null
+        && (last === undefined || !isElseNode(last))
+    ;
+};
+
 const isInBoard = (move: Move, boardsize: number): boolean => {
     const { row, col } = parseMove(move);
 
     return row >= 0 && col >= 0 && row < boardsize && col < boardsize;
+};
+
+/**
+ * Whether these moves can be played from puzzle initial position, last one by player:
+ * all in board, on distinct cells, not on initial stones nor disabled cells.
+ */
+export const isPlayableLine = (definition: Pick<PuzzleDefinition, 'boardsize' | 'redStones' | 'blueStones' | 'disabledCells' | 'computerPlaysFirst'>, moves: Move[]): boolean => {
+    const occupied = new Set([...definition.redStones, ...definition.blueStones, ...(definition.disabledCells ?? [])]);
+
+    for (const move of moves) {
+        if (!isInBoard(move, definition.boardsize) || occupied.has(move)) {
+            return false;
+        }
+
+        occupied.add(move);
+    }
+
+    // Player plays odd moves, or even moves when computer plays first
+    return (moves.length % 2 === 1) !== (definition.computerPlaysFirst ?? false);
 };
 
 const isObject = (value: unknown): value is Record<string, unknown> =>

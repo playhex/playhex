@@ -67,6 +67,16 @@ const COMPUTER_ANSWER_DELAY_MS = 200;
 
 const HINT_MARK_GROUP = 'hint';
 
+type UsePuzzleOptions = {
+    /**
+     * Called when player plays a move not covered by tree, which fails the puzzle.
+     * Not called for moves played once puzzle ended.
+     *
+     * @param moves Moves played from initial position, last one is the uncovered move
+     */
+    onUncoveredMove?: (moves: Move[]) => void;
+};
+
 /**
  * Bootstrap success color
  */
@@ -79,7 +89,7 @@ const HINT_MARK_COLOR = 0x198754;
  * Once a line is solved, computer alternative answers are played, from the top of the line,
  * and player must also solve them.
  */
-export const usePuzzle = (puzzle: Puzzle) => {
+export const usePuzzle = (puzzle: Puzzle, { onUncoveredMove }: UsePuzzleOptions = {}) => {
     const playerColor = puzzle.playerColor;
     const computerColor: 0 | 1 = playerColor === 0 ? 1 : 0;
     const computerPlaysFirst = puzzle.computerPlaysFirst ?? false;
@@ -430,8 +440,13 @@ export const usePuzzle = (puzzle: Puzzle) => {
 
         // Move not in tree: "else" node if any, else wrong move, or free move once ended
         const elseNode = treeNode === null || ended.value ? null : findElseNode(treeNode);
+        const uncovered = treeNode !== null && !ended.value && elseNode === null && color === playerColor;
 
         pushMove({ move, color, node: elseNode, parallel: null, byComputer: false });
+
+        if (uncovered) {
+            onUncoveredMove?.(path.value.map(({ move }) => move));
+        }
 
         if (elseNode !== null) {
             playComputerMove(elseNode.else, { node: elseNode, parallel: null });

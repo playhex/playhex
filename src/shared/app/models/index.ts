@@ -44,6 +44,8 @@ import PlayerHeadToHeadStats from './PlayerHeadToHeadStats.js';
 import Premove from './Premove.js';
 import Puzzle from './Puzzle.js';
 import PuzzleCollection from './PuzzleCollection.js';
+import PuzzleMonitorUncoveredLine from './PuzzleMonitorUncoveredLine.js';
+import PuzzleMonitorUncoveredLineIgnored from './PuzzleMonitorUncoveredLineIgnored.js';
 import Rating from './Rating.js';
 import SimilarPositionFlag from './SimilarPositionFlag.js';
 import Tournament from './Tournament.js';
@@ -104,6 +106,8 @@ export {
     Premove,
     Puzzle,
     PuzzleCollection,
+    PuzzleMonitorUncoveredLine,
+    PuzzleMonitorUncoveredLineIgnored,
     Rating,
     SimilarPositionFlag,
     Tournament,
@@ -161,6 +165,8 @@ export const entities = {
     PlayerStats,
     Puzzle,
     PuzzleCollection,
+    PuzzleMonitorUncoveredLine,
+    PuzzleMonitorUncoveredLineIgnored,
     Rating,
     SimilarPositionFlag,
     Tournament,

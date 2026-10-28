@@ -19,7 +19,7 @@ import { fillForKatahex, getEdgePaths, getReachableEdges, getSolverFilledPositio
 import Board from '../../../../shared/game-engine/Board.js';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 
-export type EditorStep = 'position' | 'tree' | 'engines' | 'info' | 'publish' | 'display';
+export type EditorStep = 'position' | 'tree' | 'engines' | 'info' | 'publish' | 'monitor' | 'display';
 
 /**
  * How a click on board edits initial position.
@@ -1416,6 +1416,19 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         }
     };
 
+    /**
+     * Goes to tree, selects node reached by these moves, and highlights first move not in tree,
+     * e.g an uncovered line played by players.
+     */
+    const selectPlayedMoves = (moves: Move[]): void => {
+        const { path, outOfTreeMove } = findPlayedMovesPath(tree.value, moves);
+
+        setStep('tree');
+        selectPath(path);
+        highlightedMove.value = outOfTreeMove;
+        drawHighlightedMove();
+    };
+
     /*
      * Katahex check: warnings on tree logic, not blocking publishing
      */
@@ -1638,6 +1651,7 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
         draftErrors,
         nodeErrors,
         selectErrorNode,
+        selectPlayedMoves,
         exportTree,
         importTree,
         toInput,

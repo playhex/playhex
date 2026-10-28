@@ -4,7 +4,8 @@ import { Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthenticatedPlayer } from '../controllers/http/middlewares.js';
 import { Player, Puzzle, PuzzleCollection } from '../../shared/app/models/index.js';
-import { isDraftBlockingError, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type PuzzleDefinition, type PuzzleInput } from '../../shared/app/puzzles/puzzleTree.js';
+import { PUZZLE_MONITOR_LINE_MAX_LENGTH } from '../../shared/app/models/PuzzleMonitorUncoveredLine.js';
+import { isDraftBlockingError, isPlayableLine, isUncoveredLine, normalizePuzzleText, puzzleErrorToString, validatePuzzle, type PuzzleDefinition, type PuzzleInput } from '../../shared/app/puzzles/puzzleTree.js';
 import { PUZZLE_COLLECTION_MAX_PUZZLES } from '../../shared/app/puzzles/puzzleCollection.js';
 import { canCreatePuzzleFromGame } from '../../shared/app/gameUtils.js';
 import GameStore from '../store/GameStore.js';
@@ -13,7 +14,7 @@ import PuzzleCollectionRepository from './PuzzleCollectionRepository.js';
 import { serializePuzzleData } from './puzzleSerializer.js';
 import { mustBeCollectionAuthor, mustBePuzzleAuthor } from './puzzleGuards.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
-import { ArrayMaxSize, IsArray, IsIn, IsInt, IsOptional, Max, Min, Validate } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsInt, IsOptional, Max, Min, Validate } from 'class-validator';
 import { validateMove, type Move } from '@playhex/move-notation';
 import { getEdgePaths, type PuzzleEdgeConnection, type PuzzleFixedFill } from '../../shared/app/puzzles/edgeConnections.js';
 import { PUZZLE_CHECK_ENGINES, type PuzzleCheckEngine, type PuzzleCheckInput, type PuzzleCheckState, type PuzzleSolvePositionInput, type PuzzleSolvePositionOutput } from '../../shared/app/puzzles/puzzleCheck.js';
@@ -24,10 +25,13 @@ import AiJobService, { SOLVE_POSITION_INTERACTIVE_TIMEOUT_MS } from '../ai-jobs/
 import { getPuzzleSolveInputs, solvePuzzlePosition } from './solvePuzzlePosition.js';
 import { fillDisabledCells, toColor } from './puzzleCheckUtils.js';
 import PuzzleCheckService, { getPuzzleCheckKey } from './PuzzleCheckService.js';
+import PuzzleMonitorUncoveredLineRepository from './PuzzleMonitorUncoveredLineRepository.js';
+import type { PuzzleMonitorUncoveredLineCount } from '../../shared/app/puzzles/puzzleMonitor.js';
+import { deserializeMoves, serializeMoves } from '../../shared/app/movesSerializer.js';
 import { SimilarPlayingPositionChecker } from '../services/anti-cheat/SimilarPlayingPositionChecker.js';
 import { SimilarPositionDetectedError, similarPositionDetectedToTranslatableHttpError } from '../services/anti-cheat/SimilarPositionDetectedError.js';
 import { InvalidPositionError } from '../../shared/position-comparator/position-comparator.js';
-import { rateLimiterConsumePuzzleCheck, rateLimiterConsumePuzzleSolvePosition } from '../services/rate-limiters.js';
+import { rateLimiterConsumePuzzleCheck, rateLimiterConsumePuzzleMonitor, rateLimiterConsumePuzzleSolvePosition } from '../services/rate-limiters.js';
 import { ROLE_ADMIN } from '../services/roles.js';
 
 /**
@@ -170,6 +174,33 @@ const isValidFixedFill = (cell: unknown): cell is PuzzleFixedFill =>
 ;
 
 /**
+ * A line played on a puzzle, see PuzzleMonitorUncoveredLine.
+ */
+class PuzzleMonitorLineBody
+{
+    @IsArray()
+    @ArrayMinSize(1)
+    @ArrayMaxSize(SOLVE_MAX_STONES)
+    @Validate(IsHexCoordinate, { each: true })
+    moves: Move[];
+}
+
+/**
+ * Line as stored, e.g "a1 b2 c3".
+ *
+ * @throws {BadRequestError} If line is too long to be stored
+ */
+const toMonitorLine = (moves: Move[]): string => {
+    const line = serializeMoves(moves);
+
+    if (line.length > PUZZLE_MONITOR_LINE_MAX_LENGTH) {
+        throw new BadRequestError('Line too long');
+    }
+
+    return line;
+};
+
+/**
  * Body size limit, as a tree with many nodes and messages can exceed default 100kb.
  */
 const BODY_OPTIONS = { required: true, options: { limit: '1mb' } };
@@ -187,6 +218,7 @@ export default class PuzzleController
         private similarPlayingPositionChecker: SimilarPlayingPositionChecker,
         private positionSolveCache: PositionSolveCache,
         private aiJobService: AiJobService,
+        private puzzleMonitorUncoveredLineRepository: PuzzleMonitorUncoveredLineRepository,
     ) {}
 
     /**
@@ -399,6 +431,7 @@ export default class PuzzleController
         await this.applyCollectionInput(puzzle, player, input);
 
         await this.puzzleRepository.save(puzzle, collectionsVisiblyUpdated(puzzle, previous));
+        await this.puzzleMonitorUncoveredLineRepository.deleteCoveredLines(puzzle);
 
         return serializePuzzleData(puzzle);
     }
@@ -508,6 +541,93 @@ export default class PuzzleController
         @Body(BODY_OPTIONS) input: PuzzleCheckInput,
     ): Promise<PuzzleCheckState> {
         return await this.puzzleCheck(input, async () => {});
+    }
+
+    /**
+     * Logs a player move not covered by puzzle tree, which failed the puzzle.
+     * Silently ignored when not relevant: draft, author testing, or move covered by saved tree.
+     * Lines marked as false positive are still logged.
+     */
+    @Post('/api/puzzles/:publicId/monitor/uncovered-lines')
+    @OnUndefined(204)
+    async postUncoveredLine(
+        @AuthenticatedPlayer() player: Player,
+        @Param('publicId') publicId: string,
+        @Body() body: PuzzleMonitorLineBody,
+    ): Promise<void> {
+        const line = toMonitorLine(body.moves);
+        const puzzle = await this.getPuzzleOrFail(publicId);
+
+        if (!isPlayableLine(puzzle, body.moves)) {
+            throw new BadRequestError('Line cannot be played on this puzzle');
+        }
+
+        if (!puzzle.published || puzzle.author?.publicId === player.publicId) {
+            return;
+        }
+
+        await rateLimiterConsumePuzzleMonitor(player.publicId);
+
+        if (!isUncoveredLine(puzzle.tree, body.moves)) {
+            return;
+        }
+
+        await this.puzzleMonitorUncoveredLineRepository.log(puzzle, player, line);
+    }
+
+    /**
+     * Lines not covered by puzzle tree played by players, most played first, false positives included.
+     * Lines covered since then are not returned.
+     */
+    @Get('/api/puzzles/:publicId/monitor/uncovered-lines')
+    async getUncoveredLines(
+        @AuthenticatedPlayer() player: Player,
+        @Param('publicId') publicId: string,
+    ): Promise<PuzzleMonitorUncoveredLineCount[]> {
+        const puzzle = await this.getPuzzleOrFail(publicId);
+
+        mustBePuzzleAuthor(puzzle, player);
+
+        return (await this.puzzleMonitorUncoveredLineRepository.countByLine(puzzle))
+            .map(({ line, count, ignored }) => ({ moves: deserializeMoves<Move>(line), count, ignored }))
+            .filter(({ moves }) => isUncoveredLine(puzzle.tree, moves))
+        ;
+    }
+
+    /**
+     * Marks an uncovered line as false positive, hidden by default.
+     */
+    @Post('/api/puzzles/:publicId/monitor/uncovered-lines/ignore')
+    @OnUndefined(204)
+    async ignoreUncoveredLine(
+        @AuthenticatedPlayer() player: Player,
+        @Param('publicId') publicId: string,
+        @Body() body: PuzzleMonitorLineBody,
+    ): Promise<void> {
+        await this.setUncoveredLineIgnored(player, publicId, body.moves, true);
+    }
+
+    /**
+     * Line is no longer a false positive, shown again.
+     */
+    @Post('/api/puzzles/:publicId/monitor/uncovered-lines/unignore')
+    @OnUndefined(204)
+    async unignoreUncoveredLine(
+        @AuthenticatedPlayer() player: Player,
+        @Param('publicId') publicId: string,
+        @Body() body: PuzzleMonitorLineBody,
+    ): Promise<void> {
+        await this.setUncoveredLineIgnored(player, publicId, body.moves, false);
+    }
+
+    private async setUncoveredLineIgnored(player: Player, publicId: string, moves: Move[], ignored: boolean): Promise<void>
+    {
+        const line = toMonitorLine(moves);
+        const puzzle = await this.getPuzzleOrFail(publicId);
+
+        mustBePuzzleAuthor(puzzle, player);
+
+        await this.puzzleMonitorUncoveredLineRepository.setIgnored(puzzle, line, ignored);
     }
 
     @Delete('/api/puzzles/:publicId')

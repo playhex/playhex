@@ -4,12 +4,13 @@ import { whenever } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import { Game, Puzzle } from '../../../../shared/app/models/index.js';
 import { intlFormat } from 'date-fns';
+import type { Move } from '@playhex/move-notation';
 import { autoLocale } from '../../../../shared/app/i18n/index.js';
 import { getPuzzleTitle } from '../services/puzzleTitle.js';
 import { usePuzzle } from '../composables/usePuzzle.js';
 import { puzzleToHexplorerAnalysis } from '../services/puzzleToHexplorer.js';
 import { validatePuzzle } from '../../../../shared/app/puzzles/puzzleTree.js';
-import { apiGetNextPuzzle, apiPublishPuzzle } from '../../../apiClient.js';
+import { apiGetNextPuzzle, apiPostPuzzleMonitorUncoveredLine, apiPublishPuzzle } from '../../../apiClient.js';
 import { HEXPLORER_ANALYSIS_STATE_KEY } from '../../hexplorer/HexplorerState.js';
 import { IconAlphabet, IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowRight, IconCheck, IconCircleFill, IconCopy, IconDiagram2, IconLightbulb, IconPencilSquare, IconRepeat, IconSendFill, IconXLg } from '../../icons.js';
 import AppPseudo from '../../components/AppPseudo.vue';
@@ -23,6 +24,20 @@ import { renderMessageWithCoords, useCoordsMarks } from '../../composables/useCo
 const props = defineProps<{
     puzzle: Puzzle;
 }>();
+
+const { loggedInPlayer } = storeToRefs(useAuthStore());
+
+/**
+ * Lets author see which moves players try that are not in tree.
+ * Only on published puzzles, not when author tests it.
+ */
+const logUncoveredMove = (moves: Move[]): void => {
+    if (!props.puzzle.published || loggedInPlayer.value === null || loggedInPlayer.value.publicId === props.puzzle.author?.publicId) {
+        return;
+    }
+
+    apiPostPuzzleMonitorUncoveredLine(props.puzzle.publicId, moves).catch(e => console.error('Could not log uncovered move', e));
+};
 
 const {
     gameView,
@@ -41,7 +56,7 @@ const {
     restart,
     hint,
     nextAlternative,
-} = usePuzzle(props.puzzle);
+} = usePuzzle(props.puzzle, { onUncoveredMove: logUncoveredMove });
 
 const gameViewElement = useTemplateRef('game-view-element');
 
@@ -73,8 +88,6 @@ const dismissBoardMessage = (key: string): void => {
 };
 
 const hexplorerAnalysis = puzzleToHexplorerAnalysis(props.puzzle);
-
-const { loggedInPlayer } = storeToRefs(useAuthStore());
 
 /**
  * Local, as draft can be published from this page.

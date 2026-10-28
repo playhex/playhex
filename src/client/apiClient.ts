@@ -25,6 +25,8 @@ import type TimeControlType from '../shared/time-control/TimeControlType.js';
 import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
 import type { PuzzleCheckInput, PuzzleCheckState, PuzzleSolvePositionInput, PuzzleSolvePositionOutput } from '../shared/app/puzzles/puzzleCheck.js';
 import type { PuzzleCollectionInput } from '../shared/app/puzzles/puzzleCollection.js';
+import type { Move } from '@playhex/move-notation';
+import type { PuzzleMonitorUncoveredLineCount } from '../shared/app/puzzles/puzzleMonitor.js';
 import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.js';
 import type { OAuthConnectedApplication, OAuthInteractionDetails } from '../shared/app/oauth.js';
 
@@ -1616,6 +1618,46 @@ export const apiPublishPuzzle = async (publicId: string): Promise<Puzzle> => {
 export const apiDeletePuzzle = async (publicId: string): Promise<void> => {
     const response = await fetch(`/api/puzzles/${publicId}`, {
         method: 'delete',
+    });
+
+    await checkResponse(response);
+};
+
+/**
+ * Logs a player move not covered by puzzle tree, see PuzzleMonitorUncoveredLine.
+ *
+ * @param moves Moves played from initial position, last one is the uncovered move
+ */
+export const apiPostPuzzleMonitorUncoveredLine = async (publicId: string, moves: Move[]): Promise<void> => {
+    const response = await fetch(`/api/puzzles/${publicId}/monitor/uncovered-lines`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ moves }),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiGetPuzzleMonitorUncoveredLines = async (publicId: string): Promise<PuzzleMonitorUncoveredLineCount[]> => {
+    const response = await fetch(`/api/puzzles/${publicId}/monitor/uncovered-lines`);
+
+    await checkResponse(response);
+
+    return await response.json() as PuzzleMonitorUncoveredLineCount[];
+};
+
+/**
+ * Marks an uncovered line as false positive, or not anymore.
+ */
+export const apiSetPuzzleMonitorUncoveredLineIgnored = async (publicId: string, moves: Move[], ignored: boolean): Promise<void> => {
+    const response = await fetch(`/api/puzzles/${publicId}/monitor/uncovered-lines/${ignored ? 'ignore' : 'unignore'}`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ moves }),
     });
 
     await checkResponse(response);

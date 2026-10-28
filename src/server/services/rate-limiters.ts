@@ -137,6 +137,15 @@ const puzzleSolvePositionLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit uncovered moves logged by a player while playing puzzles.
+ */
+const puzzleMonitorLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.puzzle_monitor',
+    points: 30,
+    duration: 60,
+});
+
+/**
  * Limit game analyze moves deep analyzes (tree search), by player.
  * One point by move, enough to deeply analyze a whole game at once.
  */
@@ -293,6 +302,10 @@ export const rateLimiterConsumePuzzleCheck = async (playerPublicId: string) => {
 
 export const rateLimiterConsumePuzzleSolvePosition = async (playerPublicId: string) => {
     await consume(puzzleSolvePositionLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumePuzzleMonitor = async (playerPublicId: string) => {
+    await consume(puzzleMonitorLimiter, playerPublicId);
 };
 
 export const rateLimiterConsumeAiWorkerNextJob = async (aiWorkerKeyId: number) => {

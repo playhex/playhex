@@ -11,12 +11,14 @@ import { isElseNode, PUZZLE_DESCRIPTION_MAX_LENGTH, PUZZLE_MESSAGE_MAX_LENGTH, P
 import { isValidBoardsize, MAX_BOARDSIZE, MIN_BOARDSIZE, MOHEX_MAX_BOARDSIZE } from '../../../../shared/app/boardsizeLimits.js';
 import { apiDeletePuzzle, apiGetMyPuzzleCollections, apiPostPuzzle, apiPutPuzzle } from '../../../apiClient.js';
 import { type EditorStep, usePuzzleEditor } from '../composables/usePuzzleEditor.js';
+import { usePuzzleMonitor } from '../composables/usePuzzleMonitor.js';
 import AppPuzzleTreeNode from './AppPuzzleTreeNode.vue';
 import AppPuzzleEdgeConnectionTool from './AppPuzzleEdgeConnectionTool.vue';
+import AppPuzzleMonitorUncoveredLines from './AppPuzzleMonitorUncoveredLines.vue';
 import { translatePuzzleError } from '../services/puzzleErrorMessage.js';
 import PuzzleEditorExpertModeOverlay from './PuzzleEditorExpertModeOverlay.vue';
 import ImportGameOverlay from '../../components/overlay/ImportGameOverlay.vue';
-import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconAspectRatio, IconAsterisk, IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconCrosshair, IconDiagram2, IconEraser, IconExclamationTriangle, IconEye, IconHexagonFill, IconHouseFill, IconInfoCircle, IconMagic, IconPlayFill, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconXLg, IconZoomIn, IconZoomOut } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconArrowLeft, IconArrowReturnRight, IconAspectRatio, IconAsterisk, IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCircleFill, IconCrosshair, IconDiagram2, IconEraser, IconExclamationTriangle, IconEye, IconGraphUp, IconHexagonFill, IconHouseFill, IconInfoCircle, IconMagic, IconPlayFill, IconRobot, IconSave2, IconSendFill, IconShuffle, IconSignpostSplit, IconTrash, IconXLg, IconZoomIn, IconZoomOut } from '../../icons.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import { downloadString } from '../../../services/fileDownload.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
@@ -107,6 +109,7 @@ const {
     draftErrors,
     nodeErrors,
     selectErrorNode,
+    selectPlayedMoves,
     exportTree,
     importTree,
     puzzleCheck,
@@ -161,6 +164,7 @@ const panels: { step: EditorStep, icon: Component, labelKey: string, bottom?: tr
     { step: 'engines', icon: IconRobot, labelKey: 'puzzles.editor.engines_tab' },
     { step: 'info', icon: IconInfoCircle, labelKey: 'puzzles.editor.info_tab' },
     { step: 'publish', icon: IconSendFill, labelKey: 'puzzles.editor.publish_tab' },
+    { step: 'monitor', icon: IconGraphUp, labelKey: 'puzzles.editor.monitor_tab' },
     { step: 'display', icon: IconAspectRatio, labelKey: 'puzzles.editor.display_tab', bottom: true },
 ];
 
@@ -512,6 +516,10 @@ const getPanelBadge = (panelStep: EditorStep): null | PanelBadge => {
         return { count: checkWarningsCount.value, variant: 'warning', titleKey: 'puzzles.editor.warnings_badge' };
     }
 
+    if (panelStep === 'monitor' && monitor.uncoveredLines.value.length > 0) {
+        return { count: monitor.uncoveredLines.value.length, variant: 'warning', titleKey: 'puzzles.editor.monitor_badge' };
+    }
+
     return null;
 };
 
@@ -560,6 +568,20 @@ const withSaving = async (callback: () => Promise<void>): Promise<void> => {
 const savedPublicId = ref<null | string>(props.puzzle?.publicId ?? null);
 
 /**
+ * Null until puzzle is published once, see Puzzle.publishedAt.
+ */
+const publishedAt = ref<null | Date>(props.puzzle?.publishedAt ?? null);
+
+const monitor = usePuzzleMonitor(savedPublicId, publishedAt, tree);
+
+// Reloaded when opening panel, players may have played since
+watch(step, newStep => {
+    if (newStep === 'monitor') {
+        void monitor.load();
+    }
+});
+
+/**
  * Shows saved feedback on save button for a moment, when staying on editor.
  */
 const justSaved = ref(false);
@@ -574,6 +596,8 @@ const save = ({ publish = published, stay = false } = {}): Promise<void> => with
         ? await apiPostPuzzle(toInput(publish))
         : await apiPutPuzzle(savedPublicId.value, toInput(publish))
     ;
+
+    publishedAt.value = saved.publishedAt;
 
     if (!stay) {
         await router.push({ name: 'puzzle', params: { publicId: saved.publicId } });
@@ -1161,6 +1185,19 @@ const deletePuzzle = async (): Promise<void> => {
                         </div>
 
                         <div class="form-text">{{ $t('puzzles.editor.board_display_help') }}</div>
+                    </template>
+
+                    <!-- Monitoring, once published -->
+                    <template v-else-if="'monitor' === step">
+                        <AppPuzzleMonitorUncoveredLines
+                            :enabled="monitor.enabled.value"
+                            :loaded="monitor.loaded.value"
+                            :error="monitor.error.value"
+                            :uncoveredLines="monitor.uncoveredLines.value"
+                            :ignoredLines="monitor.ignoredLines.value"
+                            @select="selectPlayedMoves"
+                            @setIgnored="monitor.setIgnored"
+                        />
                     </template>
 
                     <!-- Publish -->
