@@ -10,4 +10,3 @@ onlyBuiltDependencies:
   - '@sentry/cli'
   - protobufjs
   - vue-demi
-  - tournament-organizer

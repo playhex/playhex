@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { type LoadableTournamentValues } from 'tournament-organizer/interfaces';
+import { type LoadableTournamentValues } from '@playhex/tournament-organizer/interfaces';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, type Relation } from 'typeorm';
 import { IsArray, IsBoolean, IsDate, IsIn, IsInt, IsObject, IsOptional, IsString, IsUUID, Length, Max, Min, Validate, ValidateNested } from 'class-validator';
 import { IsTournamentSlug } from '../validator/IsTournamentSlug.js';

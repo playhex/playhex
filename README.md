@@ -293,6 +293,35 @@ On release:
 Some parts of PlayHex are published on npm as standalone packages (`src/packages/`),
 see [docs/publishing-packages.md](docs/publishing-packages.md).
 
+### Work on tournament-organizer locally
+
+Tournaments use [`@playhex/tournament-organizer`](https://github.com/playhex/tournament-organizer), installed from npm.
+To change it and test changes in PlayHex without publishing, clone it next to this repository, then:
+
+``` bash
+# build it (PlayHex uses its dist/)
+cd ../tournament-organizer
+npm install
+npm run build # or `npx tsc -p tsconfig.json --watch` to rebuild on change
+
+# use the local folder instead of the npm package
+cd ../hex
+pnpm link ../tournament-organizer
+```
+
+Restart `pnpm serve` after each rebuild, so that the server loads the new `dist/`.
+
+`pnpm link` adds an `overrides` entry in `pnpm-workspace.yaml` and `pnpm-lock.yaml`: do not commit it.
+When done, go back to the npm package (`pnpm unlink` does not remove the override):
+
+``` bash
+git checkout pnpm-workspace.yaml pnpm-lock.yaml
+pnpm install
+```
+
+To use the changes in PlayHex, publish a new version of tournament-organizer (see "Publishing" in its README),
+then `pnpm add @playhex/tournament-organizer@^<version>`.
+
 ## License
 
 This project is under [AGPL-3.0 license](LICENSE).

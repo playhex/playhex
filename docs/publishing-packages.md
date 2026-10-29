@@ -11,6 +11,10 @@ They live in `src/packages/<name>`, and are pnpm workspaces (see `pnpm-workspace
 | `@playhex/shading-patterns` | `src/packages/shading-patterns` | Board shading patterns |
 | `@playhex/pixi-board` | `src/packages/pixi-board` | Hex board renderer built on PixiJS |
 
+`@playhex/tournament-organizer`, our fork of [tournament-organizer](https://github.com/slashinfty/tournament-organizer),
+is also published under the `@playhex` scope, but lives in its own repository: <https://github.com/playhex/tournament-organizer>
+(see "Publishing" in its README).
+
 ## Prerequisites (once)
 
 - Be a member of the [`playhex` npm organization](https://www.npmjs.com/org/playhex), with publish rights
@@ -142,6 +146,10 @@ pnpm -r publish
 ```
 
 Then tag (see step 6 below) with the 4 packages at `1.0.0`.
+
+On first publication of a package, npm first creates a `0.0.0-stage` placeholder version,
+and the real version appears a few minutes later (`npm view @playhex/<name> dist-tags` shows `latest: 1.0.0`).
+The placeholder stays in the version list, it is harmless.
 
 ### Release new versions
 

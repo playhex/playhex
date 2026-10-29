@@ -1,6 +1,6 @@
-import TournamentOrganizer from 'tournament-organizer';
-import { StandingsValues } from 'tournament-organizer/interfaces';
-import { Tournament as TOTournament, Player as TOPlayer, Match } from 'tournament-organizer/components';
+import TournamentOrganizer from '@playhex/tournament-organizer';
+import { StandingsValues } from '@playhex/tournament-organizer/interfaces';
+import { Tournament as TOTournament, Player as TOPlayer, Match } from '@playhex/tournament-organizer/components';
 import { findTournamentPlayerByPublicIdStrict, findTournamentMatchByRoundAndNumber, getMatchLoserStrict, getMatchWinnerStrict, getSwissTotalRounds, groupAndSortTournamentMatches, tournamentMatchKey, rankParticipantsDoubleElimination, sortAndRankParticipants } from '../../../shared/app/tournamentUtils.js';
 import { TournamentEngineInterface } from './TournamentEngineInterface.js';
 import { CannotStartTournamentMatchError, NotEnoughParticipantsToStartTournamentError, TooDeepResetError, TournamentEngineError } from '../TournamentError.js';
