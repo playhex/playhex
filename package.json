@@ -92,7 +92,7 @@
     "oidc-provider": "^9.13.3",
     "parse-duration": "^2.1.10",
     "pg": "^8.23.1",
-    "pinia": "^3.0.4",
+    "pinia": "^4.1.0",
     "pixi.js": "^8.22.0",
     "qs": "^6.17.1",
     "rate-limiter-flexible": "^11.2.3",
