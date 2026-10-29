@@ -147,6 +147,8 @@ export const initI18n = async (): Promise<void> => {
             lng: autoLocale(),
             debug: process.env.NODE_ENV === 'development',
             fallbackLng: 'en',
+            // Fallback to en when a translation is empty, e.g a plural form left blank in Weblate
+            returnEmptyString: false,
             interpolation: { escapeValue: false },
         })
     ;
