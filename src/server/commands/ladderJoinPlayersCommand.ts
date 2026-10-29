@@ -1,7 +1,7 @@
 import { Container } from 'typedi';
 import { Repository } from 'typeorm';
 import hexProgram from './hexProgram.js';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import { LadderPlayer, Player } from '../../shared/app/models/index.js';
 import { pseudoString } from '../../shared/app/pseudoUtils.js';
 import LadderService from '../ladder/LadderService.js';
@@ -14,9 +14,7 @@ hexProgram
     .argument('<count>', 'Number of players to add')
     .argument('[ladder]', 'Ladder slug', 'main')
     .action(async (count, slug) => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         const targetCount = parseInt(count, 10);
 

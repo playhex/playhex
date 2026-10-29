@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import { gzipSync } from 'node:zlib';
-import { AppDataSource } from '../data-source.js';
+import { AppDataSource, appDataSourceInitialized } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { guessDemerHandicap } from '../../shared/app/demerHandicap.js';
 import { pseudoString } from '../../shared/app/pseudoUtils.js';
@@ -101,9 +101,7 @@ hexProgram
     .command('export-games')
     .description('Export games as json to a file')
     .action(async () => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         const gameUrlPrefix = (BASE_URL ?? '') + '/games/';
 

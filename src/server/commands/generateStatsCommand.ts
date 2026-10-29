@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import { AppDataSource } from '../data-source.js';
+import { AppDataSource, appDataSourceInitialized } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { Player, PlayerSettings } from '../../shared/app/models/index.js';
 import type { GameAnalyzeData } from '../../shared/app/models/GameAnalyze.js';
@@ -581,9 +581,7 @@ hexProgram
     .command('generate-stats')
     .description('Compute PlayHex statistics and write them as json files to be displayed on the statistics page')
     .action(async () => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         const now = new Date();
         const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));

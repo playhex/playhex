@@ -1,7 +1,7 @@
 import { Container } from 'typedi';
 import { Repository } from 'typeorm';
 import hexProgram from './hexProgram.js';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import { Player } from '../../shared/app/models/index.js';
 import PlayerAiWorkerKeyRepository from '../repositories/PlayerAiWorkerKeyRepository.js';
 import BullMqAiJobQueue from '../ai-jobs/queue/BullMqAiJobQueue.js';
@@ -9,9 +9,7 @@ import { getAiJobsRedisPrefix } from '../ai-jobs/AiJobService.js';
 import { AI_JOB_TYPES, isAiJobType } from '../ai-jobs/protocol.js';
 
 const initDataSource = async (): Promise<void> => {
-    if (!AppDataSource.isInitialized) {
-        await AppDataSource.initialize();
-    }
+    await appDataSourceInitialized;
 };
 
 hexProgram

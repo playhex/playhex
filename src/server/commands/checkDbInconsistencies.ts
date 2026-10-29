@@ -1,5 +1,5 @@
 import { Container } from 'typedi';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { AccountsMustHavePassword } from './data-inconsistency-checks/AccountsMustHavePassword.js';
 import { MoveTimestampsAreOrdered } from './data-inconsistency-checks/MoveTimestampsAreOrdered.js';
@@ -15,9 +15,7 @@ hexProgram
     .description('Check inconsistencies in database')
     .option('--name <name>', 'Only perform this check')
     .action(async ({ name }) => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         const checkers: DataInconsistenciesCheckerInterface[] = [
             Container.get(AccountsMustHavePassword),

@@ -10,3 +10,10 @@ onlyBuiltDependencies:
   - '@sentry/cli'
   - protobufjs
   - vue-demi
+
+peerDependencyRules:
+  allowedVersions:
+    # typeorm redis cache not used (typeorm-in-memory-cache instead)
+    typeorm>ioredis: '6'
+    winston-transport-sentry-node>@sentry/node: '10'
+    routing-controllers>class-validator: '0.15'

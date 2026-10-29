@@ -7,7 +7,7 @@ import logger from '../services/logger.js';
 import { FindAIError, findAIOpponent } from '../services/AIManager.js';
 import { Repository } from 'typeorm';
 import { cloneGameOptions } from '../../shared/app/models/GameOptions.js';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import RatingRepository from '../repositories/RatingRepository.js';
 import { isDuplicateError } from '../repositories/typeormUtils.js';
 import OnlinePlayersService from '../services/OnlinePlayersService.js';
@@ -86,7 +86,7 @@ export default class GameStore
     {
         logger.info('Loading active games from memory...');
 
-        await AppDataSource.initialize();
+        await appDataSourceInitialized;
 
         const games = await this.gameRepository.findMany({
             where: [

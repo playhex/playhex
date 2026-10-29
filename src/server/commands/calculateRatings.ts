@@ -1,6 +1,6 @@
 import { Container } from 'typedi';
 import { In, Repository } from 'typeorm';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { Game, Player } from '../../shared/app/models/index.js';
 import RatingRepository from '../repositories/RatingRepository.js';
@@ -23,9 +23,7 @@ hexProgram
     .command('calculate-ratings')
     .description('Calculate ratings')
     .action(async () => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         const ratingRepository = Container.get(RatingRepository);
         const playerRepository = Container.get<Repository<Player>>('Repository<Player>');

@@ -1,6 +1,6 @@
 import { Container } from 'typedi';
 import hexProgram from '../commands/hexProgram.js';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import { puzzleErrorToString, validatePuzzle } from '../../shared/app/puzzles/puzzleTree.js';
 import PuzzleRepository from './PuzzleRepository.js';
 import { PuzzleFileError, readPuzzleFile } from './puzzleFile.js';
@@ -35,9 +35,7 @@ hexProgram
             process.exit(1);
         }
 
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         await Container.get(PuzzleRepository).save(puzzle);
 

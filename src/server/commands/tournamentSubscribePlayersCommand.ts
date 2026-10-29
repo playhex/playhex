@@ -1,7 +1,7 @@
 import { Container } from 'typedi';
 import { Repository } from 'typeorm';
 import hexProgram from './hexProgram.js';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import TournamentRepository from '../repositories/TournamentRepository.js';
 import { Player, Tournament, TournamentSubscription } from '../../shared/app/models/index.js';
 import { addTournamentHistory } from '../../shared/app/models/TournamentHistory.js';
@@ -55,9 +55,7 @@ hexProgram
     .argument('<tournament>', 'Tournament id or slug')
     .argument('<count>', 'Target number of participants')
     .action(async (tournamentIdentifier, count) => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         const targetCount = parseInt(count, 10);
 

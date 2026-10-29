@@ -1,4 +1,3 @@
-import { setTimeout } from 'node:timers/promises';
 import { Container } from 'typedi';
 import AiJobService from './AiJobService.js';
 import AiWorkersRegistry from './worker/AiWorkersRegistry.js';
@@ -6,7 +5,7 @@ import { AI_JOB_TYPES } from './protocol.js';
 import { isMonitoringEnabled, sendAiQueuePoint } from '../services/metrics.js';
 import GameAnalyzeRepository from '../repositories/GameAnalyzeRepository.js';
 import ExternalGameRepository from '../external-games/ExternalGameRepository.js';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import logger from '../services/logger.js';
 
 const MONITOR_INTERVAL_MS = 30_000;
@@ -38,9 +37,7 @@ export const initAiJobs = async (): Promise<void> => {
         monitorAiQueues();
     }
 
-    while (!AppDataSource.isInitialized) {
-        await setTimeout(100);
-    }
+    await appDataSourceInitialized;
 
     const failedCount = await Container.get(GameAnalyzeRepository).failUnfinished();
 

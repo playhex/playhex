@@ -39,14 +39,6 @@ export default defineConfig(({ command }) => ({
             'vue': path.resolve(__dirname, 'node_modules/vue/dist/vue.runtime.esm-bundler.js'),
         },
     },
-    css: {
-        preprocessorOptions: {
-            scss: {
-                // Silence Bootstrap SCSS deprecations (safe to ignore until Bootstrap upgrades Sass syntax)
-                silenceDeprecations: ['color-functions', 'global-builtin', 'import', 'if-function'],
-            },
-        },
-    },
     // Also add typings for these constants in src/client/types.d.ts
     define: {
         BASE_URL: JSON.stringify(process.env.BASE_URL),

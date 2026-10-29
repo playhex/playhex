@@ -3,7 +3,7 @@ import { Player, Tournament, TournamentSeries } from '../../shared/app/models/in
 import { by, errorToLogger } from '../../shared/app/utils.js';
 import { ActiveTournament } from '../tournaments/ActiveTournament.js';
 import logger from '../services/logger.js';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import { createTournamentFromCreateInput } from '../../shared/app/models/Tournament.js';
 import { getTournamentEngine } from '../tournaments/organizers/getTournamentEngine.js';
 import { ActiveTournamentsFilters, isFeaturedNow, isPlayerInvolved, tournamentMatchKey } from '../../shared/app/tournamentUtils.js';
@@ -38,7 +38,7 @@ export default class TournamentStore
     {
         logger.info('Loading tournaments from database to memory...');
 
-        await AppDataSource.initialize();
+        await appDataSourceInitialized;
 
         const tournaments = await this.tournamentRepository.findActiveTournaments();
 

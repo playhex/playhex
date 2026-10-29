@@ -1,6 +1,6 @@
 import { Container } from 'typedi';
 import { MoreThan, Repository } from 'typeorm';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import { Game } from '../../shared/app/models/index.js';
 import { comparableBoardsizes, comparePositions, createCanonicalPosition, InvalidPositionError, type CandidatePosition, type ComparisonResult } from '../../shared/position-comparator/position-comparator.js';
 import hexProgram from './hexProgram.js';
@@ -23,9 +23,7 @@ hexProgram
     .requiredOption('--game <publicId>', 'Public id (uuid) of the reference game')
     .option('--top <number>', 'Number of similar games to return', '5')
     .action(async ({ game: gamePublicId, top }) => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         const topCount = parseInt(top, 10);
 

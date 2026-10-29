@@ -2,7 +2,7 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import { Service } from 'typedi';
 import { ExternalGameImportJob } from '../../shared/app/models/index.js';
 import { errorToLogger } from '../../shared/app/utils.js';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import logger from '../services/logger.js';
 import { isDuplicateError } from '../repositories/typeormUtils.js';
 import ExternalGameRepository from './ExternalGameRepository.js';
@@ -68,9 +68,7 @@ export default class ExternalGameImportWorker
 
     private async loop(): Promise<void>
     {
-        while (!AppDataSource.isInitialized) {
-            await sleep(100);
-        }
+        await appDataSourceInitialized;
 
         const resetCount = await this.externalGameRepository.resetRunningImportJobs();
 

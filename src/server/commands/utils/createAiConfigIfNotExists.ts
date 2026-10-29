@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { v4 as uuidv4 } from 'uuid';
-import { AppDataSource } from '../../data-source.js';
+import { AppDataSource, appDataSourceInitialized } from '../../data-source.js';
 import { Player, AIConfig } from '../../../shared/app/models/index.js';
 
 type CreateAiConfigParameters = {
@@ -23,9 +23,7 @@ type CreateAiConfigParameters = {
  * @returns {Boolean} true if aiConfig just has been created, false if it was already existing.
  */
 export default async (parameters: CreateAiConfigParameters, reusePlayer?: boolean): Promise<boolean> => {
-    if (!AppDataSource.isInitialized) {
-        await AppDataSource.initialize();
-    }
+    await appDataSourceInitialized;
 
     const playerRepository = AppDataSource.getRepository(Player);
 

@@ -1,5 +1,5 @@
 import { Container } from 'typedi';
-import { AppDataSource } from '../data-source.js';
+import { AppDataSource, appDataSourceInitialized } from '../data-source.js';
 import { Game, PlayerNotification } from '../../shared/app/models/index.js';
 import { createPlayerNotification } from '../../shared/app/models/PlayerNotification.js';
 import PlayerRepository from '../repositories/PlayerRepository.js';
@@ -10,9 +10,7 @@ hexProgram
     .description('Create one fake mailbox notification of each type for a player, for debug/design purpose')
     .requiredOption('--player <identifier>', 'Id, publicId (uuid) or slug of the player who will receive the notifications')
     .action(async ({ player: playerIdentifier }) => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         const playerRepository = Container.get(PlayerRepository);
         const player = await playerRepository.getPlayerByIdPublicIdOrSlug(playerIdentifier);

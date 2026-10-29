@@ -1,4 +1,4 @@
-import { AppDataSource } from '../data-source.js';
+import { AppDataSource, appDataSourceInitialized } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { Player } from '../../shared/app/models/index.js';
 
@@ -6,9 +6,7 @@ hexProgram
     .command('check-tests-requirements')
     .description('Check whether config is ok to run integration tests')
     .action(async () => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         if (process.env.ALLOW_RANKED_BOT_GAMES !== 'true') {
             throw new Error('[FAIL] env var "ALLOW_RANKED_BOT_GAMES" must be true');
@@ -21,9 +19,7 @@ hexProgram
 ;
 
 const checkBots = async (): Promise<void> => {
-    if (!AppDataSource.isInitialized) {
-        await AppDataSource.initialize();
-    }
+    await appDataSourceInitialized;
 
     const playerRepository = AppDataSource.getRepository(Player);
 

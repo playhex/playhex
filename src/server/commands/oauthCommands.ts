@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import hexProgram from './hexProgram.js';
-import { AppDataSource } from '../data-source.js';
+import { AppDataSource, appDataSourceInitialized } from '../data-source.js';
 import { OAuthClient } from '../../shared/app/models/index.js';
 import { DEVICE_CODE_GRANT_TYPE } from '../oauth/provider.js';
 
@@ -18,9 +18,7 @@ hexProgram
     .option('--public', 'Public client (mobile app, SPA, CLI...): no client secret, must use PKCE')
     .option('--device', 'Allow device flow, for applications without browser (CLI, bots...)')
     .action(async ({ name, author, logo, website, description, redirectUri, public: isPublic, device }) => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         if (redirectUri.length === 0 && !device) {
             console.error('Either pass at least one --redirect-uri, or --device');

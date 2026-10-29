@@ -1,5 +1,5 @@
 import { hashPassword } from '../services/security/authentication.js';
-import { AppDataSource } from '../data-source.js';
+import { AppDataSource, appDataSourceInitialized } from '../data-source.js';
 import hexProgram from './hexProgram.js';
 import { mustAnswerYes } from './utils/question.js';
 
@@ -7,9 +7,7 @@ hexProgram
     .command('db-anonymize')
     .description('Anonymize database personal data for development purpose. Must not be run on production for sure.')
     .action(async () => {
-        if (!AppDataSource.isInitialized) {
-            await AppDataSource.initialize();
-        }
+        await appDataSourceInitialized;
 
         await mustAnswerYes('This will remove data, not to do on real database!');
 

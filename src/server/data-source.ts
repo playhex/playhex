@@ -47,7 +47,13 @@ export const AppDataSource = new DataSource({
 
 patchAppDataSourceDestroy(AppDataSource);
 
-AppDataSource.initialize().catch(reason => {
+/**
+ * Await this instead of calling AppDataSource.initialize(),
+ * which throws if called while already initializing or initialized.
+ */
+export const appDataSourceInitialized: Promise<void> = AppDataSource.initialize().then(() => undefined);
+
+appDataSourceInitialized.catch(reason => {
     logger.crit('Could not initialize data source', { reason: errorToString(reason) });
 });
 

@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import { Container } from 'typedi';
 import { Option } from '@commander-js/extra-typings';
 import hexProgram from '../commands/hexProgram.js';
-import { AppDataSource } from '../data-source.js';
+import { appDataSourceInitialized } from '../data-source.js';
 import { Puzzle } from '../../shared/app/models/index.js';
 import { puzzleErrorToString, validatePuzzle, type PuzzleDefinition } from '../../shared/app/puzzles/puzzleTree.js';
 import { PUZZLE_CHECK_ENGINES, type PuzzleCheckInput, type PuzzleCheckState } from '../../shared/app/puzzles/puzzleCheck.js';
@@ -19,9 +19,7 @@ const loadPuzzle = async (publicIdOrFile: string): Promise<Puzzle> => {
         return await readPuzzleFile(publicIdOrFile);
     }
 
-    if (!AppDataSource.isInitialized) {
-        await AppDataSource.initialize();
-    }
+    await appDataSourceInitialized;
 
     const puzzle = await Container.get(PuzzleRepository).findPuzzleByPublicId(publicIdOrFile);
 
