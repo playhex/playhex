@@ -514,7 +514,7 @@
     "back_to_menu": "Regresar al menu",
     "tournament_admins": "Administradores del torneo",
     "admins_one": "Administrador: { players }",
-    "admins_many": "",
+    "admins_many": "Administradores: { players }",
     "admins_other": "Administradores: { players }",
     "tournament_unsubscribe": "Ya no estoy interesado.",
     "tournament_slug_duplicate": "Un torneo con la misma url ya existe",
