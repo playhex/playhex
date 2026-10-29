@@ -157,10 +157,10 @@ describe('Puzzle collections', () => {
             cy.visit(`/puzzles/${puzzlePublicId}/edit`);
         });
 
-        cy.contains('button', '3. Publish').click();
+        cy.contains('button.puzzle-nav-item', 'Information').click();
         cy.get('#puzzle-collection').contains('option', collectionName);
         cy.get('#puzzle-collection').select(collectionName);
-        cy.contains('button', /^\s*Save\s*$/).click();
+        cy.contains('button', 'Save and test').click();
 
         cy.contains('h1', puzzleTitle);
         cy.get('.puzzle-breadcrumb').contains(collectionName).click();

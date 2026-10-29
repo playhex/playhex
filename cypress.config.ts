@@ -60,7 +60,6 @@ export default defineConfig({
         baseUrl: 'http://localhost:3000',
         experimentalRunAllSpecs: true,
         watchForFileChanges: false,
-        allowCypressEnv: false,
         setupNodeEvents(on) {
             on('file:preprocessor', esbuildPreprocessor);
         },
