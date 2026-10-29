@@ -58,6 +58,7 @@ describe('Little Golem parsers', () => {
         assert.strictEqual(parsePlidInput('44438'), 44438);
         assert.strictEqual(parsePlidInput(' https://littlegolem.net/jsp/info/player.jsp?plid=44438 '), 44438);
         assert.strictEqual(parsePlidInput('https://www.littlegolem.net/jsp/info/player_game_list.jsp?gtid=hex&plid=2883'), 2883);
+        assert.strictEqual(parsePlidInput('https://old.littlegolem.net/jsp/info/player.jsp?plid=44438'), 44438);
         assert.strictEqual(parsePlidInput('nytope'), null);
         assert.strictEqual(parsePlidInput('player42'), null);
         assert.strictEqual(parsePlidInput('https://example.com/?plid=44438'), null);

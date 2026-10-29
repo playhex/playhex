@@ -26,7 +26,7 @@ describe('createExternalGameFromLittleGolem', () => {
         assert.strictEqual(externalGame.startedAt?.toISOString(), '2023-12-16T08:34:00.000Z');
         assert.strictEqual(externalGame.endedAt?.toISOString(), '2024-04-16T07:13:00.000Z');
         assert.strictEqual(externalGame.source, 'Little Golem');
-        assert.strictEqual(externalGame.sourceUrl, 'https://littlegolem.net/jsp/game/game.jsp?gid=2424182');
+        assert.strictEqual(externalGame.sourceUrl, 'https://old.littlegolem.net/jsp/game/game.jsp?gid=2424182');
         assert.strictEqual(externalGame.event, 'hex.ld.DEFAULT');
     });
 

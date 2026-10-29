@@ -8,6 +8,7 @@ const clientReturning = (fetchGameHsgf: (gid: number) => Promise<string>): Littl
 
 describe('LittleGolemLink', () => {
     it('supports a Little Golem game url', () => {
+        assert.strictEqual(new LittleGolemLink().supports('https://old.littlegolem.net/jsp/game/game.jsp?gid=1512976'), true);
         assert.strictEqual(new LittleGolemLink().supports('https://littlegolem.net/jsp/game/game.jsp?gid=1512976&nmove=27'), true);
     });
 

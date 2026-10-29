@@ -2,7 +2,11 @@
  * Little Golem ids and urls, usable from both client and server.
  */
 
-export const LITTLE_GOLEM_BASE_URL = 'https://littlegolem.net';
+/**
+ * Little Golem moved its new website to littlegolem.net, which redirects old pages to homepage.
+ * Old website, with pages and exports we use, is still available here.
+ */
+export const LITTLE_GOLEM_BASE_URL = 'https://old.littlegolem.net';
 
 export const LITTLE_GOLEM_SOURCE = 'Little Golem';
 
