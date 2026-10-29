@@ -28,7 +28,7 @@
     "serve": "concurrently -n \"SERVER,BROWSER\" \"pnpm dev-server\" \"pnpm open-browser\"",
     "serve:prod": "pnpm build && pnpm start:prod",
     "build": "concurrently --prefix \"[{name}]\" --names \"SERVER,CLIENT\" -c \"bgBlue.bold,bgGreen.bold\" \"pnpm build-server\" \"pnpm build-client\"",
-    "typeorm": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT=src/server/tsconfig.json typeorm -d src/server/data-source.ts",
+    "typeorm": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT=src/server/tsconfig.json typeorm -d src/server/data-source-cli.ts",
     "test:unit": "NODE_OPTIONS='--import=./register.js' TS_NODE_PROJECT=\"src/shared/tsconfig.json\" mocha 'src/**/**/**/test/**/**/**/*.ts' --extension ts --ignore 'src/**/node_modules/**' --ignore 'src/**/dist/**' --ignore 'src/**/pixi-board/**' --exit",
     "test:e2e": "pnpm hex check-tests-requirements && concurrently --kill-others --success command-CYPRESS --names SERVER,CYPRESS \"pnpm serve:prod\" \"wait-on http://localhost:${PORT:-3000} && pnpm cypress run --browser firefox\"",
     "test:all": "pnpm test:unit && pnpm test:e2e",
