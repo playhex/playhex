@@ -7,6 +7,14 @@ defineProps({
         type: Array as PropType<PlayerNotification[]>,
         required: true,
     },
+
+    /**
+     * Whether there is more unread notifications than the ones loaded
+     */
+    hasMore: {
+        type: Boolean,
+        default: false,
+    },
 });
 </script>
 
@@ -15,7 +23,7 @@ defineProps({
         v-if="playerNotifications && playerNotifications.length > 0"
         class="badge bg-danger"
     >
-        {{ playerNotifications.length }}
+        {{ playerNotifications.length }}{{ hasMore ? '+' : '' }}
         <span class="visually-hidden">unread notifications</span>
     </span>
 </template>

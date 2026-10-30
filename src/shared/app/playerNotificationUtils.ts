@@ -1,6 +1,12 @@
 import { Game } from './models/index.js';
 import PlayerNotification from './models/PlayerNotification.js';
 
+/**
+ * Max unread notifications loaded in the header.
+ * If player has more, badge displays "50+".
+ */
+export const UNREAD_PLAYER_NOTIFICATIONS_LIMIT = 50;
+
 export type GamePlayerNotifications = {
     /**
      * From which game notifications are from.
@@ -12,28 +18,27 @@ export type GamePlayerNotifications = {
 };
 
 /**
- * Groups player notification by game.
+ * Groups consecutive player notifications from the same game.
+ * A same game can appear in multiple groups
+ * if its notifications are not consecutive.
  */
 export const groupPlayerNotificationByGame = (playerNotifications: PlayerNotification[]): GamePlayerNotifications[] => {
-    const indexed: { [gamePublicId: string]: PlayerNotification[] } = {};
+    const result: GamePlayerNotifications[] = [];
+    let current: null | GamePlayerNotifications = null;
 
     for (const playerNotification of playerNotifications) {
-        const index = playerNotification.game?.publicId ?? 'null';
+        const game = playerNotification.game ?? null;
 
-        if (!indexed[index]) {
-            indexed[index] = [];
+        if (current === null || current.game?.publicId !== game?.publicId) {
+            current = {
+                game,
+                playerNotifications: [],
+            };
+
+            result.push(current);
         }
 
-        indexed[index].push(playerNotification);
-    }
-
-    const result: GamePlayerNotifications[] = [];
-
-    for (const publicId in indexed) {
-        result.push({
-            game: indexed[publicId][0].game ?? null,
-            playerNotifications: indexed[publicId],
-        });
+        current.playerNotifications.push(playerNotification);
     }
 
     return result;

@@ -4,17 +4,27 @@ import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import { IconMailbox, IconMailboxFlag } from '../icons.js';
-import { apiPostPlayerNotificationsAcknowledge } from '../../apiClient.js';
 import AppNotification from './AppNotification.vue';
 import AppUnreadNotificationsBadge from './AppUnreadNotificationsBadge.vue';
 import { getOpponent } from '../../services/context-utils.js';
 import { pseudoStringOptional } from '../../../shared/app/pseudoUtils.js';
 import usePlayerNotificationsStore from '../../stores/playerNotificationsStore.js';
 
+const playerNotificationsStore = usePlayerNotificationsStore();
+
 /**
  * null: not yet loaded
  */
-const { playerNotifications, gamePlayerNotifications } = storeToRefs(usePlayerNotificationsStore());
+const {
+    playerNotifications,
+    unreadPlayerNotifications,
+    hasMoreUnread,
+    gamePlayerNotifications,
+    hasMoreRead,
+    loadingMoreRead,
+} = storeToRefs(playerNotificationsStore);
+
+const { acknowledge: ack, loadMoreReadNotifications } = playerNotificationsStore;
 
 const showNotifications = ref(false);
 
@@ -23,21 +33,6 @@ const notificationsElement = ref<HTMLElement>();
 onClickOutside(notificationsElement, () => {
     showNotifications.value = false;
 });
-
-const ack = async (gamePublicId?: string) => {
-    // if list is loaded, remove acknowledged notifications from local list
-    if (Array.isArray(playerNotifications.value)) {
-        if (gamePublicId) {
-            playerNotifications.value = playerNotifications.value
-                .filter(notification => notification.game?.publicId !== gamePublicId)
-            ;
-        } else {
-            playerNotifications.value = [];
-        }
-    }
-
-    await apiPostPlayerNotificationsAcknowledge(gamePublicId);
-};
 </script>
 
 <template>
@@ -45,7 +40,7 @@ const ack = async (gamePublicId?: string) => {
         <button
             @click="showNotifications = !showNotifications"
             class="btn btn-link position-relative p-0 me-3"
-            :class="playerNotifications && playerNotifications.length > 0
+            :class="unreadPlayerNotifications && unreadPlayerNotifications.length > 0
                 ? 'link-body-emphasis'
                 : 'link-secondary'
             "
@@ -53,11 +48,11 @@ const ack = async (gamePublicId?: string) => {
             :aria-label="$t('Notifications')"
             :title="$t('Notifications')"
         >
-            <IconMailboxFlag v-if="playerNotifications && playerNotifications.length > 0" style="font-size: 1.5em" class="custom-svg-color" />
+            <IconMailboxFlag v-if="unreadPlayerNotifications && unreadPlayerNotifications.length > 0" style="font-size: 1.5em" class="custom-svg-color" />
             <IconMailbox v-else style="font-size: 1.5em" />
 
             <AppUnreadNotificationsBadge
-                v-if="!showNotifications && playerNotifications" :playerNotifications
+                v-if="!showNotifications && unreadPlayerNotifications" :playerNotifications="unreadPlayerNotifications" :hasMore="hasMoreUnread"
                 class="position-absolute top-0 start-100 translate-middle badge-notifications rounded-pill"
             />
         </button>
@@ -71,14 +66,14 @@ const ack = async (gamePublicId?: string) => {
                             {{ $t('notifications') }}
 
                             <AppUnreadNotificationsBadge
-                                v-if="showNotifications && playerNotifications" :playerNotifications
+                                v-if="showNotifications && unreadPlayerNotifications" :playerNotifications="unreadPlayerNotifications" :hasMore="hasMoreUnread"
                                 class="badge-notifications"
                             />
                         </h5>
 
                         <button
                             @click="ack()"
-                            :disabled="!gamePlayerNotifications || gamePlayerNotifications.length === 0"
+                            :disabled="!unreadPlayerNotifications || unreadPlayerNotifications.length === 0"
                             class="btn btn-outline-primary btn-sm float-end"
                         >{{ $t('mark_all_as_read') }}</button>
                     </div>
@@ -95,7 +90,7 @@ const ack = async (gamePublicId?: string) => {
                 <div v-else class="list-group list-group-flush overflow-auto">
                     <template
                         v-for="{ game, playerNotifications } in gamePlayerNotifications"
-                        :key="game?.publicId ?? 'null'"
+                        :key="playerNotifications[0].publicId"
                     >
                         <router-link
                             v-if="game"
@@ -108,7 +103,7 @@ const ack = async (gamePublicId?: string) => {
                                 },
                             }"
                         >
-                            <h6 class="mb-1">
+                            <h6 class="mb-1" :class="{ 'is-read': playerNotifications.every(n => n.isRead) }">
                                 {{ $t('game_against_player', { player: pseudoStringOptional(getOpponent(game)) }) }}
                                 &nbsp;
                                 <span class="text-secondary small">
@@ -120,19 +115,29 @@ const ack = async (gamePublicId?: string) => {
                                 v-for="playerNotification of playerNotifications"
                                 :playerNotification
                                 class="small"
+                                :class="{ 'is-read': playerNotification.isRead }"
                             />
                         </router-link>
 
                         <div v-else class="list-group-item" @click="e => (e.target as HTMLElement).closest('a') && (showNotifications = false)">
-                            <h6 class="mb-1">{{ $t('notifications_misc') }}</h6>
+                            <h6 class="mb-1" :class="{ 'is-read': playerNotifications.every(n => n.isRead) }">{{ $t('notifications_misc') }}</h6>
 
                             <AppNotification
                                 v-for="playerNotification of playerNotifications"
                                 :playerNotification
                                 class="small"
+                                :class="{ 'is-read': playerNotification.isRead }"
                             />
                         </div>
                     </template>
+                </div>
+
+                <div v-if="playerNotifications !== null && hasMoreRead" class="card-footer text-center">
+                    <button
+                        @click="loadMoreReadNotifications()"
+                        :disabled="loadingMoreRead"
+                        class="btn btn-link btn-sm"
+                    >{{ $t('load_more') }}</button>
                 </div>
             </div>
         </div>
@@ -155,6 +160,9 @@ const ack = async (gamePublicId?: string) => {
 
     .player-notifications
         max-height 70vh
+
+    .is-read
+        opacity 0.5
 </style>
 
 <style lang="stylus">

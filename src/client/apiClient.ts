@@ -1240,6 +1240,23 @@ export const apiGetPlayerNotifications = async (): Promise<PlayerNotification[]>
     ;
 };
 
+/**
+ * @param before publicId of the last read notification already loaded, to get older ones
+ */
+export const apiGetPlayerReadNotifications = async (before?: string, limit?: number): Promise<PlayerNotification[]> => {
+    const response = await fetch('/api/player-notifications/read?' + qs.stringify({ before, limit }), {
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return (await response.json() as PlayerNotification[])
+        .map(playerNotification => plainToInstance(PlayerNotification, playerNotification))
+    ;
+};
+
 export const apiGetPlayerIsCurrentlyChatRestricted = async (playerPublicId: string): Promise<boolean> => {
     const response = await fetch(`/api/players/${playerPublicId}/has-moderation-actions`);
 
