@@ -67,14 +67,6 @@ export const formatDate = (date: Date, context: SocialMetaContext): string => {
 };
 
 /**
- * "12 Mar 2026, 18:00 UTC".
- * Crawlers don't know reader timezone, so dates are shown in UTC.
- */
-export const formatDateTime = (date: Date, context: SocialMetaContext): string => {
-    return new Intl.DateTimeFormat(context.locale, { dateStyle: 'medium', timeStyle: 'short', timeZone: 'UTC' }).format(date) + ' UTC';
-};
-
-/**
  * "2026-03-12", in UTC.
  */
 export const formatIsoDate = (date: Date): string => date.toISOString().slice(0, 10);

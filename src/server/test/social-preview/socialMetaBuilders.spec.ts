@@ -157,7 +157,9 @@ describe('social preview meta builders', () => {
         assert.strictEqual(created.title, 'Monthly #1 · Hex tournament · 2026-04-01 - PlayHex');
         assertTranslated(created.description);
         assert.ok(created.description!.includes('0 players registered'));
-        assert.ok(created.description!.includes('UTC'));
+        // Only date: time in UTC would confuse players
+        assert.ok(created.description!.includes('Starts Apr 1, 2026'));
+        assert.ok(!created.description!.includes('UTC'));
         assert.strictEqual(created.jsonLd?.[0]['@type'], 'Event');
         assert.strictEqual(created.jsonLd?.[0].eventStatus, 'https://schema.org/EventScheduled');
         assert.strictEqual(created.jsonLd?.[1]['@type'], 'BreadcrumbList');
@@ -252,6 +254,10 @@ describe('social preview meta builders', () => {
 
         assert.strictEqual(meta?.title, 'Puzzles de Hex - PlayHex');
         assertTranslated(meta?.description);
+        assert.ok(meta?.image?.url.startsWith('https://playhex.org/og/pages/puzzles.png?lang=fr&v='));
         assert.strictEqual(new StaticPageMetaBuilder().buildMeta('/unknown', context()), null);
+
+        // Pages without data that would get outdated use a screenshot
+        assert.strictEqual(new StaticPageMetaBuilder().buildMeta('/hexplorer', context('fr'))?.image?.url, 'https://playhex.org/images/social-preview/hexplorer.jpg');
     });
 });

@@ -3,7 +3,7 @@ import type { Tournament, TournamentSeries } from '../../../shared/app/models/in
 import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
 import TournamentMetaBuilder from './TournamentMetaBuilder.js';
-import { breadcrumbJsonLd, formatDateTime, joinTitle, truncate } from './metaUtils.js';
+import { breadcrumbJsonLd, formatDate, joinTitle, truncate } from './metaUtils.js';
 
 export type TournamentSeriesPageData = {
     series: TournamentSeries;
@@ -66,7 +66,7 @@ export default class TournamentSeriesMetaBuilder extends AbstractEntityMetaBuild
         const lines: string[] = [];
 
         if (next) {
-            lines.push(t('social_preview.tournament_series.next', { title: next.title, date: formatDateTime(next.startOfficialAt, context) }));
+            lines.push(t('social_preview.tournament_series.next', { title: next.title, date: formatDate(next.startOfficialAt, context) }));
         }
 
         lines.push(t('social_preview.tournament_series.n_editions', { count: this.editionsCount(tournaments) }));

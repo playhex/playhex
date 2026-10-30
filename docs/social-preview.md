@@ -38,6 +38,7 @@ Server needs Noto fonts for image rendering: `fonts-noto-core fonts-noto-cjk`.
 | `/puzzles/collections/:publicId` | card | CollectionPage |
 | `/@:slug` (player) | card with avatar | ProfilePage |
 | `/king-of-the-hill/:slug` | card | breadcrumb only |
-| Static pages: `/puzzles`, `/tournaments`, `/tournament-series`, `/king-of-the-hill`, `/games-archive`, `/videos`, `/statistics`, `/hexplorer`, `/swap-maps`, `/guide` | default | none |
+| Static pages: `/puzzles`, `/tournaments`, `/tournament-series`, `/king-of-the-hill`, `/games-archive`, `/videos`, `/statistics`, `/guide` | card with page title and description, no data that would get outdated | none |
+| `/hexplorer`, `/swap-maps` | board screenshot (dark theme, landscape, no texts) in `assets/images/social-preview/<key>.jpg` | none |
 
 All pages also get WebSite + Organization JSON-LD, and a breadcrumb when relevant.

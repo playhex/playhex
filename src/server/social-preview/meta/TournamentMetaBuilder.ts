@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import type { Player, Tournament } from '../../../shared/app/models/index.js';
 import { withSiteName, type JsonLd, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
-import { breadcrumbJsonLd, formatDateTime, formatIsoDate, joinTitle, personJsonLd, playerName, settingsLine, truncate } from './metaUtils.js';
+import { breadcrumbJsonLd, formatDate, formatIsoDate, joinTitle, personJsonLd, playerName, settingsLine, truncate } from './metaUtils.js';
 
 const eventStatus = (tournament: Tournament): string => {
     switch (tournament.state) {
@@ -68,7 +68,7 @@ export default class TournamentMetaBuilder extends AbstractEntityMetaBuilder<Tou
         switch (tournament.state) {
             case 'created':
                 return [
-                    t('social_preview.tournament.starts_at', { date: formatDateTime(tournament.startOfficialAt, context) }),
+                    t('social_preview.tournament.starts_at', { date: formatDate(tournament.startOfficialAt, context) }),
                     settings,
                     t('social_preview.tournament.n_registered', { count }),
                 ];

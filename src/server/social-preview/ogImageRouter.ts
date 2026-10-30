@@ -12,7 +12,7 @@ import { isCorrespondence } from '../../shared/app/timeControlUtils.js';
 import { resolveSocialLocale } from './resolveSocialLocale.js';
 import { getSocialT } from './socialI18n.js';
 import { socialBaseUrl, type SocialMetaContext } from './SocialMeta.js';
-import { brandText, greyText, renderBoardImageSvg, renderCardImageSvg, svgToPng, type OgBoard, type OgText } from './OgImageRenderer.js';
+import { brandText, greyText, renderBoardImageSvg, renderCardImageSvg, svgToPng, wrapText, type OgBoard, type OgIcon, type OgText } from './OgImageRenderer.js';
 import GameMetaBuilder from './meta/GameMetaBuilder.js';
 import PuzzleMetaBuilder from './meta/PuzzleMetaBuilder.js';
 import PuzzleCollectionMetaBuilder, { COLLECTION_IMAGE_PUZZLES } from './meta/PuzzleCollectionMetaBuilder.js';
@@ -20,6 +20,7 @@ import TournamentMetaBuilder from './meta/TournamentMetaBuilder.js';
 import TournamentSeriesMetaBuilder from './meta/TournamentSeriesMetaBuilder.js';
 import PlayerMetaBuilder from './meta/PlayerMetaBuilder.js';
 import LadderMetaBuilder from './meta/LadderMetaBuilder.js';
+import StaticPageMetaBuilder from './meta/StaticPageMetaBuilder.js';
 import { playerName, settingsLine } from './meta/metaUtils.js';
 import { loadGame, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
 
@@ -50,7 +51,7 @@ type OgImage = {
     renderSvg: () => string | Promise<string>;
 };
 
-type OgImageResolver = (id: string, context: SocialMetaContext) => Promise<null | OgImage>;
+type OgImageResolver = (id: string, context: SocialMetaContext) => null | OgImage | Promise<null | OgImage>;
 
 let runningRenders = 0;
 const renderQueue: (() => void)[] = [];
@@ -173,6 +174,15 @@ const renderGameBoardSvg = (game: Game, gameMetaBuilder: GameMetaBuilder, bottom
     });
 };
 
+/**
+ * Static pages images icon, hexagon by default.
+ */
+const staticPageIcons: { [key: string]: OgIcon } = {
+    tournaments: 'trophy',
+    tournament_series: 'trophy',
+    ladders: 'crown',
+};
+
 const playerColor = (index: 0 | 1): string => index === 0 ? boardSvgColors.red : boardSvgColors.blue;
 
 /**
@@ -187,6 +197,7 @@ const createResolvers = (): { [type: string]: OgImageResolver } => {
     const tournamentSeriesMetaBuilder = Container.get(TournamentSeriesMetaBuilder);
     const playerMetaBuilder = Container.get(PlayerMetaBuilder);
     const ladderMetaBuilder = Container.get(LadderMetaBuilder);
+    const staticPageMetaBuilder = Container.get(StaticPageMetaBuilder);
 
     return {
         [gameMetaBuilder.imageType]: async (publicId, context) => {
@@ -395,6 +406,25 @@ const createResolvers = (): { [type: string]: OgImageResolver } => {
                     icon: 'crown',
                     avatar: await loadAvatar(ladder.currentReign?.player),
                     lines: ladderMetaBuilder.summaryLines(ladder, context).map(text => ({ text })),
+                }),
+            };
+        },
+
+        // Only page title and description: displayed data would get outdated
+        [staticPageMetaBuilder.imageType]: (key, context) => {
+            if (!staticPageMetaBuilder.isPageKey(key)) {
+                return null;
+            }
+
+            const { title, description } = staticPageMetaBuilder.texts(key, context);
+
+            return {
+                version: staticPageMetaBuilder.imageVersion(key, context),
+                immutable: false,
+                renderSvg: () => renderCardImageSvg({
+                    title,
+                    icon: staticPageIcons[key] ?? 'hexagon',
+                    lines: wrapText(description, 1000, 36, 4).map(text => ({ text, size: 36 })),
                 }),
             };
         },
