@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { getManifest, getBootstrapStylesheetUrl } from './manifest-manager.js';
 import { seo } from '../../../../shared/app/seo.js';
+import { serializeJsonLd } from '../../../social-preview/serializeJsonLd.js';
+import { ogLocales } from '../../../social-preview/SocialMeta.js';
 
 export function pagesRouter(): Router {
     const router = Router();
@@ -16,6 +18,11 @@ export function pagesRouter(): Router {
             baseUrl: process.env.BASE_URL,
             sentryLoaderScript: process.env.SENTRY_LOADER_SCRIPT,
             blockRobotsIndex: process.env.BLOCK_ROBOTS_INDEX === 'true',
+
+            // Set by socialPreviewRouter, only for crawlers
+            socialMeta: res.locals.socialMeta,
+            serializeJsonLd,
+            ogLocales,
         });
     });
 

@@ -16,6 +16,7 @@ import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.j
 import useAnalyzeStore from '../../stores/analyzeStore.js';
 import useServerDateStore from '../../stores/serverDateStore.js';
 import { downloadString } from '../../services/fileDownload.js';
+import { shareUrl } from '../../services/shareUrl.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { gameToSGF } from '../../../shared/app/gameToSGF.js';
 import { autoLocale } from '../../../shared/app/i18n/index.js';
@@ -237,7 +238,7 @@ onUnmounted(() => document.removeEventListener('keydown', ctrlSListener));
  * On desktop, just copy link.
  * On mobile, use share api to allow share to other apps, or just copy.
  */
-const { href } = window.location;
+const href = shareUrl(window.location.href);
 const copiedResult = ref<null | true | false>(null);
 let copiedResultTimeout: null | number = null;
 type CopyResult = 'copied' | 'shared' | 'canceled' | 'unsupported';

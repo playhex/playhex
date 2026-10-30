@@ -7,6 +7,8 @@ import { pagesRouter } from './misc/pages-router.js';
 import { reflectMetadataRouter } from './misc/reflect-metadata-router.js';
 import { seoRouter } from './misc/seo-router.js';
 import { pwaRouter } from './misc/pwa-router.js';
+import { socialPreviewRouter } from '../../social-preview/socialPreviewRouter.js';
+import { ogImageRouter } from '../../social-preview/ogImageRouter.js';
 import logger from '../../services/logger.js';
 import { DomainHttpError, normalizeDomainHttpError } from '../../../shared/app/DomainHttpError.js';
 import { HttpError } from 'routing-controllers';
@@ -32,6 +34,8 @@ export const registerHttpControllers = async (app: Express, httpServer: http.Ser
     app.use(await staticsRouter(httpServer));
     app.use(pwaRouter());
     app.use(seoRouter());
+    app.use(ogImageRouter());
+    app.use(socialPreviewRouter());
     app.use(pagesRouter());
 
     app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

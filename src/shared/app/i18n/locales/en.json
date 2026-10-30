@@ -1777,5 +1777,125 @@
             }
         },
         "check_device_code": "Make sure this code matches the one displayed on your device:"
+    },
+    "social_preview": {
+        "default_description": "Play the Hex board game online, against other players or AI. Tournaments, puzzles, game analysis.",
+        "by": "by {{author}}",
+        "n_days_one": "{{count}} day",
+        "n_days_other": "{{count}} days",
+        "n_hours_one": "{{count}} hour",
+        "n_hours_other": "{{count}} hours",
+        "game": {
+            "canceled_title": "Canceled Hex game",
+            "canceled_description": "This Hex {{boardsize}} game has been canceled.",
+            "waiting_title": "Open Hex game by {{player}}",
+            "waiting_title_anonymous": "Open Hex game",
+            "waiting_description": "Hex {{boardsize}} game, {{timeControl}}, waiting for an opponent. Join it on PlayHex.",
+            "ranked": "ranked",
+            "friendly": "friendly",
+            "playing_description": "Game in progress, watch it live on PlayHex.",
+            "outcome_path": "{{winner}} won by connecting their sides",
+            "outcome_resign": "{{winner}} won by resignation",
+            "outcome_time": "{{winner}} won on time",
+            "outcome_forfeit": "{{winner}} won by forfeit",
+            "n_moves_one": "{{count}} move",
+            "n_moves_other": "{{count}} moves",
+            "winner": "{{winner}} wins",
+            "image_alt": "Final position of the Hex game {{title}}",
+            "open_game": "Open game",
+            "join": "Join it on PlayHex",
+            "playing": "Game in progress",
+            "cadency_live": "Live",
+            "cadency_correspondence": "Correspondence"
+        },
+        "tournament": {
+            "starts_at": "Starts {{date}}",
+            "n_registered_one": "{{count}} player registered",
+            "n_registered_other": "{{count}} players registered",
+            "running": "Tournament in progress",
+            "n_participants_one": "{{count}} participant",
+            "n_participants_other": "{{count}} participants",
+            "rank_1": "1st: {{player}}",
+            "rank_2": "2nd: {{player}}",
+            "rank_3": "3rd: {{player}}",
+            "canceled": "Tournament canceled",
+            "hex_tournament": "Hex tournament"
+        },
+        "tournament_series": {
+            "next": "Next: {{title}}, {{date}}",
+            "n_editions_one": "{{count}} edition played",
+            "n_editions_other": "{{count}} editions played",
+            "hex_tournaments": "Hex tournaments"
+        },
+        "puzzle": {
+            "default_title": "Hex puzzle",
+            "red_to_play": "Red to play and win",
+            "blue_to_play": "Blue to play and win",
+            "label": "Puzzle",
+            "hex_puzzle_by": "Hex puzzle by {{author}}"
+        },
+        "puzzle_collection": {
+            "n_puzzles_one": "{{count}} Hex puzzle",
+            "n_puzzles_other": "{{count}} Hex puzzles",
+            "hex_puzzles_by": "Hex puzzles by {{author}}"
+        },
+        "player": {
+            "title": "{{player}}, Hex player",
+            "bot": "Hex AI",
+            "rating": "Rating {{rating}}",
+            "n_games_one": "{{count}} game played",
+            "n_games_other": "{{count}} games played",
+            "member_since": "Member since {{date}}",
+            "on_playhex": "Player on PlayHex"
+        },
+        "ladder": {
+            "king": "King: {{player}}",
+            "reign_one": "Reigning for {{duration}}, {{count}} defense",
+            "reign_other": "Reigning for {{duration}}, {{count}} defenses",
+            "n_players_one": "{{count}} player on the hill",
+            "n_players_other": "{{count}} players on the hill"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hex puzzles",
+                "description": "Solve Hex puzzles made by the community, from beginner to expert, and create your own."
+            },
+            "tournaments": {
+                "title": "Hex tournaments",
+                "description": "Join online Hex tournaments: live and correspondence, Swiss and elimination formats."
+            },
+            "tournament_series": {
+                "title": "Hex tournament series",
+                "description": "Recurring Hex tournaments: follow a series to know when the next edition is played."
+            },
+            "ladders": {
+                "title": "King of the Hill",
+                "description": "Climb the Hex ladder: challenge players above you, take their seat and defend the throne."
+            },
+            "games_archive": {
+                "title": "Hex games archive",
+                "description": "Browse and search all Hex games played on PlayHex."
+            },
+            "videos": {
+                "title": "Hex videos",
+                "description": "Videos about Hex made by the community: tutorials, strategy, game reviews."
+            },
+            "statistics": {
+                "title": "PlayHex statistics",
+                "description": "Games, players, board sizes and win rates on PlayHex."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Explore Hex positions with AI analysis."
+            },
+            "swap_maps": {
+                "title": "Hex swap maps",
+                "description": "Which opening moves should be swapped, for each board size, computed by KataHex."
+            },
+            "guide": {
+                "title": "PlayHex guide",
+                "description": "How to play Hex on PlayHex: rules, AI analysis, conditional moves, moderation."
+            }
+        }
     }
 }

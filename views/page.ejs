@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="<%= locals.socialMeta ? socialMeta.locale : 'en' %>">
 
 <head>
     <meta charset="utf-8">
-    <title><%= seo.title %></title>
+    <title><%= locals.socialMeta ? socialMeta.title : seo.title %></title>
 
     <link rel="manifest" href="/pwa-manifest.json" />
     <meta name="theme-color" content="#DC3545"/>

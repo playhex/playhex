@@ -1,10 +1,41 @@
-<% if (blockRobotsIndex) { %>
+<% if (blockRobotsIndex || (locals.socialMeta && socialMeta.noindex)) { %>
 <meta name="robots" content="noindex, nofollow" />
 <% } %>
 
-<meta name="description" content="<%= seo.description %>">
-
 <link rel="icon" href="/images/logo-transparent.svg" type="image/svg+xml">
+
+<% if (locals.socialMeta) { %>
+<%# Rendered only for crawlers, see socialPreviewRouter. Values may contain user content: always escaped. %>
+<meta name="description" content="<%= socialMeta.description %>">
+<link rel="canonical" href="<%= socialMeta.url %>">
+
+<meta property="og:type" content="<%= socialMeta.type %>">
+<meta property="og:url" content="<%= socialMeta.url %>">
+<meta property="og:title" content="<%= socialMeta.title %>">
+<meta property="og:description" content="<%= socialMeta.description %>">
+<meta property="og:image" content="<%= socialMeta.image.url %>">
+<meta property="og:image:width" content="<%= socialMeta.image.width %>">
+<meta property="og:image:height" content="<%= socialMeta.image.height %>">
+<meta property="og:image:alt" content="<%= socialMeta.image.alt %>">
+<meta property="og:site_name" content="<%= seo.title %>">
+<meta property="og:locale" content="<%= ogLocales[socialMeta.locale] %>">
+<% for (const [locale, ogLocale] of Object.entries(ogLocales)) { %>
+<% if (locale !== socialMeta.locale) { %>
+<meta property="og:locale:alternate" content="<%= ogLocale %>">
+<% } %>
+<% } %>
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<%= socialMeta.title %>">
+<meta name="twitter:description" content="<%= socialMeta.description %>">
+<meta name="twitter:image" content="<%= socialMeta.image.url %>">
+<meta name="twitter:image:alt" content="<%= socialMeta.image.alt %>">
+
+<% if (socialMeta.jsonLd.length > 0) { %>
+<script type="application/ld+json"><%- serializeJsonLd(socialMeta.jsonLd) %></script>
+<% } %>
+<% } else { %>
+<meta name="description" content="<%= seo.description %>">
 
 <meta property="og:type" content="website">
 <meta property="og:url" content="<%= baseUrl %>">
@@ -14,3 +45,4 @@
 <meta property="og:site_name" content="<%= seo.title %>" />
 
 <meta name="twitter:card" content="summary_large_image">
+<% } %>

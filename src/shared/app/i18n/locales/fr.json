@@ -1800,5 +1800,135 @@
             }
         },
         "check_device_code": "Vérifiez que ce code correspond à celui affiché sur votre appareil :"
+    },
+    "social_preview": {
+        "default_description": "Jouez au jeu de Hex en ligne, contre d’autres joueurs ou contre l’IA. Tournois, puzzles, analyse de parties.",
+        "by": "par {{author}}",
+        "n_days_one": "{{count}} jour",
+        "n_days_many": "{{count}} jours",
+        "n_days_other": "{{count}} jours",
+        "n_hours_one": "{{count}} heure",
+        "n_hours_many": "{{count}} heures",
+        "n_hours_other": "{{count}} heures",
+        "game": {
+            "canceled_title": "Partie de Hex annulée",
+            "canceled_description": "Cette partie de Hex {{boardsize}} a été annulée.",
+            "waiting_title": "Partie de Hex ouverte par {{player}}",
+            "waiting_title_anonymous": "Partie de Hex ouverte",
+            "waiting_description": "Partie de Hex {{boardsize}}, {{timeControl}}, en attente d’un adversaire. Rejoignez-la sur PlayHex.",
+            "ranked": "classée",
+            "friendly": "amicale",
+            "playing_description": "Partie en cours, regardez-la en direct sur PlayHex.",
+            "outcome_path": "{{winner}} gagne en reliant ses bords",
+            "outcome_resign": "{{winner}} gagne par abandon",
+            "outcome_time": "{{winner}} gagne au temps",
+            "outcome_forfeit": "{{winner}} gagne par forfait",
+            "n_moves_one": "{{count}} coup",
+            "n_moves_many": "{{count}} coups",
+            "n_moves_other": "{{count}} coups",
+            "winner": "{{winner}} gagne",
+            "image_alt": "Position finale de la partie de Hex {{title}}",
+            "open_game": "Partie ouverte",
+            "join": "Rejoignez-la sur PlayHex",
+            "playing": "Partie en cours",
+            "cadency_live": "En direct",
+            "cadency_correspondence": "Correspondance"
+        },
+        "tournament": {
+            "starts_at": "Commence le {{date}}",
+            "n_registered_one": "{{count}} joueur inscrit",
+            "n_registered_many": "{{count}} joueurs inscrits",
+            "n_registered_other": "{{count}} joueurs inscrits",
+            "running": "Tournoi en cours",
+            "n_participants_one": "{{count}} participant",
+            "n_participants_many": "{{count}} participants",
+            "n_participants_other": "{{count}} participants",
+            "rank_1": "1er : {{player}}",
+            "rank_2": "2e : {{player}}",
+            "rank_3": "3e : {{player}}",
+            "canceled": "Tournoi annulé",
+            "hex_tournament": "Tournoi de Hex"
+        },
+        "tournament_series": {
+            "next": "Prochain : {{title}}, {{date}}",
+            "n_editions_one": "{{count}} édition jouée",
+            "n_editions_many": "{{count}} éditions jouées",
+            "n_editions_other": "{{count}} éditions jouées",
+            "hex_tournaments": "Tournois de Hex"
+        },
+        "puzzle": {
+            "default_title": "Puzzle de Hex",
+            "red_to_play": "Rouge joue et gagne",
+            "blue_to_play": "Bleu joue et gagne",
+            "label": "Puzzle",
+            "hex_puzzle_by": "Puzzle de Hex par {{author}}"
+        },
+        "puzzle_collection": {
+            "n_puzzles_one": "{{count}} puzzle de Hex",
+            "n_puzzles_many": "{{count}} puzzles de Hex",
+            "n_puzzles_other": "{{count}} puzzles de Hex",
+            "hex_puzzles_by": "Puzzles de Hex par {{author}}"
+        },
+        "player": {
+            "title": "{{player}}, joueur de Hex",
+            "bot": "IA de Hex",
+            "rating": "Classement {{rating}}",
+            "n_games_one": "{{count}} partie jouée",
+            "n_games_many": "{{count}} parties jouées",
+            "n_games_other": "{{count}} parties jouées",
+            "member_since": "Membre depuis le {{date}}",
+            "on_playhex": "Joueur sur PlayHex"
+        },
+        "ladder": {
+            "king": "Roi : {{player}}",
+            "reign_one": "Règne depuis {{duration}}, {{count}} défense",
+            "reign_many": "Règne depuis {{duration}}, {{count}} défenses",
+            "reign_other": "Règne depuis {{duration}}, {{count}} défenses",
+            "n_players_one": "{{count}} joueur sur la colline",
+            "n_players_many": "{{count}} joueurs sur la colline",
+            "n_players_other": "{{count}} joueurs sur la colline"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Puzzles de Hex",
+                "description": "Résolvez des puzzles de Hex créés par la communauté, du débutant à l’expert, et créez les vôtres."
+            },
+            "tournaments": {
+                "title": "Tournois de Hex",
+                "description": "Participez à des tournois de Hex en ligne : en direct ou par correspondance, formats suisse et à élimination."
+            },
+            "tournament_series": {
+                "title": "Séries de tournois de Hex",
+                "description": "Tournois de Hex récurrents : suivez une série pour savoir quand la prochaine édition a lieu."
+            },
+            "ladders": {
+                "title": "Roi de la colline",
+                "description": "Grimpez l’échelle de Hex : défiez les joueurs au-dessus de vous, prenez leur place et défendez le trône."
+            },
+            "games_archive": {
+                "title": "Archives des parties de Hex",
+                "description": "Parcourez et recherchez toutes les parties de Hex jouées sur PlayHex."
+            },
+            "videos": {
+                "title": "Vidéos sur Hex",
+                "description": "Vidéos sur Hex faites par la communauté : tutoriels, stratégie, analyses de parties."
+            },
+            "statistics": {
+                "title": "Statistiques de PlayHex",
+                "description": "Parties, joueurs, tailles de plateau et taux de victoire sur PlayHex."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Explorez des positions de Hex avec l’analyse de l’IA."
+            },
+            "swap_maps": {
+                "title": "Cartes de swap de Hex",
+                "description": "Quels premiers coups faut-il swapper, pour chaque taille de plateau, calculé par KataHex."
+            },
+            "guide": {
+                "title": "Guide de PlayHex",
+                "description": "Comment jouer à Hex sur PlayHex : règles, analyse IA, coups conditionnels, modération."
+            }
+        }
     }
 }
