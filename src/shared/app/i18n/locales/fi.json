@@ -519,10 +519,6 @@
             "cancelLabel": "Hups, ei, jatka pelaamista"
         }
     },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Aikasiirtymä: {{ms}}ms"
-    },
     "time_cadency": {
         "blitz": "Blitz",
         "normal": "Live",

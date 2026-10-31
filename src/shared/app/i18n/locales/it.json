@@ -528,10 +528,6 @@
             "cancelLabel": "Ops, no, continua a giocare"
         }
     },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Shift del tempo: {{ms}}ms"
-    },
     "time_cadency": {
         "blitz": "Blitz",
         "normal": "Normale",
@@ -633,6 +629,7 @@
     "lobby_join": "Unisciti",
     "lobby_game_no_longer_available": "Partita non più disponibile",
     "lobby_active_players_one": "giocatore attivo",
+    "lobby_active_players_many": "giocatori attivi",
     "lobby_active_players_other": "giocatori attivi",
     "lobby_playing_now": "Stanno giocando ora",
     "lobby_no_live_games_now": "Nessuna partita live in corso ora.",
@@ -669,6 +666,7 @@
     "tournaments_page_intro": "Ecco i tornei Hex, che possono essere <strong>organizzati da chiunque</strong> in vari formati come svizzero o eliminazione.<br>Puoi guardare le partite dei tornei in corso o unirti a uno imminente.<br><strong>Per partecipare</strong>, assicurati di <strong>fare il check-in in tempo</strong>. Puoi iscriverti per ricevere una notifica quando il check-in apre.<br>Consulta la descrizione del torneo per dettagli come orari di check-in, formato e partecipanti.",
     "tournament_admins": "Amministratori del torneo",
     "admins_one": "Admin: { players }",
+    "admins_many": "Amministratori: { players }",
     "admins_other": "Admin: { players }",
     "tournament_unsubscribe": "Non sono più interessato.",
     "losers_bracket": "Tabellone perdenti",
@@ -708,6 +706,7 @@
     "bot": "Bot",
     "browse_all_ended_games": "Sfoglia tutte le partite terminate",
     "n_total_games_one": "1 partita totale.",
+    "n_total_games_many": "{{count}} partite in totale.",
     "n_total_games_other": "{{count}} partite totali.",
     "previous": "Precedente",
     "next": "Successivo",
@@ -880,6 +879,7 @@
     "sort_recently_played": "Giocate di recente",
     "tournament_series": "Serie",
     "n_tournaments_one": "{{ count }} torneo",
+    "n_tournaments_many": "{{ count }} tornei",
     "n_tournaments_other": "{{ count }} tornei",
     "tournament_part_of_series": "Questo torneo sarà un'edizione di {series}.",
     "tournament_series_slug_duplicate": "Esiste già una serie di tornei con lo stesso nome nell'URL.",
@@ -903,6 +903,7 @@
     "tournament_series_page": {
         "host": "Organizzatore: {{ player }}",
         "admins_one": "Amministratore: {{ players }}",
+        "admins_many": "Amministratori: {{ players }}",
         "admins_other": "Amministratori: {{ players }}",
         "last_tournament": "Ultimo torneo",
         "next_tournament": "Prossimo torneo",
@@ -913,8 +914,7 @@
         "not_found": "Serie di tornei non trovata.",
         "configure_auto_create": "Creali automaticamente",
         "auto_create_enabled": "Le prossime edizioni di questa serie vengono create automaticamente.",
-        "auto_create_manage": "Modifica o interrompi",
-        "admins_many": "Amministratori: {{ players }}"
+        "auto_create_manage": "Modifica o interrompi"
     },
     "tournament_series_form": {
         "create_title": "Crea una serie di tornei",
@@ -991,8 +991,10 @@
         "simulation_created_at": "Creata dopo"
     },
     "n_messages_one": "{{ count }} messaggio",
+    "n_messages_many": "{{ count }} messaggi",
     "n_messages_other": "{{ count }} messaggi",
     "n_interested_one": "{{ count }} interessato",
+    "n_interested_many": "{{ count }} interessati",
     "n_interested_other": "{{ count }} interessati",
     "tournament_ended": "terminato",
     "manage_tournament_page": {
@@ -1798,11 +1800,5 @@
             }
         },
         "check_device_code": "Assicurati che questo codice corrisponda a quello mostrato sul tuo dispositivo:"
-    },
-    "lobby_active_players_many": "giocatori attivi",
-    "n_tournaments_many": "{{ count }} tornei",
-    "n_messages_many": "{{ count }} messaggi",
-    "n_interested_many": "{{ count }} interessati",
-    "admins_many": "Amministratori: { players }",
-    "n_total_games_many": "{{count}} partite in totale."
+    }
 }

@@ -576,10 +576,6 @@
             "cancelLabel": "Hayır, oynamaya devam et"
         }
     },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Zaman farkı: {{ms}}ms"
-    },
     "time_cadency": {
         "blitz": "Blitz",
         "normal": "Canlı",

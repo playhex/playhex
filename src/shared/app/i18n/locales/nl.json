@@ -370,10 +370,6 @@
             "cancelLabel": "Oeps nee, doorspelen"
         }
     },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Tijdsverschuiving: {{ms}}ms"
-    },
     "time_cadency": {
         "blitz": "Blitz",
         "normal": "Normaal",

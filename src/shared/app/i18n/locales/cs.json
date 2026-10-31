@@ -181,7 +181,6 @@
         "deep_analysis_failed": "Hloubková analýza selhala, možná teď není k dispozici žádný AI worker.",
         "deep_analysis_moves_one": "Hloubková analýza ({{count}} tah)",
         "deep_analysis_moves_few": "Hloubková analýza ({{count}} tahy)",
-        "deep_analysis_moves_many": "Hloubková analýza ({{count}} tahu)",
         "deep_analysis_moves_other": "Hloubková analýza ({{count}} tahů)"
     },
     "try_again": "Zkusit znovu",
@@ -351,6 +350,7 @@
     "tournament_organized_by": "Organizuje { player }",
     "tournament_admins": "Správci turnaje",
     "admins_one": "Správce: { players }",
+    "admins_few": "Správci: { players }",
     "admins_other": "Správci: { players }",
     "checkin_opens_time_before": "Registrace se otevře {{ time }} předem.",
     "tournament_subscribe": "Mám zájem!",
@@ -534,10 +534,6 @@
             "confirmLabel": "Ano, odeslat žádost",
             "cancelLabel": "Jejda ne, hrát dál"
         }
-    },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Časový posun: {{ms}}ms"
     },
     "time_cadency": {
         "blitz": "Blitz",
@@ -958,7 +954,6 @@
         "auto_create_manage": "Změnit nebo zastavit",
         "admins_one": "Správce: {{ players }}",
         "admins_few": "Správci: {{ players }}",
-        "admins_many": "Správci: {{ players }}",
         "admins_other": "Správci: {{ players }}"
     },
     "tournament_series_form": {
@@ -1249,7 +1244,6 @@
             "invalid_type": "Neplatné {{property}}",
             "solver_unproven_one": "{{count}} pozici nebylo možné včas vyřešit, úloha byla zkontrolována jen částečně",
             "solver_unproven_few": "{{count}} pozice nebylo možné včas vyřešit, úloha byla zkontrolována jen částečně",
-            "solver_unproven_many": "{{count}} pozice nebylo možné včas vyřešit, úloha byla zkontrolována jen částečně",
             "solver_unproven_other": "{{count}} pozic nebylo možné včas vyřešit, úloha byla zkontrolována jen částečně"
         },
         "editor": {
@@ -1406,27 +1400,21 @@
             "delete_confirm": "Smazat tuto úlohu?",
             "monitor_players_one": "{{ count }} hráč",
             "monitor_players_few": "{{ count }} hráči",
-            "monitor_players_many": "{{ count }} hráče",
             "monitor_players_other": "{{ count }} hráčů",
             "monitor_show_ignored_one": "Zobrazit {{count}} falešně pozitivní",
             "monitor_show_ignored_few": "Zobrazit {{count}} falešně pozitivní",
-            "monitor_show_ignored_many": "Zobrazit {{count}} falešně pozitivního",
             "monitor_show_ignored_other": "Zobrazit {{count}} falešně pozitivních",
             "monitor_badge_one": "{{count}} nepokrytá linie",
             "monitor_badge_few": "{{count}} nepokryté linie",
-            "monitor_badge_many": "{{count}} nepokryté linie",
             "monitor_badge_other": "{{count}} nepokrytých linií",
             "errors_badge_one": "{{count}} problém k opravě",
             "errors_badge_few": "{{count}} problémy k opravě",
-            "errors_badge_many": "{{count}} problému k opravě",
             "errors_badge_other": "{{count}} problémů k opravě",
             "warnings_badge_one": "{{count}} varování kontroly",
             "warnings_badge_few": "{{count}} varování kontroly",
-            "warnings_badge_many": "{{count}} varování kontroly",
             "warnings_badge_other": "{{count}} varování kontroly",
             "errors_count_one": "{{count}} problém k opravě, viz kartu Zveřejnit",
             "errors_count_few": "{{count}} problémy k opravě, viz kartu Zveřejnit",
-            "errors_count_many": "{{count}} problému k opravě, viz kartu Zveřejnit",
             "errors_count_other": "{{count}} problémů k opravě, viz kartu Zveřejnit"
         },
         "next_puzzle": "Další úloha",
@@ -1455,7 +1443,6 @@
             "back_to_collection": "Zpět na sbírku",
             "puzzles_count_one": "{{count}} úloha",
             "puzzles_count_few": "{{count}} úlohy",
-            "puzzles_count_many": "{{count}} úlohy",
             "puzzles_count_other": "{{count}} úloh"
         }
     },
@@ -1721,7 +1708,6 @@
         },
         "account_age_one": "Váš účet je starý {{count}} den.",
         "account_age_few": "Váš účet je starý {{count}} dny.",
-        "account_age_many": "Váš účet je starý {{count}} dne.",
         "account_age_other": "Váš účet je starý {{count}} dní."
     },
     "ai_worker_keys": {
@@ -1808,24 +1794,11 @@
     },
     "n_tournaments_one": "{{ count }} turnaj",
     "n_tournaments_few": "{{ count }} turnaje",
-    "n_tournaments_many": "{{ count }} turnaje",
     "n_tournaments_other": "{{ count }} turnajů",
     "n_messages_one": "{{ count }} zpráva",
     "n_messages_few": "{{ count }} zprávy",
-    "n_messages_many": "{{ count }} zprávy",
     "n_messages_other": "{{ count }} zpráv",
     "n_interested_one": "{{ count }} zájemce",
     "n_interested_few": "{{ count }} zájemci",
-    "n_interested_many": "{{ count }} zájemce",
-    "n_interested_other": "{{ count }} zájemců",
-    "lobby_active_players_many": "aktivního hráče",
-    "n_people_are_interested_many": "{{count}} osoby má zájem",
-    "n_participants_many": "{{ count }} účastníka",
-    "n_playing_games_many": "{{ count }} hrané hry",
-    "n_matches_played_many": "Odehráno {{ count }} zápasu",
-    "admins_few": "Správci: { players }",
-    "admins_many": "Správci: { players }",
-    "n_rounds_many": "{{ count }} kola",
-    "n_characters_many": "{{count}} znaku",
-    "n_total_games_many": "{{count}} odehrané hry."
+    "n_interested_other": "{{ count }} zájemců"
 }

@@ -554,10 +554,6 @@
             "cancelLabel": "Hoppsan nej, fortsätt spela"
         }
     },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Tidsförskjutning: {{ms}}ms"
-    },
     "time_cadency": {
         "blitz": "Blixtrunda",
         "normal": "Snabbt",

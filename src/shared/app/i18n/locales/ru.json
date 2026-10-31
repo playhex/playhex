@@ -158,8 +158,7 @@
         "deep_analysis_failed": "Глубокий анализ не удался, возможно, сейчас нет доступных воркеров ИИ.",
         "deep_analysis_moves_one": "Глубокий анализ ({{count}} ход)",
         "deep_analysis_moves_few": "Глубокий анализ ({{count}} хода)",
-        "deep_analysis_moves_many": "Глубокий анализ ({{count}} ходов)",
-        "deep_analysis_moves_other": "Глубокий анализ ({{count}} хода)"
+        "deep_analysis_moves_many": "Глубокий анализ ({{count}} ходов)"
     },
     "try_again": "Попробовать снова",
     "yes": "Да",
@@ -266,10 +265,6 @@
             "confirmLabel": "Да, отправить запрос",
             "cancelLabel": "Нет, продолжить игру"
         }
-    },
-    "ping": {
-        "ping_ms": "Пинг: {{ms}}мс",
-        "date_shift_ms": "Сдвиг времени: {{ms}}мс"
     },
     "time_cadency": {
         "blitz": "Блиц",
@@ -919,8 +914,7 @@
         "not_found": "Серия турниров не найдена.",
         "configure_auto_create": "Создавать автоматически",
         "auto_create_enabled": "Следующие выпуски этой серии создаются автоматически.",
-        "auto_create_manage": "Изменить или остановить",
-        "admins_other": "Администраторы: {{ players }}"
+        "auto_create_manage": "Изменить или остановить"
     },
     "tournament_series_form": {
         "create_title": "Создать серию турниров",
@@ -1311,8 +1305,7 @@
             "invalid_type": "Недопустимое значение {{property}}",
             "solver_unproven_one": "{{count}} позицию не удалось решить вовремя, задача проверена лишь частично",
             "solver_unproven_few": "{{count}} позиции не удалось решить вовремя, задача проверена лишь частично",
-            "solver_unproven_many": "{{count}} позиций не удалось решить вовремя, задача проверена лишь частично",
-            "solver_unproven_other": "{{count}} позиции не удалось решить вовремя, задача проверена лишь частично"
+            "solver_unproven_many": "{{count}} позиций не удалось решить вовремя, задача проверена лишь частично"
         },
         "editor": {
             "optional": "Необязательно",
@@ -1469,27 +1462,21 @@
             "monitor_players_one": "{{ count }} игрок",
             "monitor_players_few": "{{ count }} игрока",
             "monitor_players_many": "{{ count }} игроков",
-            "monitor_players_other": "{{ count }} игрока",
             "monitor_show_ignored_one": "Показать {{count}} ложное срабатывание",
             "monitor_show_ignored_few": "Показать {{count}} ложных срабатывания",
             "monitor_show_ignored_many": "Показать {{count}} ложных срабатываний",
-            "monitor_show_ignored_other": "Показать {{count}} ложного срабатывания",
             "monitor_badge_one": "{{count}} неохваченная линия",
             "monitor_badge_few": "{{count}} неохваченные линии",
             "monitor_badge_many": "{{count}} неохваченных линий",
-            "monitor_badge_other": "{{count}} неохваченной линии",
             "errors_badge_one": "{{count}} проблема для исправления",
             "errors_badge_few": "{{count}} проблемы для исправления",
             "errors_badge_many": "{{count}} проблем для исправления",
-            "errors_badge_other": "{{count}} проблемы для исправления",
             "warnings_badge_one": "{{count}} предупреждение проверки",
             "warnings_badge_few": "{{count}} предупреждения проверки",
             "warnings_badge_many": "{{count}} предупреждений проверки",
-            "warnings_badge_other": "{{count}} предупреждения проверки",
             "errors_count_one": "{{count}} проблема для исправления, см. вкладку Публикация",
             "errors_count_few": "{{count}} проблемы для исправления, см. вкладку Публикация",
-            "errors_count_many": "{{count}} проблем для исправления, см. вкладку Публикация",
-            "errors_count_other": "{{count}} проблемы для исправления, см. вкладку Публикация"
+            "errors_count_many": "{{count}} проблем для исправления, см. вкладку Публикация"
         },
         "next_puzzle": "Следующая задача",
         "collections": {
@@ -1517,8 +1504,7 @@
             "back_to_collection": "Назад к сборнику",
             "puzzles_count_one": "{{count}} задача",
             "puzzles_count_few": "{{count}} задачи",
-            "puzzles_count_many": "{{count}} задач",
-            "puzzles_count_other": "{{count}} задачи"
+            "puzzles_count_many": "{{count}} задач"
         }
     },
     "videos": {
@@ -1731,8 +1717,7 @@
         },
         "account_age_one": "Вашему аккаунту {{count}} день.",
         "account_age_few": "Вашему аккаунту {{count}} дня.",
-        "account_age_many": "Вашему аккаунту {{count}} дней.",
-        "account_age_other": "Вашему аккаунту {{count}} дня."
+        "account_age_many": "Вашему аккаунту {{count}} дней."
     },
     "ai_worker_keys": {
         "description": "Ключи для запуска воркеров ИИ и предоставления вычислительной мощности ботам и анализу партий PlayHex. Храните их в тайне.",
@@ -1815,17 +1800,5 @@
             }
         },
         "check_device_code": "Убедитесь, что этот код совпадает с кодом, отображаемым на вашем устройстве:"
-    },
-    "lobby_active_players_other": "активного игрока",
-    "n_tournaments_other": "{{ count }} турнира",
-    "n_messages_other": "{{ count }} сообщения",
-    "n_interested_other": "{{ count }} заинтересованного",
-    "n_people_are_interested_other": "{{count}} человека заинтересованы",
-    "n_participants_other": "{{ count }} участника",
-    "n_playing_games_other": "{{ count }} текущей партии",
-    "n_matches_played_other": "{{ count }} сыгранного матча",
-    "admins_other": "Администраторы: { players }",
-    "n_rounds_other": "{{ count }} раунда",
-    "n_characters_other": "{{count}} символа",
-    "n_total_games_other": "Всего {{count}} партии."
+    }
 }

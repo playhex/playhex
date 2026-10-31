@@ -303,10 +303,6 @@
     "change_password": "Passwort ändern",
     "preview": "Vorschau",
     "new_password": "Neues Passwort",
-    "ping": {
-        "date_shift_ms": "Zeitversatz: {{ms}}ms",
-        "ping_ms": "Ping: {{ms}} ms"
-    },
     "game_state": {
         "canceled": "Abgebrochen",
         "created": "Erstellt",

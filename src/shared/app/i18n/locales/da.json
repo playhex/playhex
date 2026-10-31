@@ -264,10 +264,6 @@
             "cancelLabel": "Ups nej, fortsæt med at spille"
         }
     },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Tidsforskel: {{ms}}ms"
-    },
     "time_cadency": {
         "blitz": "Blitz",
         "normal": "Normal",
