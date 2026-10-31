@@ -1,5 +1,5 @@
 import { Player } from '../../shared/app/models/index.js';
-import { authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest } from '../../client/apiClient.js';
+import { apiChangePseudo, authLogin, authLogout, authMeOrSignupGuest, authSignupFromGuest } from '../../client/apiClient.js';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import useSocketStore from './socketStore.js';
@@ -34,6 +34,20 @@ const useAuthStore = defineStore('authStore', () => {
         return loggedInPlayer.value = await authLogout();
     };
 
+    /**
+     * @throws {DomainHttpError}
+     */
+    const changePseudo = async (pseudo: string): Promise<Player> => {
+        const player = await apiChangePseudo(pseudo);
+
+        if (loggedInPlayer.value !== null) {
+            loggedInPlayer.value.pseudo = player.pseudo;
+            loggedInPlayer.value.slug = player.slug;
+        }
+
+        return player;
+    };
+
     socket.on('ratingsUpdated', (gameId, ratings) => {
         if (loggedInPlayer.value === null) {
             return;
@@ -55,6 +69,7 @@ const useAuthStore = defineStore('authStore', () => {
         login,
         signup,
         logout,
+        changePseudo,
     };
 });
 

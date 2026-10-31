@@ -19,6 +19,8 @@ type DomainHttpErrorTypes =
     | 'tournament_series_no_tournament_to_clone'
     | 'content_restricted'
     | 'must_be_logged_in'
+    | 'same_pseudo'
+    | 'pseudo_change_limit_reached'
 ;
 
 type DomainHttpErrorType = {

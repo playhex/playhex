@@ -120,7 +120,7 @@ const submitPasswordChange = async () => {
 };
 
 /*
- * Private account data: login, email.
+ * Private account data: login, email, pseudo change.
  * Only for registered players.
  */
 const accountInfo = ref<null | AccountInfo>(null);
@@ -135,6 +135,45 @@ const loadAccountInfo = async (): Promise<void> => {
 };
 
 watch(() => loggedInPlayer.value?.publicId, () => void loadAccountInfo(), { immediate: true });
+
+const formatDate = (date: Date): string => intlFormat(
+    date,
+    { year: 'numeric', month: 'long', day: 'numeric' },
+    { locale: autoLocale() },
+);
+
+const formatDays = (until: Date): number => Math.ceil((until.getTime() - Date.now()) / 86400000);
+
+/*
+ * Pseudo change
+ */
+const newPseudo = ref('');
+const newPseudoValidation: Ref<InputValidation> = ref(null);
+const changePseudoSuccess = ref(false);
+
+const submitPseudoChange = async (): Promise<void> => {
+    newPseudoValidation.value = null;
+    changePseudoSuccess.value = false;
+
+    if (!confirm(t('change_pseudo.confirm', { pseudo: newPseudo.value.trim() }))) {
+        return;
+    }
+
+    try {
+        await useAuthStore().changePseudo(newPseudo.value);
+
+        newPseudo.value = '';
+        changePseudoSuccess.value = true;
+    } catch (e) {
+        if (!(e instanceof DomainHttpError)) {
+            throw e;
+        }
+
+        newPseudoValidation.value = { ok: false, reason: e.type };
+    }
+
+    await loadAccountInfo();
+};
 
 /*
  * Recovery email
@@ -443,6 +482,7 @@ const sectionPanels: { [sectionId: string]: Panel } = {
     'language': 'interface',
     'theme': 'interface',
     'audio': 'interface',
+    'pseudo': 'account',
     'country-flag': 'account',
     'moderation': 'account',
     'change-password': 'security',
@@ -687,6 +727,45 @@ const {
                             :modelValue="loggedInPlayer.countryFlag ?? null"
                             @update:modelValue="updateCountryFlag"
                         />
+                    </section>
+
+                    <section id="pseudo" v-if="loggedInPlayer && !loggedInPlayer.isGuest && accountInfo">
+                        <form @submit.prevent="submitPseudoChange">
+                            <h3>{{ $t('change_pseudo.title') }}</h3>
+
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 col-md-3 col-form-label" for="change-pseudo-new">{{ $t('change_pseudo.new_pseudo') }}</label>
+                                <div class="col-sm-8 col-md-6">
+                                    <input
+                                        v-model="newPseudo"
+                                        required
+                                        maxlength="32"
+                                        class="form-control"
+                                        :class="toInputClass(newPseudoValidation)"
+                                        :placeholder="loggedInPlayer.pseudo"
+                                        :disabled="accountInfo.pseudoChange.nextAllowedAt !== null"
+                                        id="change-pseudo-new"
+                                    >
+                                    <div v-if="newPseudoValidation?.reason" class="invalid-feedback">
+                                        {{ $t(newPseudoValidation.reason) }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <ul class="small text-body-secondary">
+                                <li v-if="accountInfo.pseudoChange.nextAllowedAt === null">{{ $t('change_pseudo.remaining', { count: accountInfo.pseudoChange.remaining }) }}</li>
+                                <li v-else class="text-warning">{{ $t('change_pseudo.next_allowed_at', { date: formatDate(accountInfo.pseudoChange.nextAllowedAt) }) }}</li>
+                                <li>{{ $t('change_pseudo.old_pseudo_released') }}</li>
+                                <li v-if="accountInfo.pseudoChange.formerPseudoIfRenamedNow">
+                                    <i18next :translation="$t('change_pseudo.former_pseudo_note', { count: formatDays(accountInfo.pseudoChange.formerPseudoIfRenamedNow.until) })">
+                                        <template #pseudo><strong>{{ accountInfo.pseudoChange.formerPseudoIfRenamedNow.pseudo }}</strong></template>
+                                    </i18next>
+                                </li>
+                            </ul>
+
+                            <p v-if="changePseudoSuccess" class="text-success">{{ $t('change_pseudo.success') }}</p>
+                            <button type="submit" class="btn btn-outline-primary" :disabled="accountInfo.pseudoChange.nextAllowedAt !== null">{{ $t('change_pseudo.submit') }}</button>
+                        </form>
                     </section>
 
                     <section id="moderation">

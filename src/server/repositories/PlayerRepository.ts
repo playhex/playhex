@@ -1,4 +1,4 @@
-import { Player, PlayerAccountPassword } from '../../shared/app/models/index.js';
+import { Player, PlayerAccountPassword, PlayerPseudoHistory } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication.js';
@@ -9,9 +9,21 @@ import { isDuplicateError } from './typeormUtils.js';
 import SearchPlayersParameters from '../../shared/app/SearchPlayersParameters.js';
 import { instanceToPlain } from '../../shared/app/class-transformer-custom.js';
 import PlayerIdentityMap from '../identity-map/PlayerIdentityMap.js';
+import { getCurrentPseudoStartedAt, getNextPseudoChangeAllowedAt, type PseudoPeriod } from '../../shared/app/pseudoHistoryRules.js';
 
 export class PseudoAlreadyTakenError extends Error {}
 export class MustBeGuestError extends Error {}
+export class MustNotBeGuestError extends Error {}
+export class SamePseudoError extends Error {}
+
+export class PseudoChangeLimitReachedError extends Error
+{
+    constructor(
+        public nextAllowedAt: Date,
+    ) {
+        super('Pseudo change limit reached');
+    }
+}
 
 @Service()
 export default class PlayerRepository
@@ -22,6 +34,9 @@ export default class PlayerRepository
 
         @Inject('Repository<PlayerAccountPassword>')
         private playerAccountPasswordRepository: Repository<PlayerAccountPassword>,
+
+        @Inject('Repository<PlayerPseudoHistory>')
+        private playerPseudoHistoryRepository: Repository<PlayerPseudoHistory>,
 
         private playerIdentityMap: PlayerIdentityMap,
     ) {}
@@ -290,6 +305,117 @@ export default class PlayerRepository
 
             throw e;
         }
+    }
+
+    async getPseudoHistory(playerId: number): Promise<PseudoPeriod[]>
+    {
+        return await this.playerPseudoHistoryRepository.find({
+            where: { playerId },
+            order: { endedAt: 'desc' },
+        });
+    }
+
+    /**
+     * Get player who used this slug, the most recently.
+     * Used to redirect old profile urls.
+     */
+    async getPlayerByOldSlug(slug: string): Promise<null | Player>
+    {
+        const lastPeriod = await this.playerPseudoHistoryRepository.findOne({
+            where: { slug },
+            order: { endedAt: 'desc' },
+        });
+
+        if (lastPeriod === null) {
+            return null;
+        }
+
+        return this.resolveInstance(await this.playerRepository.findOneBy({ id: lastPeriod.playerId }));
+    }
+
+    /**
+     * Player changes its own pseudo.
+     * Old pseudo is kept in history, and login follows new pseudo.
+     *
+     * @throws {MustNotBeGuestError}
+     * @throws {SamePseudoError}
+     * @throws {PseudoChangeLimitReachedError}
+     * @throws {PseudoAlreadyTakenError}
+     * @throws {PseudoTooShortError}
+     * @throws {PseudoTooLongError}
+     * @throws {InvalidPseudoError}
+     */
+    async changePseudo(player: Player, newPseudo: string): Promise<Player>
+    {
+        newPseudo = newPseudo.trim();
+
+        checkPseudo(newPseudo);
+
+        if (player.isGuest || !player.id) {
+            throw new MustNotBeGuestError();
+        }
+
+        if (newPseudo === player.pseudo) {
+            throw new SamePseudoError();
+        }
+
+        const now = new Date();
+        const history = await this.getPseudoHistory(player.id);
+        const nextAllowedAt = getNextPseudoChangeAllowedAt(history, now);
+
+        if (nextAllowedAt !== null) {
+            throw new PseudoChangeLimitReachedError(nextAllowedAt);
+        }
+
+        const oldPeriod = new PlayerPseudoHistory();
+
+        oldPeriod.playerId = player.id;
+        oldPeriod.pseudo = player.pseudo;
+        oldPeriod.slug = player.slug;
+        oldPeriod.startedAt = getCurrentPseudoStartedAt(history, player.registeredAt ?? player.createdAt);
+        oldPeriod.endedAt = now;
+
+        const update = {
+            pseudo: newPseudo,
+            slug: pseudoSlug(newPseudo),
+        };
+
+        try {
+            await this.playerRepository.manager.transaction(async manager => {
+                await manager.save(oldPeriod);
+
+                await manager.createQueryBuilder(Player, 'player')
+                    .update()
+                    .where('id = :id', { id: player.id })
+                    .set(update)
+                    .execute()
+                ;
+
+                await manager.createQueryBuilder(PlayerAccountPassword, 'playerAccountPassword')
+                    .update()
+                    .where('playerId = :playerId', { playerId: player.id })
+                    .set({ login: newPseudo })
+                    .execute()
+                ;
+            });
+        } catch (e) {
+            if (isDuplicateError(e)) {
+                throw new PseudoAlreadyTakenError();
+            }
+
+            throw e;
+        }
+
+        // Update player instance kept in memory, i.e in games already created
+        Object.assign(this.playerIdentityMap.get(player.publicId) ?? player, update);
+
+        logger.info('Player changed pseudo', {
+            playerPublicId: player.publicId,
+            oldPseudo: oldPeriod.pseudo,
+            newPseudo,
+        });
+
+        return player;
     }
 
     async getLastRegisteredPlayers(limit: number): Promise<Player[]>

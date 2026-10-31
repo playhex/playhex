@@ -30,6 +30,7 @@ import type { PuzzleMonitorUncoveredLineCount } from '../shared/app/puzzles/puzz
 import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.js';
 import type { OAuthConnectedApplication, OAuthInteractionDetails } from '../shared/app/oauth.js';
 import type { AccountInfo } from '../shared/app/AccountInfo.js';
+import type { FormerPseudo } from '../shared/app/pseudoHistoryRules.js';
 
 /**
  * @throws {DomainHttpError}
@@ -197,7 +198,18 @@ export const apiGetAccount = async (): Promise<AccountInfo> => {
 
     await checkResponse(response);
 
-    return await response.json();
+    const accountInfo: AccountInfo = await response.json();
+    const { pseudoChange } = accountInfo;
+
+    if (pseudoChange.nextAllowedAt !== null) {
+        pseudoChange.nextAllowedAt = new Date(pseudoChange.nextAllowedAt);
+    }
+
+    if (pseudoChange.formerPseudoIfRenamedNow !== null) {
+        pseudoChange.formerPseudoIfRenamedNow.until = new Date(pseudoChange.formerPseudoIfRenamedNow.until);
+    }
+
+    return accountInfo;
 };
 
 export const apiSetAccountEmail = async (email: string): Promise<void> => {
@@ -224,6 +236,48 @@ export const apiDeleteAccountEmail = async (): Promise<void> => {
     });
 
     await checkResponse(response);
+};
+
+export const apiChangePseudo = async (pseudo: string): Promise<Player> => {
+    const response = await fetch('/api/account/pseudo', {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            pseudo,
+        }),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(Player, await response.json());
+};
+
+/**
+ * Former pseudo to display on player profile ("formerly ..."), if any.
+ */
+export const apiGetPlayerFormerPseudo = async (publicId: string): Promise<null | FormerPseudo> => {
+    const response = await fetch(`/api/players/${publicId}/former-pseudo`, {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    const { formerPseudo } = await response.json() as { formerPseudo: null | FormerPseudo };
+
+    if (formerPseudo === null) {
+        return null;
+    }
+
+    return {
+        pseudo: formerPseudo.pseudo,
+        until: new Date(formerPseudo.until),
+    };
 };
 
 export const apiGetActiveGames = async (): Promise<Game[]> => {

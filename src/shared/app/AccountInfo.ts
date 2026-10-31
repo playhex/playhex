@@ -12,4 +12,21 @@ export type AccountInfo = {
      * Optional recovery email.
      */
     email: null | string;
+
+    pseudoChange: {
+        remaining: number;
+
+        /**
+         * Date when player will be able to change pseudo again, or null if player can change now.
+         */
+        nextAllowedAt: null | Date;
+
+        /**
+         * Former pseudo that would be displayed on profile if player changes pseudo now.
+         */
+        formerPseudoIfRenamedNow: null | {
+            pseudo: string;
+            until: Date;
+        };
+    };
 };

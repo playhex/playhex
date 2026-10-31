@@ -3,7 +3,7 @@ import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
 import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconX, IconFlag } from '../../icons.js';
 import { Game, GameOptions, Player, PlayerHeadToHeadStats, PlayerLittleGolemAccount, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
-import { getPlayerBySlug, apiGetPlayerStats, apiGetHeadToHeadStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames, getExternalGames, apiGetPlayerLittleGolemAccount } from '../../../apiClient.js';
+import { getPlayerBySlug, apiGetPlayerFormerPseudo, apiGetPlayerStats, apiGetHeadToHeadStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames, getExternalGames, apiGetPlayerLittleGolemAccount } from '../../../apiClient.js';
 import { useCreateGameOverlay } from '../../composables/useCreateGameOverlay.js';
 import { Ref, computed, ref, useTemplateRef, watch } from 'vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
@@ -40,8 +40,10 @@ import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
 import AppPlayerExternalGames from '../../components/external-games/AppPlayerExternalGames.vue';
 import AppExternalAccounts from '../../components/external-games/AppExternalAccounts.vue';
 import { littleGolemPlayerExternalId } from '../../../../shared/app/little-golem/littleGolemUtils.js';
+import type { FormerPseudo } from '../../../../shared/app/pseudoHistoryRules.js';
 
 const { slug } = useRoute().params;
+const router = useRouter();
 
 if (Array.isArray(slug)) {
     throw new Error('Unexpected array in "slug" param');
@@ -112,7 +114,16 @@ const challenge = (mode: 'ranked' | 'friendly') => {
 void (async () => {
     try {
         if (player.value === null) {
-            player.value = await getPlayerBySlug(slug);
+            const fetchedPlayer = await getPlayerBySlug(slug);
+
+            // Player changed pseudo, and was found by its old slug: redirect to current profile url.
+            // Do not set player yet, it will be loaded again on new url.
+            if (fetchedPlayer.slug !== slug) {
+                void router.replace({ name: 'player', params: { slug: fetchedPlayer.slug } });
+                return;
+            }
+
+            player.value = fetchedPlayer;
         }
 
         updateMeta(player.value);
@@ -127,6 +138,26 @@ void (async () => {
         throw e;
     }
 })();
+
+/*
+ * Former pseudo, displayed as "formerly ..."
+ */
+const formerPseudo = ref<null | FormerPseudo>(null);
+
+watch(() => player.value?.publicId, async publicId => {
+    formerPseudo.value = null;
+
+    if (!publicId || player.value?.isGuest) {
+        return;
+    }
+
+    try {
+        formerPseudo.value = await apiGetPlayerFormerPseudo(publicId);
+    } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error('Could not load player former pseudo', e);
+    }
+}, { immediate: true });
 
 /*
  * Current games
@@ -208,8 +239,6 @@ watchEffect(async () => {
     gamesHistory.value = results;
     totalResults.value = count;
 });
-
-const router = useRouter();
 
 const clickLogout = async () => {
     gamesHistory.value = [];
@@ -519,6 +548,8 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         @click="setCountryFlag()"
                     ><IconFlag /></button>
                 </h2>
+
+                <p v-if="formerPseudo" class="mb-0 text-body-secondary">{{ $t('formerly') }} <strong>{{ formerPseudo.pseudo }}</strong></p>
 
                 <p v-if="player && !player.isGuest" class="mb-0">{{ $t('account_created_on', { date: player?.createdAt
                     ? format(player?.createdAt, 'd MMMM y')

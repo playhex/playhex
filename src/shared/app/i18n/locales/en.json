@@ -717,6 +717,22 @@
     "password_changed_success": "The password has been changed.",
     "saved": "Saved",
     "must_be_logged_in": "You must be logged in",
+    "same_pseudo": "This is already your username",
+    "pseudo_change_limit_reached": "You changed your username too many times recently",
+    "change_pseudo": {
+        "title": "Change username",
+        "new_pseudo": "New username",
+        "submit": "Change username",
+        "confirm": "Change your username to \"{{pseudo}}\"?",
+        "success": "Your username has been changed.",
+        "remaining_one": "You can change your username {{count}} more time within 30 days.",
+        "remaining_other": "You can change your username {{count}} more times within 30 days.",
+        "next_allowed_at": "You changed your username too many times recently. You will be able to change it again on {{date}}.",
+        "old_pseudo_released": "Your old username will be available to other players. Links to your old profile url will redirect to your new one. You will also log in with your new username.",
+        "former_pseudo_note_one": "Your profile will show \"formerly {pseudo}\" for {{count}} day.",
+        "former_pseudo_note_other": "Your profile will show \"formerly {pseudo}\" for {{count}} days."
+    },
+    "formerly": "formerly",
     "recovery_email": {
         "title": "Recovery email",
         "explain": "Optional. Used to contact you about your account security, e.g if you lose your password.",

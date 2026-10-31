@@ -67,7 +67,10 @@ export const loadPuzzleCollection = async (publicId: string): Promise<null | Puz
 };
 
 export const loadPlayer = async (slug: string): Promise<null | PlayerPageData> => {
-    const player = await Container.get(PlayerRepository).getPlayerBySlug(slug);
+    const playerRepository = Container.get(PlayerRepository);
+    const player = await playerRepository.getPlayerBySlug(slug)
+        ?? await playerRepository.getPlayerByOldSlug(slug)
+    ;
 
     if (player === null || player.id === undefined) {
         return null;
