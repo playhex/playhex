@@ -213,6 +213,7 @@
     "spectators": "Espectadores",
     "n_characters_one": "{{count}} caractere",
     "n_characters_many": "{{count}} caracteres",
+    "n_characters_other": "{{count}} caracteres",
     "landscape": "Paisagem",
     "portrait": "Retrato",
     "resign": "Desistir",
@@ -259,10 +260,13 @@
     "participants": "Participantes",
     "n_people_are_interested_one": "{{count}} pessoa está interessada",
     "n_people_are_interested_many": "{{count}} pessoas estão interessadas",
+    "n_people_are_interested_other": "{{count}} pessoas estão interessadas",
     "n_participants_one": "{{ count }} participante",
     "n_participants_many": "{{ count }} participantes",
+    "n_participants_other": "{{ count }} participantes",
     "n_playing_games_one": "{{ count }} partida em andamento",
     "n_playing_games_many": "{{ count }} partidas em andamento",
+    "n_playing_games_other": "{{ count }} jogos em andamento",
     "view_tournament_as_participant": "Jogar torneio",
     "view_tournament": "Ver torneio",
     "tournament_started_ago": "Começou {{ date }}",
@@ -271,6 +275,7 @@
     "tournament_duration": "Duração do torneio: {{ duration }}",
     "n_matches_played_one": "{{ count }} partida jogada",
     "n_matches_played_many": "{{ count }} partidas jogadas",
+    "n_matches_played_other": "{{ count }} partidas jogadas",
     "tournament_subscription": {
         "subscribed": "Você está inscrito",
         "checked_in": "Sua participação está confirmada!",
@@ -302,6 +307,7 @@
     "round_n": "Rodada {{ n }}",
     "n_rounds_one": "Uma rodada",
     "n_rounds_many": "{{ count }} rodadas",
+    "n_rounds_other": "{{ count }} rodadas",
     "rounds_number_auto": "Rodadas: baseado no número de participantes",
     "consolation_enabled": "Com partida de consolação",
     "consolation_disabled": "Sem partida de consolação",
@@ -369,10 +375,6 @@
             "confirmLabel": "Sim, enviar o pedido",
             "cancelLabel": "Ops, não, continuar jogando"
         }
-    },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Compensação de deslocamento de data: {{ms}}ms"
     },
     "time_cadency": {
         "blitz": "Blitz",
@@ -475,6 +477,7 @@
     "lobby_join": "Entrar",
     "lobby_game_no_longer_available": "Jogo não está mais disponível",
     "lobby_active_players_one": "jogador ativo",
+    "lobby_active_players_many": "de jogadores ativos",
     "lobby_active_players_other": "jogadores ativos",
     "lobby_playing_now": "Jogando agora",
     "lobby_no_live_games_now": "Nenhum jogo ao vivo em andamento agora.",
@@ -509,15 +512,11 @@
     "nav_archives": "Arquivos",
     "update": "Atualizar",
     "tournaments_page_intro": "Aqui estão os torneios de Hex, que podem ser <strong>organizados por qualquer pessoa</strong> em vários formatos, como suíço ou eliminação.<br>Você pode assistir jogos de torneios em andamento ou entrar em um próximo torneio.<br><strong>Para participar</strong>, certifique-se de <strong>fazer check-in no horário</strong>. Você pode se inscrever para receber uma notificação quando o check-in abrir.<br>Veja a descrição do torneio para detalhes como horários de check-in, formato e participantes.",
-    "n_people_are_interested_other": "{{count}} pessoas estão interessadas",
-    "n_participants_other": "{{ count }} participantes",
-    "n_playing_games_other": "{{ count }} jogos em andamento",
-    "n_matches_played_other": "{{ count }} partidas jogadas",
     "tournament_admins": "Administradores do torneio",
     "admins_one": "Admin: { players }",
+    "admins_many": "Admins: { players }",
     "admins_other": "Admins: { players }",
     "tournament_unsubscribe": "Não estou mais interessado.",
-    "n_rounds_other": "{{ count }} rodadas",
     "losers_bracket": "Chave dos perdedores",
     "tournament_slug_duplicate": "Já existe um torneio com o mesmo nome de URL",
     "tournament_seeding_methods": {
@@ -532,7 +531,6 @@
     "moves": "Jogadas",
     "move_number": "jogada {{n}}",
     "chat_message_moderated": "Mensagem excluída pela moderação",
-    "n_characters_other": "{{count}} caracteres",
     "force_board_orientation_mode": "Forçar exibição do tabuleiro em paisagem ou retrato nesta tela",
     "resign_confirm_overlay": {
         "title": "Desistir da partida",
@@ -557,6 +555,7 @@
     "bot": "Bot",
     "browse_all_ended_games": "Ver todos os jogos encerrados",
     "n_total_games_one": "1 jogo no total.",
+    "n_total_games_many": "{{count}} de jogos no total.",
     "n_total_games_other": "{{count}} jogos no total.",
     "previous": "Anterior",
     "next": "Próximo",
@@ -880,6 +879,7 @@
     "sort_recently_played": "Jogados recentemente",
     "tournament_series": "Séries",
     "n_tournaments_one": "{{ count }} torneio",
+    "n_tournaments_many": "{{ count }} de torneios",
     "n_tournaments_other": "{{ count }} torneios",
     "tournament_part_of_series": "Este torneio será uma edição de {series}.",
     "tournament_series_slug_duplicate": "Já existe uma série de torneios com o mesmo nome de URL.",
@@ -903,6 +903,7 @@
     "tournament_series_page": {
         "host": "Anfitrião: {{ player }}",
         "admins_one": "Administrador: {{ players }}",
+        "admins_many": "Administradores: {{ players }}",
         "admins_other": "Administradores: {{ players }}",
         "last_tournament": "Último torneio",
         "next_tournament": "Próximo torneio",
@@ -913,8 +914,7 @@
         "not_found": "Série de torneios não encontrada.",
         "configure_auto_create": "Criar automaticamente",
         "auto_create_enabled": "As próximas edições desta série são criadas automaticamente.",
-        "auto_create_manage": "Alterar ou parar",
-        "admins_many": "Administradores: {{ players }}"
+        "auto_create_manage": "Alterar ou parar"
     },
     "tournament_series_form": {
         "create_title": "Criar uma série de torneios",
@@ -991,8 +991,10 @@
         "simulation_created_at": "Criado após"
     },
     "n_messages_one": "{{ count }} mensagem",
+    "n_messages_many": "{{ count }} de mensagens",
     "n_messages_other": "{{ count }} mensagens",
     "n_interested_one": "{{ count }} interessado",
+    "n_interested_many": "{{ count }} de interessados",
     "n_interested_other": "{{ count }} interessados",
     "tournament_ended": "terminado",
     "manage_tournament_page": {
@@ -1798,11 +1800,5 @@
             }
         },
         "check_device_code": "Verifique se este código corresponde ao exibido no seu dispositivo:"
-    },
-    "n_tournaments_many": "{{ count }} de torneios",
-    "n_messages_many": "{{ count }} de mensagens",
-    "n_interested_many": "{{ count }} de interessados",
-    "lobby_active_players_many": "de jogadores ativos",
-    "admins_many": "Admins: { players }",
-    "n_total_games_many": "{{count}} de jogos no total."
+    }
 }

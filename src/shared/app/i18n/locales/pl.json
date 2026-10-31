@@ -158,8 +158,7 @@
         "deep_analysis_failed": "Głęboka analiza nie powiodła się, być może żaden worker AI nie jest teraz dostępny.",
         "deep_analysis_moves_one": "Głęboka analiza ({{count}} ruch)",
         "deep_analysis_moves_few": "Głęboka analiza ({{count}} ruchy)",
-        "deep_analysis_moves_many": "Głęboka analiza ({{count}} ruchów)",
-        "deep_analysis_moves_other": "Głęboka analiza ({{count}} ruchu)"
+        "deep_analysis_moves_many": "Głęboka analiza ({{count}} ruchów)"
     },
     "try_again": "Spróbuj ponownie",
     "yes": "Tak",
@@ -376,10 +375,6 @@
             "confirmLabel": "Tak, wyślij prośbę",
             "cancelLabel": "Ups, nie, grajmy dalej"
         }
-    },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Różnica czasu: {{ms}}ms"
     },
     "time_cadency": {
         "blitz": "Blitz",
@@ -919,8 +914,7 @@
         "not_found": "Nie znaleziono serii turniejów.",
         "configure_auto_create": "Utwórz automatycznie",
         "auto_create_enabled": "Kolejne edycje tej serii są tworzone automatycznie.",
-        "auto_create_manage": "Zmień lub zatrzymaj",
-        "admins_other": "Administratorzy: {{ players }}"
+        "auto_create_manage": "Zmień lub zatrzymaj"
     },
     "tournament_series_form": {
         "create_title": "Utwórz serię turniejów",
@@ -1311,8 +1305,7 @@
             "invalid_type": "Nieprawidłowe {{property}}",
             "solver_unproven_one": "{{count}} pozycja nie została rozwiązana na czas, zadanie zostało sprawdzone tylko częściowo",
             "solver_unproven_few": "{{count}} pozycje nie zostały rozwiązane na czas, zadanie zostało sprawdzone tylko częściowo",
-            "solver_unproven_many": "{{count}} pozycji nie zostało rozwiązanych na czas, zadanie zostało sprawdzone tylko częściowo",
-            "solver_unproven_other": "{{count}} pozycji nie zostało rozwiązanych na czas, zadanie zostało sprawdzone tylko częściowo"
+            "solver_unproven_many": "{{count}} pozycji nie zostało rozwiązanych na czas, zadanie zostało sprawdzone tylko częściowo"
         },
         "editor": {
             "optional": "Opcjonalne",
@@ -1469,27 +1462,21 @@
             "monitor_players_one": "{{ count }} gracz",
             "monitor_players_few": "{{ count }} graczy",
             "monitor_players_many": "{{ count }} graczy",
-            "monitor_players_other": "{{ count }} gracza",
             "monitor_show_ignored_one": "Pokaż {{count}} fałszywy alarm",
             "monitor_show_ignored_few": "Pokaż {{count}} fałszywe alarmy",
             "monitor_show_ignored_many": "Pokaż {{count}} fałszywych alarmów",
-            "monitor_show_ignored_other": "Pokaż {{count}} fałszywego alarmu",
             "monitor_badge_one": "{{count}} nieobjęta linia",
             "monitor_badge_few": "{{count}} nieobjęte linie",
             "monitor_badge_many": "{{count}} nieobjętych linii",
-            "monitor_badge_other": "{{count}} nieobjętej linii",
             "errors_badge_one": "{{count}} problem do poprawienia",
             "errors_badge_few": "{{count}} problemy do poprawienia",
             "errors_badge_many": "{{count}} problemów do poprawienia",
-            "errors_badge_other": "{{count}} problemu do poprawienia",
             "warnings_badge_one": "{{count}} ostrzeżenie sprawdzania",
             "warnings_badge_few": "{{count}} ostrzeżenia sprawdzania",
             "warnings_badge_many": "{{count}} ostrzeżeń sprawdzania",
-            "warnings_badge_other": "{{count}} ostrzeżenia sprawdzania",
             "errors_count_one": "{{count}} problem do poprawienia, zobacz kartę Publikacja",
             "errors_count_few": "{{count}} problemy do poprawienia, zobacz kartę Publikacja",
-            "errors_count_many": "{{count}} problemów do poprawienia, zobacz kartę Publikacja",
-            "errors_count_other": "{{count}} problemu do poprawienia, zobacz kartę Publikacja"
+            "errors_count_many": "{{count}} problemów do poprawienia, zobacz kartę Publikacja"
         },
         "next_puzzle": "Następne zadanie",
         "collections": {
@@ -1517,8 +1504,7 @@
             "back_to_collection": "Wróć do kolekcji",
             "puzzles_count_one": "{{count}} zadanie",
             "puzzles_count_few": "{{count}} zadania",
-            "puzzles_count_many": "{{count}} zadań",
-            "puzzles_count_other": "{{count}} zadania"
+            "puzzles_count_many": "{{count}} zadań"
         }
     },
     "videos": {
@@ -1731,8 +1717,7 @@
         },
         "account_age_one": "Twoje konto ma {{count}} dzień.",
         "account_age_few": "Twoje konto ma {{count}} dni.",
-        "account_age_many": "Twoje konto ma {{count}} dni.",
-        "account_age_other": "Twoje konto ma {{count}} dnia."
+        "account_age_many": "Twoje konto ma {{count}} dni."
     },
     "ai_worker_keys": {
         "description": "Klucze do uruchamiania workerów AI i udostępniania mocy obliczeniowej botom i analizom gier PlayHex. Zachowaj je w tajemnicy.",
@@ -1815,17 +1800,5 @@
             }
         },
         "check_device_code": "Upewnij się, że ten kod jest zgodny z kodem wyświetlanym na twoim urządzeniu:"
-    },
-    "lobby_active_players_other": "aktywnego gracza",
-    "n_tournaments_other": "{{ count }} turnieju",
-    "n_messages_other": "{{ count }} wiadomości",
-    "n_interested_other": "{{ count }} zainteresowanej osoby",
-    "n_people_are_interested_other": "{{count}} osoby jest zainteresowane",
-    "n_participants_other": "{{ count }} uczestnika",
-    "n_playing_games_other": "{{ count }} trwającej gry",
-    "n_matches_played_other": "{{ count }} rozegranego meczu",
-    "admins_other": "Administratorzy: { players }",
-    "n_rounds_other": "{{ count }} rundy",
-    "n_characters_other": "{{count}} znaku",
-    "n_total_games_other": "{{count}} gry łącznie."
+    }
 }

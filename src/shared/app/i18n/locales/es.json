@@ -227,10 +227,6 @@
             "cancelLabel": "No, seguir jugando"
         }
     },
-    "ping": {
-        "date_shift_ms": "Ajustes temporales: {{ms}}ms",
-        "ping_ms": "Ping: {{ms}}ms"
-    },
     "time_cadency": {
         "blitz": "Blitz",
         "normal": "Normal",
@@ -676,6 +672,7 @@
     "lobby_join": "Unirse",
     "lobby_game_no_longer_available": "La partida ya no está disponible",
     "lobby_active_players_one": "jugador activo",
+    "lobby_active_players_many": "jugadores activos",
     "lobby_active_players_other": "jugadores activos",
     "lobby_playing_now": "Jugando ahora",
     "lobby_no_live_games_now": "No hay partidas en vivo en curso ahora mismo.",
@@ -720,6 +717,7 @@
     "bot": "Bot",
     "browse_all_ended_games": "Ver todas las partidas terminadas",
     "n_total_games_one": "1 partida en total.",
+    "n_total_games_many": "{{count}} partidas en total.",
     "n_total_games_other": "{{count}} partidas en total.",
     "previous": "Anterior",
     "next": "Siguiente",
@@ -892,6 +890,7 @@
     "sort_recently_played": "Jugadas recientemente",
     "tournament_series": "Series",
     "n_tournaments_one": "{{ count }} torneo",
+    "n_tournaments_many": "{{ count }} torneos",
     "n_tournaments_other": "{{ count }} torneos",
     "tournament_part_of_series": "Este torneo será una edición de {series}.",
     "tournament_series_slug_duplicate": "Ya existe una serie de torneos con el mismo nombre en la URL.",
@@ -915,6 +914,7 @@
     "tournament_series_page": {
         "host": "Anfitrión: {{ player }}",
         "admins_one": "Administrador: {{ players }}",
+        "admins_many": "Administradores: {{ players }}",
         "admins_other": "Administradores: {{ players }}",
         "last_tournament": "Último torneo",
         "next_tournament": "Próximo torneo",
@@ -925,8 +925,7 @@
         "not_found": "No se ha encontrado la serie de torneos.",
         "configure_auto_create": "Crearlas automáticamente",
         "auto_create_enabled": "Las próximas ediciones de esta serie se crean automáticamente.",
-        "auto_create_manage": "Cambiar o detener",
-        "admins_many": "Administradores: {{ players }}"
+        "auto_create_manage": "Cambiar o detener"
     },
     "tournament_series_form": {
         "create_title": "Crear una serie de torneos",
@@ -1003,8 +1002,10 @@
         "simulation_created_at": "Creado después de"
     },
     "n_messages_one": "{{ count }} mensaje",
+    "n_messages_many": "{{ count }} mensajes",
     "n_messages_other": "{{ count }} mensajes",
     "n_interested_one": "{{ count }} persona interesada",
+    "n_interested_many": "{{ count }} interesados",
     "n_interested_other": "{{ count }} personas interesadas",
     "tournament_ended": "finalizado",
     "manage_tournament_page": {
@@ -1799,10 +1800,5 @@
             }
         },
         "check_device_code": "Asegúrate de que este código coincide con el que se muestra en tu dispositivo:"
-    },
-    "lobby_active_players_many": "jugadores activos",
-    "n_tournaments_many": "{{ count }} torneos",
-    "n_messages_many": "{{ count }} mensajes",
-    "n_interested_many": "{{ count }} interesados",
-    "n_total_games_many": "{{count}} partidas en total."
+    }
 }

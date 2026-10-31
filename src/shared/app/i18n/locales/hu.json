@@ -525,10 +525,6 @@
             "cancelLabel": "Hoppá, nem, játszom tovább"
         }
     },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}ms",
-        "date_shift_ms": "Időeltérés: {{ms}}ms"
-    },
     "time_cadency": {
         "blitz": "Blitz",
         "normal": "Élő",

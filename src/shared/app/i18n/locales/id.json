@@ -461,10 +461,6 @@
             "cancelLabel": "Ups tidak, lanjut bermain"
         }
     },
-    "ping": {
-        "ping_ms": "Ping: {{ms}}md",
-        "date_shift_ms": "Pergeseran waktu: {{ms}}md"
-    },
     "time_cadency": {
         "blitz": "Blitz",
         "normal": "Langsung",
