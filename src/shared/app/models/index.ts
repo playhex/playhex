@@ -30,12 +30,15 @@ import OAuthClient from './OAuthClient.js';
 import OAuthPayload from './OAuthPayload.js';
 import OnlinePlayers, { OnlinePlayer } from './OnlinePlayers.js';
 import Player from './Player.js';
+import PlayerAccountDiscord from './PlayerAccountDiscord.js';
+import PlayerAccountEmail from './PlayerAccountEmail.js';
 import PlayerAccountPassword from './PlayerAccountPassword.js';
 import PlayerCheat from './PlayerCheat.js';
 import PlayerModerationAction from './PlayerModerationAction.js';
 import PlayerNotification from './PlayerNotification.js';
 import PlayerAiWorkerKey from './PlayerAiWorkerKey.js';
 import PlayerPushSubscription from './PlayerPushSubscription.js';
+import PlayerPseudoHistory from './PlayerPseudoHistory.js';
 import PlayerIp from './PlayerIp.js';
 import PlayerLittleGolemAccount from './PlayerLittleGolemAccount.js';
 import PlayerFavoriteTimeControl from './PlayerFavoriteTimeControl.js';
@@ -93,6 +96,8 @@ export {
     OnlinePlayers,
     OnlinePlayer,
     Player,
+    PlayerAccountDiscord,
+    PlayerAccountEmail,
     PlayerAccountPassword,
     PlayerCheat,
     PlayerFavoriteTimeControl,
@@ -105,6 +110,7 @@ export {
     PlayerHeadToHeadStats,
     PlayerAiWorkerKey,
     PlayerPushSubscription,
+    PlayerPseudoHistory,
     Premove,
     Puzzle,
     PuzzleCollection,
@@ -155,6 +161,8 @@ export const entities = {
     OAuthPayload,
     OnlinePlayers,
     Player,
+    PlayerAccountDiscord,
+    PlayerAccountEmail,
     PlayerAccountPassword,
     PlayerCheat,
     PlayerFavoriteTimeControl,
@@ -164,6 +172,7 @@ export const entities = {
     PlayerNotification,
     PlayerAiWorkerKey,
     PlayerPushSubscription,
+    PlayerPseudoHistory,
     PlayerSettings,
     PlayerStats,
     Puzzle,

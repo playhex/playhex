@@ -65,6 +65,7 @@
             "board": "Board",
             "notifications": "Notifications",
             "ai_workers": "AI workers",
+            "security": "Security",
             "connected_applications": "Connected applications",
             "technical_info": "Technical info"
         },
@@ -714,6 +715,15 @@
     "confirm_new_password": "Confirm new password",
     "update_password": "Update password",
     "password_changed_success": "The password has been changed.",
+    "saved": "Saved",
+    "must_be_logged_in": "You must be logged in",
+    "recovery_email": {
+        "title": "Recovery email",
+        "explain": "Optional. Used to contact you about your account security, e.g if you lose your password.",
+        "email": "Email",
+        "private": "Your email is private, never displayed to other players. Leave empty to remove it.",
+        "invalid": "Invalid email"
+    },
     "contribute": "Contribute",
     "contributors": "Contributors",
     "no_yet_data": "Who knows!",

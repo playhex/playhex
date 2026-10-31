@@ -5,7 +5,9 @@ import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
 import useNotificationStore from '../../../stores/notificationStore.js';
 import useAuthStore from '../../../stores/authStore.js';
-import { apiGetOAuthConnectedApplications, apiGetPlayerAiWorkerKeys, apiPostPushTest, apiRevokeOAuthConnectedApplication, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
+import { apiDeleteAccountEmail, apiGetAccount, apiGetOAuthConnectedApplications, apiGetPlayerAiWorkerKeys, apiPostPushTest, apiRevokeOAuthConnectedApplication, apiSetAccountEmail, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
+import type { AccountInfo } from '../../../../shared/app/AccountInfo.js';
+import { AppValidationError } from '../../../../shared/app/ValidationError.js';
 import type { OAuthConnectedApplication } from '../../../../shared/app/oauth.js';
 import { watch, Ref, ref, computed, onMounted, onBeforeUnmount, onUnmounted, nextTick } from 'vue';
 import { injectHead, useSeoMeta } from '@unhead/vue';
@@ -114,6 +116,56 @@ const submitPasswordChange = async () => {
             default:
                 changePasswordError.value = e.type;
         }
+    }
+};
+
+/*
+ * Private account data: login, email.
+ * Only for registered players.
+ */
+const accountInfo = ref<null | AccountInfo>(null);
+
+const loadAccountInfo = async (): Promise<void> => {
+    if (!loggedInPlayer.value || loggedInPlayer.value.isGuest) {
+        accountInfo.value = null;
+        return;
+    }
+
+    accountInfo.value = await apiGetAccount();
+};
+
+watch(() => loggedInPlayer.value?.publicId, () => void loadAccountInfo(), { immediate: true });
+
+/*
+ * Recovery email
+ */
+const email = ref('');
+const emailSaved = ref(false);
+const emailError = ref<null | string>(null);
+
+// Only when saved email changes, to not erase an email being typed when account info is reloaded
+watch(() => accountInfo.value?.email, savedEmail => {
+    email.value = savedEmail ?? '';
+});
+
+const submitEmail = async (): Promise<void> => {
+    emailSaved.value = false;
+    emailError.value = null;
+
+    try {
+        if (email.value.trim() === '') {
+            await apiDeleteAccountEmail();
+        } else {
+            await apiSetAccountEmail(email.value.trim());
+        }
+
+        emailSaved.value = true;
+    } catch (e) {
+        if (!(e instanceof AppValidationError)) {
+            throw e;
+        }
+
+        emailError.value = 'recovery_email.invalid';
     }
 };
 
@@ -280,7 +332,7 @@ const formatThemeReleaseDate = (releaseDate: string): string => intlFormat(
 /*
  * Panels
  */
-type Panel = 'interface' | 'account' | 'game' | 'board' | 'notifications' | 'ai_workers' | 'connected_applications' | 'technical_info';
+type Panel = 'interface' | 'account' | 'security' | 'game' | 'board' | 'notifications' | 'ai_workers' | 'connected_applications' | 'technical_info';
 
 /*
  * AI worker keys, only a few players have one: panel is hidden if player has none.
@@ -335,6 +387,7 @@ const revokeConnectedApplication = async (application: OAuthConnectedApplication
 const panels = computed((): Panel[] => [
     'interface',
     'account',
+    ...(loggedInPlayer.value && !loggedInPlayer.value.isGuest ? ['security' as const] : []),
     'game',
     'board',
     'notifications',
@@ -392,7 +445,8 @@ const sectionPanels: { [sectionId: string]: Panel } = {
     'audio': 'interface',
     'country-flag': 'account',
     'moderation': 'account',
-    'change-password': 'account',
+    'change-password': 'security',
+    'recovery-email': 'security',
     'move-settings': 'game',
     'board': 'board',
     'board-theme': 'board',
@@ -640,7 +694,10 @@ const {
 
                         <AppPlayerModerationActionList />
                     </section>
+                </div>
 
+                <!-- Security -->
+                <div v-show="'security' === currentPanel">
                     <section id="change-password" v-if="loggedInPlayer && !loggedInPlayer.isGuest">
                         <form @submit.prevent="submitPasswordChange">
                             <h3>{{ $t('change_password') }}</h3>
@@ -671,6 +728,27 @@ const {
                             <p v-if="changePasswordError" class="text-danger">{{ $t(changePasswordError) }}</p>
                             <p v-if="changePasswordSuccess" class="text-success">{{ $t('password_changed_success') }}</p>
                             <button type="submit" class="btn btn-outline-primary">{{ $t('update_password') }}</button>
+                        </form>
+                    </section>
+
+                    <section id="recovery-email" v-if="loggedInPlayer && !loggedInPlayer.isGuest && accountInfo">
+                        <form @submit.prevent="submitEmail">
+                            <h3>{{ $t('recovery_email.title') }}</h3>
+
+                            <p>{{ $t('recovery_email.explain') }}</p>
+
+                            <div class="mb-3 row">
+                                <label class="col-sm-4 col-md-3 col-form-label" for="recovery-email-input">{{ $t('recovery_email.email') }}</label>
+                                <div class="col-sm-8 col-md-6">
+                                    <input v-model="email" type="email" maxlength="254" autocomplete="email" class="form-control" id="recovery-email-input">
+                                </div>
+                            </div>
+
+                            <p class="small text-body-secondary">{{ $t('recovery_email.private') }}</p>
+
+                            <p v-if="emailError" class="text-danger">{{ $t(emailError) }}</p>
+                            <p v-if="emailSaved" class="text-success">{{ $t('saved') }}</p>
+                            <button type="submit" class="btn btn-outline-primary">{{ $t('save') }}</button>
                         </form>
                     </section>
                 </div>

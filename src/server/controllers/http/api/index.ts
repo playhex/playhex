@@ -5,6 +5,7 @@ import GameController from './GameController.js';
 import PlayerController from './PlayerController.js';
 import PlayerNotificationController from './PlayerNotificationController.js';
 import AuthController from './AuthController.js';
+import AccountController from './AccountController.js';
 import OnlinePlayersController from './OnlinePlayersController.js';
 import PlayerFavoriteTimeControlController from './PlayerFavoriteTimeControlController.js';
 import PlayerSettingsController from './PlayerSettingsController.js';
@@ -112,6 +113,7 @@ export const registerApi = (app: Express) => {
             PlayerController,
             PlayerNotificationController,
             AuthController,
+            AccountController,
             PlayerSettingsController,
             PlayerFavoriteTimeControlController,
             AdminController,

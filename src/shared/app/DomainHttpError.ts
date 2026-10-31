@@ -18,6 +18,7 @@ type DomainHttpErrorTypes =
     | 'tournament_series_has_tournaments'
     | 'tournament_series_no_tournament_to_clone'
     | 'content_restricted'
+    | 'must_be_logged_in'
 ;
 
 type DomainHttpErrorType = {

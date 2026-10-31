@@ -29,6 +29,7 @@ import type { Move } from '@playhex/move-notation';
 import type { PuzzleMonitorUncoveredLineCount } from '../shared/app/puzzles/puzzleMonitor.js';
 import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.js';
 import type { OAuthConnectedApplication, OAuthInteractionDetails } from '../shared/app/oauth.js';
+import type { AccountInfo } from '../shared/app/AccountInfo.js';
 
 /**
  * @throws {DomainHttpError}
@@ -184,6 +185,45 @@ export const authChangePassword = async (oldPassword: string, newPassword: strin
     await checkResponse(response);
 
     return plainToInstance(Player, await response.json());
+};
+
+export const apiGetAccount = async (): Promise<AccountInfo> => {
+    const response = await fetch('/api/account', {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
+};
+
+export const apiSetAccountEmail = async (email: string): Promise<void> => {
+    const response = await fetch('/api/account/email', {
+        method: 'put',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email,
+        }),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiDeleteAccountEmail = async (): Promise<void> => {
+    const response = await fetch('/api/account/email', {
+        method: 'delete',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
 };
 
 export const apiGetActiveGames = async (): Promise<Game[]> => {
