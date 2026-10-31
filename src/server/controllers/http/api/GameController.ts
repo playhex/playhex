@@ -15,7 +15,7 @@ import logger from '../../../services/logger.js';
 import { rateLimiterConsumeCreateGame, rateLimiterConsumeChallengePlayer, rateLimiterConsumeChallengeSameTarget } from '../../../services/rate-limiters.js';
 import { isChallengeGame } from '../../../../shared/app/gameUtils.js';
 
-class AnswerUndoBody
+class AnswerRequestBody
 {
     @Expose()
     @IsBoolean()
@@ -192,9 +192,34 @@ export default class GameController
     answerUndo(
         @AuthenticatedPlayer() player: Player,
         @Param('publicId') publicId: string,
-        @Body() answerUndoBody: AnswerUndoBody,
+        @Body() answerRequestBody: AnswerRequestBody,
     ) {
-        const result = this.gameStore.playerAnswerUndo(player, publicId, answerUndoBody.accept);
+        const result = this.gameStore.playerAnswerUndo(player, publicId, answerRequestBody.accept);
+
+        if (result !== true) {
+            throw new HttpError(400, result);
+        }
+    }
+
+    @Post('/api/games/:publicId/ask-cancel')
+    askCancel(
+        @AuthenticatedPlayer() player: Player,
+        @Param('publicId') publicId: string,
+    ) {
+        const result = this.gameStore.playerAskCancel(player, publicId);
+
+        if (result !== true) {
+            throw new HttpError(400, result);
+        }
+    }
+
+    @Post('/api/games/:publicId/answer-cancel')
+    answerCancel(
+        @AuthenticatedPlayer() player: Player,
+        @Param('publicId') publicId: string,
+        @Body() answerRequestBody: AnswerRequestBody,
+    ) {
+        const result = this.gameStore.playerAnswerCancel(player, publicId, answerRequestBody.accept);
 
         if (result !== true) {
             throw new HttpError(400, result);

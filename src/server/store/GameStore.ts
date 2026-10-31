@@ -752,6 +752,32 @@ export default class GameStore
         return result;
     }
 
+    playerAskCancel(player: Player, gameId: string): string | true
+    {
+        const game = this.activeGames[gameId];
+
+        if (!game) {
+            return 'no active game ' + gameId;
+        }
+
+        this.onlinePlayerService.notifyPlayerActivity(player);
+
+        return game.playerAskCancel(player);
+    }
+
+    playerAnswerCancel(player: Player, gameId: string, accept: boolean): string | true
+    {
+        const game = this.activeGames[gameId];
+
+        if (!game) {
+            return 'no active game ' + gameId;
+        }
+
+        this.onlinePlayerService.notifyPlayerActivity(player);
+
+        return game.playerAnswerCancel(player, accept);
+    }
+
     playerResign(player: Player, gameId: string): string | true
     {
         const game = this.activeGames[gameId];

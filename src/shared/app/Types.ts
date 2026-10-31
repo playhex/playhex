@@ -73,6 +73,11 @@ export const cancelGameReasons = [
      * Game against a strong AI reached a position too similar to a currently playing 1v1 game
      */
     'anti_cheat',
+
+    /**
+     * Both players agreed to cancel the game
+     */
+    'mutual',
 ] as const;
 
 export type CancelGameReason = typeof cancelGameReasons[number];

@@ -50,6 +50,8 @@ const {
     canDeclineChallenge,
     shouldDisplayUndoMove,
     shouldEnableUndoMove,
+    shouldDisplayAskCancel,
+    shouldEnableAskCancel,
     canResign,
     canRematch,
     shouldShowPass,
@@ -62,6 +64,7 @@ const {
     useGame,
 
     askUndo,
+    askCancel,
     sendPass,
     sendResign,
     sendCancel,
@@ -448,6 +451,31 @@ const pass = async () => {
 };
 
 /*
+ * Propose to cancel, opponent must accept
+ */
+const proposeCancel = async (): Promise<void> => {
+    try {
+        await confirmationOverlay({
+            title: t('cancel_request.confirm_overlay.title'),
+            message: t('cancel_request.confirm_overlay.message'),
+            confirmLabel: t('cancel_request.confirm_overlay.confirmLabel'),
+            confirmClass: 'btn-warning',
+            cancelLabel: t('cancel_request.confirm_overlay.cancelLabel'),
+            cancelClass: 'btn-outline-primary',
+        });
+    } catch (e) {
+        // noop, player said no
+        return;
+    }
+
+    const result = await askCancel();
+
+    if (result !== true) {
+        useToastsStore().addToast(cancelErrorMessage(result), { level: 'danger' });
+    }
+};
+
+/*
  * Takeback
  */
 const takeback = async () => {
@@ -504,6 +532,7 @@ const shouldShowHexplorerLink = computed<boolean>(() => engineGame.value !== nul
  */
 const hasSecondaryActions = computed<boolean>(() => shouldShowPass.value
     || shouldDisplayUndoMoveInMenu.value
+    || shouldDisplayAskCancel.value
     || shouldShowHexworldLink.value
     || shouldShowHexplorerLink.value,
 );
@@ -666,7 +695,20 @@ const {
                                     {{ $t('undo.undo_move') }}
                                 </button>
 
-                                <div v-if="(shouldShowHexworldLink || shouldShowHexplorerLink) && (shouldShowPass || shouldDisplayUndoMoveInMenu)"><hr class="dropdown-divider"></div>
+                                <!-- Propose to cancel -->
+                                <button
+                                    v-if="shouldDisplayAskCancel"
+                                    type="button"
+                                    class="dropdown-item"
+                                    :class="shouldEnableAskCancel ? 'text-warning' : 'disabled'"
+                                    :disabled="!shouldEnableAskCancel"
+                                    @click="proposeCancel()"
+                                >
+                                    <IconXLg />
+                                    {{ $t('cancel_request.ask') }}
+                                </button>
+
+                                <div v-if="(shouldShowHexworldLink || shouldShowHexplorerLink) && (shouldShowPass || shouldDisplayUndoMoveInMenu || shouldDisplayAskCancel)"><hr class="dropdown-divider"></div>
 
                                 <!-- Explore -->
                                 <AppHexWorldExplore

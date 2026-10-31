@@ -55,6 +55,7 @@ const {
     conditionalMovesEditor,
     gameUIMode,
     shouldDisplayAnswerUndoMove,
+    shouldDisplayAnswerCancel,
 } = storeToRefs(useCurrentGameStore());
 
 const {
@@ -62,6 +63,7 @@ const {
     enableSimulationMode,
     disableSimulationMode,
     answerUndo,
+    answerCancel,
 } = useCurrentGameStore();
 
 /*
@@ -79,6 +81,21 @@ const undoRequestPseudo = computed<string>(() => {
     }
 
     const player = players.value[undoRequest];
+
+    return player ? pseudoString(player, 'pseudo') : '';
+});
+
+/**
+ * Pseudo of the player who proposed to cancel the game, to show it in the cancel request bar.
+ */
+const cancelRequestPseudo = computed<string>(() => {
+    const cancelRequest = game.value?.cancelRequest;
+
+    if (cancelRequest === null || cancelRequest === undefined) {
+        return '';
+    }
+
+    const player = players.value[cancelRequest];
 
     return player ? pseudoString(player, 'pseudo') : '';
 });
@@ -200,7 +217,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="app-board" :class="{ 'has-rewind-controls': gameUIMode !== 'play' || shouldDisplayAnswerUndoMove }">
+    <div class="app-board" :class="{ 'has-rewind-controls': gameUIMode !== 'play' || shouldDisplayAnswerCancel || shouldDisplayAnswerUndoMove }">
         <div class="board-container" ref="pixiApp"></div>
 
         <div v-if="mountError || mountTooLong" class="board-mount-error">
@@ -320,6 +337,23 @@ onUnmounted(() => {
             <!-- Close conditional moves edition -->
             <button type="button" @click="stopConditionalMoves()" class="btn btn-outline-warning">
                 <IconX />
+            </button>
+        </div>
+
+        <!-- Opponent proposed to cancel the game: accept or reject it -->
+        <div class="rewind-controls takeback-request" v-else-if="shouldDisplayAnswerCancel">
+            <p class="takeback-request-text">{{ $t('cancel_request.player_wants_to_cancel', { player: cancelRequestPseudo }) }}</p>
+
+            <!-- Accept cancel -->
+            <button type="button" @click="answerCancel(true)" class="btn btn-success">
+                <IconCheck />
+                <span class="btn-label d-none d-lg-inline">{{ ' ' + $t('cancel_request.accept') }}</span>
+            </button>
+
+            <!-- Reject cancel -->
+            <button type="button" @click="answerCancel(false)" class="btn btn-danger">
+                <IconX />
+                <span class="btn-label d-none d-lg-inline">{{ ' ' + $t('cancel_request.reject') }}</span>
             </button>
         </div>
 

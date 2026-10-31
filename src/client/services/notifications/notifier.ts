@@ -54,6 +54,18 @@ type NotifiableEvents = {
      * @param playerTakeback Player who wanted to takeback his move.
      */
     takebackAnswered: (game: Game, accepted: boolean, playerTakeback: Player) => void;
+
+    /**
+     * A player proposed to cancel the game.
+     */
+    cancelRequested: (game: Game, byPlayer: Player) => void;
+
+    /**
+     * Opponent accepted or rejected cancel request.
+     *
+     * @param playerAsking Player who proposed to cancel.
+     */
+    cancelRequestAnswered: (game: Game, accepted: boolean, playerAsking: Player) => void;
 };
 
 export const notifier = new TypedEmitter<NotifiableEvents>();

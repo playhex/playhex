@@ -830,6 +830,20 @@
             "cancelLabel": "Oops no, keep playing"
         }
     },
+    "cancel_request": {
+        "ask": "Propose to cancel",
+        "player_wants_to_cancel": "{{ player }} proposes to cancel the game",
+        "accept": "Accept cancel",
+        "reject": "Reject",
+        "request_denied": "{{ player }}'s request to cancel the game has been denied.",
+        "game_canceled_by_agreement": "Game canceled by agreement of both players, proposed by {{ player }}.",
+        "confirm_overlay": {
+            "title": "Propose to cancel the game?",
+            "message": "This sends a request to your opponent, who can accept or decline it. If accepted, the game is canceled and will not count.",
+            "confirmLabel": "Yes, send the request",
+            "cancelLabel": "No, keep playing"
+        }
+    },
     "technical_info": {
         "description": "Technical information about your account and your connection to PlayHex. Useful when reporting a bug.",
         "public_id": "Player public ID",

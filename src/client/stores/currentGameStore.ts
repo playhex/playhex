@@ -3,7 +3,7 @@ import Game from '../../shared/app/models/Game.js';
 import { AnimatorFacade, GameView, PlayingGameFacade, SimulatePlayingGameFacade } from '@playhex/pixi-board';
 import { ConditionalMovesFacade } from '@playhex/pixi-board/conditional-moves';
 import { ConditionalMovesEditor, type ConditionalMovesState, createConditionalMovesState } from '@playhex/conditional-moves';
-import { addMove, cancelGame, canExplore, canPlayerUndo, cloneGame, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, hasPlayer, isChallengeTargetOf, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateGame } from '../../shared/app/gameUtils.js';
+import { addMove, cancelGame, canExplore, canPlayerUndo, cloneGame, endGame, getPlayer, getPlayerIndex, getPlayers, handleTimeControlUpdate, hasPlayer, isBotGame, isChallengeTargetOf, isPlayerTurn, shouldShowConditionalMoves, toEngineGameData, updateGame } from '../../shared/app/gameUtils.js';
 import useAuthStore from './authStore.js';
 import useSocketStore from './socketStore.js';
 import { computed, onBeforeUnmount, ref, shallowRef, watch, watchEffect } from 'vue';
@@ -14,7 +14,7 @@ import { useRouter } from 'vue-router';
 import Player from '../../shared/app/models/Player.js';
 import { MoveSettings } from '../../shared/app/models/PlayerSettings.js';
 import { timeControlToCadencyName } from '../../shared/app/timeControlUtils.js';
-import { apiGetConditionalMoves, apiPatchConditionalMoves, apiPostAnswerUndo, apiPostAskUndo, apiPostCancel, apiPostResign } from '../apiClient.js';
+import { apiGetConditionalMoves, apiPatchConditionalMoves, apiPostAnswerCancel, apiPostAnswerUndo, apiPostAskCancel, apiPostAskUndo, apiPostCancel, apiPostResign } from '../apiClient.js';
 import { HexMove, isSpecialHexMove, Move } from '@playhex/move-notation';
 import { useChatInputStore } from './chatInputStore.js';
 import usePlayerLocalSettingsStore from './playerLocalSettingsStore.js';
@@ -320,6 +320,52 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             }
 
             game.value.undoRequest = null;
+        });
+
+        on('askCancel', (gameId, byPlayerIndex) => {
+            if (gameId !== gamePublicId || !game.value) {
+                return;
+            }
+
+            game.value.cancelRequest = byPlayerIndex;
+
+            const player = getPlayer(game.value, byPlayerIndex);
+
+            if (!player) {
+                throw new Error('No player at position ' + byPlayerIndex + ', cannot emit notification');
+            }
+
+            notifier.emit('cancelRequested', game.value, player);
+        });
+
+        on('answerCancel', (gameId, accept) => {
+            if (gameId !== gamePublicId || !game.value) {
+                return;
+            }
+
+            const { cancelRequest } = game.value;
+
+            game.value.cancelRequest = null;
+
+            if (cancelRequest === null) {
+                throw new Error('There was no cancel request, cannot emit notification');
+            }
+
+            const playerAsking = getPlayer(game.value, cancelRequest);
+
+            if (!playerAsking) {
+                throw new Error('No player at position ' + cancelRequest + ', cannot emit notification');
+            }
+
+            notifier.emit('cancelRequestAnswered', game.value, accept, playerAsking);
+        });
+
+        on('cancelRequestExpired', (gameId) => {
+            if (gameId !== gamePublicId || !game.value) {
+                return;
+            }
+
+            game.value.cancelRequest = null;
         });
 
         on('ended', (gameId, winner, outcome, { date }) => {
@@ -1057,6 +1103,73 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         return await apiPostCancel(game.value.publicId);
     };
 
+    /**
+     * Whether the "Propose to cancel" button should be displayed, disabled or not.
+     * When less than 2 moves, player can cancel directly instead.
+     */
+    const shouldDisplayAskCancel = computed<boolean>(() => {
+        if (game.value === null || localPlayerIndex.value === null) {
+            return false;
+        }
+
+        if (game.value.state !== 'playing' || game.value.ladderChallenge) {
+            return false;
+        }
+
+        if (isBotGame(game.value)) {
+            return false;
+        }
+
+        if (game.value.moves.length < 2) {
+            return false;
+        }
+
+        // Hide if opponent sent a cancel request: answer bar is shown instead
+        return game.value.cancelRequest !== 1 - localPlayerIndex.value;
+    });
+
+    /**
+     * Disabled while my own cancel request is pending.
+     */
+    const shouldEnableAskCancel = computed<boolean>(() => {
+        if (game.value === null || localPlayerIndex.value === null) {
+            return false;
+        }
+
+        return game.value.cancelRequest !== localPlayerIndex.value;
+    });
+
+    /**
+     * Whether we should display "Accept" or "Reject" opponent cancel request.
+     */
+    const shouldDisplayAnswerCancel = computed<boolean>(() => {
+        if (!game.value || localPlayerIndex.value === null) {
+            return false;
+        }
+
+        if (game.value.state !== 'playing') {
+            return false;
+        }
+
+        return game.value.cancelRequest === 1 - localPlayerIndex.value;
+    });
+
+    const askCancel = async (): Promise<string | true> => {
+        if (!game.value) {
+            throw new Error('unexpected no game');
+        }
+
+        return await apiPostAskCancel(game.value.publicId);
+    };
+
+    const answerCancel = async (accept: boolean): Promise<string | true> => {
+        if (!game.value) {
+            throw new Error('unexpected no game');
+        }
+
+        return await apiPostAnswerCancel(game.value.publicId, accept);
+    };
+
     /*
      * Rematch
      */
@@ -1337,6 +1450,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         sendPass,
         sendResign,
         sendCancel,
+        shouldDisplayAskCancel,
+        shouldEnableAskCancel,
+        shouldDisplayAnswerCancel,
+        askCancel,
+        answerCancel,
         enableSimulationMode,
         disableSimulationMode,
         startConditionalMoves,

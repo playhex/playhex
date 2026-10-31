@@ -151,6 +151,30 @@ export class GameEventsEmitter
         ]).emit('cancelUndo', game.publicId);
     }
 
+    emitAskCancel(game: Game, byPlayerIndex: number): void
+    {
+        io().to([
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+        ]).emit('askCancel', game.publicId, byPlayerIndex);
+    }
+
+    emitAnswerCancel(game: Game, accept: boolean): void
+    {
+        io().to([
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+        ]).emit('answerCancel', game.publicId, accept);
+    }
+
+    emitCancelRequestExpired(game: Game): void
+    {
+        io().to([
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+        ]).emit('cancelRequestExpired', game.publicId);
+    }
+
     emitGameEnded(game: Game, winner: 0 | 1, outcome: Outcome, endedAt: { date: Date }): void
     {
         io().to([

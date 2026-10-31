@@ -208,6 +208,14 @@ export default class Game implements TimeControlBoardsize, GameOptions
     undoRequest: null | number = null;
 
     /**
+     * Whether a player proposed to cancel the game, and waits for opponent agreement.
+     * Equals to the index of the player who proposed to cancel.
+     */
+    @Column({ type: 'smallint', nullable: true })
+    @Expose()
+    cancelRequest: null | number = null;
+
+    /**
      * Link to next game if this game has been rematched.
      */
     @OneToOne(() => Game)

@@ -112,6 +112,39 @@ notifier.on('takebackAnswered', (game, accepted, playerTakeback) => {
     }
 });
 
+notifier.on('cancelRequested', (game, byPlayer) => {
+    // Only display to watchers: players see the cancel request bar above the board
+    if (iAmInGame(game)) {
+        return;
+    }
+
+    useToastsStore().addToast(
+        t('cancel_request.player_wants_to_cancel', { player: pseudoString(byPlayer, 'pseudo') }),
+        {
+            level: 'warning',
+        },
+    );
+});
+
+notifier.on('cancelRequestAnswered', (game, accepted, playerAsking) => {
+    // Accepted: game canceled, already visible to everyone
+    if (accepted) {
+        return;
+    }
+
+    const opponent = getOtherPlayer(game, playerAsking);
+
+    // Only display to player who asked and watchers
+    if (opponent && isMe(opponent)) {
+        return;
+    }
+
+    useToastsStore().addToast(
+        t('cancel_request.request_denied', { player: pseudoString(playerAsking, 'pseudo') }),
+        { level: 'danger' },
+    );
+});
+
 notifier.on('gameChallengeCreated', game => {
     if (game.host === null) {
         return;

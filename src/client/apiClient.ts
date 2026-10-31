@@ -551,6 +551,40 @@ export const apiPostAskUndo = async (gameId: string): Promise<true | string> => 
     return response.text();
 };
 
+export const apiPostAskCancel = async (gameId: string): Promise<true | string> => {
+    const response = await fetch(`/api/games/${gameId}/ask-cancel`, {
+        method: 'post',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    if (response.status === 204) {
+        return true;
+    }
+
+    return response.text();
+};
+
+export const apiPostAnswerCancel = async (gameId: string, accept: boolean): Promise<true | string> => {
+    const response = await fetch(`/api/games/${gameId}/answer-cancel`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            accept,
+        }),
+    });
+
+    if (response.status === 204) {
+        return true;
+    }
+
+    return response.text();
+};
+
 export const apiPostAnswerUndo = async (gameId: string, accept: boolean): Promise<true | string> => {
     const response = await fetch(`/api/games/${gameId}/answer-undo`, {
         method: 'post',

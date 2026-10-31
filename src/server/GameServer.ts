@@ -76,6 +76,13 @@ export default class GameServer extends TypedEmitter<GameEvents>
      */
     private pendingCancelReason: null | CancelGameReason = null;
 
+    /**
+     * For each player, number of moves in history when they last proposed to cancel.
+     * Prevents spamming cancel requests: a player can propose again only once a new move has been played.
+     * In memory only, lost on server restart.
+     */
+    private lastCancelRequestMovesCount: [null | number, null | number] = [null, null];
+
     private io: HexServer = Container.get(HexServer);
 
     private logger = baseLogger;
@@ -433,6 +440,7 @@ export default class GameServer extends TypedEmitter<GameEvents>
             }
 
             this.cancelUndoRequestIfAny(byPlayerIndex);
+            this.expireCancelRequestIfAny();
             this.emit('played');
 
             if (!engineGame.isEnded()) {
@@ -466,6 +474,7 @@ export default class GameServer extends TypedEmitter<GameEvents>
     {
         this.game.state = 'ended';
         this.game.outcome = outcome;
+        this.game.cancelRequest = null;
 
         this.gameEventEmitter.emitGameEnded(this.game, winner, outcome, { date });
         this.gameEventEmitter.emitTimeControlUpdate(this.game, this.timeControl);
@@ -906,6 +915,8 @@ export default class GameServer extends TypedEmitter<GameEvents>
                     now,
                 );
             }
+
+            this.expireCancelRequestIfAny();
         }
 
         return true;
@@ -924,6 +935,130 @@ export default class GameServer extends TypedEmitter<GameEvents>
             this.game.undoRequest = null;
             this.gameEventEmitter.emitCancelUndo(this.game);
         }
+    }
+
+    private canAskCancel(player: Player): { playerIndex: PlayerIndex, movesCount: number } | string
+    {
+        const playerIndex = this.getPlayerIndex(player);
+
+        if (playerIndex === null) {
+            this.logger.notice('A player not in the game tried to ask cancel', { player: player.pseudo });
+            return 'you are not a player of this game';
+        }
+
+        if (this.game.state !== 'playing' || this.engineGame === null) {
+            this.logger.notice('Player tried to ask cancel but game is not playing', { player: player.pseudo });
+            return 'Game is not playing';
+        }
+
+        if (this.game.ladderChallenge) {
+            this.logger.notice('Player tried to ask cancel on a ladder game', { player: player.pseudo });
+            return 'Cannot cancel a ladder game';
+        }
+
+        if (isBotGame(this.game)) {
+            this.logger.notice('Player tried to ask cancel on a bot game', { player: player.pseudo });
+            return 'Cannot ask a bot to cancel the game';
+        }
+
+        if (this.game.cancelRequest !== null) {
+            this.logger.notice('A player tried to ask cancel but there is already a cancel request', { player: player.pseudo, cancelRequest: this.game.cancelRequest });
+            return 'there is already a cancel request';
+        }
+
+        const movesCount = this.engineGame.getMovesHistory().length;
+
+        if (this.lastCancelRequestMovesCount[playerIndex] === movesCount) {
+            this.logger.notice('A player tried to ask cancel again without any new move', { player: player.pseudo });
+            return 'already asked to cancel at this position';
+        }
+
+        return { playerIndex, movesCount };
+    }
+
+    /**
+     * Player proposes to cancel the game. Opponent must accept.
+     */
+    playerAskCancel(player: Player): true | string
+    {
+        this.logger.info('Player ask cancel', { player: player.pseudo });
+
+        const canAskCancel = this.canAskCancel(player);
+
+        if (typeof canAskCancel === 'string') {
+            return canAskCancel;
+        }
+
+        const { playerIndex, movesCount } = canAskCancel;
+
+        this.lastCancelRequestMovesCount[playerIndex] = movesCount;
+        this.game.cancelRequest = playerIndex;
+        this.gameEventEmitter.emitAskCancel(this.game, playerIndex);
+
+        return true;
+    }
+
+    playerAnswerCancel(player: Player, accept: boolean): true | string
+    {
+        this.logger.info('Player answer cancel request', { player: player.pseudo, accept });
+
+        if (this.game.state !== 'playing' || this.engineGame === null) {
+            this.logger.notice('Player tried to answer cancel but game is not playing', { player: player.pseudo });
+            return 'Game is not playing';
+        }
+
+        const playerIndex = this.getPlayerIndex(player);
+
+        if (playerIndex === null) {
+            this.logger.notice('A player not in the game tried to answer cancel', { player: player.pseudo });
+            return 'you are not a player of this game';
+        }
+
+        if (this.game.cancelRequest === null) {
+            this.logger.notice('A player tried to answer cancel but there is no cancel request', { player: player.pseudo });
+            return 'there is no cancel request';
+        }
+
+        if (this.game.cancelRequest === playerIndex) {
+            this.logger.notice('A player tried to answer their own cancel request', { player: player.pseudo });
+            return 'cannot answer own cancel request';
+        }
+
+        const playerAsking = this.players[this.game.cancelRequest];
+
+        this.game.cancelRequest = null;
+        this.gameEventEmitter.emitAnswerCancel(this.game, accept);
+
+        if (!accept) {
+            return true;
+        }
+
+        const now = new Date();
+
+        this.postSystemChatMessage(
+            `Game canceled by agreement of both players, proposed by ${pseudoString(playerAsking)}.`,
+            'cancel_request.game_canceled_by_agreement',
+            { player: pseudoString(playerAsking) },
+            now,
+        );
+
+        this.pendingCancelReason = 'mutual';
+        this.engineGame.cancel(now);
+
+        return true;
+    }
+
+    /**
+     * A cancel request is no longer valid as soon as position changes.
+     */
+    private expireCancelRequestIfAny(): void
+    {
+        if (typeof this.game.cancelRequest !== 'number') {
+            return;
+        }
+
+        this.game.cancelRequest = null;
+        this.gameEventEmitter.emitCancelRequestExpired(this.game);
     }
 
     playerResign(player: Player): true | string
@@ -1064,6 +1199,7 @@ export default class GameServer extends TypedEmitter<GameEvents>
     {
         this.game.state = 'canceled';
         this.game.cancelReason = cancelReason;
+        this.game.cancelRequest = null;
         this.pendingCancelReason = null;
         this.game.endedAt = date;
 

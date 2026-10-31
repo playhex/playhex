@@ -215,6 +215,22 @@ export type HexServerToClientEvents = {
     cancelUndo: (gameId: string) => void;
 
     /**
+     * A player proposed to cancel the game, and waits for opponent agreement.
+     */
+    askCancel: (gameId: string, byPlayerIndex: number) => void;
+
+    /**
+     * Opponent accepted or rejected the cancel request.
+     * If accepted, "gameCanceled" event is also emitted.
+     */
+    answerCancel: (gameId: string, accept: boolean) => void;
+
+    /**
+     * Cancel request is no longer valid because position changed (a move has been played or undone).
+     */
+    cancelRequestExpired: (gameId: string) => void;
+
+    /**
      * Analyze has been requested for a given game, or has finished.
      * See gameAnalyze.analyze and gameAnalyze.endedAt
      * to know if game analyze has finished, or is just requested.
