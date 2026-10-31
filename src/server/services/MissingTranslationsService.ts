@@ -14,6 +14,18 @@ const ORDINAL_SUFFIX = '_ordinal';
 
 const CATEGORIES_ORDER: Intl.LDMLPluralRule[] = ['zero', 'one', 'two', 'few', 'many', 'other'];
 
+const INTEGER_SAMPLES = [...Array(1001).keys(), 1000000, 2000000];
+const DECIMAL_SAMPLES = [0.5, 1.5, 2.5];
+
+export type MissingTranslationsOptions = {
+    /**
+     * Do not generate plural categories only used for decimal numbers,
+     * like "many" in Czech or "other" in Polish and Russian.
+     * Weblate plural formulas only handle integers, and removes these categories.
+     */
+    ignoreDecimalPlurals?: boolean;
+};
+
 const isObject = (value: unknown): value is TranslationObject =>
     typeof value === 'object' && value !== null
 ;
@@ -23,13 +35,43 @@ export default class MissingTranslationsService
     constructor(
         /** Locale of the source translation file, e.g "en" */
         private sourceLocale: string,
+        private options: MissingTranslationsOptions = {},
     ) {}
+
+    /**
+     * Integer samples selecting each plural category, cached by locale and type,
+     * because selecting all samples is done for each plural key.
+     */
+    private integerSamplesCache = new Map<string, Map<Intl.LDMLPluralRule, number[]>>();
+
+    private getIntegerSamples(locale: string, ordinal: boolean): Map<Intl.LDMLPluralRule, number[]>
+    {
+        const cacheKey = `${locale}|${ordinal}`;
+        let samples = this.integerSamplesCache.get(cacheKey);
+
+        if (samples === undefined) {
+            const pluralRules = new Intl.PluralRules(locale, { type: ordinal ? 'ordinal' : 'cardinal' });
+            samples = new Map();
+
+            for (const n of INTEGER_SAMPLES) {
+                const category = pluralRules.select(n);
+                const categorySamples = samples.get(category) ?? [];
+
+                categorySamples.push(n);
+                samples.set(category, categorySamples);
+            }
+
+            this.integerSamplesCache.set(cacheKey, samples);
+        }
+
+        return samples;
+    }
 
     getPluralCategories(locale: string, ordinal = false): Intl.LDMLPluralRule[]
     {
-        const categories = new Intl.PluralRules(locale, { type: ordinal ? 'ordinal' : 'cardinal' })
-            .resolvedOptions()
-            .pluralCategories
+        const categories = this.options.ignoreDecimalPlurals
+            ? [...this.getIntegerSamples(locale, ordinal).keys()]
+            : new Intl.PluralRules(locale, { type: ordinal ? 'ordinal' : 'cardinal' }).resolvedOptions().pluralCategories
         ;
 
         return CATEGORIES_ORDER.filter(category => categories.includes(category));
@@ -113,12 +155,11 @@ export default class MissingTranslationsService
     describePluralRules(locale: string, ordinal = false): string[]
     {
         const pluralRules = new Intl.PluralRules(locale, { type: ordinal ? 'ordinal' : 'cardinal' });
-        const integers = [...Array(1001).keys(), 1000000, 2000000];
-        const decimals = [0.5, 1.5, 2.5];
+        const integerSamples = this.getIntegerSamples(locale, ordinal);
 
         return this.getPluralCategories(locale, ordinal).map(category => {
-            const integerExamples = integers.filter(n => pluralRules.select(n) === category);
-            const decimalExamples = decimals.filter(n => pluralRules.select(n) === category);
+            const integerExamples = integerSamples.get(category) ?? [];
+            const decimalExamples = DECIMAL_SAMPLES.filter(n => pluralRules.select(n) === category);
 
             const examples = integerExamples.length > 8
                 ? [...integerExamples.slice(0, 8), '…']

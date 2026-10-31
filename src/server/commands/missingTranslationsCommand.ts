@@ -38,7 +38,7 @@ hexProgram
             process.exit(1);
         }
 
-        const missingTranslationsService = new MissingTranslationsService('en');
+        const missingTranslationsService = new MissingTranslationsService('en', { ignoreDecimalPlurals: true });
         const en: TranslationObject = JSON.parse(fs.readFileSync(enPath, 'utf-8'));
         const target: TranslationObject = JSON.parse(fs.readFileSync(targetPath, 'utf-8'));
         const missing = missingTranslationsService.getMissingKeys(en, target, locale);
