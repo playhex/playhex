@@ -19,6 +19,7 @@ import { errorToRateLimitReachedErrorPayload, RateLimitReachedError } from '../.
 import { TranslatableHttpError } from '../../../shared/app/TranslatableHttpError.js';
 import { getOidcProvider, OIDC_PATH_PREFIX } from '../../oauth/provider.js';
 import { oauthApiMiddleware } from '../../oauth/oauthApiMiddleware.js';
+import { discordAuthRouter } from '../../discord/discordAuthRouter.js';
 
 export const registerHttpControllers = async (app: Express, httpServer: http.Server): Promise<void> => {
     app.use(ipBanMiddleware);
@@ -30,6 +31,7 @@ export const registerHttpControllers = async (app: Express, httpServer: http.Ser
     app.use('/statics/bootstrap-css', express.static(path.join(process.cwd(), 'node_modules', 'bootstrap', 'dist', 'css')));
     app.use(OIDC_PATH_PREFIX, getOidcProvider().callback());
     app.use('/api', oauthApiMiddleware);
+    app.use(discordAuthRouter());
     registerApi(app);
     app.use(await staticsRouter(httpServer));
     app.use(pwaRouter());

@@ -21,6 +21,7 @@ type DomainHttpErrorTypes =
     | 'must_be_logged_in'
     | 'same_pseudo'
     | 'pseudo_change_limit_reached'
+    | 'must_set_password_first'
 ;
 
 type DomainHttpErrorType = {

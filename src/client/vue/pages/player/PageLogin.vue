@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { useRoute, useRouter } from 'vue-router';
-import { getSafeRedirect } from '../../../services/safeRedirect.js';
+import { getSafeRedirect } from '../../../../shared/app/safeRedirect.js';
 import useAuthStore from '../../../stores/authStore.js';
 import { Ref, ref } from 'vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
 import { useSeoMeta } from '@unhead/vue';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
+import AppDiscordLoginButton from '../../components/AppDiscordLoginButton.vue';
 
 useSeoMeta({
     title: 'Log in',
@@ -24,6 +25,11 @@ const route = useRoute();
 
 // e.g /login?redirect=/oauth/interaction/xxx to go back to OAuth authorization page
 const redirect = getSafeRedirect(route.query.redirect);
+
+// Error when coming back from "Log in with Discord"
+if (typeof route.query.discord_error === 'string') {
+    globalError.value = route.query.discord_error;
+}
 
 const onSubmit = async () => {
     pseudoValidation.value = null;
@@ -89,12 +95,16 @@ const onSubmit = async () => {
                     </div>
                 </form>
 
+                <AppDiscordLoginButton :redirect class="mt-3" />
+
                 <div class="mt-4 text-center">
-                    <i18next :translation="$t('no_account_sign_up_instead')">
-                        <template #signUp>
-                            <router-link :to="{ name: 'signup', query: redirect ? { redirect } : {} }">{{ $t('no_account_sign_up_instead_link_label') }}</router-link>
-                        </template>
-                    </i18next>
+                    <p>
+                        <i18next :translation="$t('no_account_sign_up_instead')">
+                            <template #signUp>
+                                <router-link :to="{ name: 'signup', query: redirect ? { redirect } : {} }">{{ $t('no_account_sign_up_instead_link_label') }}</router-link>
+                            </template>
+                        </i18next>
+                    </p>
                 </div>
             </div>
         </div>

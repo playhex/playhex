@@ -40,7 +40,7 @@ class ChangePasswordInput
  * (e.g set by an attacker on a victim's browser) must not stay valid once it carries
  * an authenticated account. See session fixation.
  */
-const regenerateSessionFor = (request: Request, player: Player): Promise<void> => {
+export const regenerateSessionFor = (request: Request, player: Player): Promise<void> => {
     return new Promise((resolve, reject) => {
         request.session.regenerate(err => {
             if (err) {

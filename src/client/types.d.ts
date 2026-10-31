@@ -10,5 +10,6 @@ declare const PUSH_VAPID_PUBLIC_KEY: string | undefined;
 declare const ALLOW_RANKED_BOT_GAMES: string | undefined;
 declare const MATOMO_WEBSITE_ID: string | undefined;
 declare const MATOMO_SRC: string | undefined;
+declare const DISCORD_LOGIN_ENABLED: boolean;
 declare const LAST_COMMIT_DATE: string;
 declare const VERSION: string;

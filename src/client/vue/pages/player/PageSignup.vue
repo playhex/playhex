@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { useRoute, useRouter } from 'vue-router';
-import { getSafeRedirect } from '../../../services/safeRedirect.js';
+import { getSafeRedirect } from '../../../../shared/app/safeRedirect.js';
 import useAuthStore from '../../../stores/authStore.js';
 import { Ref, ref } from 'vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
 import { useSeoMeta } from '@unhead/vue';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
+import AppDiscordLoginButton from '../../components/AppDiscordLoginButton.vue';
 
 useSeoMeta({
     title: 'Sign up',
@@ -81,6 +82,8 @@ const onSubmit = async () => {
                         <button type="submit" class="btn btn-lg btn-success">{{ $t('sign_up') }}</button>
                     </div>
                 </form>
+
+                <AppDiscordLoginButton :redirect class="mt-3" />
 
                 <div class="mt-4 text-center">
                     <p>

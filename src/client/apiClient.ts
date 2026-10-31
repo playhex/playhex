@@ -238,6 +238,17 @@ export const apiDeleteAccountEmail = async (): Promise<void> => {
     await checkResponse(response);
 };
 
+export const apiUnlinkDiscord = async (): Promise<void> => {
+    const response = await fetch('/api/account/discord', {
+        method: 'delete',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+};
+
 export const apiChangePseudo = async (pseudo: string): Promise<Player> => {
     const response = await fetch('/api/account/pseudo', {
         method: 'post',

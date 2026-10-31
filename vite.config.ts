@@ -47,6 +47,8 @@ export default defineConfig(({ command }) => ({
         ALLOW_RANKED_BOT_GAMES: JSON.stringify(process.env.ALLOW_RANKED_BOT_GAMES),
         MATOMO_WEBSITE_ID: JSON.stringify(process.env.MATOMO_WEBSITE_ID),
         MATOMO_SRC: JSON.stringify(process.env.MATOMO_SRC),
+        // Same condition as server isDiscordLoginEnabled()
+        DISCORD_LOGIN_ENABLED: JSON.stringify(!!process.env.DISCORD_CLIENT_ID && !!process.env.DISCORD_CLIENT_SECRET && !!process.env.BASE_URL),
         LAST_COMMIT_DATE: JSON.stringify(commitRef.date),
         VERSION: JSON.stringify(commitRef.version),
         __VUE_OPTIONS_API__: true,

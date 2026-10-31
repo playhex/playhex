@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import { IconBrightnessHighFill, IconMoonStarsFill, IconCircleHalf, IconPcDisplayHorizontal, IconPhone, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconAlphabet, IconDot, IconCheck, IconX, IconExclamationTriangleFill, IconMuteOn, IconMuteOff } from '../../icons.js';
+import { IconDiscord, IconBrightnessHighFill, IconMoonStarsFill, IconCircleHalf, IconPcDisplayHorizontal, IconPhone, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconAlphabet, IconDot, IconCheck, IconX, IconExclamationTriangleFill, IconMuteOn, IconMuteOff } from '../../icons.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
 import useNotificationStore from '../../../stores/notificationStore.js';
 import useAuthStore from '../../../stores/authStore.js';
-import { apiDeleteAccountEmail, apiGetAccount, apiGetOAuthConnectedApplications, apiGetPlayerAiWorkerKeys, apiPostPushTest, apiRevokeOAuthConnectedApplication, apiSetAccountEmail, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
+import { apiDeleteAccountEmail, apiGetAccount, apiGetOAuthConnectedApplications, apiGetPlayerAiWorkerKeys, apiPostPushTest, apiRevokeOAuthConnectedApplication, apiSetAccountEmail, apiUnlinkDiscord, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
 import type { AccountInfo } from '../../../../shared/app/AccountInfo.js';
 import { AppValidationError } from '../../../../shared/app/ValidationError.js';
+import { useRoute } from 'vue-router';
 import type { OAuthConnectedApplication } from '../../../../shared/app/oauth.js';
 import { watch, Ref, ref, computed, onMounted, onBeforeUnmount, onUnmounted, nextTick } from 'vue';
 import { injectHead, useSeoMeta } from '@unhead/vue';
@@ -103,6 +104,11 @@ const submitPasswordChange = async () => {
         oldPassword.value = '';
         newPassword.value = '';
         newPasswordConfirmed.value = '';
+
+        // Account created from Discord had no password
+        if (accountInfo.value && !accountInfo.value.hasPassword) {
+            accountInfo.value.hasPassword = true;
+        }
     } catch (e) {
         if (!(e instanceof DomainHttpError)) {
             throw e;
@@ -120,7 +126,7 @@ const submitPasswordChange = async () => {
 };
 
 /*
- * Private account data: login, email, pseudo change.
+ * Private account data: login, email, Discord, pseudo change.
  * Only for registered players.
  */
 const accountInfo = ref<null | AccountInfo>(null);
@@ -206,6 +212,37 @@ const submitEmail = async (): Promise<void> => {
 
         emailError.value = 'recovery_email.invalid';
     }
+};
+
+/*
+ * Discord
+ */
+const route = useRoute();
+const discordLoginEnabled = DISCORD_LOGIN_ENABLED;
+
+/**
+ * Error when coming back from Discord, i.e "discord_already_linked"
+ */
+const discordError = ref<null | string>(typeof route.query.discord_error === 'string' ? route.query.discord_error : null);
+
+const unlinkDiscord = async (): Promise<void> => {
+    discordError.value = null;
+
+    if (!confirm(t('discord_account.unlink_confirm'))) {
+        return;
+    }
+
+    try {
+        await apiUnlinkDiscord();
+    } catch (e) {
+        if (!(e instanceof DomainHttpError)) {
+            throw e;
+        }
+
+        discordError.value = e.type;
+    }
+
+    await loadAccountInfo();
 };
 
 /*
@@ -483,6 +520,7 @@ const sectionPanels: { [sectionId: string]: Panel } = {
     'theme': 'interface',
     'audio': 'interface',
     'pseudo': 'account',
+    'discord': 'account',
     'country-flag': 'account',
     'moderation': 'account',
     'change-password': 'security',
@@ -768,6 +806,32 @@ const {
                         </form>
                     </section>
 
+                    <section id="discord" v-if="loggedInPlayer && !loggedInPlayer.isGuest && accountInfo && (discordLoginEnabled || accountInfo.discord)">
+                        <h3><IconDiscord /> {{ $t('discord_account.title') }}</h3>
+
+                        <p class="small text-body-secondary">{{ $t('discord_account.private') }}</p>
+
+                        <template v-if="accountInfo.discord">
+                            <p>
+                                <i18next :translation="$t('discord_account.linked_to')">
+                                    <template #username><strong>{{ accountInfo.discord.username }}</strong></template>
+                                </i18next>
+                            </p>
+                            <button type="button" class="btn btn-outline-danger" :disabled="!accountInfo.hasPassword" @click="unlinkDiscord">{{ $t('discord_account.unlink') }}</button>
+                            <p v-if="!accountInfo.hasPassword" class="small text-body-secondary mt-2">
+                                {{ $t('discord_account.set_password_to_unlink') }}
+                                <a href="#change-password">{{ $t('set_password') }}</a>
+                            </p>
+                        </template>
+
+                        <template v-else>
+                            <p>{{ $t('discord_account.explain') }}</p>
+                            <a href="/auth/discord?intent=link" class="btn btn-outline-primary"><IconDiscord /> {{ $t('discord_account.link') }}</a>
+                        </template>
+
+                        <p v-if="discordError" class="text-danger mt-2">{{ $t(discordError) }}</p>
+                    </section>
+
                     <section id="moderation">
                         <h3>{{ $t('player_settings.moderation') }}</h3>
 
@@ -777,10 +841,14 @@ const {
 
                 <!-- Security -->
                 <div v-show="'security' === currentPanel">
-                    <section id="change-password" v-if="loggedInPlayer && !loggedInPlayer.isGuest">
+                    <section id="change-password" v-if="loggedInPlayer && !loggedInPlayer.isGuest && accountInfo">
                         <form @submit.prevent="submitPasswordChange">
-                            <h3>{{ $t('change_password') }}</h3>
-                            <div class="mb-3 row">
+                            <h3 v-if="accountInfo.hasPassword">{{ $t('change_password') }}</h3>
+                            <template v-else>
+                                <h3>{{ $t('set_password') }}</h3>
+                                <p>{{ $t('set_password_explain', { login: accountInfo.login }) }}</p>
+                            </template>
+                            <div v-if="accountInfo.hasPassword" class="mb-3 row">
                                 <label class="col-sm-4 col-md-3 col-form-label" for="change-password-old">{{ $t('old_password') }}</label>
                                 <div class="col-sm-8 col-md-6">
                                     <input v-model="oldPassword" required type="password" class="form-control" :class="toInputClass(oldPasswordValidation)" id="change-password-old">

@@ -9,9 +9,21 @@ export type AccountInfo = {
     login: null | string;
 
     /**
+     * Whether player has a password. False when account has been created from Discord.
+     */
+    hasPassword: boolean;
+
+    /**
      * Optional recovery email.
      */
     email: null | string;
+
+    /**
+     * Linked Discord account. Private, not displayed on profile.
+     */
+    discord: null | {
+        username: string;
+    };
 
     pseudoChange: {
         remaining: number;

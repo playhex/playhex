@@ -1,15 +1,16 @@
-import { Player, PlayerAccountPassword, PlayerPseudoHistory } from '../../shared/app/models/index.js';
+import { Player, PlayerAccountDiscord, PlayerAccountPassword, PlayerPseudoHistory } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import { v4 as uuidv4, validate as isUuid } from 'uuid';
 import { hashPassword, checkPassword, InvalidPasswordError } from '../services/security/authentication.js';
 import logger from '../services/logger.js';
-import { checkPseudo, pseudoSlug } from '../../shared/app/pseudoUtils.js';
-import { IsNull, Not, QueryFailedError, Repository } from 'typeorm';
+import { checkPseudo, pseudoSlug, validatePseudo } from '../../shared/app/pseudoUtils.js';
+import { EntityManager, IsNull, Not, QueryFailedError, Repository } from 'typeorm';
 import { isDuplicateError } from './typeormUtils.js';
 import SearchPlayersParameters from '../../shared/app/SearchPlayersParameters.js';
 import { instanceToPlain } from '../../shared/app/class-transformer-custom.js';
 import PlayerIdentityMap from '../identity-map/PlayerIdentityMap.js';
 import { getCurrentPseudoStartedAt, getNextPseudoChangeAllowedAt, type PseudoPeriod } from '../../shared/app/pseudoHistoryRules.js';
+import { throwDiscordAlreadyLinkedOnDuplicate } from './PlayerAccountRepository.js';
 
 export class PseudoAlreadyTakenError extends Error {}
 export class MustBeGuestError extends Error {}
@@ -24,6 +25,14 @@ export class PseudoChangeLimitReachedError extends Error
         super('Pseudo change limit reached');
     }
 }
+
+/**
+ * Discord account to link to a player created from Discord.
+ */
+export type DiscordAccountToLink = {
+    discordId: string;
+    discordUsername: string;
+};
 
 @Service()
 export default class PlayerRepository
@@ -165,34 +174,131 @@ export default class PlayerRepository
     {
         checkPseudo(pseudo);
 
-        try {
-            const player = new Player();
+        const player = await this.registerAccount(null, pseudo.trim(), await hashPassword(password));
 
+        logger.info('Player created an account from anonymous', {
+            pseudo,
+            upgradedPlayer: instanceToPlain(player), // do not log password hash
+        });
+
+        return player;
+    }
+
+    /**
+     * Creates an account, or upgrades a guest, with a linked Discord account and no password.
+     * If pseudo is already taken, a suffix is added ("pseudo-2", "pseudo-3", ...).
+     *
+     * @param guest Guest to upgrade, or null to create a new player.
+     * @param pseudoCandidates Pseudos to try, in order, before adding suffixes. Invalid ones are skipped.
+     *
+     * @throws {MustBeGuestError}
+     * @throws {DiscordAlreadyLinkedError} If this Discord account has been linked meanwhile
+     */
+    async createPlayerFromDiscord(guest: null | Player, pseudoCandidates: string[], discordAccount: DiscordAccountToLink): Promise<Player>
+    {
+        if (guest !== null && !guest.isGuest) {
+            throw new MustBeGuestError();
+        }
+
+        const linkDiscord = async (manager: EntityManager, player: Player) => {
+            const playerAccountDiscord = new PlayerAccountDiscord();
+
+            playerAccountDiscord.player = player;
+            playerAccountDiscord.discordId = discordAccount.discordId;
+            playerAccountDiscord.discordUsername = discordAccount.discordUsername;
+            playerAccountDiscord.createdAt = new Date();
+
+            // Must not be caught as PseudoAlreadyTakenError, else would retry all pseudo suffixes
+            await throwDiscordAlreadyLinkedOnDuplicate(manager.save(playerAccountDiscord));
+        };
+
+        for (const pseudo of generatePseudoCandidates(pseudoCandidates)) {
+            try {
+                const player = await this.registerAccount(guest, pseudo, null, linkDiscord);
+
+                logger.info('Player created an account from Discord', {
+                    pseudo,
+                    fromGuest: guest !== null,
+                    discordId: discordAccount.discordId,
+                    upgradedPlayer: instanceToPlain(player),
+                });
+
+                return player;
+            } catch (e) {
+                if (e instanceof PseudoAlreadyTakenError) {
+                    continue;
+                }
+
+                throw e;
+            }
+        }
+
+        throw new Error('Unable to find an available pseudo to create account from Discord');
+    }
+
+    /**
+     * Create a new player, or upgrade a guest, with its PlayerAccountPassword.
+     * Pseudo must have been checked before.
+     *
+     * @param guest Guest to upgrade, or null to create a new player
+     * @param hashedPassword Null to create an account without password, i.e created from Discord
+     * @param extra Callback to save more entities in the same transaction
+     *
+     * @throws {PseudoAlreadyTakenError}
+     */
+    private async registerAccount(
+        guest: null | Player,
+        pseudo: string,
+        hashedPassword: null | string,
+        extra?: (manager: EntityManager, player: Player) => Promise<void>,
+    ): Promise<Player>
+    {
+        // Do not mutate guest instance before saving: it is shared (identity map),
+        // and could be reverted by a concurrent getPlayer() while awaiting.
+        const upgrade = {
+            isGuest: false,
+            pseudo,
+            slug: pseudoSlug(pseudo),
+            registeredAt: new Date(),
+        };
+
+        let player: Player;
+
+        if (guest === null) {
+            player = new Player();
             player.publicId = uuidv4();
-            player.pseudo = pseudo;
-            player.slug = pseudoSlug(pseudo);
-            player.registeredAt = new Date();
+            Object.assign(player, upgrade);
+        } else {
+            player = guest;
+        }
 
-            const playerAccountPassword = new PlayerAccountPassword();
+        const playerAccountPassword = new PlayerAccountPassword();
 
-            playerAccountPassword.player = player;
-            playerAccountPassword.login = pseudo.trim();
-            playerAccountPassword.password = await hashPassword(password);
-            playerAccountPassword.createdAt = new Date();
-            playerAccountPassword.updatedAt = new Date();
+        playerAccountPassword.player = player;
+        playerAccountPassword.login = pseudo;
+        playerAccountPassword.password = hashedPassword;
+        playerAccountPassword.createdAt = new Date();
+        playerAccountPassword.updatedAt = new Date();
 
+        try {
             await this.playerRepository.manager.transaction(async manager => {
-                await manager.save(player);
+                if (guest === null) {
+                    await manager.save(player);
+                } else {
+                    await manager.createQueryBuilder(Player, 'player')
+                        .update()
+                        .where('publicId = :publicId', { publicId: guest.publicId })
+                        .set(upgrade)
+                        .execute()
+                    ;
+                }
+
                 await manager.save(playerAccountPassword);
-            });
 
-            logger.info('Player created an account from anonymous', {
-                oldPlayer: player,
-                pseudo,
-                upgradedPlayer: instanceToPlain(player), // do not log password hash
+                if (extra) {
+                    await extra(manager, player);
+                }
             });
-
-            return player;
         } catch (e) {
             if (isDuplicateError(e)) {
                 throw new PseudoAlreadyTakenError();
@@ -200,6 +306,12 @@ export default class PlayerRepository
 
             throw e;
         }
+
+        if (guest !== null) {
+            Object.assign(guest, upgrade);
+        }
+
+        return player;
     }
 
     /**
@@ -226,7 +338,8 @@ export default class PlayerRepository
             throw new Error('Unexpected null playerAccountPassword');
         }
 
-        if (!checkPassword(playerAccountPassword, oldPassword)) {
+        // Account created from Discord has no password yet: allow to set one
+        if (playerAccountPassword.password && !checkPassword(playerAccountPassword, oldPassword)) {
             throw new InvalidPasswordError();
         }
 
@@ -262,49 +375,14 @@ export default class PlayerRepository
             throw new MustBeGuestError();
         }
 
-        // Do not mutate player instance before saving: it is shared (identity map),
-        // and could be reverted by a concurrent getPlayer() while awaiting.
-        const upgrade = {
-            isGuest: false,
-            pseudo: pseudo.trim(),
-            slug: pseudoSlug(pseudo),
-            registeredAt: new Date(),
-        };
+        await this.registerAccount(player, pseudo.trim(), await hashPassword(password));
 
-        const playerAccountPassword = new PlayerAccountPassword();
+        logger.info('Player created an account from guest', {
+            pseudo,
+            upgradedPlayer: instanceToPlain(player), // do not log password hash
+        });
 
-        playerAccountPassword.player = player;
-        playerAccountPassword.login = upgrade.pseudo;
-        playerAccountPassword.password = await hashPassword(password);
-        playerAccountPassword.createdAt = new Date();
-        playerAccountPassword.updatedAt = new Date();
-
-        try {
-            await this.playerRepository.manager.transaction(async manager => {
-                await manager.createQueryBuilder(Player, 'player')
-                    .update()
-                    .where('publicId = :publicId', { publicId })
-                    .set(upgrade)
-                    .execute()
-                ;
-                await manager.save(playerAccountPassword);
-            });
-
-            Object.assign(player, upgrade);
-
-            logger.info('Player created an account from guest', {
-                pseudo,
-                upgradedPlayer: instanceToPlain(player), // do not log password hash
-            });
-
-            return player;
-        } catch (e) {
-            if (isDuplicateError(e)) {
-                throw new PseudoAlreadyTakenError();
-            }
-
-            throw e;
-        }
+        return player;
     }
 
     async getPseudoHistory(playerId: number): Promise<PseudoPeriod[]>
@@ -487,5 +565,31 @@ export default class PlayerRepository
 
         logger.error('Unable to moderate nickname');
         throw new Error('Unable to moderate nickname');
+    }
+}
+
+/**
+ * Yields pseudo candidates to create an account,
+ * skipping invalid ones, and adding suffix if all are taken.
+ */
+function* generatePseudoCandidates(bases: string[]): Generator<string>
+{
+    const validBases = bases
+        .map(base => base.trim().substring(0, 32).trim())
+        .filter(base => validatePseudo(base))
+    ;
+
+    if (validBases.length === 0) {
+        validBases.push('player');
+    }
+
+    yield* validBases;
+
+    const base = validBases[0];
+
+    for (let i = 2; i < 100; ++i) {
+        const suffix = `-${i}`;
+
+        yield base.substring(0, 32 - suffix.length) + suffix;
     }
 }
