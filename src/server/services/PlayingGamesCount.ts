@@ -4,6 +4,7 @@ import { isLive } from '../../shared/app/timeControlUtils.js';
 import { isBotGame } from '../../shared/app/gameUtils.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { notifier } from './notifications/notifier.js';
+import { Game } from '../../shared/app/models/index.js';
 
 type PlayingGamesCountEvents = {
     updated: (counts: { live: number, correspondence: number }) => void;
@@ -17,9 +18,22 @@ export class PlayingGamesCount extends TypedEmitter<PlayingGamesCountEvents>
     ) {
         super();
 
-        notifier.on('gameStart', () => this.emit('updated', this.getCounts()));
-        notifier.on('gameEnd', () => this.emit('updated', this.getCounts()));
-        notifier.on('gameCanceled', () => this.emit('updated', this.getCounts()));
+        notifier.on('gameStart', game => this.emitUpdatedIfHumanGame(game));
+        notifier.on('gameEnd', game => this.emitUpdatedIfHumanGame(game));
+        notifier.on('gameCanceled', game => this.emitUpdatedIfHumanGame(game));
+    }
+
+    /**
+     * Counts only include human games,
+     * so bot games changes would broadcast the same counts for nothing.
+     */
+    private emitUpdatedIfHumanGame(game: Game): void
+    {
+        if (isBotGame(game)) {
+            return;
+        }
+
+        this.emit('updated', this.getCounts());
     }
 
     getCounts(): { live: number, correspondence: number }
