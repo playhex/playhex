@@ -1,7 +1,20 @@
 import type { NextFunction, Request, Response } from 'express';
-import { getBearerToken, resolveOAuthAccess } from './oauthAccess.js';
-import { checkOAuthApiPolicy } from './oauthApiPolicy.js';
+import { getBearerToken, resolveOAuthAccess, resolveOAuthClientAccess } from './oauthAccess.js';
+import { checkOAuthApiPolicy, checkOAuthClientApiPolicy, type OAuthApiPolicyResult } from './oauthApiPolicy.js';
 import logger from '../services/logger.js';
+
+const deny = (res: Response, result: OAuthApiPolicyResult & { allowed: false }): void => {
+    if (result.reason === 'insufficient_scope') {
+        res.set('WWW-Authenticate', `Bearer error="insufficient_scope", scope="${result.requiredScope}"`);
+    }
+
+    res.status(403).send({
+        error: result.reason,
+        error_description: result.reason === 'insufficient_scope'
+            ? `This route requires the "${result.requiredScope}" scope`
+            : 'This route cannot be called by a third-party application',
+    });
+};
 
 /**
  * Authenticates api requests made by third-party applications
@@ -20,31 +33,40 @@ export const oauthApiMiddleware = async (req: Request, res: Response, next: Next
     }
 
     try {
+        const path = req.baseUrl + req.path;
+
+        // Application acting on behalf of a player
         const oauthAccess = await resolveOAuthAccess(token);
 
-        if (oauthAccess === null) {
+        if (oauthAccess !== null) {
+            const result = checkOAuthApiPolicy(req.method, path, oauthAccess.scopes);
+
+            if (!result.allowed) {
+                deny(res, result);
+                return;
+            }
+
+            req.oauth = oauthAccess;
             next();
             return;
         }
 
-        const path = req.baseUrl + req.path;
-        const result = checkOAuthApiPolicy(req.method, path, oauthAccess.scopes);
+        // Application acting on its own (client_credentials), not on behalf of a player
+        const oauthClientAccess = await resolveOAuthClientAccess(token);
 
-        if (!result.allowed) {
-            if (result.reason === 'insufficient_scope') {
-                res.set('WWW-Authenticate', `Bearer error="insufficient_scope", scope="${result.requiredScope}"`);
-            }
-
-            res.status(403).send({
-                error: result.reason,
-                error_description: result.reason === 'insufficient_scope'
-                    ? `This route requires the "${result.requiredScope}" scope`
-                    : 'This route cannot be called by a third-party application',
-            });
+        if (oauthClientAccess === null) {
+            next();
             return;
         }
 
-        req.oauth = oauthAccess;
+        const result = checkOAuthClientApiPolicy(req.method, path, oauthClientAccess.scopes);
+
+        if (!result.allowed) {
+            deny(res, result);
+            return;
+        }
+
+        req.oauthClient = oauthClientAccess;
         next();
     } catch (e) {
         logger.error('Error while resolving OAuth access token', { errorMessage: (e as Error)?.message });

@@ -3,6 +3,11 @@
 import { ListenerSignature, TypedEmitter } from 'tiny-typed-emitter';
 
 /**
+ * Regex pattern of a uuid, e.g a game publicId. Use with "i" flag to accept uppercase.
+ */
+export const UUID_PATTERN = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
+
+/**
  * For .sort() function, sort by a given field only.
  * Ex:
  *

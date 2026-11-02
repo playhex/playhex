@@ -14,12 +14,27 @@ export type OAuthAccess = {
     scopes: Set<string>;
 };
 
+/**
+ * An application authenticated through an OAuth access token issued with client_credentials grant,
+ * acting on its own, not on behalf of a player (e.g Discord bot).
+ */
+export type OAuthClientAccess = {
+    clientId: string;
+    scopes: Set<string>;
+};
+
 declare module 'http' {
     interface IncomingMessage {
         /**
          * Set when request is authenticated by an OAuth access token instead of session cookie.
          */
         oauth?: OAuthAccess;
+
+        /**
+         * Set when request is authenticated by an application OAuth access token (client_credentials).
+         * No player then.
+         */
+        oauthClient?: OAuthClientAccess;
     }
 }
 
@@ -62,5 +77,29 @@ export const resolveOAuthAccess = async (token: string): Promise<null | OAuthAcc
         player,
         clientId: accessToken.clientId,
         scopes: new Set(parseScope(accessToken.scope)),
+    };
+};
+
+/**
+ * Returns null if token is not a valid application access token
+ * (unknown, expired, client disabled, or a token issued on behalf of a player).
+ */
+export const resolveOAuthClientAccess = async (token: string): Promise<null | OAuthClientAccess> => {
+    const provider = getOidcProvider();
+    const clientCredentials = await provider.ClientCredentials.find(token);
+
+    if (!clientCredentials || clientCredentials.isExpired || !clientCredentials.clientId) {
+        return null;
+    }
+
+    const client = await provider.Client.find(clientCredentials.clientId);
+
+    if (!client) {
+        return null;
+    }
+
+    return {
+        clientId: clientCredentials.clientId,
+        scopes: new Set(parseScope(clientCredentials.scope)),
     };
 };

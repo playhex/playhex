@@ -19,6 +19,7 @@ import PendingMctsMoveAnalyzes from '../ai-jobs/PendingMctsMoveAnalyzes.js';
 import { AuthenticatedPlayer } from '../controllers/http/middlewares.js';
 import { rateLimiterConsumeAnalyzeMoveMcts } from '../services/rate-limiters.js';
 import ExternalGameRepository from './ExternalGameRepository.js';
+import { sendGameAnalyzeGraphPng } from '../game-analyze/gameAnalyzeGraph.js';
 
 type MctsMove = GameAnalyzeMoveMcts['move'];
 
@@ -113,6 +114,23 @@ export default class ExternalGameController
         }
 
         return toGameAnalyze(externalGameAnalyze);
+    }
+
+    /**
+     * Game analyze chart as an image, e.g to share it on Discord.
+     */
+    @Get('/api/external-games/:publicId/analyze/graph.png')
+    async getGraphPng(
+        @Param('publicId') publicId: string,
+        @Res() res: Response,
+    ) {
+        const externalGame = await this.mustFindExternalGame(publicId);
+        const externalGameAnalyze = await this.externalGameRepository.findAnalyze(externalGame);
+
+        return await sendGameAnalyzeGraphPng(res, externalGameAnalyze, {
+            player0Name: externalGame.player0Name,
+            player1Name: externalGame.player1Name,
+        });
     }
 
     @Put('/api/external-games/:publicId/analyze')

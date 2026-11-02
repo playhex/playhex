@@ -2,9 +2,19 @@ import { HexMove } from '@playhex/move-notation';
 import { ImportUserError } from '../errors.js';
 import { ImporterHandlerInterface } from '../ImporterHandlerInterface.js';
 import { ImportedGame } from '../types.js';
+import { UUID_PATTERN } from '../../utils.js';
 
-const UUID_PATTERN = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
 const SOURCE_PATTERN = new RegExp(`^(?:https?:\\/\\/[^/]+\\/games\\/)?(${UUID_PATTERN})\\/?$`, 'i');
+
+/**
+ * "https://playhex.org/games/0d1f8e8c-..." => "0d1f8e8c-..."
+ * Null if source is not a PlayHex game url or id.
+ */
+export const parsePlayHexGameId = (source: string): null | string => {
+    const match = source.trim().match(SOURCE_PATTERN);
+
+    return match ? match[1].toLowerCase() : null;
+};
 
 type GamesApiResponse = {
     boardsize: number;
@@ -48,9 +58,7 @@ export class PlayHexLink implements ImporterHandlerInterface
 
     private parseGameId(source: string): null | string
     {
-        const match = source.trim().match(SOURCE_PATTERN);
-
-        return match ? match[1] : null;
+        return parsePlayHexGameId(source);
     }
 
     async import(source: string): Promise<ImportedGame>

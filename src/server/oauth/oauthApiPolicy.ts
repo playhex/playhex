@@ -1,4 +1,5 @@
 import type { OAuthScope } from '../../shared/app/oauth.js';
+import { UUID_PATTERN } from '../../shared/app/utils.js';
 
 /**
  * Api routes that a third-party application can never call on behalf of a player,
@@ -56,5 +57,35 @@ export const checkOAuthApiPolicy = (method: string, path: string, scopes: Set<st
     return canWrite(scopes)
         ? { allowed: true }
         : { allowed: false, reason: 'insufficient_scope', requiredScope: 'write' }
+    ;
+};
+
+/**
+ * Only routes an application token (client_credentials, no player) can call,
+ * with the scope it requires. Everything else is denied.
+ */
+const CLIENT_ALLOWED_ROUTES: { method: string, pattern: RegExp, scope: OAuthScope }[] = [
+    { method: 'POST', pattern: /^\/api\/external-games\/import$/i, scope: 'games:analyze' },
+    { method: 'GET', pattern: new RegExp(`^/api/(games|external-games)/${UUID_PATTERN}$`, 'i'), scope: 'games:analyze' },
+    { method: 'GET', pattern: new RegExp(`^/api/(games|external-games)/${UUID_PATTERN}/analyze(/graph\\.png)?$`, 'i'), scope: 'games:analyze' },
+    { method: 'PUT', pattern: new RegExp(`^/api/(games|external-games)/${UUID_PATTERN}/analyze$`, 'i'), scope: 'games:analyze' },
+];
+
+/**
+ * Whether an application access token (client_credentials grant, not on behalf of a player)
+ * with given scopes can call this api route.
+ */
+export const checkOAuthClientApiPolicy = (method: string, path: string, scopes: Set<string>): OAuthApiPolicyResult => {
+    method = method.toUpperCase();
+
+    const route = CLIENT_ALLOWED_ROUTES.find(route => route.method === method && route.pattern.test(path));
+
+    if (route === undefined) {
+        return { allowed: false, reason: 'route_not_allowed' };
+    }
+
+    return scopes.has(route.scope)
+        ? { allowed: true }
+        : { allowed: false, reason: 'insufficient_scope', requiredScope: route.scope }
     ;
 };

@@ -7,7 +7,7 @@ import { AuthenticatedPlayer } from '../controllers/http/middlewares.js';
 import { OAuthClient, OAuthPayload, Player } from '../../shared/app/models/index.js';
 import { getOidcProvider, OAUTH_PAGES_PREFIX } from './provider.js';
 import { revokeGrant } from './TypeOrmOidcAdapter.js';
-import { parseScope, type OAuthClientInfo, type OAuthConnectedApplication, type OAuthInteractionDetails } from '../../shared/app/oauth.js';
+import { isClientOnlyScope, parseScope, type OAuthClientInfo, type OAuthConnectedApplication, type OAuthInteractionDetails } from '../../shared/app/oauth.js';
 
 const getRequestedScope = (interaction: Interaction): string => {
     const { scope } = interaction.params;
@@ -84,6 +84,19 @@ export default class OAuthController
         const interaction = await this.loadInteraction(uid, req, res);
         const accountId = player.publicId;
         const clientId = String(interaction.params.client_id);
+        const requestedScope = getRequestedScope(interaction);
+        const clientOnlyScopes = parseScope(requestedScope).filter(isClientOnlyScope);
+
+        // A player can never grant scopes reserved to applications themselves.
+        // Fail instead of granting other scopes only, else consent would be prompted again and again for missing scopes.
+        if (clientOnlyScopes.length > 0) {
+            const redirectTo = await provider.interactionResult(req, res, {
+                error: 'invalid_scope',
+                error_description: `Scope ${clientOnlyScopes.join(', ')} cannot be granted by a player, only obtained by the application itself with client_credentials grant`,
+            }, { mergeWithLastSubmission: false });
+
+            return { redirectTo };
+        }
 
         let grant = interaction.grantId
             ? await provider.Grant.find(interaction.grantId)
@@ -98,8 +111,6 @@ export default class OAuthController
         if (!grant) {
             grant = new provider.Grant({ accountId, clientId });
         }
-
-        const requestedScope = getRequestedScope(interaction);
 
         if (requestedScope) {
             grant.addOIDCScope(requestedScope);

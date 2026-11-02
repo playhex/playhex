@@ -9,7 +9,7 @@ const H = OG_IMAGE_HEIGHT;
 /**
  * Fonts installed on server, with CJK and accents support for player pseudos.
  */
-const FONT_FAMILY = `'Noto Sans', 'Noto Sans CJK JP', 'Noto Sans CJK SC', 'DejaVu Sans', sans-serif`;
+export const FONT_FAMILY = `'Noto Sans', 'Noto Sans CJK JP', 'Noto Sans CJK SC', 'DejaVu Sans', sans-serif`;
 
 export const greyText = '#adb5bd';
 
@@ -341,4 +341,33 @@ export const svgToPng = async (svg: string): Promise<Buffer> => {
         .png({ compressionLevel: 9 })
         .toBuffer()
     ;
+};
+
+/**
+ * Rendering is cpu intensive: limit concurrent renders, shared by all rendered images.
+ */
+const MAX_CONCURRENT_RENDERS = 2;
+
+let runningRenders = 0;
+const renderQueue: (() => void)[] = [];
+
+export const withRenderSlot = async <T>(callback: () => Promise<T>): Promise<T> => {
+    if (runningRenders < MAX_CONCURRENT_RENDERS) {
+        ++runningRenders;
+    } else {
+        // Slot is handed over by a finished render, not released, so no new render can take it meanwhile
+        await new Promise<void>(resolve => renderQueue.push(resolve));
+    }
+
+    try {
+        return await callback();
+    } finally {
+        const next = renderQueue.shift();
+
+        if (next) {
+            next();
+        } else {
+            --runningRenders;
+        }
+    }
 };

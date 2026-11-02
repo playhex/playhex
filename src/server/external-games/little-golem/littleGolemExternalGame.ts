@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ExternalGame } from '../../../shared/app/models/index.js';
-import { EngineGame } from '../../../shared/game-engine/index.js';
+import { findPathWinner } from '../externalGameOutcome.js';
 import type { Outcome } from '../../../shared/game-engine/Types.js';
 import type { HexMove } from '@playhex/move-notation';
 import { parseGamePage } from './littleGolemParsers.js';
@@ -20,21 +20,13 @@ const guessOutcome = (boardsize: number, moves: HexMove[], resigned: boolean): n
         return 'forfeit';
     }
 
-    try {
-        const engineGame = new EngineGame(boardsize);
+    const pathWinner = findPathWinner(boardsize, moves);
 
-        engineGame.setAllowSwap(true);
-
-        moves.forEach((move, index) => engineGame.move(move, index % 2 as 0 | 1));
-
-        if (engineGame.hasWinner()) {
-            return 'path';
-        }
-    } catch {
+    if (pathWinner === undefined) {
         return null;
     }
 
-    return 'time';
+    return pathWinner !== null ? 'path' : 'time';
 };
 
 /**

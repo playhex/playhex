@@ -1,4 +1,5 @@
-import { BadRequestError, Get, HttpCode, HttpError, JsonController, NotFoundError, OnUndefined, Param, Put, QueryParam } from 'routing-controllers';
+import { BadRequestError, Get, HttpCode, HttpError, JsonController, NotFoundError, OnUndefined, Param, Put, QueryParam, Res } from 'routing-controllers';
+import type { Response } from 'express';
 import { Service } from 'typedi';
 import { isSpecialHexMove } from '@playhex/move-notation';
 import GameAnalyzeRepository from '../../../repositories/GameAnalyzeRepository.js';
@@ -18,6 +19,7 @@ import PendingMctsMoveAnalyzes from '../../../ai-jobs/PendingMctsMoveAnalyzes.js
 import { MCTS_PLAYOUTS } from '../../../../shared/app/mctsSettings.js';
 import { AuthenticatedPlayer } from '../middlewares.js';
 import { rateLimiterConsumeAnalyzeMoveMcts } from '../../../services/rate-limiters.js';
+import { sendGameAnalyzeGraphPng } from '../../../game-analyze/gameAnalyzeGraph.js';
 
 type MctsMove = GameAnalyzeMoveMcts['move'];
 
@@ -65,6 +67,25 @@ export default class GameAnalyzeController
         }
 
         return gameAnalyze;
+    }
+
+    /**
+     * Game analyze chart as an image, e.g to share it on Discord.
+     */
+    @Get('/api/games/:publicId/analyze/graph.png')
+    async getGraphPng(
+        @Param('publicId') publicId: string,
+        @Res() res: Response,
+    ) {
+        const [gameAnalyze, game] = await Promise.all([
+            this.gameAnalyzeRepository.findByGamePublicId(publicId),
+            this.gameRepository.findUnique(publicId),
+        ]);
+
+        return await sendGameAnalyzeGraphPng(res, gameAnalyze, {
+            player0Name: game?.gameToPlayers[0]?.player.pseudo,
+            player1Name: game?.gameToPlayers[1]?.player.pseudo,
+        });
     }
 
     @Put('/api/games/:publicId/analyze')

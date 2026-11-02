@@ -19,6 +19,19 @@ pnpm hex oauth:create-client \
 
 # --public: no client secret (mobile apps, SPA, CLI), PKCE required
 # --device: allow device flow (applications without browser)
+# --client-credentials: application gets tokens for itself, not on behalf of a player (bots...)
+# --scope "...": allowed scopes, default "openid offline_access read write"
+```
+
+Application acting on its own, e.g the Discord bot:
+
+``` bash
+pnpm hex oauth:create-client \
+    --name "PlayHex Discord" \
+    --author "PlayHex" \
+    --logo https://playhex.org/images/logo.png \
+    --client-credentials \
+    --scope games:analyze
 ```
 
 Disable an application with `enabled = 0`: all its tokens stop working immediately.
@@ -44,6 +57,9 @@ and the "Connected applications" panel in settings.
 
 - Authorization code, with client secret (confidential clients) or PKCE (public clients)
 - Device flow (`urn:ietf:params:oauth:grant-type:device_code`)
+- Client credentials: application gets a token for itself, no player.
+  Only with application only scopes (`games:analyze`), see below.
+  No refresh token: request a new token once expired.
 - Refresh token: with `offline_access` scope, or always with device flow.
   Rotated on each use for public clients, and for confidential clients only once 70% of its lifetime has passed
   (oidc-provider default). Applications must always store the `refresh_token` returned in the response, if any.
@@ -58,6 +74,22 @@ Implicit and hybrid flows are disabled.
 | `read` | All `GET` api routes, as the player. Adds `pseudo`, `slug`, `is_guest` claims. |
 | `write` | All api routes, as the player (create games, play moves, chat, settings...). Implies `read`. |
 | `offline_access` | Get a refresh token |
+| `games:analyze` | Application only (client credentials). Import a game from any source and request its analyze. |
+
+Application only scopes are never granted by a player consent (authorization fails with `invalid_scope`),
+and give no right to a token issued on behalf of a player.
+An application with these scopes must be client credentials only: create a separate application to act on behalf of players.
+An application token (client credentials) can only call these routes, all requiring `games:analyze`:
+
+- `POST /api/external-games/import` with `{ "source": "<game url, SGF...>" }`:
+  returns `{ "kind": "game" | "external-game", "publicId": "..." }`.
+  A PlayHex game url returns the existing game. A game already imported returns the existing external game.
+- `GET` and `PUT /api/games/:publicId/analyze`, `GET /api/games/:publicId/analyze/graph.png`, `GET /api/games/:publicId`
+- Same under `/api/external-games/:publicId`
+
+``` bash
+curl -u "$CLIENT_ID:$CLIENT_SECRET" -d grant_type=client_credentials -d scope=games:analyze https://playhex.org/oidc/token
+```
 
 Some routes can never be called with an access token, even with `write`:
 authentication (`/api/auth/*` except `GET /api/auth/me`), admin, AI workers, push subscriptions,

@@ -7,6 +7,16 @@ import LittleGolemClient, { LittleGolemFetchError, littleGolemClient as sharedLi
 const SOURCE_PATTERN = /littlegolem\.net\/jsp\/game\/game\.jsp\?gid=(\d+)/i;
 
 /**
+ * "https://littlegolem.net/jsp/game/game.jsp?gid=1512976&nmove=27" => 1512976
+ * Null if source is not a Little Golem game url.
+ */
+export const parseLittleGolemGameId = (source: string): null | number => {
+    const match = source.trim().match(SOURCE_PATTERN);
+
+    return match ? parseInt(match[1], 10) : null;
+};
+
+/**
  * Import from a Little Golem game url. Example:
  * - https://littlegolem.net/jsp/game/game.jsp?gid=1512976&nmove=27
  *
@@ -30,9 +40,7 @@ export class LittleGolemLink implements ImporterHandlerInterface
 
     private parseGameId(source: string): null | number
     {
-        const match = source.trim().match(SOURCE_PATTERN);
-
-        return match ? parseInt(match[1], 10) : null;
+        return parseLittleGolemGameId(source);
     }
 
     async import(source: string): Promise<ImportedGame>

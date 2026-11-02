@@ -184,6 +184,16 @@ const importExternalGamesLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Import of a single game from any source (link, SGF...), by an application (e.g Discord bot).
+ * By application, so a high limit: application limits its own users.
+ */
+const importExternalGameLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.import_external_game',
+    points: 60,
+    duration: 60,
+});
+
+/**
  * Error thrown from rate limiter
  */
 export class RateLimiterError extends Error {}
@@ -318,4 +328,8 @@ export const rateLimiterConsumeLinkExternalAccount = async (playerPublicId: stri
 
 export const rateLimiterConsumeImportExternalGames = async (playerPublicId: string) => {
     await consume(importExternalGamesLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumeImportExternalGame = async (oauthClientId: string) => {
+    await consume(importExternalGameLimiter, oauthClientId);
 };

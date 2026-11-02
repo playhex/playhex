@@ -107,6 +107,9 @@ const createProvider = (): Provider => {
 
         features: {
             devInteractions: { enabled: false },
+            // Applications acting on their own, not on behalf of a player, e.g Discord bot.
+            // Only for clients with "client_credentials" grant type, and only client only scopes, see oauthApiPolicy.
+            clientCredentials: { enabled: true },
             deviceFlow: {
                 enabled: true,
                 userCodeInputSource,

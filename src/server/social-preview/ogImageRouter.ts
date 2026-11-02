@@ -12,7 +12,7 @@ import { isCorrespondence } from '../../shared/app/timeControlUtils.js';
 import { resolveSocialLocale } from './resolveSocialLocale.js';
 import { getSocialT } from './socialI18n.js';
 import { socialBaseUrl, type SocialMetaContext } from './SocialMeta.js';
-import { brandText, greyText, renderBoardImageSvg, renderCardImageSvg, svgToPng, wrapText, type OgBoard, type OgIcon, type OgText } from './OgImageRenderer.js';
+import { brandText, greyText, renderBoardImageSvg, renderCardImageSvg, svgToPng, withRenderSlot, wrapText, type OgBoard, type OgIcon, type OgText } from './OgImageRenderer.js';
 import GameMetaBuilder from './meta/GameMetaBuilder.js';
 import PuzzleMetaBuilder from './meta/PuzzleMetaBuilder.js';
 import PuzzleCollectionMetaBuilder, { COLLECTION_IMAGE_PUZZLES } from './meta/PuzzleCollectionMetaBuilder.js';
@@ -31,11 +31,6 @@ const cachePath = path.resolve(process.env.OG_CACHE_PATH || 'var/og-cache/');
  */
 const RENDER_VERSION = 4;
 
-/**
- * Rendering is cpu intensive: limit concurrent renders.
- */
-const MAX_CONCURRENT_RENDERS = 2;
-
 type OgImage = {
     /**
      * Changes when image content changes. Computed server side,
@@ -53,30 +48,7 @@ type OgImage = {
 
 type OgImageResolver = (id: string, context: SocialMetaContext) => null | OgImage | Promise<null | OgImage>;
 
-let runningRenders = 0;
-const renderQueue: (() => void)[] = [];
 const pendingRenders = new Map<string, Promise<Buffer>>();
-
-const withRenderSlot = async <T>(callback: () => Promise<T>): Promise<T> => {
-    if (runningRenders < MAX_CONCURRENT_RENDERS) {
-        ++runningRenders;
-    } else {
-        // Slot is handed over by a finished render, not released, so no new render can take it meanwhile
-        await new Promise<void>(resolve => renderQueue.push(resolve));
-    }
-
-    try {
-        return await callback();
-    } finally {
-        const next = renderQueue.shift();
-
-        if (next) {
-            next();
-        } else {
-            --runningRenders;
-        }
-    }
-};
 
 const loadAvatar = async (player: null | undefined | Player, size = 300): Promise<null | Buffer> => {
     if (!player?.avatarPath) {

@@ -132,6 +132,11 @@ export default class ExternalGameRepository
         return { results, count };
     }
 
+    async findByExternalId(externalId: string): Promise<null | ExternalGame>
+    {
+        return await this.externalGameRepository.findOneBy({ externalId });
+    }
+
     async save(externalGame: ExternalGame): Promise<ExternalGame>
     {
         return await this.externalGameRepository.save(externalGame);
