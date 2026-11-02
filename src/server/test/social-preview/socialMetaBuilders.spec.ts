@@ -1,9 +1,10 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { Game, GameToPlayer, Player, Puzzle, Rating, Tournament, TournamentParticipant } from '../../../shared/app/models/index.js';
+import { ExternalGame, Game, GameToPlayer, Player, Puzzle, Rating, Tournament, TournamentParticipant } from '../../../shared/app/models/index.js';
 import { getSocialT } from '../../social-preview/socialI18n.js';
 import { createDefaultSocialMeta, type SocialLocale, type SocialMetaContext } from '../../social-preview/SocialMeta.js';
 import GameMetaBuilder from '../../social-preview/meta/GameMetaBuilder.js';
+import ExternalGameMetaBuilder from '../../social-preview/meta/ExternalGameMetaBuilder.js';
 import TournamentMetaBuilder from '../../social-preview/meta/TournamentMetaBuilder.js';
 import PuzzleMetaBuilder from '../../social-preview/meta/PuzzleMetaBuilder.js';
 import PlayerMetaBuilder from '../../social-preview/meta/PlayerMetaBuilder.js';
@@ -134,6 +135,39 @@ describe('social preview meta builders', () => {
 
         assert.strictEqual(meta.noindex, true);
         assertTranslated(meta.title);
+    });
+
+    it('builds external game meta like an ended game', () => {
+        const externalGame: ExternalGame = Object.assign(new ExternalGame(), {
+            publicId: 'external-1',
+            externalId: 'LG:123',
+            boardsize: 13,
+            moves: ['a1', 'b2', 'c3'],
+            player0Name: 'Alice',
+            player1Name: 'Bob',
+            player0Rating: '1870.9',
+            player1Rating: null,
+            winner: 1 as const,
+            outcome: 'resign' as const,
+            source: 'Little Golem',
+            endedAt: new Date('2026-03-12T10:30:00Z'),
+            createdAt: new Date('2026-04-01T00:00:00Z'),
+            updatedAt: new Date('2026-04-01T00:00:00Z'),
+        });
+
+        const meta = new ExternalGameMetaBuilder().buildMeta(externalGame, context('en', 'https://playhex.org/external-games/external-1'));
+
+        assert.strictEqual(meta.title, 'Alice (1870.9) vs Bob · Bob wins · 2026-03-12 - PlayHex');
+        assert.strictEqual(meta.description, 'Bob won by resignation. Hex 13×13 · Little Golem · 3 moves · Mar 12, 2026');
+        assert.strictEqual(meta.image?.url, `https://playhex.org/og/external-games/external-1.png?lang=en&v=${new Date('2026-04-01T00:00:00Z').getTime()}`);
+        assert.strictEqual(meta.jsonLd?.[0]['@type'], 'SportsEvent');
+
+        externalGame.winner = null;
+
+        const unknownResult = new ExternalGameMetaBuilder().buildMeta(externalGame, context());
+
+        assert.strictEqual(unknownResult.title, 'Alice (1870.9) vs Bob · 2026-03-12 - PlayHex');
+        assert.strictEqual(unknownResult.description, 'Hex 13×13 · Little Golem · 3 moves · Mar 12, 2026');
     });
 
     it('builds tournament meta depending on its state', () => {

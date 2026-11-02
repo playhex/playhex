@@ -14,6 +14,7 @@ import { getSocialT } from './socialI18n.js';
 import { socialBaseUrl, type SocialMetaContext } from './SocialMeta.js';
 import { brandText, greyText, renderBoardImageSvg, renderCardImageSvg, svgToPng, withRenderSlot, wrapText, type OgBoard, type OgIcon, type OgText } from './OgImageRenderer.js';
 import GameMetaBuilder from './meta/GameMetaBuilder.js';
+import ExternalGameMetaBuilder from './meta/ExternalGameMetaBuilder.js';
 import PuzzleMetaBuilder from './meta/PuzzleMetaBuilder.js';
 import PuzzleCollectionMetaBuilder, { COLLECTION_IMAGE_PUZZLES } from './meta/PuzzleCollectionMetaBuilder.js';
 import TournamentMetaBuilder from './meta/TournamentMetaBuilder.js';
@@ -22,7 +23,7 @@ import PlayerMetaBuilder from './meta/PlayerMetaBuilder.js';
 import LadderMetaBuilder from './meta/LadderMetaBuilder.js';
 import StaticPageMetaBuilder from './meta/StaticPageMetaBuilder.js';
 import { playerName, settingsLine } from './meta/metaUtils.js';
-import { loadGame, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
+import { loadExternalGame, loadGame, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
 
 const cachePath = path.resolve(process.env.OG_CACHE_PATH || 'var/og-cache/');
 
@@ -67,6 +68,8 @@ const loadAvatar = async (player: null | undefined | Player, size = 300): Promis
         return null;
     }
 };
+
+const playerColor = (index: 0 | 1): string => index === 0 ? boardSvgColors.red : boardSvgColors.blue;
 
 const greyLine = (text: string, size = 28): OgText => ({ text, size, color: greyText });
 
@@ -118,33 +121,56 @@ const renderOpenGameSvg = async (game: Game, context: SocialMetaContext): Promis
     });
 };
 
+type BoardGame = {
+    boardsize: number;
+    swapRule: boolean;
+    moves: Game['moves'];
+
+    /**
+     * Red then blue: name, and optional rating line below.
+     */
+    players: [{ name: string, rating: null | string }, { name: string, rating: null | string }];
+};
+
 /**
  * Running or ended game: current position, players in top corners.
  */
-const renderGameBoardSvg = (game: Game, gameMetaBuilder: GameMetaBuilder, bottomLeft: OgText[]): string => {
-    const [red, blue] = gameMetaBuilder.orderedPlayers(game);
-    const { stones, lastMove, winningPath } = gameMovesToBoardSvgPosition(game.boardsize, game.swapRule, game.moves);
+const renderGameBoardSvg = ({ boardsize, swapRule, moves, players }: BoardGame, bottomLeft: OgText[]): string => {
+    const { stones, lastMove, winningPath } = gameMovesToBoardSvgPosition(boardsize, swapRule, moves);
 
-    // Ratings after game, so only on ended ranked games
-    const rating = (player: Player): OgText[] => {
-        const value = gameMetaBuilder.rating(game, player);
-
-        return value === null ? [] : [greyLine(String(value))];
-    };
+    const corner = (index: 0 | 1): OgText[] => [
+        { text: players[index].name, color: playerColor(index), size: 40, bold: true },
+        ...(players[index].rating === null ? [] : [greyLine(players[index].rating)]),
+    ];
 
     return renderBoardImageSvg({
-        boardsize: game.boardsize,
+        boardsize,
         stones,
         lastMove,
         highlighted: winningPath,
         corners: {
-            topLeft: [{ text: playerName(red), color: boardSvgColors.red, size: 40, bold: true }, ...rating(red)],
-            topRight: [{ text: playerName(blue), color: boardSvgColors.blue, size: 40, bold: true }, ...rating(blue)],
+            topLeft: corner(0),
+            topRight: corner(1),
             bottomLeft,
             bottomRight: [brandText()],
         },
     });
 };
+
+/**
+ * PlayHex game players, with ratings after game, so only on ended ranked games.
+ */
+const playHexBoardGame = (game: Game, gameMetaBuilder: GameMetaBuilder): BoardGame => {
+    const [red, blue] = gameMetaBuilder.orderedPlayers(game).map(player => {
+        const rating = gameMetaBuilder.rating(game, player);
+
+        return { name: playerName(player), rating: rating === null ? null : String(rating) };
+    });
+
+    return { boardsize: game.boardsize, swapRule: game.swapRule, moves: game.moves, players: [red, blue] };
+};
+
+const winnerLine = (name: string, winner: 0 | 1): OgText => ({ text: name, color: playerColor(winner), size: 40, bold: true, icon: 'trophy' });
 
 /**
  * Static pages images icon, hexagon by default.
@@ -155,14 +181,13 @@ const staticPageIcons: { [key: string]: OgIcon } = {
     ladders: 'crown',
 };
 
-const playerColor = (index: 0 | 1): string => index === 0 ? boardSvgColors.red : boardSvgColors.blue;
-
 /**
  * Resolvers by image type, using same image version as meta builders,
  * so that image url in meta always matches cached image.
  */
 const createResolvers = (): { [type: string]: OgImageResolver } => {
     const gameMetaBuilder = Container.get(GameMetaBuilder);
+    const externalGameMetaBuilder = Container.get(ExternalGameMetaBuilder);
     const puzzleMetaBuilder = Container.get(PuzzleMetaBuilder);
     const puzzleCollectionMetaBuilder = Container.get(PuzzleCollectionMetaBuilder);
     const tournamentMetaBuilder = Container.get(TournamentMetaBuilder);
@@ -195,7 +220,7 @@ const createResolvers = (): { [type: string]: OgImageResolver } => {
                 return {
                     version,
                     immutable: false,
-                    renderSvg: () => renderGameBoardSvg(game, gameMetaBuilder, [
+                    renderSvg: () => renderGameBoardSvg(playHexBoardGame(game, gameMetaBuilder), [
                         { text: context.t('social_preview.game.playing'), color: '#ffffff', size: 36, bold: true },
                         greyLine(context.t(`social_preview.game.cadency_${cadency}`)),
                     ]),
@@ -208,9 +233,30 @@ const createResolvers = (): { [type: string]: OgImageResolver } => {
             return {
                 version,
                 immutable: true,
-                renderSvg: () => renderGameBoardSvg(game, gameMetaBuilder, [
-                    { text: playerName(winnerPlayer), color: playerColor(winner), size: 40, bold: true, icon: 'trophy' },
-                ]),
+                renderSvg: () => renderGameBoardSvg(playHexBoardGame(game, gameMetaBuilder), [winnerLine(playerName(winnerPlayer), winner)]),
+            };
+        },
+
+        [externalGameMetaBuilder.imageType]: async (publicId) => {
+            const externalGame = await loadExternalGame(publicId);
+
+            if (externalGame === null) {
+                return null;
+            }
+
+            const [red, blue] = externalGameMetaBuilder.playerNames(externalGame);
+            const [redRating, blueRating] = externalGameMetaBuilder.ratings(externalGame);
+            const { winner } = externalGame;
+
+            return {
+                version: externalGameMetaBuilder.imageVersion(externalGame),
+                immutable: false,
+                renderSvg: () => renderGameBoardSvg({
+                    boardsize: externalGame.boardsize,
+                    swapRule: true,
+                    moves: externalGame.moves,
+                    players: [{ name: red, rating: redRating }, { name: blue, rating: blueRating }],
+                }, winner === null ? [] : [winnerLine(winner === 0 ? red : blue, winner)]),
             };
         },
 

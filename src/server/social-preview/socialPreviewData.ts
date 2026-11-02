@@ -1,6 +1,6 @@
 import { Container } from 'typedi';
 import { AppDataSource } from '../data-source.js';
-import { Game, type Puzzle, type Tournament } from '../../shared/app/models/index.js';
+import { ExternalGame, Game, type Puzzle, type Tournament } from '../../shared/app/models/index.js';
 import type { LadderDto } from '../../shared/app/models/LadderDto.js';
 import PlayerRepository from '../repositories/PlayerRepository.js';
 import StatsRepository from '../repositories/StatsRepository.js';
@@ -30,6 +30,10 @@ export const loadGame = async (publicId: string): Promise<null | Game> => {
             ladderChallenge: true,
         },
     });
+};
+
+export const loadExternalGame = async (publicId: string): Promise<null | ExternalGame> => {
+    return await AppDataSource.getRepository(ExternalGame).findOneBy({ publicId });
 };
 
 export const loadTournament = async (slug: string): Promise<null | Tournament> => {

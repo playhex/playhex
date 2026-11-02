@@ -3,6 +3,7 @@ import { Container } from 'typedi';
 import { initSocialMeta, resolveMeta } from './socialPreviewMiddlewares.js';
 import { socialBaseUrl } from './SocialMeta.js';
 import GameMetaBuilder from './meta/GameMetaBuilder.js';
+import ExternalGameMetaBuilder from './meta/ExternalGameMetaBuilder.js';
 import TournamentMetaBuilder from './meta/TournamentMetaBuilder.js';
 import TournamentSeriesMetaBuilder from './meta/TournamentSeriesMetaBuilder.js';
 import PuzzleMetaBuilder from './meta/PuzzleMetaBuilder.js';
@@ -10,7 +11,7 @@ import PuzzleCollectionMetaBuilder from './meta/PuzzleCollectionMetaBuilder.js';
 import PlayerMetaBuilder from './meta/PlayerMetaBuilder.js';
 import LadderMetaBuilder from './meta/LadderMetaBuilder.js';
 import StaticPageMetaBuilder from './meta/StaticPageMetaBuilder.js';
-import { loadGame, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
+import { loadExternalGame, loadGame, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
 
 const param = (req: Request, name: string): string => String(req.params[name]);
 
@@ -33,6 +34,12 @@ export function socialPreviewRouter(): Router {
         const game = await loadGame(param(req, 'gameId'));
 
         return game && Container.get(GameMetaBuilder).buildMeta(game, context);
+    }));
+
+    router.get('/external-games/:externalGameId', resolveMeta(async (req, context) => {
+        const externalGame = await loadExternalGame(param(req, 'externalGameId'));
+
+        return externalGame && Container.get(ExternalGameMetaBuilder).buildMeta(externalGame, context);
     }));
 
     router.get('/tournaments/:slug', resolveMeta(async (req, context) => {
