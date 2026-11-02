@@ -3,7 +3,7 @@ import { ExternalGame } from '../../../shared/app/models/index.js';
 import { findPathWinner } from '../externalGameOutcome.js';
 import type { Outcome } from '../../../shared/game-engine/Types.js';
 import type { HexMove } from '@playhex/move-notation';
-import { parseGamePage } from './littleGolemParsers.js';
+import { parseGameDetail } from './littleGolemParsers.js';
 import { parseLittleGolemHsgf } from '../../../shared/app/little-golem/littleGolemHsgf.js';
 import { LITTLE_GOLEM_SOURCE, littleGolemGameExternalId, littleGolemGameUrl, littleGolemPlayerExternalId } from '../../../shared/app/little-golem/littleGolemUtils.js';
 
@@ -32,31 +32,35 @@ const guessOutcome = (boardsize: number, moves: HexMove[], resigned: boolean): n
 /**
  * Creates an ExternalGame from Little Golem exports.
  *
- * @param hsgf Content of servlet/sgf/<gid>/game<gid>.hsgf
- * @param gamePageHtml Content of jsp/game/game.jsp?gid=<gid>, for dates and players ids
+ * @param hsgf Content of api /gameexport/<gid>
+ * @param gameDetailJson Content of api /games/gamedetail/<gid>, for dates, players ids and ratings
  *
  * @throws {LittleGolemGameNotFinishedError}
  */
-export const createExternalGameFromLittleGolem = (gid: number, hsgf: string, gamePageHtml: string): ExternalGame => {
+export const createExternalGameFromLittleGolem = (gid: number, hsgf: string, gameDetailJson: string): ExternalGame => {
     const parsed = parseLittleGolemHsgf(hsgf);
-    const gamePage = parseGamePage(gamePageHtml);
+    const gameDetail = parseGameDetail(gameDetailJson);
     const externalGame = new ExternalGame();
 
     externalGame.publicId = uuidv4();
     externalGame.externalId = littleGolemGameExternalId(gid);
     externalGame.boardsize = parsed.boardsize;
     externalGame.moves = parsed.moves;
-    externalGame.moveTimestamps = null;
-    externalGame.player0Name = (parsed.player0Name ?? gamePage.player0?.pseudo ?? '?').substring(0, 64);
-    externalGame.player1Name = (parsed.player1Name ?? gamePage.player1?.pseudo ?? '?').substring(0, 64);
-    externalGame.player0ExternalId = gamePage.player0 ? littleGolemPlayerExternalId(gamePage.player0.plid) : null;
-    externalGame.player1ExternalId = gamePage.player1 ? littleGolemPlayerExternalId(gamePage.player1.plid) : null;
-    externalGame.player0Rating = gamePage.player0Rating?.substring(0, 32) ?? null;
-    externalGame.player1Rating = gamePage.player1Rating?.substring(0, 32) ?? null;
+    // Only if consistent with moves from hsgf
+    externalGame.moveTimestamps = gameDetail.moveTimestamps.length === parsed.moves.length && parsed.moves.length > 0
+        ? gameDetail.moveTimestamps
+        : null
+    ;
+    externalGame.player0Name = (parsed.player0Name ?? gameDetail.player0?.pseudo ?? '?').substring(0, 64);
+    externalGame.player1Name = (parsed.player1Name ?? gameDetail.player1?.pseudo ?? '?').substring(0, 64);
+    externalGame.player0ExternalId = gameDetail.player0 ? littleGolemPlayerExternalId(gameDetail.player0.plid) : null;
+    externalGame.player1ExternalId = gameDetail.player1 ? littleGolemPlayerExternalId(gameDetail.player1.plid) : null;
+    externalGame.player0Rating = gameDetail.player0Rating?.substring(0, 32) ?? null;
+    externalGame.player1Rating = gameDetail.player1Rating?.substring(0, 32) ?? null;
     externalGame.winner = parsed.winner;
     externalGame.outcome = parsed.winner === null ? null : guessOutcome(parsed.boardsize, parsed.moves, parsed.resigned);
-    externalGame.startedAt = gamePage.startedAt;
-    externalGame.endedAt = gamePage.endedAt;
+    externalGame.startedAt = gameDetail.startedAt;
+    externalGame.endedAt = gameDetail.endedAt;
     externalGame.source = LITTLE_GOLEM_SOURCE;
     externalGame.sourceUrl = littleGolemGameUrl(gid);
     externalGame.event = parsed.event?.substring(0, 128) ?? null;

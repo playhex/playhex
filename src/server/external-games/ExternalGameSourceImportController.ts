@@ -163,9 +163,9 @@ export default class ExternalGameSourceImportController
 
         try {
             const hsgf = await this.littleGolemClient.fetchGameHsgf(gid);
-            const gamePage = await this.littleGolemClient.fetchGamePage(gid);
+            const gameDetail = await this.littleGolemClient.fetchGameDetail(gid);
 
-            externalGame = createExternalGameFromLittleGolem(gid, hsgf, gamePage);
+            externalGame = createExternalGameFromLittleGolem(gid, hsgf, gameDetail);
         } catch (e) {
             if (e instanceof LittleGolemFetchError) {
                 throw new ImportUserError('Could not download Little Golem game');

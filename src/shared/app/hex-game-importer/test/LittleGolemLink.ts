@@ -1,15 +1,39 @@
 import assert from 'assert';
 import { ImportUserError } from '../errors.js';
-import { LittleGolemLink } from '../handlers/LittleGolemLink.js';
+import { LittleGolemLink, parseLittleGolemGameId } from '../handlers/LittleGolemLink.js';
+import { LittleGolemGameNotFinishedError } from '../../little-golem/littleGolemHsgf.js';
 import LittleGolemClient, { LittleGolemFetchError } from '../../little-golem/LittleGolemClient.js';
 
 const clientReturning = (fetchGameHsgf: (gid: number) => Promise<string>): LittleGolemClient =>
     ({ fetchGameHsgf }) as unknown as LittleGolemClient;
 
 describe('LittleGolemLink', () => {
-    it('supports a Little Golem game url', () => {
-        assert.strictEqual(new LittleGolemLink().supports('https://old.littlegolem.net/jsp/game/game.jsp?gid=1512976'), true);
-        assert.strictEqual(new LittleGolemLink().supports('https://littlegolem.net/jsp/game/game.jsp?gid=1512976&nmove=27'), true);
+    it('parses game id from all Little Golem game urls', () => {
+        const urls: [string, number][] = [
+            ['https://www.littlegolem.net/web/game?id=2566487', 2566487],
+            ['https://littlegolem.net/web/game?id=2566487', 2566487],
+            ['https://www.littlegolem.net/web/play?id=2566487', 2566487],
+            ['https://www.littlegolem.net/app/#/game/daily/2566487', 2566487],
+            ['https://www.littlegolem.net/app/#/web-replay/2566487?move=23', 2566487],
+            ['https://www.littlegolem.net/app/#/games/game/2566487', 2566487],
+            ['https://www.littlegolem.net/app/#/tournament/hex.ch.30.1.1/game/1512976', 1512976],
+            ['https://www.littlegolem.net/app/#/player/2844/stats/hex/DEFAULT/game/1512976', 1512976],
+            ['https://api.littlegolem.net/gameexport/1512976', 1512976],
+            ['https://old.littlegolem.net/jsp/game/game.jsp?gid=1512976', 1512976],
+            ['https://littlegolem.net/jsp/game/game.jsp?gid=1512976&nmove=27', 1512976],
+            ['  https://www.littlegolem.net/web/game?id=2566487  ', 2566487],
+        ];
+
+        for (const [url, gid] of urls) {
+            assert.strictEqual(parseLittleGolemGameId(url), gid, url);
+            assert.strictEqual(new LittleGolemLink().supports(url), true, url);
+        }
+    });
+
+    it('does not parse a game id from Little Golem urls that are not a game', () => {
+        assert.strictEqual(parseLittleGolemGameId('https://www.littlegolem.net/web/players/4189'), null);
+        assert.strictEqual(parseLittleGolemGameId('https://www.littlegolem.net/app/#/player/4189'), null);
+        assert.strictEqual(parseLittleGolemGameId('https://www.littlegolem.net/web/ladder/hex/DEFAULT?from_game=2566487'), null);
     });
 
     it('does not support an unrelated url', () => {
@@ -39,6 +63,15 @@ describe('LittleGolemLink', () => {
 
         await assert.rejects(
             () => new LittleGolemLink(client).import('https://littlegolem.net/jsp/game/game.jsp?gid=1512976'),
+            ImportUserError,
+        );
+    });
+
+    it('rejects a game that Little Golem does not export because not finished', async () => {
+        const client = clientReturning(() => Promise.reject(new LittleGolemGameNotFinishedError()));
+
+        await assert.rejects(
+            () => new LittleGolemLink(client).import('https://www.littlegolem.net/web/game?id=2566487'),
             ImportUserError,
         );
     });

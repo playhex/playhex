@@ -2,11 +2,12 @@
  * Little Golem ids and urls, usable from both client and server.
  */
 
+export const LITTLE_GOLEM_BASE_URL = 'https://www.littlegolem.net';
+
 /**
- * Little Golem moved its new website to littlegolem.net, which redirects old pages to homepage.
- * Old website, with pages and exports we use, is still available here.
+ * Api used by Little Golem new website and apps, e.g /gameexport/<gid> to download a finished game in ".hsgf".
  */
-export const LITTLE_GOLEM_BASE_URL = 'https://old.littlegolem.net';
+export const LITTLE_GOLEM_API_URL = 'https://api.littlegolem.net';
 
 export const LITTLE_GOLEM_SOURCE = 'Little Golem';
 
@@ -20,6 +21,6 @@ export const littleGolemGameExternalId = (gid: number): string => `LG:${gid}`;
  */
 export const littleGolemPlayerExternalId = (plid: number): string => `LG:${plid}`;
 
-export const littleGolemPlayerUrl = (plid: number): string => `${LITTLE_GOLEM_BASE_URL}/jsp/info/player.jsp?plid=${plid}`;
+export const littleGolemPlayerUrl = (plid: number): string => `${LITTLE_GOLEM_BASE_URL}/web/players/${plid}`;
 
-export const littleGolemGameUrl = (gid: number): string => `${LITTLE_GOLEM_BASE_URL}/jsp/game/game.jsp?gid=${gid}`;
+export const littleGolemGameUrl = (gid: number): string => `${LITTLE_GOLEM_BASE_URL}/web/game?id=${gid}`;

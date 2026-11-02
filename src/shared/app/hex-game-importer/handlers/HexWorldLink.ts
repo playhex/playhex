@@ -12,8 +12,9 @@ export class HexWorldLink implements ImporterHandlerInterface
 {
     supports(source: string): boolean
     {
+        // Same format as parseHexworldString() expects: "<size>[x<height>][options],<moves>"
         return source.includes('hexworld.org/board')
-            || source.match(/\d+(r\d+)?(c\d)?,?/) !== null
+            || /^\d+[^,\s]*,/.test(source.trim())
         ;
     }
 

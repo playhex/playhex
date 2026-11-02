@@ -22,7 +22,7 @@ export const hexGameImporter = new HexGameImporter(
         new AbstractPlay(),
         new AbstractPlayJson(),
         new PlayHexLink(),
-        new RawMoves(), // RawMoves must come before HexWorldLink, whose supports() is loose
+        new RawMoves(),
         new HexWorldLink(),
     ],
     new BackendFetchHexGameImporter(),

@@ -7,7 +7,7 @@ import logger from '../services/logger.js';
 import { isDuplicateError } from '../repositories/typeormUtils.js';
 import ExternalGameRepository from './ExternalGameRepository.js';
 import LittleGolemClient from '../../shared/app/little-golem/LittleGolemClient.js';
-import { parsePlayerGameList } from './little-golem/littleGolemParsers.js';
+import { parsePlayerGames } from './little-golem/littleGolemParsers.js';
 import { createExternalGameFromLittleGolem } from './little-golem/littleGolemExternalGame.js';
 import { littleGolemGameExternalId } from '../../shared/app/little-golem/littleGolemUtils.js';
 import { LittleGolemGameNotFinishedError } from '../../shared/app/little-golem/littleGolemHsgf.js';
@@ -160,7 +160,7 @@ export default class ExternalGameImportWorker
     private async importLittleGolemGames(job: ExternalGameImportJob): Promise<void>
     {
         const plid = parseInt(job.externalPlayerId, 10);
-        const gids = parsePlayerGameList(await this.littleGolemClient.fetchPlayerGameList(plid));
+        const gids = await this.listLittleGolemFinishedGames(plid);
         const existing = await this.externalGameRepository.findExistingExternalIds(gids.map(littleGolemGameExternalId));
         const gidsToImport = gids.filter(gid => !existing.has(littleGolemGameExternalId(gid)));
 
@@ -177,8 +177,8 @@ export default class ExternalGameImportWorker
         for (const gid of gidsToImport) {
             try {
                 const hsgf = await this.littleGolemClient.fetchGameHsgf(gid);
-                const gamePage = await this.littleGolemClient.fetchGamePage(gid);
-                const externalGame = createExternalGameFromLittleGolem(gid, hsgf, gamePage);
+                const gameDetail = await this.littleGolemClient.fetchGameDetail(gid);
+                const externalGame = createExternalGameFromLittleGolem(gid, hsgf, gameDetail);
 
                 externalGame.createdBy = job.requestedBy;
 
@@ -203,5 +203,24 @@ export default class ExternalGameImportWorker
             }
         }
     }
-}
 
+    /**
+     * Ids of all finished hex games of a Little Golem player, browsing all pages.
+     */
+    private async listLittleGolemFinishedGames(plid: number): Promise<number[]>
+    {
+        const gids: number[] = [];
+        let offset = 0;
+
+        while (true) {
+            const page = parsePlayerGames(await this.littleGolemClient.fetchPlayerGames(plid, offset));
+
+            gids.push(...page.finishedGids);
+            offset += page.count;
+
+            if (!page.hasMore || page.count === 0) {
+                return gids;
+            }
+        }
+    }
+}

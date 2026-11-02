@@ -10,7 +10,7 @@ import { rateLimiterConsumeImportExternalGames, rateLimiterConsumeLinkExternalAc
 import ExternalGameRepository from './ExternalGameRepository.js';
 import ExternalGameImportWorker from './ExternalGameImportWorker.js';
 import LittleGolemClient, { LittleGolemFetchError } from '../../shared/app/little-golem/LittleGolemClient.js';
-import { findPlayerByPseudo, LittleGolemPlayer, parsePlayerPagePseudo, parsePlidInput } from './little-golem/littleGolemParsers.js';
+import { findPlayerByPseudo, LittleGolemPlayer, parsePlayerStatsPseudo, parsePlidInput } from './little-golem/littleGolemParsers.js';
 
 class LinkLittleGolemBody
 {
@@ -91,7 +91,7 @@ export default class ExternalGameImportController
         }
 
         if (littleGolemPlayer === null) {
-            throw new NotFoundError('Little Golem player not found. Only recently active players can be found by pseudo, paste your Little Golem profile link instead.');
+            throw new NotFoundError('Little Golem player not found. Paste your Little Golem profile link instead.');
         }
 
         return await this.externalGameRepository.saveLittleGolemAccount(player, littleGolemPlayer.plid, littleGolemPlayer.pseudo);
@@ -99,7 +99,7 @@ export default class ExternalGameImportController
 
     /**
      * Search by plid or profile url if provided,
-     * else by pseudo, but Little Golem search only lists recently active players.
+     * else by pseudo, but pseudos are not unique on Little Golem: takes the most recently active one.
      *
      * @throws {LittleGolemFetchError}
      */
@@ -108,7 +108,8 @@ export default class ExternalGameImportController
         const plid = parsePlidInput(input);
 
         if (plid !== null) {
-            const pseudo = parsePlayerPagePseudo(await this.littleGolemClient.fetchPlayerPage(plid));
+            const playerStats = await this.littleGolemClient.fetchPlayerStats(plid);
+            const pseudo = playerStats === null ? null : parsePlayerStatsPseudo(playerStats);
 
             return pseudo === null ? null : { plid, pseudo };
         }
@@ -117,7 +118,7 @@ export default class ExternalGameImportController
             return null;
         }
 
-        return findPlayerByPseudo(await this.littleGolemClient.fetchPlayerList(input.trim()), input);
+        return findPlayerByPseudo(await this.littleGolemClient.searchPlayers(input.trim()), input);
     }
 
     /**
