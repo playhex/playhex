@@ -111,14 +111,40 @@ const sortedGames = computed(() => {
         case 'recently-played':
             return games.sort((a, b) => {
                 const dateA = a.moveTimestamps[a.moveTimestamps.length - 1] ?? a.startedAt ?? a.createdAt;
-                const dateB = b.moveTimestamps[a.moveTimestamps.length - 1] ?? b.startedAt ?? b.createdAt;
+                const dateB = b.moveTimestamps[b.moveTimestamps.length - 1] ?? b.startedAt ?? b.createdAt;
 
                 return dateB.getTime() - dateA.getTime();
             });
     }
 });
 
-const thumbnailGames = computed(() => sortedGames.value.slice(0, THUMBNAILS_COLUMN_CLASSES.length));
+/**
+ * Thumbnails are pinned once displayed, so they don't keep jumping
+ * when games are created or ended (an ended game stays as "Just ended").
+ * Empty slots are filled with next games in current sort order.
+ * Reset only when sort or view changes.
+ */
+const thumbnailGameIds = ref<string[]>([]);
+let thumbnailsPinnedFor: null | string = null;
+
+watch(sortedGames, games => {
+    const pinKey = `${currentLobby.value}:${sort.value}`;
+
+    if (pinKey !== thumbnailsPinnedFor) {
+        thumbnailsPinnedFor = pinKey;
+        thumbnailGameIds.value = [];
+    }
+
+    for (const game of games) {
+        if (thumbnailGameIds.value.length >= THUMBNAILS_COLUMN_CLASSES.length) {
+            break;
+        }
+
+        if (!thumbnailGameIds.value.includes(game.publicId)) {
+            thumbnailGameIds.value.push(game.publicId);
+        }
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -186,11 +212,11 @@ const thumbnailGames = computed(() => sortedGames.value.slice(0, THUMBNAILS_COLU
             <div v-else class="card-body pb-0">
                 <div class="row g-2">
                     <div
-                        v-for="(game, index) in thumbnailGames"
-                        :key="game.publicId"
+                        v-for="(gamePublicId, index) in thumbnailGameIds"
+                        :key="gamePublicId"
                         :class="THUMBNAILS_COLUMN_CLASSES[index]"
                     >
-                        <AppGameThumbnailLobbyLiveCard :gamePublicId="game.publicId" />
+                        <AppGameThumbnailLobbyLiveCard :gamePublicId />
                     </div>
                 </div>
             </div>
