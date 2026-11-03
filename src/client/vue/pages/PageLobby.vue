@@ -51,6 +51,8 @@ const router = useRouter();
 const { mySortedGames, myTurnCount } = storeToRefs(useMyGamesStore());
 const { activePlayersCount } = storeToRefs(useOnlinePlayersStore());
 useSocketRoom(Rooms.onlinePlayersCount);
+useSocketRoom(Rooms.lobby);
+useSocketRoom(Rooms.playingGamesCount);
 const lobbyStore = useLobbyStore();
 const { clearSoftRemovedGames } = lobbyStore;
 const { currentLobby, currentLobbyGames, endedGames, waitingGamesCount } = storeToRefs(lobbyStore);

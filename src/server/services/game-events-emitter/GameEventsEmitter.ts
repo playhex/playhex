@@ -219,11 +219,11 @@ export class GameEventsEmitter
         ]).emit('gameChallengeCreated', instanceToInstance(game));
     }
 
-    emitRematchAvailable(game: Game, rematchPublicId: string): void
+    emitRematchAvailable(game: Game, rematch: Game): void
     {
         io().to([
             Rooms.game(game.publicId),
-        ]).emit('rematchAvailable', game.publicId, rematchPublicId);
+        ]).emit('rematchAvailable', game.publicId, instanceToInstance(rematch, { groups: ['lobby'] }));
     }
 
     emitSpectatorJoined(gameId: string, player: Player): void

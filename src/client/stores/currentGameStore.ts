@@ -29,7 +29,6 @@ import { GameTimeData } from '../../shared/time-control/TimeControl.js';
 import useServerDateStore from './serverDateStore.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js';
-import useLobbyStore from './lobbyStore.js';
 import { defineOverlay } from '@overlastic/vue';
 import GameFinishedOverlay from '../vue/components/overlay/GameFinishedOverlay.vue';
 import type ExternalGame from '../../shared/app/models/ExternalGame.js';
@@ -408,12 +407,10 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             engineGame.value.cancel(date);
         });
 
-        on('rematchAvailable', (gameId, rematchId) => {
+        on('rematchAvailable', (gameId, rematch) => {
             if (gameId !== gamePublicId || !game.value) {
                 return;
             }
-
-            const rematch = useLobbyStore().games[rematchId];
 
             game.value.rematch = rematch;
 

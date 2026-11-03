@@ -11,6 +11,8 @@ import { useHead } from '@unhead/vue';
 import { useRouter, useRoute } from 'vue-router';
 import AppGameThumbnailLobbyLiveCard from '../components/AppGameThumbnailLobbyLiveCard.vue';
 import { t } from 'i18next';
+import Rooms from '../../../shared/app/Rooms.js';
+import { useSocketRoom } from '../composables/useSocketRoom.js';
 
 useHead({ title: () => t('playing_games.title') });
 
@@ -46,6 +48,9 @@ const currentLobby = computed<PlayingGamesView>(() => {
 const sort = ref<SortKey>(route.params.mode === 'correspondence' ? 'most-moves' : 'recently-started');
 const setLobby = (mode: PlayingGamesView) => router.push({ name: 'playing-games', params: { mode } });
 
+// 1v1 games updates, only while this page is displayed.
+// Joined before loading games to not miss an update.
+useSocketRoom(Rooms.lobby);
 onMounted(() => void playingGamesStore.load());
 
 // Bot games events are only received while their view is displayed

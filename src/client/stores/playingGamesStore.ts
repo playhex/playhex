@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { computed, ref, watch, watchEffect } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Game } from '../../shared/app/models/index.js';
 import { apiGetActiveGames } from '../apiClient.js';
 import useSocketStore from './socketStore.js';
@@ -11,6 +11,7 @@ import { isCorrespondence, isLive } from '../../shared/app/timeControlUtils.js';
  * All currently playing games, used to observe games on playing games page.
  * Kept up to date when a game starts, ends or is canceled.
  *
+ * 1v1 games updates come from `Rooms.lobby`, joined by playing games page while displayed.
  * There is way more bot games than 1v1 games, so `Rooms.lobbyBotGames` is joined
  * only while bot games are actually displayed, see `watchingBotGames`.
  */
@@ -58,15 +59,6 @@ const usePlayingGamesStore = defineStore('playingGamesStore', () => {
 
     socket.on('gameCanceled', gameId => {
         delete games.value[gameId];
-    });
-
-    // Get 1v1 games updates. Never left: lobbyStore also uses this room on a same socket.
-    watchEffect(() => {
-        if (!socketStore.connected) {
-            return;
-        }
-
-        void joinRoom(Rooms.lobby);
     });
 
     // Get bot games updates, only while they are displayed

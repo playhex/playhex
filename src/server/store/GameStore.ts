@@ -633,7 +633,7 @@ export default class GameStore
             }
         }
 
-        this.gameEventEmitter.emitRematchAvailable(game, game.rematch.publicId);
+        this.gameEventEmitter.emitRematchAvailable(game, game.rematch);
 
         return game.rematch;
     }

@@ -129,7 +129,7 @@ export type HexServerToClientEvents = {
     /**
      * A rematch game is now available and can be accepted.
      */
-    rematchAvailable: (gameId: string, rematchId: string) => void;
+    rematchAvailable: (gameId: string, rematch: Game) => void;
 
     /**
      * A game has ended and there is a winner.

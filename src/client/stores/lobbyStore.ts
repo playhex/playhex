@@ -2,8 +2,7 @@ import { defineStore } from 'pinia';
 import { Game } from '../../shared/app/models/index.js';
 import { getGame, getGames } from '../../client/apiClient.js';
 import useSocketStore from './socketStore.js';
-import { computed, ref, watchEffect } from 'vue';
-import Rooms from '../../shared/app/Rooms.js';
+import { computed, ref } from 'vue';
 import { cancelGame, hasPlayer, isBotGame, isChallengeGame, isChallengeTargetOf, matchSearchParams, updateGame } from '../../shared/app/gameUtils.js';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 import { isCorrespondence, isLive, TimeControlCadency } from '../../shared/app/timeControlUtils.js';
@@ -33,11 +32,15 @@ const softRemoveDate = () => new Date(new Date().getTime() + REMOVE_AFTER);
 
 /**
  * State synced with server, and methods to handle games and players.
+ *
+ * Games are kept up to date only while `Rooms.lobby` is joined (by lobby page),
+ * to not receive all lobby events while on another page.
+ * When joining the room, server sends `lobbyUpdate` with all waiting games to resync.
  */
 const useLobbyStore = defineStore('lobbyStore', () => {
 
     const socketStore = useSocketStore();
-    const { socket, joinRoom } = socketStore;
+    const { socket } = socketStore;
     const authStore = useAuthStore();
 
     /**
@@ -139,6 +142,15 @@ const useLobbyStore = defineStore('lobbyStore', () => {
             // to avoid layout shift when a game already displayed gets updated.
             const sortedGames = [...updatedGames].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
+            // Remove games that changed while lobby room was not joined
+            const updatedGamesIds = new Set(updatedGames.map(game => game.publicId));
+
+            for (const publicId in games.value) {
+                if (!updatedGamesIds.has(publicId)) {
+                    delete games.value[publicId];
+                }
+            }
+
             for (const game of sortedGames) {
                 if (games.value[game.publicId]) {
                     updateGame(games.value[game.publicId], game);
@@ -206,15 +218,6 @@ const useLobbyStore = defineStore('lobbyStore', () => {
 
     // Listen lobby event to update state on change
     listenLobbyEvents();
-
-    // Get lobby updates
-    watchEffect(() => {
-        if (!socketStore.connected) {
-            return;
-        }
-
-        void joinRoom(Rooms.lobby);
-    });
 
     return {
         games,
