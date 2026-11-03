@@ -17,6 +17,7 @@ import AppGameSidebar from '../components/AppGameSidebar.vue';
 import AppConnectionAlert from '../components/AppConnectionAlert.vue';
 import { Game } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
+import { tournamentMatchFullTitle } from '../../../shared/app/tournamentUtils.js';
 import { apiPostRematch, getPlayer } from '../../apiClient.js';
 import { canJoin, isChallengeGame, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame, isBotGame, canShowHexworldLink, canShowHexplorerLink } from '../../../shared/app/gameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
@@ -232,7 +233,8 @@ const makeTitle = (game: Game) => {
         }
     }
     const pairing = playerPseudos.join(' VS ');
-    return `${yourTurn}${t('game_state.' + state)}: ${pairing}`;
+    const tournamentMatch = game.tournamentMatch?.tournament ? `${tournamentMatchFullTitle(game.tournamentMatch, t)} • ` : '';
+    return `${yourTurn}${tournamentMatch}${t('game_state.' + state)}: ${pairing}`;
 };
 
 /*

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
 import type { BreadcrumbList, DataDownload, Dataset, Event, LearningResource, ProfilePage, SportsEvent, TechArticle, WebApplication, WebSite } from 'schema-dts';
-import { ExternalGame, Game, GameToPlayer, Player, Puzzle, Rating, Tournament, TournamentParticipant } from '../../../shared/app/models/index.js';
+import { ExternalGame, Game, GameToPlayer, Player, Puzzle, Rating, Tournament, TournamentMatch, TournamentParticipant } from '../../../shared/app/models/index.js';
 import { getSocialT } from '../../social-preview/socialI18n.js';
 import { createDefaultSocialMeta, type SocialLocale, type SocialMetaContext } from '../../social-preview/SocialMeta.js';
 import GameMetaBuilder from '../../social-preview/meta/GameMetaBuilder.js';
@@ -101,6 +101,24 @@ describe('social preview meta builders', () => {
         assert.ok(metaFr.description!.includes('Alice gagne par abandon'));
         assert.ok(metaFr.description!.includes('3 coups'));
         assert.ok(metaFr.image?.url.includes('lang=fr'));
+    });
+
+    it('tells which tournament match a game is, in english and french', () => {
+        const game = createEndedGame();
+
+        game.tournamentMatch = Object.assign(new TournamentMatch(), {
+            tournament: Object.assign(new Tournament(), { title: 'Hex Monthly 42' }),
+            label: 'semi_final',
+            round: 3,
+            number: 2,
+        });
+
+        assert.strictEqual(new GameMetaBuilder().buildMeta(game, context()).title, 'Semi-final 2 of Hex Monthly 42 · Alice (1850) vs Bob (1790) · Alice wins · 2026-03-12 - PlayHex');
+        assert.ok(new GameMetaBuilder().buildMeta(game, context('fr')).title!.startsWith('Demi-finale 2 de Hex Monthly 42 · Alice (1850) vs Bob (1790)'));
+
+        game.tournamentMatch.label = null;
+
+        assert.ok(new GameMetaBuilder().buildMeta(game, context()).title!.startsWith('Match 3.2 of Hex Monthly 42 · '));
     });
 
     it('shows position of a running game, not indexed', () => {

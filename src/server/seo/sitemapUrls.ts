@@ -1,4 +1,4 @@
-import type { Tournament, TournamentSeries } from '../../shared/app/models/index.js';
+import type { Game, Tournament, TournamentSeries } from '../../shared/app/models/index.js';
 import { landingLocales, landingPath } from '../landing/landingLocales.js';
 
 export type SitemapUrl = {
@@ -89,3 +89,13 @@ export const tournamentsSitemapUrls = (
 
     return [...seriesUrls, ...tournamentUrls];
 };
+
+/**
+ * Game pages. An ended game does not change anymore.
+ */
+export const gamesSitemapUrls = (games: Pick<Game, 'publicId' | 'endedAt'>[]): SitemapUrl[] =>
+    games.map((game): SitemapUrl => ({
+        path: `/games/${encodeURIComponent(game.publicId)}`,
+        lastmod: game.endedAt ?? undefined,
+    }))
+;

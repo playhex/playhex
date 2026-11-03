@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
 import { Tournament, TournamentSeries } from '../../../shared/app/models/index.js';
-import { tournamentsSitemapUrls } from '../../seo/sitemapUrls.js';
+import { gamesSitemapUrls, tournamentsSitemapUrls } from '../../seo/sitemapUrls.js';
 
 const createSeries = (id: number, slug: string, createdAt: string): TournamentSeries => Object.assign(new TournamentSeries(), {
     id,
@@ -34,6 +34,18 @@ describe('sitemapUrls', () => {
             ['/tournaments/weekly-2', '2026-03-01T00:00:00.000Z'],
             ['/tournaments/weekly-1', '2026-01-08T02:00:00.000Z'],
             ['/tournaments/alone', '2026-04-05T00:00:00.000Z'],
+        ]);
+    });
+
+    it('lists games with their end date', () => {
+        const urls = gamesSitemapUrls([
+            { publicId: '4e440288-15c0-4950-bf78-5c3e15184251', endedAt: new Date('2026-10-14T12:26:27.707Z') },
+            { publicId: '6cedeeac-143a-46a5-9f45-aa9390fe6477', endedAt: null },
+        ]);
+
+        assert.deepStrictEqual(urls.map(url => [url.path, url.lastmod?.toISOString()]), [
+            ['/games/4e440288-15c0-4950-bf78-5c3e15184251', '2026-10-14T12:26:27.707Z'],
+            ['/games/6cedeeac-143a-46a5-9f45-aa9390fe6477', undefined],
         ]);
     });
 });

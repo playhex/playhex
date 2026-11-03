@@ -3,6 +3,7 @@ import type { Game, Player } from '../../../shared/app/models/index.js';
 import type { SportsEvent, WithContext } from 'schema-dts';
 import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
+import { tournamentMatchFullTitle } from '../../../shared/app/tournamentUtils.js';
 import { boardsizeString, formatDate, formatIsoDate, formatTimeControl, joinTitle, personJsonLd, playerName, tournamentJsonLdId } from './metaUtils.js';
 
 @Service()
@@ -96,6 +97,7 @@ export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
 
         const [red, blue] = players;
         const versus = `${this.playerWithRating(game, red)} vs ${this.playerWithRating(game, blue)}`;
+        const tournamentMatchTitle = game.tournamentMatch?.tournament ? tournamentMatchFullTitle(game.tournamentMatch, t) : null;
         const settings: string[] = [
             `Hex ${boardsize}`,
             game.ranked ? t('social_preview.game.ranked') : t('social_preview.game.friendly'),
@@ -113,7 +115,7 @@ export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
 
         if (game.state !== 'ended' || game.winner === null) {
             return {
-                title: withSiteName(versus),
+                title: withSiteName(joinTitle(tournamentMatchTitle, versus)),
                 description: [...settings, ...details].join(' · ') + '. ' + t('social_preview.game.playing_description'),
                 image: this.image(game, context, versus),
                 noindex: true,
@@ -130,7 +132,7 @@ export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
             details.push(formatDate(game.endedAt, context));
         }
 
-        const title = joinTitle(versus, t('social_preview.game.winner', { winner: playerName(winner) }), game.endedAt && formatIsoDate(game.endedAt));
+        const title = joinTitle(tournamentMatchTitle, versus, t('social_preview.game.winner', { winner: playerName(winner) }), game.endedAt && formatIsoDate(game.endedAt));
 
         const jsonLd: WithContext<SportsEvent> = {
             '@context': 'https://schema.org',

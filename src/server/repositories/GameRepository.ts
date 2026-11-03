@@ -1,4 +1,4 @@
-import { Game } from '../../shared/app/models/index.js';
+import { ChatMessage, Game, GameToPlayer } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import logger from '../services/logger.js';
 import { FindManyOptions, FindOptionsOrder, FindOptionsRelations, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
@@ -316,6 +316,61 @@ export default class GameRepository
             date: result.date,
             totalGames: +result.totalGames,
         }));
+    }
+
+    /**
+     * Recent tournament games listed in sitemap: between two registered players
+     * with a good current rating, not lost on time, long enough,
+     * and with players talking in chat, so game page has some content.
+     * Only selects what is needed for urls and last modification dates.
+     *
+     * Tournament games are few, so no need to go through game indexes here.
+     */
+    async findForSitemap(limit: number, minRating: number): Promise<Game[]>
+    {
+        const queryBuilder = this.gameRepository
+            .createQueryBuilder('game')
+            .comment('sitemap games')
+            .select(['game.id', 'game.publicId', 'game.endedAt'])
+            .innerJoin('game.tournamentMatch', 'tournamentMatch')
+            .innerJoin('tournamentMatch.tournament', 'tournament')
+        ;
+
+        const ineligiblePlayer = queryBuilder
+            .subQuery()
+            .select('1')
+            .from(GameToPlayer, 'gameToPlayer')
+            .innerJoin('gameToPlayer.player', 'player')
+            .leftJoin('player.currentRating', 'currentRating')
+            .where('gameToPlayer.gameId = game.id')
+            .andWhere('(player.isGuest = true OR player.isBot = true OR currentRating.id IS NULL OR currentRating.rating <= :minRating)')
+        ;
+
+        // Offset 1: there is a second message
+        const secondChatMessage = queryBuilder
+            .subQuery()
+            .select('1')
+            .from(ChatMessage, 'chatMessage')
+            .where('chatMessage.gameId = game.id')
+            .andWhere('chatMessage.playerId IS NOT NULL')
+            .limit(1)
+            .offset(1)
+        ;
+
+        return await queryBuilder
+            .where('game.state = :state', { state: 'ended' })
+            .andWhere('game.opponentType = :opponentType', { opponentType: 'player' })
+            .andWhere('game.outcome != :excludedOutcome', { excludedOutcome: 'time' })
+            .andWhere('game.boardsize >= :minBoardsize', { minBoardsize: 9 })
+            .andWhere('game.moves LIKE :atLeast10Moves', { atLeast10Moves: '% % % % % % % % % %' }) // moves are space separated
+            .andWhere('tournament.hidden = false')
+            .andWhere(`NOT EXISTS ${ineligiblePlayer.getQuery()}`)
+            .andWhere(`EXISTS ${secondChatMessage.getQuery()}`)
+            .setParameter('minRating', minRating)
+            .orderBy('game.endedAt', 'DESC')
+            .limit(limit)
+            .getMany()
+        ;
     }
 
     /**

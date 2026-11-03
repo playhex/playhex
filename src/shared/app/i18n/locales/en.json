@@ -560,6 +560,7 @@
         "grand_final_reset": "Grand Final Reset",
         "losers_final": "Losers Final"
     },
+    "match_title_in_tournament": "{{ match }} of {{ tournament }}",
     "tournament_create": "Create a tournament",
     "tournament_slug_duplicate": "A tournament with the same url name already exists",
     "content_restricted": "You are not allowed to post content at this time, due to a moderation action.",

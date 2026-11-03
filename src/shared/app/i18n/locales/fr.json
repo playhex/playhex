@@ -318,6 +318,7 @@
         "grand_final_reset": "Grande finale - revanche",
         "losers_final": "Finale des perdants"
     },
+    "match_title_in_tournament": "{{ match }} de {{ tournament }}",
     "tournament_create": "Créer un tournoi",
     "tournament_slug_duplicate": "Un tournoi avec le même nom d'url existe déjà",
     "content_restricted": "Vous ne pouvez pas publier de contenu pour le moment, suite à une action de modération.",

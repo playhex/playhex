@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import { GameOptions, Player, Tournament, TournamentMatch, TournamentParticipant } from './models/index.js';
 import { slugify } from './slugify.js';
 
@@ -129,6 +130,18 @@ export const tournamentStartsAutomatically = (tournament: Tournament): null | Da
     }
 
     return new Date(officiallyStartsAt.getTime() + delayStartInSeconds * 1000);
+};
+
+/**
+ * Which match of which tournament, e.g "Semi-final 1 of Hex Monthly 42".
+ */
+export const tournamentMatchFullTitle = (tournamentMatch: Pick<TournamentMatch, 'tournament' | 'label' | 'round' | 'number'>, t: TFunction): string => {
+    const { tournament, label, round, number } = tournamentMatch;
+
+    return t('match_title_in_tournament', {
+        match: t(`match_title.${label ?? 'default'}`, { round, number }),
+        tournament: tournament.title,
+    });
 };
 
 /**
