@@ -1,5 +1,6 @@
 import { colToLetter, Move, parseMove } from '@playhex/move-notation';
 import { Game, Player, ChatMessage } from './models/index.js';
+import { shortenHexworldLink } from './hexworld.js';
 
 export const canPlayerChatInGame = (player: null | Player, game: Game): true | string => {
     if (player === null) {
@@ -37,9 +38,80 @@ export const sanitizeMessage = (str: string): string => {
     });
 };
 
+const hexworldLogo = '<svg class="link-logo" width="1.2em" height="1.2em" viewBox="0 0 26 27" fill="#d8b47d" stroke="#000000" stroke-width="1" role="img" aria-label="Hexworld" style="vertical-align: -0.25em"><path d="M 3 8 L 13 2.25 L 23 8 L 23 19.5 L 13 25.25 L 3 19.5z" /></svg>';
+
+const hexwikiLogo = '<span role="img" aria-label="HexWiki">📖</span>';
+
+const decodeWikiPart = (part: string): string => {
+    part = part.replace(/&amp;/g, '&').replace(/_/g, ' ');
+
+    try {
+        part = decodeURIComponent(part);
+    } catch {
+        // keep as is if malformed
+    }
+
+    return sanitizeMessage(part.trim());
+};
+
+/**
+ * Shorten a HexWiki page link to the page title, and section if any.
+ * Expects a link already sanitized with sanitizeMessage(), returns sanitized label.
+ *
+ * Example:
+ *      "https://www.hexwiki.net/index.php/Tom%27s_move#Pushing_the_4th_row_ladder_first"
+ *  =>  "Tom's move › Pushing the 4th row ladder first"
+ *
+ * Returns null if the link is not a HexWiki page link.
+ */
+export const shortenHexwikiLink = (link: string): null | string => {
+    const match = link.match(/^https?:\/\/(?:www\.)?hexwiki\.net\/index\.php(?:\/([^?#]+)|\?title=([^&#]+)[^#]*)(?:#(.+))?$/);
+
+    if (!match) {
+        return null;
+    }
+
+    const [, pathTitle, queryTitle, section] = match;
+    const title = decodeWikiPart(pathTitle ?? queryTitle);
+
+    if (title === '') {
+        return null;
+    }
+
+    return section
+        ? `${title} › ${decodeWikiPart(section)}`
+        : title;
+};
+
+/**
+ * Returns a shorter html label for known long links (i.e Hexworld),
+ * or null to display the link as is.
+ */
+const shortenLink = (link: string): null | string => {
+    const hexworld = shortenHexworldLink(link);
+
+    if (hexworld !== null) {
+        return `${hexworldLogo} ${hexworld}`;
+    }
+
+    const hexwiki = shortenHexwikiLink(link);
+
+    if (hexwiki !== null) {
+        return `${hexwikiLogo} ${hexwiki}`;
+    }
+
+    return null;
+};
+
 export const makeLinksClickable = (str: string): string => {
     return str.replace(/https?:\/\/[\S]+[^\s?.,]/g, link => {
         const escapedLink = link.replace(/"/g, '&quot;');
+        const shortLabel = shortenLink(link);
+
+        if (shortLabel !== null) {
+            return `<a target="_blank" href="${escapedLink}" title="${escapedLink}">${shortLabel}</a>`;
+        }
+
         return `<a target="_blank" href="${escapedLink}">${link}</a>`;
     });
 };
@@ -81,7 +153,7 @@ export const relCoordsTranslate = (str: string, boardsize: number): string => {
 /**
  * Parse coords in chat to wrap them in <span class="coords">
  * and allow to highlight them and make them interactive.
- * Do not match coords inside url (to not break hexworld links for example).
+ * Do not match coords inside url or inside links (to not break hexworld links for example).
  *
  * Example:
  *      "I would play d4 first"
@@ -93,8 +165,8 @@ export const relCoordsTranslate = (str: string, boardsize: number): string => {
  */
 export const makesCoordsInteractive = (str: string, boardsize: number): string => {
     const regex = boardsize > 26
-        ? /(https?:\/\/\S+)|\b([a-z]{1,2}\d{1,3})\b/gi
-        : /(https?:\/\/\S+)|\b([a-z][1-2]?\d)\b/gi
+        ? /(<a\s.*?<\/a>|https?:\/\/\S+)|\b([a-z]{1,2}\d{1,3})\b/gi
+        : /(<a\s.*?<\/a>|https?:\/\/\S+)|\b([a-z][1-2]?\d)\b/gi
     ;
 
     return str.replace(

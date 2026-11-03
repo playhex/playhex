@@ -64,6 +64,38 @@ export const createHexworldString = (game: HexworldGame, orientation: number = 1
 };
 
 /**
+ * Shorten a Hexworld link to display it in chat without taking too much place.
+ * Keeps board size, the 2 first moves and the 2 last moves.
+ * Special tokens (":p", ":s") are kept attached to the following move.
+ *
+ * Example:
+ *      "https://hexworld.org/board/#14r9c1,a14e4k4j11g9:pf2:pn7:pl5"
+ *  =>  "hexworld.org/14,a14e4..:pn7:pl5"
+ *
+ * Returns null if the link is not a Hexworld board link.
+ */
+export const shortenHexworldLink = (link: string): null | string => {
+    const match = link.match(/^https?:\/\/(?:www\.)?hexworld\.org\/board\/?#(\d+(?:x\d+)?)[^,]*(?:,(.*))?$/);
+
+    if (!match) {
+        return null;
+    }
+
+    const [, size, movesStr = ''] = match;
+    const moves = movesStr.replace(/,/g, '').match(/(?::[a-z])*[a-z]+\d+|:[a-z]/g) ?? [];
+
+    if (moves.length === 0) {
+        return `hexworld.org/${size}`;
+    }
+
+    const shortMoves = moves.length <= 4
+        ? moves.join('')
+        : moves.slice(0, 2).join('') + '..' + moves.slice(-2).join('');
+
+    return `hexworld.org/${size},${shortMoves}`;
+};
+
+/**
  * Parses 14r1c1,d3:sa3... to { size: 14, moves: ["d3", "swap-pieces",  "a3", ...]' }
  *
  * Supports a cursor comma: "11c1,h4e7f9,b9c3" means the full line is h4 e7 f9 b9 c3,

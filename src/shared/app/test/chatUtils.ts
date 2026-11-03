@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { makesCoordsInteractive, relCoordsTranslate } from '../chatUtils.js';
+import { makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage, shortenHexwikiLink } from '../chatUtils.js';
 
 describe('chatMessageUtils', () => {
     describe('makesCoordsInteractive', () => {
@@ -128,6 +128,54 @@ describe('chatMessageUtils', () => {
                 `play [4'4']`,
                 `do not match coords outside board`,
             );
+        });
+    });
+
+    describe('makeLinksClickable', () => {
+        it('shortens hexworld links label, keeps full href', () => {
+            const link = 'https://hexworld.org/board/#11c1,a1:sb2c3d4e5f6';
+            const html = makeLinksClickable(`see ${link} !`);
+
+            assert.ok(html.startsWith(`see <a target="_blank" href="${link}" title="${link}"><svg`));
+            assert.ok(html.endsWith('</svg> hexworld.org/11,a1:sb2..e5f6</a> !'));
+        });
+
+        it('does not change other links label', () => {
+            assert.strictEqual(
+                makeLinksClickable('https://playhex.org/games'),
+                '<a target="_blank" href="https://playhex.org/games">https://playhex.org/games</a>',
+            );
+        });
+
+        it('does not make coords interactive inside shortened links', () => {
+            const html = makesCoordsInteractive(makeLinksClickable('https://hexworld.org/board/#11c1,a1:sb2c3d4e5f6 then c3'), 11);
+
+            assert.ok(html.endsWith('</a> then <span class="coords">c3</span>'));
+            assert.strictEqual(html.match(/class="coords"/g)?.length, 1);
+        });
+    });
+
+    describe('shortenHexwikiLink', () => {
+        it('shortens to page title and section', () => {
+            assert.strictEqual(shortenHexwikiLink('https://www.hexwiki.net/index.php/Dominated_cell'), 'Dominated cell');
+            assert.strictEqual(
+                shortenHexwikiLink('https://www.hexwiki.net/index.php/Tom%27s_move#Pushing_the_4th_row_ladder_first'),
+                'Tom\'s move › Pushing the 4th row ladder first',
+            );
+            assert.strictEqual(shortenHexwikiLink('http://hexwiki.net/index.php?title=Ziggurat&action=edit#Intrusion'), 'Ziggurat › Intrusion');
+        });
+
+        it('keeps label sanitized', () => {
+            assert.strictEqual(
+                shortenHexwikiLink(sanitizeMessage('https://www.hexwiki.net/index.php/A_%3Cb%3E&_B')),
+                'A &lt;b&gt;&amp; B',
+            );
+        });
+
+        it('returns null for non page links', () => {
+            assert.strictEqual(shortenHexwikiLink('https://www.hexwiki.net'), null);
+            assert.strictEqual(shortenHexwikiLink('https://www.hexwiki.net/index.php/'), null);
+            assert.strictEqual(shortenHexwikiLink('https://trmph.com/hexwiki/Intermediate_strategy_guide.html'), null);
         });
     });
 });

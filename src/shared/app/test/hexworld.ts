@@ -1,4 +1,4 @@
-import { gameToHexworldLink, parseHexworldString } from '../hexworld.js';
+import { gameToHexworldLink, parseHexworldString, shortenHexworldLink } from '../hexworld.js';
 import { EngineGame } from '../../game-engine/index.js';
 import { describe, it } from 'mocha';
 import assert from 'assert';
@@ -134,6 +134,34 @@ describe('hexworld', () => {
 
         it('throws when board is not square', () => {
             assert.throws(() => parseHexworldString('11x5,d2e3'));
+        });
+    });
+
+    describe('shortenHexworldLink', () => {
+        it('keeps board size, 2 first and 2 last moves', () => {
+            assert.strictEqual(
+                shortenHexworldLink('https://hexworld.org/board/#14r9c1,a14e4k4j11g9k2l2k3l3:pj6i7h6:pf2:pm8:pn7:pl5'),
+                'hexworld.org/14,a14e4..:pn7:pl5',
+            );
+            assert.strictEqual(
+                shortenHexworldLink('https://hexworld.org/board/#15c1,e6:sf7i8g10j10l6i4h3'),
+                'hexworld.org/15,e6:sf7..i4h3',
+            );
+        });
+
+        it('does not truncate short move lists', () => {
+            assert.strictEqual(shortenHexworldLink('https://hexworld.org/board/#11c1,a1b2c3d4'), 'hexworld.org/11,a1b2c3d4');
+            assert.strictEqual(shortenHexworldLink('https://hexworld.org/board/#11c1,'), 'hexworld.org/11');
+            assert.strictEqual(shortenHexworldLink('https://hexworld.org/board/#11'), 'hexworld.org/11');
+        });
+
+        it('handles cursor comma', () => {
+            assert.strictEqual(shortenHexworldLink('https://hexworld.org/board/#11c1,h4e7f9,b9c3'), 'hexworld.org/11,h4e7..b9c3');
+        });
+
+        it('returns null for non hexworld board links', () => {
+            assert.strictEqual(shortenHexworldLink('https://hexworld.org/'), null);
+            assert.strictEqual(shortenHexworldLink('https://example.com/board/#11c1,a1'), null);
         });
     });
 });
