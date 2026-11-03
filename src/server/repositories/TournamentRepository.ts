@@ -57,6 +57,36 @@ export default class TournamentRepository
         return await this.tournamentRepository.save(tournament);
     }
 
+    /**
+     * Tournaments listed in sitemap: not hidden nor canceled, like indexed tournament pages.
+     * Only selects what is needed for urls and last modification dates.
+     */
+    async findForSitemap(): Promise<Tournament[]>
+    {
+        return await this.tournamentRepository.find({
+            select: {
+                id: true,
+                slug: true,
+                createdAt: true,
+                startedAt: true,
+                endedAt: true,
+                series: {
+                    id: true,
+                },
+            },
+            relations: {
+                series: true,
+            },
+            where: {
+                hidden: false,
+                state: Not<Tournament['state']>('canceled'),
+            },
+            order: {
+                startOfficialAt: 'desc',
+            },
+        });
+    }
+
     async findActiveTournaments(): Promise<Tournament[]>
     {
         return await this.tournamentRepository.find({

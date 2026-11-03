@@ -1,6 +1,6 @@
 import { Router, type Request } from 'express';
 import { Container } from 'typedi';
-import { initSocialMeta, resolveMeta } from './socialPreviewMiddlewares.js';
+import { initSocialMeta, mergeSocialMeta, resolveMeta } from './socialPreviewMiddlewares.js';
 import { socialBaseUrl } from './SocialMeta.js';
 import GameMetaBuilder from './meta/GameMetaBuilder.js';
 import ExternalGameMetaBuilder from './meta/ExternalGameMetaBuilder.js';
@@ -109,7 +109,7 @@ export function socialPreviewRouter(): Router {
         const { socialMeta, socialMetaContext } = res.locals;
 
         if (socialMeta && socialMetaContext) {
-            Object.assign(socialMeta, Container.get(StaticPageMetaBuilder).buildMeta(req.path, socialMetaContext) ?? {});
+            mergeSocialMeta(socialMeta, Container.get(StaticPageMetaBuilder).buildMeta(req.path, socialMetaContext) ?? {});
         }
 
         next();

@@ -36,6 +36,21 @@ export default class TournamentSeriesRepository
         });
     }
 
+    /**
+     * Only selects what is needed for sitemap urls.
+     */
+    async findForSitemap(): Promise<TournamentSeries[]>
+    {
+        return await this.tournamentSeriesRepository.find({
+            select: {
+                id: true,
+                slug: true,
+                createdAt: true,
+            },
+            order: { createdAt: 'desc' },
+        });
+    }
+
     async findBySlug(slug: string): Promise<null | TournamentSeries>
     {
         return await this.tournamentSeriesRepository.findOne({

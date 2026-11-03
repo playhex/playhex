@@ -32,6 +32,15 @@ export const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> => n
 });
 
 /**
+ * Overrides page social meta with given ones, but appends json-ld.
+ */
+export const mergeSocialMeta = (socialMeta: SocialMeta, meta: Partial<SocialMeta>): void => {
+    Object.assign(socialMeta, meta, {
+        jsonLd: [...socialMeta.jsonLd, ...(meta.jsonLd ?? [])],
+    });
+};
+
+/**
  * Completes page social meta with resolved ones.
  * Never fails: on missing entity, error or timeout, default meta are kept,
  * so the page is always rendered.
@@ -51,9 +60,7 @@ export const resolveMeta = (resolver: MetaResolver, timeoutMs = RESOLVE_TIMEOUT_
             // Not found: let the client show its "not found" page, but don't index it
             socialMeta.noindex = true;
         } else {
-            Object.assign(socialMeta, meta, {
-                jsonLd: [...socialMeta.jsonLd, ...(meta.jsonLd ?? [])],
-            });
+            mergeSocialMeta(socialMeta, meta);
         }
     } catch (e) {
         logger.notice('Could not resolve social preview meta, keep default ones', {

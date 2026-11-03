@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import type { BreadcrumbList, DataDownload, Dataset, Event, ProfilePage, SportsEvent, WebSite } from 'schema-dts';
+import type { BreadcrumbList, DataDownload, Dataset, Event, LearningResource, ProfilePage, SportsEvent, TechArticle, WebApplication, WebSite } from 'schema-dts';
 import { ExternalGame, Game, GameToPlayer, Player, Puzzle, Rating, Tournament, TournamentParticipant } from '../../../shared/app/models/index.js';
 import { getSocialT } from '../../social-preview/socialI18n.js';
 import { createDefaultSocialMeta, type SocialLocale, type SocialMetaContext } from '../../social-preview/SocialMeta.js';
@@ -295,6 +295,28 @@ describe('social preview meta builders', () => {
 
         // Pages without data that would get outdated use a screenshot
         assert.strictEqual(new StaticPageMetaBuilder().buildMeta('/hexplorer', context('fr'))?.image?.url, 'https://playhex.org/images/social-preview/hexplorer.jpg');
+    });
+
+    it('builds static pages json-ld', () => {
+        const builder = new StaticPageMetaBuilder();
+
+        // Home keeps default title, only adds json-ld
+        const home = builder.buildMeta('/', context());
+        assert.strictEqual(home?.title, undefined);
+        assert.strictEqual((home?.jsonLd?.[0] as WebApplication & { '@type': 'WebApplication' })['@type'], 'WebApplication');
+
+        const guide = builder.buildMeta('/guide/ai-analysis', context('fr'));
+        assert.strictEqual(guide?.title, 'Analyse de partie par IA - PlayHex');
+        assert.strictEqual((guide?.jsonLd?.[0] as TechArticle & { headline: string }).headline, 'Analyse de partie par IA');
+        assert.strictEqual((guide?.jsonLd?.[1] as BreadcrumbList & { '@type': string })['@type'], 'BreadcrumbList');
+
+        const tutorial = builder.buildMeta('/tutorial/rules', context());
+        assert.strictEqual((tutorial?.jsonLd?.[0] as LearningResource & { '@type': string })['@type'], 'LearningResource');
+
+        const cijm = builder.buildMeta('/tournoi-hex-paris-2026', context('fr'));
+        const event = cijm?.jsonLd?.[0] as Event & { startDate: string, name: string };
+        assert.strictEqual(event.name, 'Tournoi de Hex – Paris 2026');
+        assert.strictEqual(event.startDate, '2026-05-24T14:00:00+02:00');
     });
 
     it('builds export games data dataset json-ld', () => {

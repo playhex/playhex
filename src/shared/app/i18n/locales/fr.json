@@ -1959,6 +1959,26 @@
             "export_games_data": {
                 "title": "Exporter les parties de PlayHex",
                 "description": "Téléchargez un jeu de données de toutes les parties de Hex jouées sur PlayHex, libre de réutilisation."
+            },
+            "guide_ai_analysis": {
+                "title": "Analyse de partie par IA",
+                "description": "Analysez vos parties de Hex avec l’IA : repérez vos erreurs, découvrez les meilleurs coups, et quand vous avez pris ou perdu l’avantage."
+            },
+            "guide_conditional_moves": {
+                "title": "Coups conditionnels",
+                "description": "Jouez plus vite vos parties de Hex par correspondance : prévoyez vos réponses aux prochains coups de l’adversaire, et jouez les échelles automatiquement."
+            },
+            "tutorial_rules": {
+                "title": "Règles du Hex",
+                "description": "Apprenez les 2 règles du Hex en quelques minutes avec un tutoriel interactif, puis jouez vos premières parties contre un bot."
+            },
+            "cijm_2025": {
+                "title": "Tournoi de Hex – Paris 2025",
+                "description": "Deux tournois de Hex les 14 et 15 juin 2025, au Salon Culture & Jeux Mathématiques, place Saint-Sulpice à Paris. Gratuit, tous niveaux."
+            },
+            "cijm_2026": {
+                "title": "Tournoi de Hex – Paris 2026",
+                "description": "Tournoi géant de Hex le dimanche 24 mai 2026, au Salon Culture & Jeux Mathématiques, place Saint-Sulpice à Paris. Gratuit, tous niveaux, dès 8 ans."
             }
         }
     }

@@ -1985,6 +1985,26 @@
             "export_games_data": {
                 "title": "Export PlayHex games data",
                 "description": "Download a dataset of all Hex games played on PlayHex, free to reuse."
+            },
+            "guide_ai_analysis": {
+                "title": "AI game analysis",
+                "description": "Review your Hex games with AI: spot your blunders, see the best moves, and find when you took or lost the advantage."
+            },
+            "guide_conditional_moves": {
+                "title": "Conditional moves",
+                "description": "Play correspondence Hex games faster: plan your answers to your opponent’s next moves, and play ladders automatically."
+            },
+            "tutorial_rules": {
+                "title": "Hex rules",
+                "description": "Learn the 2 rules of Hex in a few minutes with an interactive tutorial, then play your first games against a bot."
+            },
+            "cijm_2025": {
+                "title": "Hex tournament – Paris 2025",
+                "description": "Two Hex tournaments on June 14 and 15, 2025, at the Culture & Mathematical Games Fair, Place Saint-Sulpice, Paris. Free, all levels."
+            },
+            "cijm_2026": {
+                "title": "Hex tournament – Paris 2026",
+                "description": "Giant Hex tournament on Sunday, May 24, 2026, at the Culture & Mathematical Games Fair, Place Saint-Sulpice, Paris. Free, all levels, from age 8."
             }
         }
     }
