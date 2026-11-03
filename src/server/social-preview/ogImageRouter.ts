@@ -30,7 +30,7 @@ const cachePath = path.resolve(process.env.OG_CACHE_PATH || 'var/og-cache/');
 /**
  * Increment to invalidate all cached images when templates change.
  */
-const RENDER_VERSION = 4;
+const RENDER_VERSION = 5;
 
 type OgImage = {
     /**
@@ -179,6 +179,28 @@ const staticPageIcons: { [key: string]: OgIcon } = {
     tournaments: 'trophy',
     tournament_series: 'trophy',
     ladders: 'crown',
+};
+
+/**
+ * Static pages images showing a shape below their title, instead of their description.
+ * Image version only depends on texts: increment RENDER_VERSION when changing these boards.
+ */
+const staticPageIllustrations: { [key: string]: OgBoard } = {
+    tutorial_bridge: {
+        boardsize: 4,
+        stones: { red: ['b2', 'c3'], blue: [] },
+        visibleCells: ['b2', 'c3', 'c2', 'b3'],
+        arrows: [{ move: 'b2', direction: 270 }, { move: 'c3', direction: 90 }],
+    },
+
+    // Not on first column, to not display blue side
+    tutorial_ziggurat: {
+        boardsize: 6,
+        stones: { red: ['d4'], blue: [] },
+        visibleCells: ['d4', 'e4', 'c5', 'd5', 'e5', 'b6', 'c6', 'd6', 'e6'],
+        arrows: [{ move: 'd4', direction: 0 }],
+        rotation: 0,
+    },
 };
 
 /**
@@ -435,11 +457,12 @@ const createResolvers = (): { [type: string]: OgImageResolver } => {
             }
 
             const { title, description } = staticPageMetaBuilder.texts(key, context);
+            const illustration: undefined | OgBoard = staticPageIllustrations[key];
 
             return {
                 version: staticPageMetaBuilder.imageVersion(key, context),
                 immutable: false,
-                renderSvg: () => renderCardImageSvg({
+                renderSvg: () => renderCardImageSvg(illustration ? { title, illustration, lines: [] } : {
                     title,
                     icon: staticPageIcons[key] ?? 'hexagon',
                     lines: wrapText(description, 1000, 36, 4).map(text => ({ text, size: 36 })),

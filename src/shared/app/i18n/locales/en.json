@@ -907,6 +907,7 @@
         "to_win_you_must_connect_with_path": "To win, you must <strong>connect your sides</strong> with a fully connected path.",
         "demo_0_step_example": "Here is an ended game: {red} connected both {red} sides and wins.",
         "demo_0_step_lets_play": "Let's play! You are {red}. Try to connect {red} sides.",
+        "demo_0_play": "Play",
         "demo_0_step_congrats": "Congrats! You won the game!",
         "stones_are_played_this_way": "Stones are played as follows:",
         "each_player_place_a_stone": "the players take turns placing <strong>a stone</strong>",
@@ -947,8 +948,12 @@
         "n_steps_completed": "{{completed}}/{{total}} steps completed",
         "start": "Start the tutorial",
         "continue": "Continue the tutorial",
+        "chapters": {
+            "hex_rule": "I. Hex rule",
+            "beginners_strategy": "II. Beginners strategy"
+        },
         "steps": {
-            "rules": "The rules",
+            "rules": "The rule",
             "swap": "The swap rule",
             "davies-1": "First game",
             "bridge": "The bridge",
@@ -956,7 +961,7 @@
             "block": "Blocking = building your path",
             "davies-7": "Beat Davies 7",
             "ziggurat": "The ziggurat",
-            "davies-10": "Beat Davies 10",
+            "davies-10": "Boss Davies 10",
             "next": "What's next?"
         },
         "demo_0_step_lost": "Oops, the computer won this one. Try again!",
@@ -1998,6 +2003,22 @@
             "tutorial_rules": {
                 "title": "Hex rules",
                 "description": "Learn the 2 rules of Hex in a few minutes with an interactive tutorial, then play your first games against a bot."
+            },
+            "tutorial_swap": {
+                "title": "The swap rule in Hex",
+                "description": "The swap rule keeps Hex games balanced."
+            },
+            "tutorial_bridge": {
+                "title": "The bridge in Hex",
+                "description": "The bridge is the most important shape in Hex: two stones already connected without touching. Learn how it works and practice with puzzles."
+            },
+            "tutorial_block": {
+                "title": "Hex strategy for beginners: block to win",
+                "description": "In Hex, blocking builds your own path: the best strategy at the start of the game."
+            },
+            "tutorial_ziggurat": {
+                "title": "The ziggurat template in Hex",
+                "description": "The ziggurat is the second shape to know in Hex: a third row stone connected to its edge. Learn how it works and practice with puzzles."
             },
             "cijm_2025": {
                 "title": "Hex tournament – Paris 2025",

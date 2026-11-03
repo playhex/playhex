@@ -13,6 +13,7 @@ import StaticPageMetaBuilder from '../../social-preview/meta/StaticPageMetaBuild
 import LadderMetaBuilder from '../../social-preview/meta/LadderMetaBuilder.js';
 import ExportGamesDataMetaBuilder from '../../social-preview/meta/ExportGamesDataMetaBuilder.js';
 import type { LadderDto } from '../../../shared/app/models/LadderDto.js';
+import { tutorialSeoKey, tutorialSeoSteps } from '../../../shared/app/tutorial/tutorialSteps.js';
 
 const context = (locale: SocialLocale = 'en', url = 'https://playhex.org/page'): SocialMetaContext => ({
     t: getSocialT(locale),
@@ -330,6 +331,20 @@ describe('social preview meta builders', () => {
 
         const tutorial = builder.buildMeta('/tutorial/rules', context());
         assert.strictEqual((tutorial?.jsonLd?.[0] as LearningResource & { '@type': string })['@type'], 'LearningResource');
+
+        assert.deepStrictEqual(builder.buildMeta('/tutorial', context()), { ...tutorial, url: 'https://playhex.org/tutorial/rules' });
+
+        for (const step of tutorialSeoSteps) {
+            for (const locale of ['en', 'fr'] as const) {
+                const { title, description } = builder.texts(tutorialSeoKey(step), context(locale));
+
+                assert.ok(!title.includes('social_preview') && !description.includes('social_preview'), `Missing ${locale} translation of ${step.id}`);
+            }
+        }
+
+        const bridge = builder.buildMeta('/tutorial/bridge', context('fr'));
+        assert.strictEqual(bridge?.title, 'Le pont au Hex (bridge) - PlayHex');
+        assert.strictEqual((bridge?.jsonLd?.[0] as LearningResource & { url: string }).url, 'https://playhex.org/tutorial/bridge');
 
         const cijm = builder.buildMeta('/tournoi-hex-paris-2026', context('fr'));
         const event = cijm?.jsonLd?.[0] as Event & { startDate: string, name: string };

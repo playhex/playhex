@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { Service } from 'typedi';
 import { defaultSocialImage, OG_IMAGE_HEIGHT, OG_IMAGE_WIDTH, ogImage, withSiteName, type SocialImage, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import { seo } from '../../../shared/app/seo.js';
+import { tutorialSeoKey, tutorialSeoPath, tutorialSeoSteps } from '../../../shared/app/tutorial/tutorialSteps.js';
 import type { SocialMetaBuilderInterface } from './SocialMetaBuilderInterface.js';
 import { staticPagesJsonLd } from './staticPagesJsonLd.js';
 
@@ -22,10 +23,17 @@ const staticPages: { [path: string]: string } = {
     '/guide': 'guide',
     '/guide/ai-analysis': 'guide_ai_analysis',
     '/guide/conditional-moves': 'guide_conditional_moves',
-    '/tutorial/rules': 'tutorial_rules',
+    ...Object.fromEntries(tutorialSeoSteps.map(step => [tutorialSeoPath(step), tutorialSeoKey(step)])),
     '/tournoi-hex-paris-2025': 'cijm_2025',
     '/tournoi-hex-paris-2026': 'cijm_2026',
     '/export-games-data': 'export_games_data',
+};
+
+/**
+ * Pages with same meta as another page, which is their canonical url.
+ */
+const aliasedPages: { [path: string]: string } = {
+    '/tutorial': '/tutorial/rules',
 };
 
 /**
@@ -92,6 +100,12 @@ export default class StaticPageMetaBuilder implements SocialMetaBuilderInterface
     buildMeta(path: string, context: SocialMetaContext): null | Partial<SocialMeta>
     {
         const normalizedPath = path.replace(/\/+$/, '') || '/';
+        const aliasedPath: undefined | string = aliasedPages[normalizedPath];
+
+        if (undefined !== aliasedPath) {
+            return { ...this.buildMeta(aliasedPath, context), url: `${context.baseUrl}${aliasedPath}` };
+        }
+
         const key: undefined | string = staticPages[normalizedPath];
         const jsonLdBuilder = staticPagesJsonLd[normalizedPath];
 

@@ -7,6 +7,7 @@ import AppPlayerMenu from './AppPlayerMenu.vue';
 import { computed } from 'vue';
 import AppPlayerNotifications from '../../player-notifications/AppPlayerNotifications.vue';
 import { useTutorialControls } from '../../composables/tutorialControls.js';
+import { getTutorialChapterSteps } from '../../../../shared/app/tutorial/tutorialSteps.js';
 import { useServerVersionChecker } from '../../composables/useServerVersionChecker.js';
 
 const siteTitleSuffix = SITE_TITLE_SUFFIX;
@@ -93,7 +94,12 @@ const isToolsRoute = computed<boolean>(() => routeName.value !== null
 /*
  * Tutorial
  */
-const { shouldDisplayLink, completedCount, totalCount } = useTutorialControls();
+const { shouldDisplayLink, currentChapter, countChapterCompleted } = useTutorialControls();
+
+/**
+ * Hidden when starting a chapter, "0/8" would look like progress has been lost.
+ */
+const chapterCompletedCount = computed<number>(() => countChapterCompleted(currentChapter.value));
 
 /*
  * server and client versions check
@@ -299,7 +305,7 @@ const {
                 >
                     <IconRocketTakeOff />
                     <span class="d-none d-sm-inline">&nbsp;{{ $t('tutorial.label') }}</span>
-                    <span v-if="completedCount > 0" class="d-none d-sm-inline">&nbsp;{{ completedCount }}/{{ totalCount }}</span>
+                    <span v-if="chapterCompletedCount > 0" class="d-none d-sm-inline">&nbsp;{{ chapterCompletedCount }}/{{ getTutorialChapterSteps(currentChapter).length }}</span>
                 </router-link>
 
                 <!-- update app if versions mismatch -->

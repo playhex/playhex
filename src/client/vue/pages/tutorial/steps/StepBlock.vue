@@ -14,13 +14,13 @@ import { IconInfoCircle } from '../../../icons.js';
 
     <div class="card mb-3">
         <div class="card-body">
+            <p class="card-text small text-center mb-2">{{ $t('tutorial.block_diagram') }}</p>
             <AppTutorialDiagram
                 :boardsize="5"
                 :redStones="['c1', 'c2', 'b3', 'b4', 'b5']"
                 :blueStones="['b2', 'a3', 'e3', 'd4']"
                 :animatedPath="['c1', 'c2', 'b3', 'b4', 'b5']"
             />
-            <p class="card-text small text-center mt-2">{{ $t('tutorial.block_diagram') }}</p>
         </div>
     </div>
 

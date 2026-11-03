@@ -1,4 +1,5 @@
 import type { Game, Tournament, TournamentSeries } from '../../shared/app/models/index.js';
+import { tutorialSeoPath, tutorialSeoSteps } from '../../shared/app/tutorial/tutorialSteps.js';
 import { landingLocales, landingPath } from '../landing/landingLocales.js';
 
 export type SitemapUrl = {
@@ -18,7 +19,7 @@ export const staticSitemapUrls: SitemapUrl[] = [
     '/guide',
     '/guide/ai-analysis',
     '/guide/conditional-moves',
-    '/tutorial/rules',
+    ...tutorialSeoSteps.map(tutorialSeoPath),
     '/puzzles',
     '/tournaments',
     '/tournament-series',

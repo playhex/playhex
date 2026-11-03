@@ -4,7 +4,7 @@ import { onUnmounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
 import { useTutorialControls } from '../../composables/tutorialControls.js';
-import { tutorialSteps } from './tutorialSteps.js';
+import { tutorialSteps } from '../../../../shared/app/tutorial/tutorialSteps.js';
 
 /*
  * Continue tutorial where player stopped.

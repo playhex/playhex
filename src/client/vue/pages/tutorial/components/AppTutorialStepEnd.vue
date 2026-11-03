@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { getNextTutorialStep, type TutorialStepId } from '../tutorialSteps.js';
+import { getNextTutorialStep, type TutorialStepId } from '../../../../../shared/app/tutorial/tutorialSteps.js';
 import { useTutorialControls } from '../../../composables/tutorialControls.js';
 import { useTutorialGameCreation } from '../tutorialUtils.js';
 import { IconArrowRight, IconCheckCircleFill, IconPeople } from '../../../icons.js';

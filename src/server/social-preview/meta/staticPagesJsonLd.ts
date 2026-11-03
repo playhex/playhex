@@ -2,6 +2,7 @@ import type { Event, Game, LearningResource, Offer, TechArticle, Thing, WebAppli
 import { seo } from '../../../shared/app/seo.js';
 import type { SocialMetaContext } from '../SocialMeta.js';
 import { breadcrumbJsonLd } from './metaUtils.js';
+import { tutorialSeoPath, tutorialSeoSteps } from '../../../shared/app/tutorial/tutorialSteps.js';
 
 /**
  * What json-ld builders of static pages need, in addition to context.
@@ -94,8 +95,8 @@ const guideArticleJsonLd = (path: string): StaticPageJsonLdBuilder => context =>
     ];
 };
 
-const tutorialRulesJsonLd: StaticPageJsonLdBuilder = context => {
-    const url = `${context.baseUrl}/tutorial/rules`;
+const tutorialJsonLd = (path: string, teaches: string): StaticPageJsonLdBuilder => context => {
+    const url = `${context.baseUrl}${path}`;
 
     return [
         {
@@ -107,7 +108,7 @@ const tutorialRulesJsonLd: StaticPageJsonLdBuilder = context => {
             image: context.image,
             learningResourceType: 'Interactive tutorial',
             educationalLevel: 'Beginner',
-            teaches: 'Rules of the Hex board game',
+            teaches,
             about: hexGame,
             isAccessibleForFree: true,
             provider: organizationRef(context),
@@ -193,7 +194,7 @@ export const staticPagesJsonLd: { [path: string]: StaticPageJsonLdBuilder } = {
     '/': homeJsonLd,
     '/guide/ai-analysis': guideArticleJsonLd('/guide/ai-analysis'),
     '/guide/conditional-moves': guideArticleJsonLd('/guide/conditional-moves'),
-    '/tutorial/rules': tutorialRulesJsonLd,
+    ...Object.fromEntries(tutorialSeoSteps.map(step => [tutorialSeoPath(step), tutorialJsonLd(tutorialSeoPath(step), step.seo.teaches)])),
     '/tournoi-hex-paris-2025': cijmEventJsonLd({
         path: '/tournoi-hex-paris-2025',
         startDate: '2025-06-14T14:00:00+02:00',

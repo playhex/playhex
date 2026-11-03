@@ -13,7 +13,7 @@ import { IconInfoCircle, IconTrophy } from '../../../icons.js';
 const { markCompleted } = useTutorialControls();
 
 /*
- * Show an ended game with animated winning path, then play random bot
+ * Show an ended game with animated winning path, until player starts a game against random bot
  */
 const demoStep = ref<'example' | 'play' | 'won' | 'lost'>('example');
 
@@ -28,7 +28,7 @@ const movesDemo: HexMove[] = 'd3 c5 e4 e2 d2 d1 e1 e5 d5 d6 c6 d4 e3'.split(' ')
 movesDemo.forEach((move, i) => exampleGame.move(move, i % 2 as PlayerIndex));
 
 let unmounted = false;
-let playTimeout: null | ReturnType<typeof setTimeout> = null;
+const exampleAnimated = ref(false);
 
 const animateExample = async (): Promise<void> => {
     const winningPath = exampleGame.getBoard().getShortestWinningPath();
@@ -39,9 +39,7 @@ const animateExample = async (): Promise<void> => {
         await new AnimatorFacade(exampleGameView).animatePath(winningPath);
     }
 
-    if (!unmounted) {
-        playTimeout = setTimeout(() => demoStep.value = 'play', 2000);
-    }
+    exampleAnimated.value = true;
 };
 
 const randomBot = (game: EngineGame): Promise<HexMove> => calcRandomMove(game, 100);
@@ -56,10 +54,6 @@ const onEnded = (won: boolean): void => {
 
 const destroyExample = (): void => {
     unmounted = true;
-
-    if (playTimeout) {
-        clearTimeout(playTimeout);
-    }
 
     exampleGameViewFacade.getPlayerSettingsFacade().destroy();
     exampleGameView.destroy();
@@ -88,15 +82,24 @@ onUnmounted(destroyExample);
 
     <div v-if="demoStep === 'example'" class="card mb-3">
         <div class="card-body">
-            <div ref="example-container" class="board"></div>
-
-            <p class="text-center card-text mt-2">
+            <p class="text-center card-text mb-2">
                 <i18next :translation="$t('tutorial.demo_0_step_example')">
                     <template #red>
                         <span class="text-danger">{{ $t('game.red') }}</span>
                     </template>
                 </i18next>
             </p>
+
+            <div class="position-relative">
+                <div ref="example-container" class="board"></div>
+
+                <button
+                    v-if="exampleAnimated"
+                    type="button"
+                    class="play-button btn btn-lg btn-success position-absolute start-50 translate-middle-x"
+                    @click="demoStep = 'play'"
+                >{{ $t('tutorial.demo_0_play') }}</button>
+            </div>
         </div>
     </div>
 
@@ -140,5 +143,30 @@ onUnmounted(destroyExample);
 <style lang="stylus" scoped>
 .board
     width 100%
-    height 60vh
+    height 50vh
+
+.play-button
+    bottom 25%
+
+    // Outline growing and fading out
+    &::after
+        content ''
+        position absolute
+        inset 0
+        border 6px solid var(--bs-success)
+        border-radius inherit
+        pointer-events none
+        animation play-button-pulse 1.6s ease-out infinite
+
+        @media (prefers-reduced-motion: reduce)
+            animation none
+
+@keyframes play-button-pulse
+    from
+        inset 0
+        opacity 1
+
+    to
+        inset -0.6em
+        opacity 0
 </style>

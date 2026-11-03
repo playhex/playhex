@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha';
 import assert from 'assert';
-import { boardSvgColors, gameMovesToBoardSvgPosition, renderBoardSvg } from '../boardSvg.js';
+import { boardSvgColors, gameMovesToBoardSvgPosition, renderBoardSvg, type BoardSvgOptions } from '../boardSvg.js';
 
 const countOccurrences = (haystack: string, needle: string): number => haystack.split(needle).length - 1;
 
@@ -25,6 +25,13 @@ describe('boardSvg', () => {
         // Red sides and blue sides
         assert.strictEqual(countOccurrences(svg, '<path'), 2);
         assert.ok(!svg.includes('clipPath'));
+    });
+
+    it('draws arrows in displayed direction, whatever the board rotation', () => {
+        const options: BoardSvgOptions = { boardsize: 3, stones: { red: ['b2'], blue: [] }, x: 0, y: 0, width: 600, height: 300 };
+
+        assert.ok(renderBoardSvg({ ...options, arrows: [{ move: 'b2', direction: 90 }] }).includes('rotate(120)'));
+        assert.ok(renderBoardSvg({ ...options, rotation: 0, arrows: [{ move: 'b2', direction: 90 }] }).includes('rotate(90)'));
     });
 
     it('marks last move and highlighted cells', () => {
@@ -73,6 +80,21 @@ describe('boardSvg', () => {
         assert.strictEqual(countOccurrences(svg, `fill="${boardSvgColors.cellStroke}"`), 6);
         assert.ok(svg.includes('<clipPath id="puzzle-clip">'));
         assert.ok(svg.includes('clip-path="url(#puzzle-clip)"'));
+    });
+
+    it('only displays visible cells', () => {
+        const svg = renderBoardSvg({
+            boardsize: 3,
+            stones: { red: [], blue: [] },
+            visibleCells: ['a1', 'b1'],
+            x: 0,
+            y: 0,
+            width: 600,
+            height: 300,
+        });
+
+        assert.strictEqual(countOccurrences(svg, `fill="${boardSvgColors.cellStroke}"`), 2);
+        assert.ok(svg.includes('clipPath'));
     });
 
     it('fits board in given area, without zooming too much on small boards', () => {

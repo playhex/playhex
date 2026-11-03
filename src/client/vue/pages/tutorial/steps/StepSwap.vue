@@ -209,5 +209,5 @@ onUnmounted(() => {
 <style lang="stylus" scoped>
 .board
     width 100%
-    height 60vh
+    height 50vh
 </style>

@@ -18,17 +18,17 @@ const { markCompleted } = useTutorialControls();
     <div class="row g-3 mb-3">
         <div class="col-sm-6">
             <div class="card h-100">
-                <div class="card-body">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <p class="card-text small text-center mb-2">{{ $t('tutorial.bridge_diagram') }}</p>
                     <AppTutorialDiagram :boardsize="5" :redStones="['c2', 'b4']" :highlightedCells="['b3', 'c3']" />
-                    <p class="card-text small text-center mt-2">{{ $t('tutorial.bridge_diagram') }}</p>
                 </div>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="card h-100">
-                <div class="card-body">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <p class="card-text small text-center mb-2">{{ $t('tutorial.bridge_edge_diagram') }}</p>
                     <AppTutorialDiagram :boardsize="5" :redStones="['b4']" :highlightedCells="['a5', 'b5']" />
-                    <p class="card-text small text-center mt-2">{{ $t('tutorial.bridge_edge_diagram') }}</p>
                 </div>
             </div>
         </div>

@@ -20,6 +20,15 @@ export type BoardSvgStones = {
     blue: Move[];
 };
 
+export type BoardSvgArrow = {
+    move: Move;
+
+    /**
+     * Displayed direction in degrees, clockwise from up, whatever the board rotation.
+     */
+    direction: number;
+};
+
 export type BoardSvgOptions = {
     boardsize: number;
     stones: BoardSvgStones;
@@ -44,6 +53,27 @@ export type BoardSvgOptions = {
      * Board is zoomed on displayed cells.
      */
     hiddenCells?: Move[];
+
+    /**
+     * Only display these cells, e.g to show a shape on a partial board. Takes precedence over hiddenCells.
+     */
+    visibleCells?: Move[];
+
+    /**
+     * White arrows drawn on cells, e.g to show where a shape connects.
+     */
+    arrows?: BoardSvgArrow[];
+
+    /**
+     * Board rotation in radians, same as game page by default.
+     * 0 to get rows horizontal.
+     */
+    rotation?: number;
+
+    /**
+     * Rendered cell radius limit, raise it to display a small partial board bigger.
+     */
+    maxCellRadius?: number;
 
     /**
      * Unique id in the whole svg image, to reference board clip path.
@@ -82,6 +112,11 @@ const ROTATION = -PI / 6;
  * Rendered cell radius limit, so that a small partial board is not too zoomed in.
  */
 const MAX_CELL_RADIUS = 40;
+
+/**
+ * Arrow pointing up, centered on (0, 0).
+ */
+const ARROW_PATH = `M0 ${RADIUS * 0.6}V${-RADIUS * 0.55}M${-RADIUS * 0.45} ${-RADIUS * 0.2}L0 ${-RADIUS * 0.6}L${RADIUS * 0.45} ${-RADIUS * 0.2}`;
 
 const round = (n: number): number => Math.round(n * 100) / 100;
 
@@ -198,7 +233,7 @@ const cellClipPolygons = (row: number, col: number, boardsize: number): Point[][
  * to be embedded in a bigger svg image.
  */
 export const renderBoardSvg = (options: BoardSvgOptions): string => {
-    const { boardsize, stones, lastMove, highlighted } = options;
+    const { boardsize, stones, lastMove, highlighted, rotation = ROTATION, maxCellRadius = MAX_CELL_RADIUS } = options;
     const id = options.id ?? 'board';
     const cellColors = new Map<Move, string>();
 
@@ -206,7 +241,6 @@ export const renderBoardSvg = (options: BoardSvgOptions): string => {
     stones.red.forEach(move => cellColors.set(move, boardSvgColors.red));
     stones.blue.forEach(move => cellColors.set(move, boardSvgColors.blue));
 
-    const hidden = new Set(options.hiddenCells ?? []);
     const allCoords: Coords[] = [];
 
     for (let row = 0; row < boardsize; ++row) {
@@ -215,25 +249,28 @@ export const renderBoardSvg = (options: BoardSvgOptions): string => {
         }
     }
 
+    const { visibleCells } = options;
+    const hidden = new Set(visibleCells
+        ? allCoords.map(coords => coordsToMove(coords)).filter(move => !visibleCells.includes(move))
+        : options.hiddenCells ?? [],
+    );
     const visibleCoords = allCoords.filter(coords => !hidden.has(coordsToMove(coords)));
 
     // Fit rotated visible cells, with their sides, in given area.
     // Fit whole board when all cells are hidden, to not get NaN.
     const extent = RADIUS * (1 + SIDES_WIDTH);
-    const rotatedCenters = (visibleCoords.length > 0 ? visibleCoords : allCoords).map(({ row, col }) => rotate(cellCoords(row, col), ROTATION));
+    const rotatedCenters = (visibleCoords.length > 0 ? visibleCoords : allCoords).map(({ row, col }) => rotate(cellCoords(row, col), rotation));
     const minX = Math.min(...rotatedCenters.map(p => p.x)) - extent;
     const maxX = Math.max(...rotatedCenters.map(p => p.x)) + extent;
     const minY = Math.min(...rotatedCenters.map(p => p.y)) - extent;
     const maxY = Math.max(...rotatedCenters.map(p => p.y)) + extent;
-    const k = Math.min(options.width / (maxX - minX), options.height / (maxY - minY), MAX_CELL_RADIUS / RADIUS);
+    const k = Math.min(options.width / (maxX - minX), options.height / (maxY - minY), maxCellRadius / RADIUS);
     const tx = options.x + options.width / 2 - k * (minX + maxX) / 2;
     const ty = options.y + options.height / 2 - k * (minY + maxY) / 2;
 
     const parts: string[] = [];
     const [redSides, blueSides] = sidesPaths(boardsize);
-
-    parts.push(`<path d="${redSides}" fill="${boardSvgColors.red}"/>`);
-    parts.push(`<path d="${blueSides}" fill="${boardSvgColors.blue}"/>`);
+    let sides = `<path d="${redSides}" fill="${boardSvgColors.red}"/><path d="${blueSides}" fill="${boardSvgColors.blue}"/>`;
 
     const highlightedSet = new Set(highlighted ?? []);
 
@@ -256,8 +293,16 @@ export const renderBoardSvg = (options: BoardSvgOptions): string => {
         parts.push(`<circle cx="${round(center.x)}" cy="${round(center.y)}" r="${RADIUS * 0.45}" fill="none" stroke="${boardSvgColors.highlight}" stroke-width="${RADIUS * 0.16}"/>`);
     }
 
-    let content = parts.join('');
+    const rotationDegrees = round(rotation * 180 / PI);
 
+    for (const { move, direction } of options.arrows ?? []) {
+        const { row, col } = parseMove(move);
+        const center = cellCoords(row, col);
+
+        parts.push(`<path transform="translate(${round(center.x)} ${round(center.y)}) rotate(${direction - rotationDegrees})" d="${ARROW_PATH}" fill="none" stroke="#ffffff" stroke-width="${RADIUS * 0.16}"/>`);
+    }
+
+    // Only clip sides: clipping cells too would let sides color bleed around them
     if (hidden.size > 0) {
         const clipPolygons = visibleCoords
             .flatMap(({ row, col }) => cellClipPolygons(row, col, boardsize))
@@ -265,10 +310,10 @@ export const renderBoardSvg = (options: BoardSvgOptions): string => {
             .join('')
         ;
 
-        content = `<defs><clipPath id="${id}-clip">${clipPolygons}</clipPath></defs><g clip-path="url(#${id}-clip)">${content}</g>`;
+        sides = `<defs><clipPath id="${id}-clip">${clipPolygons}</clipPath></defs><g clip-path="url(#${id}-clip)">${sides}</g>`;
     }
 
-    return `<g transform="translate(${round(tx)} ${round(ty)}) scale(${round(k * 10000) / 10000}) rotate(${round(ROTATION * 180 / PI)})">${content}</g>`;
+    return `<g transform="translate(${round(tx)} ${round(ty)}) scale(${round(k * 10000) / 10000}) rotate(${rotationDegrees})">${sides}${parts.join('')}</g>`;
 };
 
 /**

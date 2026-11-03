@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useTutorialControls } from '../composables/tutorialControls.js';
 import { IconRocketTakeOff } from '../icons.js';
+import { getTutorialChapterSteps } from '../../../shared/app/tutorial/tutorialSteps.js';
 
 /**
  * Promotes tutorial to new players, with their progress.
  */
-const { shouldDisplayLink, dismissTutorial, completedCount, totalCount, firstIncompleteStep } = useTutorialControls();
+const { shouldDisplayLink, dismissTutorial, completedCount, firstIncompleteStep, currentChapter, countChapterCompleted } = useTutorialControls();
+
+const chapterCompletedCount = computed<number>(() => countChapterCompleted(currentChapter.value));
+const chapterTotalCount = computed<number>(() => getTutorialChapterSteps(currentChapter.value).length);
 </script>
 
 <template>
@@ -37,13 +42,13 @@ const { shouldDisplayLink, dismissTutorial, completedCount, totalCount, firstInc
                         class="progress"
                         role="progressbar"
                         :aria-label="$t('tutorial.progress')"
-                        :aria-valuenow="completedCount"
+                        :aria-valuenow="chapterCompletedCount"
                         aria-valuemin="0"
-                        :aria-valuemax="totalCount"
+                        :aria-valuemax="chapterTotalCount"
                     >
-                        <div class="progress-bar bg-success" :style="{ width: `${100 * completedCount / totalCount}%` }"></div>
+                        <div class="progress-bar bg-success" :style="{ width: `${100 * chapterCompletedCount / chapterTotalCount}%` }"></div>
                     </div>
-                    <small class="text-body-secondary">{{ $t('tutorial.n_steps_completed', { completed: completedCount, total: totalCount }) }}</small>
+                    <small class="text-body-secondary">{{ $t(`tutorial.chapters.${currentChapter}`) }} · {{ $t('tutorial.n_steps_completed', { completed: chapterCompletedCount, total: chapterTotalCount }) }}</small>
                 </div>
             </div>
         </div>

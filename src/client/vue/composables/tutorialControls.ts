@@ -3,7 +3,7 @@ import usePlayerSettingsStore from '../../stores/playerSettingsStore.js';
 import { computed, watch } from 'vue';
 import { t } from 'i18next';
 import useToastsStore from '../../stores/toastsStore.js';
-import { getNextTutorialStep, tutorialSteps, type TutorialStep, type TutorialStepId } from '../pages/tutorial/tutorialSteps.js';
+import { getNextTutorialStep, getTutorialChapterSteps, tutorialSteps, type TutorialChapter, type TutorialStep, type TutorialStepId } from '../../../shared/app/tutorial/tutorialSteps.js';
 
 /**
  * Remember whether tutorial link was displayed last time,
@@ -35,6 +35,24 @@ export const useTutorialControls = () => {
      * Where to continue the tutorial: first not completed step, or first step.
      */
     const firstIncompleteStep = computed<TutorialStep>(() => tutorialSteps.find(step => !isCompleted(step.id)) ?? tutorialSteps[0]);
+
+    /**
+     * Chapter player is currently progressing in.
+     */
+    const currentChapter = computed<TutorialChapter>(() => firstIncompleteStep.value.chapter);
+
+    const countChapterCompleted = (chapter: TutorialChapter): number => {
+        return getTutorialChapterSteps(chapter).filter(step => isCompleted(step.id)).length;
+    };
+
+    /**
+     * Where to continue given chapter: first not completed step, or first step of chapter.
+     */
+    const firstIncompleteChapterStep = (chapter: TutorialChapter): TutorialStep => {
+        const steps = getTutorialChapterSteps(chapter);
+
+        return steps.find(step => !isCompleted(step.id)) ?? steps[0];
+    };
 
     /**
      * Shows a toast with a link to next step, even if step was already completed.
@@ -94,6 +112,9 @@ export const useTutorialControls = () => {
         totalCount,
         isFinished,
         firstIncompleteStep,
+        currentChapter,
+        countChapterCompleted,
+        firstIncompleteChapterStep,
         markCompleted,
         shouldDisplayLink,
         dismissTutorial,

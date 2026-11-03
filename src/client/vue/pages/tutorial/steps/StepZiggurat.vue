@@ -17,12 +17,12 @@ const { markCompleted } = useTutorialControls();
 
     <div class="card mb-3">
         <div class="card-body">
+            <p class="card-text small text-center mb-2">{{ $t('tutorial.ziggurat_diagram') }}</p>
             <AppTutorialDiagram
                 :boardsize="5"
                 :redStones="['c3']"
                 :highlightedCells="['d3', 'b4', 'c4', 'd4', 'a5', 'b5', 'c5', 'd5']"
             />
-            <p class="card-text small text-center mt-2">{{ $t('tutorial.ziggurat_diagram') }}</p>
         </div>
     </div>
 
@@ -31,7 +31,8 @@ const { markCompleted } = useTutorialControls();
     <div class="row g-3 mb-3">
         <div class="col-sm-6">
             <div class="card h-100">
-                <div class="card-body">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <p class="card-text small text-center mb-2">{{ $t('tutorial.ziggurat_defense_1') }}</p>
                     <AppTutorialDiagram
                         :boardsize="5"
                         :redStones="['c3', 'b4']"
@@ -39,13 +40,13 @@ const { markCompleted } = useTutorialControls();
                         :highlightedCells="['a5', 'b5']"
                         :animatedPath="['b4']"
                     />
-                    <p class="card-text small text-center mt-2">{{ $t('tutorial.ziggurat_defense_1') }}</p>
                 </div>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="card h-100">
-                <div class="card-body">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <p class="card-text small text-center mb-2">{{ $t('tutorial.ziggurat_defense_2') }}</p>
                     <AppTutorialDiagram
                         :boardsize="5"
                         :redStones="['c3', 'd4']"
@@ -53,7 +54,6 @@ const { markCompleted } = useTutorialControls();
                         :highlightedCells="['d3', 'c4', 'c5', 'd5']"
                         :animatedPath="['d4']"
                     />
-                    <p class="card-text small text-center mt-2">{{ $t('tutorial.ziggurat_defense_2') }}</p>
                 </div>
             </div>
         </div>

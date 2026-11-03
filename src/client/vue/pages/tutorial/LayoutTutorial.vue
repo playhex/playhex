@@ -1,49 +1,93 @@
 <script setup lang="ts">
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
-import { tutorialSteps } from './tutorialSteps.js';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { getTutorialChapterSteps, isBossTutorialStep, isSeoTutorialStep, tutorialChapters, tutorialSeoKey, tutorialSteps, type TutorialChapter } from '../../../../shared/app/tutorial/tutorialSteps.js';
 import { useTutorialControls } from '../../composables/tutorialControls.js';
-import { IconCheckCircleFill } from '../../icons.js';
+import { IconCaretDownFill, IconCaretRight, IconCheckCircleFill, IconSkull } from '../../icons.js';
 
+const route = useRoute();
+
+// Same title as server meta, crawlers executing javascript get this one
 useHead({
-    title: () => t('how_to_play_hex'),
+    title: () => {
+        const step = tutorialSteps.find(({ routeName }) => routeName === route.name);
+
+        return step && isSeoTutorialStep(step)
+            ? t(`social_preview.static.${tutorialSeoKey(step)}.title`)
+            : t('how_to_play_hex')
+        ;
+    },
 });
 
-const { isCompleted, completedCount, totalCount } = useTutorialControls();
+const { isCompleted, currentChapter, countChapterCompleted, firstIncompleteChapterStep } = useTutorialControls();
+
+/**
+ * Only steps of this chapter are displayed.
+ */
+const displayedChapter = computed<TutorialChapter>(() => {
+    return tutorialSteps.find(step => step.routeName === route.name)?.chapter ?? currentChapter.value;
+});
+
+const displayedSteps = computed(() => getTutorialChapterSteps(displayedChapter.value));
+const completedCount = computed<number>(() => countChapterCompleted(displayedChapter.value));
+const totalCount = computed<number>(() => displayedSteps.value.length);
+
+const isChapterCompleted = (chapter: TutorialChapter): boolean => {
+    return countChapterCompleted(chapter) === getTutorialChapterSteps(chapter).length;
+};
 </script>
 
 <template>
     <div class="row g-0">
         <div class="col-12 col-sm-4 col-md-3 bg-dark-subtle">
-            <div class="p-3 pb-0">
-                <p class="h5 mb-2">{{ $t('tutorial.onboarding_title') }}</p>
+            <p class="h5 p-3 mb-0">{{ $t('tutorial.onboarding_title') }}</p>
 
-                <div
-                    class="progress"
-                    role="progressbar"
-                    :aria-label="$t('tutorial.progress')"
-                    :aria-valuenow="completedCount"
-                    aria-valuemin="0"
-                    :aria-valuemax="totalCount"
-                >
-                    <div class="progress-bar bg-success" :style="{ width: `${100 * completedCount / totalCount}%` }"></div>
-                </div>
+            <div v-for="chapter in tutorialChapters" :key="chapter" class="chapter">
+                <template v-if="chapter === displayedChapter">
+                    <div class="px-3 pt-2">
+                        <p class="chapter-title d-flex align-items-center gap-1 mb-2"><IconCaretDownFill class="chapter-marker" /> <span>{{ $t(`tutorial.chapters.${chapter}`) }}</span></p>
 
-                <p class="small text-body-secondary mt-1 mb-0">{{ $t('tutorial.n_steps_completed', { completed: completedCount, total: totalCount }) }}</p>
-            </div>
+                        <div
+                            class="progress chapter-progress"
+                            role="progressbar"
+                            :aria-label="$t('tutorial.progress')"
+                            :aria-valuenow="completedCount"
+                            aria-valuemin="0"
+                            :aria-valuemax="totalCount"
+                        >
+                            <div class="progress-bar bg-success" :style="{ width: `${100 * completedCount / totalCount}%` }"></div>
+                        </div>
 
-            <nav class="nav tutorial-steps flex-nowrap flex-sm-column my-2 my-sm-3">
+                        <p class="small text-body-secondary mt-1 mb-0">{{ $t('tutorial.n_steps_completed', { completed: completedCount, total: totalCount }) }}</p>
+                    </div>
+
+                    <nav class="nav tutorial-steps flex-nowrap flex-sm-column mt-1 mb-2">
+                        <router-link
+                            v-for="(step, index) in displayedSteps"
+                            :key="step.id"
+                            :to="{ name: step.routeName }"
+                            class="nav-link d-flex align-items-center gap-2"
+                        >
+                            <IconCheckCircleFill v-if="isCompleted(step.id)" class="step-marker text-success" />
+                            <IconSkull v-else-if="isBossTutorialStep(step)" class="step-marker" />
+                            <span v-else class="step-marker step-number">{{ index + 1 }}</span>
+                            <span>{{ $t(`tutorial.steps.${step.id}`) }}</span>
+                        </router-link>
+                    </nav>
+                </template>
+
                 <router-link
-                    v-for="(step, index) in tutorialSteps"
-                    :key="step.id"
-                    :to="{ name: step.routeName }"
-                    class="nav-link d-flex align-items-center gap-2"
+                    v-else
+                    :to="{ name: firstIncompleteChapterStep(chapter).routeName }"
+                    class="chapter-title d-flex align-items-center gap-1 px-3 py-2 text-body-secondary text-decoration-none"
                 >
-                    <IconCheckCircleFill v-if="isCompleted(step.id)" class="step-marker text-success" />
-                    <span v-else class="step-marker step-number">{{ index + 1 }}</span>
-                    <span>{{ $t(`tutorial.steps.${step.id}`) }}</span>
+                    <IconCheckCircleFill v-if="isChapterCompleted(chapter)" class="chapter-marker text-success" />
+                    <IconCaretRight v-else class="chapter-marker" />
+                    <span>{{ $t(`tutorial.chapters.${chapter}`) }}</span>
                 </router-link>
-            </nav>
+            </div>
         </div>
         <div class="col-12 col-sm-8 col-md-9 col-lg-7">
             <div class="container my-3">
@@ -54,10 +98,30 @@ const { isCompleted, completedCount, totalCount } = useTutorialControls();
 </template>
 
 <style lang="stylus" scoped>
+// Same spacing whatever chapter is displayed, so chapters do not jump when switching
+.chapter
+    margin-bottom 1em
+
+.chapter-title
+    font-size 1.1em
+    font-weight bold
+
+.chapter-marker
+    flex-shrink 0
+    font-size 0.8em
+
+.chapter-progress
+    height 0.5em
+
 .tutorial-steps
     // Horizontal scrollable steps on mobile
     overflow-x auto
     white-space nowrap
+    font-size 0.9em
+
+    .nav-link
+        padding-top 0.3em
+        padding-bottom 0.3em
 
 .step-marker
     flex-shrink 0

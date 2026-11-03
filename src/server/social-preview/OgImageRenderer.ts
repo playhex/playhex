@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import { boardSvgColors, renderBoardSvg, type BoardSvgStones } from '../../shared/app/boardSvg.js';
+import { boardSvgColors, renderBoardSvg, type BoardSvgArrow, type BoardSvgStones } from '../../shared/app/boardSvg.js';
 import type { Move } from '@playhex/move-notation';
 import { OG_IMAGE_HEIGHT, OG_IMAGE_WIDTH } from './SocialMeta.js';
 
@@ -34,6 +34,9 @@ export type OgBoard = {
     highlighted?: Move[];
     disabledCells?: Move[];
     hiddenCells?: Move[];
+    visibleCells?: Move[];
+    arrows?: BoardSvgArrow[];
+    rotation?: number;
 };
 
 export type OgBoardImage = OgBoard & {
@@ -68,6 +71,12 @@ export type OgCardImage = {
      * Small boards displayed on the right, e.g first puzzles of a collection.
      */
     boards?: OgBoard[];
+
+    /**
+     * Big board displayed below title, e.g a shape on a partial board.
+     * Lines are not displayed, there is no room left.
+     */
+    illustration?: OgBoard;
 
     /**
      * Small icon above title.
@@ -283,7 +292,7 @@ export const renderCardImageSvg = (card: OgCardImage): string => {
     }
 
     const textWidth = (hasBoards ? 620 : W - 80) - textX;
-    let y = 150;
+    let y = card.illustration ? 30 : 150;
 
     if (card.icon) {
         parts.push(icons[card.icon](textX, y - 100, 80));
@@ -300,7 +309,18 @@ export const renderCardImageSvg = (card: OgCardImage): string => {
 
     y += 20;
 
-    for (const line of card.lines.slice(0, 5)) {
+    if (card.illustration) {
+        parts.push(renderBoardSvg({
+            ...card.illustration,
+            x: textX,
+            y,
+            width: textWidth,
+            height: H - y - 20,
+            maxCellRadius: 120,
+        }));
+    }
+
+    for (const line of card.illustration ? [] : card.lines.slice(0, 5)) {
         const size = line.size ?? 34;
         y += size * 1.45;
         parts.push(textElement(textX, y, { color: greyText, ...line, size }, 'start', textWidth));

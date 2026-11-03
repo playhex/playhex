@@ -224,9 +224,7 @@ onUnmounted(destroyGame);
 <template>
     <div class="card mb-3">
         <div class="card-body">
-            <div ref="container" class="board"></div>
-
-            <p class="text-center card-text mt-2 mb-2">
+            <p class="text-center card-text mb-2">
                 <slot name="message" :status :humanIndex :botThinking>
                     <template v-if="status === 'playing'">
                         {{ $t('tutorial.you_play') }}
@@ -237,6 +235,8 @@ onUnmounted(destroyGame);
                     <template v-else>{{ $t('tutorial.bot_game_lost') }}</template>
                 </slot>
             </p>
+
+            <div ref="container" class="board mb-2"></div>
 
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 <template v-if="status === 'playing'">
@@ -279,5 +279,5 @@ onUnmounted(destroyGame);
 <style lang="stylus" scoped>
 .board
     width 100%
-    height 60vh
+    height 50vh
 </style>

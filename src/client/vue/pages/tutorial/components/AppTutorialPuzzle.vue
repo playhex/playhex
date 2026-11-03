@@ -57,13 +57,13 @@ watch(status, newStatus => {
 <template>
     <div class="card">
         <div class="card-body">
-            <p class="mb-2">
+            <p class="instruction mb-2">
                 <span v-if="puzzle.playerColor === 0" class="text-danger"><IconCircleFill /></span>
                 <span v-else class="text-primary"><IconCircleFill /></span>
                 {{ $t(puzzle.instructionKey) }}
             </p>
 
-            <div ref="game-view-element" class="board"></div>
+            <div ref="game-view-element" class="board mb-2"></div>
 
             <div v-for="(message, index) in messages" :key="index" class="alert alert-info py-2 mb-2">{{ $t(message) }}</div>
 
@@ -106,6 +106,10 @@ watch(status, newStatus => {
 </template>
 
 <style lang="stylus" scoped>
+// 2 lines, so board stays at same position between puzzles
+.instruction
+    min-height 3em
+
 .board
     width 100%
     height 50vh

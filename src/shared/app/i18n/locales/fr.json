@@ -870,6 +870,7 @@
         "to_win_you_must_connect_with_path": "Pour gagner, vous devez <strong>relier vos côtés</strong> avec un chemin complet.",
         "demo_0_step_example": "Voici une partie terminée : {red} a relié ses deux côtés {red} et gagne.",
         "demo_0_step_lets_play": "À vous de jouer ! Vous êtes {red}, essayez de relier les côtés {red}.",
+        "demo_0_play": "Jouer",
         "demo_0_step_congrats": "Félicitations ! Vous avez gagné la partie !",
         "stones_are_played_this_way": "Les pierres sont placées de cette façon :",
         "each_player_place_a_stone": "chaque joueur ou joueuse place <strong>une pierre à tour de rôle</strong>",
@@ -910,8 +911,12 @@
         "n_steps_completed": "{{completed}}/{{total}} étapes terminées",
         "start": "Commencer le tutoriel",
         "continue": "Continuer le tutoriel",
+        "chapters": {
+            "hex_rule": "I. Règle du Hex",
+            "beginners_strategy": "II. Stratégie pour débutants"
+        },
         "steps": {
-            "rules": "Les règles",
+            "rules": "La règle",
             "swap": "La règle du swap",
             "davies-1": "Première partie",
             "bridge": "Le pont (bridge)",
@@ -919,7 +924,7 @@
             "block": "Bloquer = faire son chemin",
             "davies-7": "Battre Davies 7",
             "ziggurat": "La ziggourat",
-            "davies-10": "Battre Davies 10",
+            "davies-10": "Boss Davies 10",
             "next": "Et après ?"
         },
         "demo_0_step_lost": "Oups, l'ordinateur a gagné cette fois. Réessayez !",
@@ -1972,6 +1977,22 @@
             "tutorial_rules": {
                 "title": "Règles du Hex",
                 "description": "Apprenez les 2 règles du Hex en quelques minutes avec un tutoriel interactif, puis jouez vos premières parties contre un bot."
+            },
+            "tutorial_swap": {
+                "title": "La règle du swap au Hex",
+                "description": "La règle du swap permet de garder des parties de Hex équilibrées."
+            },
+            "tutorial_bridge": {
+                "title": "Le pont au Hex (bridge)",
+                "description": "Le pont est la forme la plus importante du Hex : deux pierres déjà connectées sans se toucher. Comprenez comment il fonctionne et entraînez-vous avec des puzzles."
+            },
+            "tutorial_block": {
+                "title": "Stratégie Hex pour débuter : bloquer pour gagner",
+                "description": "Au Hex, bloquer, c’est construire son chemin : la meilleure stratégie en début de partie."
+            },
+            "tutorial_ziggurat": {
+                "title": "Le template ziggourat au Hex",
+                "description": "La ziggourat (ziggurat) est la deuxième forme à connaître au Hex : une pierre en troisième ligne connectée à son bord. Comprenez comment elle fonctionne et entraînez-vous avec des puzzles."
             },
             "cijm_2025": {
                 "title": "Tournoi de Hex – Paris 2025",

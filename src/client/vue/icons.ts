@@ -116,6 +116,7 @@ export { default as IconShieldCheck } from '~icons/bi/shield-check';
 export { default as IconShieldFill } from '~icons/bi/shield-fill';
 export { default as IconSignpostSplit } from '~icons/bi/signpost-split';
 export { default as IconSignTurnLeft } from '~icons/bi/sign-turn-left';
+export { default as IconSkull } from '~icons/mdi/skull';
 export { default as IconStairsUp } from '~icons/mdi/stairs-up';
 export { default as IconSword } from '~icons/mdi/sword';
 export { default as IconSquare } from '~icons/bi/square';
