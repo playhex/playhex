@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { defineOrganization, useSchemaOrg } from '@unhead/schema-org';
-import { injectHead, useHead, useSeoMeta } from '@unhead/vue';
+import { useHead, useSeoMeta } from '@unhead/vue';
 import { IconDownload } from '../../icons.js';
-import { ref, watchEffect } from 'vue';
+import { ref } from 'vue';
 import { t } from 'i18next';
 import type { ExportGamesDataManifest } from '../../../../shared/app/ExportGamesDataManifest.js';
 
@@ -14,45 +13,6 @@ useHead({
 
 useSeoMeta({
     description: () => t('social_preview.static.export_games_data.description'),
-});
-
-const head = injectHead();
-
-watchEffect(() => {
-    if (!fileStat.value) {
-        return;
-    }
-
-    const baseUrl = location.protocol + '//' + location.host;
-
-    useSchemaOrg(head, {
-        '@type': 'Dataset',
-        name: 'PlayHex.org Hex games',
-        description: 'Hex games played on PlayHex.org. Can be player vs player, or player vs bot. Ranked or Friendly. Variable board size. All games are ended, either by regular victory, resign, timeout or forfeited.',
-        alternateName: ['PlayHex games archive'],
-        creator: defineOrganization({
-            name: 'PlayHex',
-            url: baseUrl,
-            logo: baseUrl + '/images/logo.png',
-        }),
-        isAccessibleForFree: true,
-        datePublished: fileStat.value.generated_at,
-        dateModified: fileStat.value.generated_at,
-        keywords: ['board game', 'hex'],
-        license: 'https://creativecommons.org/publicdomain/zero/1.0/',
-        temporalCoverage: '2023-11-22/..',
-        version: fileStat.value.generated_at.split('.')[0],
-        url: baseUrl + '/export-games-data',
-        distribution: [
-            {
-                '@type': 'DataDownload',
-                encodingFormat: 'application/json',
-                contentUrl: baseUrl + fileStat.value.filename,
-            },
-        ],
-    }, {
-        tagPosition: 'head', // Should be the default, but not the case: https://github.com/unjs/unhead/issues/563
-    });
 });
 
 // To make an export file available here, run command: pnpm hex export-games

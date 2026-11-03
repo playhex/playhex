@@ -20,7 +20,6 @@ import AppTablePlayerRating from '../../components/AppTablePlayerRating.vue';
 import AppSearchGamesParameters from '../../components/AppSearchGamesParameters.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { injectHead, useSeoMeta } from '@unhead/vue';
-import { definePerson, useSchemaOrg } from '@unhead/schema-org';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { watchEffect } from 'vue';
@@ -68,15 +67,6 @@ const updateMeta = (player: Player): void => {
         ogUrl: window.location.href,
         twitterCard: 'summary',
     }, { head });
-
-    useSchemaOrg(head, [
-        definePerson({
-            name: pseudoString(player, 'pseudo'),
-            url: window.location.href,
-        }),
-    ], {
-        tagPosition: 'head', // Should be the default, but not the case: https://github.com/unjs/unhead/issues/563
-    });
 };
 
 /*

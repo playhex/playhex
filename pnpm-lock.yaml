@@ -62,9 +62,6 @@ importers:
       '@sockeye-js/ui':
         specifier: ^0.5.1
         version: 0.5.1
-      '@unhead/schema-org':
-        specifier: ^3.4.3
-        version: 3.4.3(@unhead/vue@3.4.3(@oxc-project/types@0.155.0)(esbuild@0.28.2)(lightningcss@1.33.0)(oxc-parser@0.152.0)(rolldown@1.2.15)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.107.0)(stylus@0.64.0))(vue@3.5.44(@typescript/typescript6@6.0.2)))(esbuild@0.28.2)(rolldown@1.2.15)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.107.0)(stylus@0.64.0))
       '@unhead/vue':
         specifier: ^3.4.3
         version: 3.4.3(@oxc-project/types@0.155.0)(esbuild@0.28.2)(lightningcss@1.33.0)(oxc-parser@0.152.0)(rolldown@1.2.15)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.107.0)(stylus@0.64.0))(vue@3.5.44(@typescript/typescript6@6.0.2))
@@ -2008,23 +2005,6 @@ packages:
       vite:
         optional: true
       webpack:
-        optional: true
-
-  '@unhead/schema-org@3.4.3':
-    resolution: {integrity: sha512-ikrd+QZ4dgvPRVhfunUc6cZGkiXCiOEnGYvK8OGG+dP8hN+x8GP4AeEsrrbXd6gVCf/R1eIoMjk+42vStGbh1w==}
-    peerDependencies:
-      '@unhead/react': ^3.4.3
-      '@unhead/solid-js': ^3.4.3
-      '@unhead/svelte': ^3.4.3
-      '@unhead/vue': ^3.4.3
-    peerDependenciesMeta:
-      '@unhead/react':
-        optional: true
-      '@unhead/solid-js':
-        optional: true
-      '@unhead/svelte':
-        optional: true
-      '@unhead/vue':
         optional: true
 
   '@unhead/vue@3.4.3':
@@ -6224,23 +6204,6 @@ snapshots:
       - bun-types-no-globals
       - rollup
       - unloader
-
-  '@unhead/schema-org@3.4.3(@unhead/vue@3.4.3(@oxc-project/types@0.155.0)(esbuild@0.28.2)(lightningcss@1.33.0)(oxc-parser@0.152.0)(rolldown@1.2.15)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.107.0)(stylus@0.64.0))(vue@3.5.44(@typescript/typescript6@6.0.2)))(esbuild@0.28.2)(rolldown@1.2.15)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.107.0)(stylus@0.64.0))':
-    dependencies:
-      unhead: 3.4.3(esbuild@0.28.2)(rolldown@1.2.15)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.107.0)(stylus@0.64.0))
-    optionalDependencies:
-      '@unhead/vue': 3.4.3(@oxc-project/types@0.155.0)(esbuild@0.28.2)(lightningcss@1.33.0)(oxc-parser@0.152.0)(rolldown@1.2.15)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.107.0)(stylus@0.64.0))(vue@3.5.44(@typescript/typescript6@6.0.2))
-    transitivePeerDependencies:
-      - '@farmfe/core'
-      - '@rsbuild/core'
-      - '@rspack/core'
-      - bun-types-no-globals
-      - esbuild
-      - rolldown
-      - rollup
-      - unloader
-      - vite
-      - webpack
 
   '@unhead/vue@3.4.3(@oxc-project/types@0.155.0)(esbuild@0.28.2)(lightningcss@1.33.0)(oxc-parser@0.152.0)(rolldown@1.2.15)(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.107.0)(stylus@0.64.0))(vue@3.5.44(@typescript/typescript6@6.0.2))':
     dependencies:

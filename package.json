@@ -53,7 +53,6 @@
     "@sockeye-js/store-memory": "^0.5.1",
     "@sockeye-js/store-redis": "^0.5.1",
     "@sockeye-js/ui": "^0.5.1",
-    "@unhead/schema-org": "^3.4.3",
     "@unhead/vue": "^3.4.3",
     "@vueuse/core": "^15.0.0",
     "bcryptjs": "^3.0.3",
