@@ -14,16 +14,6 @@ export type SitemapUrl = {
  */
 export const staticSitemapUrls: SitemapUrl[] = [
     '/',
-    '/landing',
-    '/cs/landing',
-    '/de/landing',
-    '/en/landing',
-    '/fr/landing',
-    '/ja/landing',
-    '/ko/landing',
-    '/pl/landing',
-    '/tr/landing',
-    '/zh/landing',
     '/guide',
     '/guide/ai-analysis',
     '/guide/conditional-moves',
