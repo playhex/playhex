@@ -7,10 +7,10 @@ Code: `src/server/social-preview/`.
 
 ## Test it
 
-Add `?iambot` to force the crawler version, then look at the `<head>`:
+Add `?bot` to force the crawler version, then look at the `<head>`:
 
 ```bash
-curl -s 'http://localhost:13000/games/<publicId>?iambot' | grep -E 'og:|twitter:|ld\+json'
+curl -s 'http://localhost:13000/games/<publicId>?bot' | grep -E 'og:|twitter:|ld\+json'
 ```
 
 Note: `curl` without User-Agent is already detected as a bot. To get the visitor version, pass a browser User-Agent.

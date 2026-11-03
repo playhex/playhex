@@ -25,8 +25,8 @@ describe('isSocialBot', () => {
     });
 
     it('can be forced with query parameter', () => {
-        assert.strictEqual(isSocialBot(browser, { iambot: '' }), true);
-        assert.strictEqual(isSocialBot(browser, { iambot: '1' }), true);
+        assert.strictEqual(isSocialBot(browser, { bot: '' }), true);
+        assert.strictEqual(isSocialBot(browser, { bot: '1' }), true);
     });
 });
 

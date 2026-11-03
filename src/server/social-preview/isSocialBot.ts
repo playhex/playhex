@@ -1,10 +1,10 @@
 import { isbot } from 'isbot';
 
 /**
- * Forces social preview rendering when present (e.g "?iambot"), to debug with a browser
+ * Forces social preview rendering when present (e.g "?bot"), to debug with a browser
  * or curl without a crawler user agent.
  */
-export const FORCE_SOCIAL_PREVIEW_PARAMETER = 'iambot';
+export const FORCE_SOCIAL_PREVIEW_PARAMETER = 'bot';
 
 /**
  * Whether page should be rendered with social preview meta.
