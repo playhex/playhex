@@ -1981,6 +1981,10 @@
             "guide": {
                 "title": "PlayHex guide",
                 "description": "How to play Hex on PlayHex: rules, AI analysis, conditional moves, moderation."
+            },
+            "export_games_data": {
+                "title": "Export PlayHex games data",
+                "description": "Download a dataset of all Hex games played on PlayHex, free to reuse."
             }
         }
     }

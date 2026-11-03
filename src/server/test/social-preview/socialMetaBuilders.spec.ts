@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import type { BreadcrumbList, Event, ProfilePage, SportsEvent, WebSite } from 'schema-dts';
+import type { BreadcrumbList, DataDownload, Dataset, Event, ProfilePage, SportsEvent, WebSite } from 'schema-dts';
 import { ExternalGame, Game, GameToPlayer, Player, Puzzle, Rating, Tournament, TournamentParticipant } from '../../../shared/app/models/index.js';
 import { getSocialT } from '../../social-preview/socialI18n.js';
 import { createDefaultSocialMeta, type SocialLocale, type SocialMetaContext } from '../../social-preview/SocialMeta.js';
@@ -11,6 +11,7 @@ import PuzzleMetaBuilder from '../../social-preview/meta/PuzzleMetaBuilder.js';
 import PlayerMetaBuilder from '../../social-preview/meta/PlayerMetaBuilder.js';
 import StaticPageMetaBuilder from '../../social-preview/meta/StaticPageMetaBuilder.js';
 import LadderMetaBuilder from '../../social-preview/meta/LadderMetaBuilder.js';
+import ExportGamesDataMetaBuilder from '../../social-preview/meta/ExportGamesDataMetaBuilder.js';
 import type { LadderDto } from '../../../shared/app/models/LadderDto.js';
 
 const context = (locale: SocialLocale = 'en', url = 'https://playhex.org/page'): SocialMetaContext => ({
@@ -294,5 +295,28 @@ describe('social preview meta builders', () => {
 
         // Pages without data that would get outdated use a screenshot
         assert.strictEqual(new StaticPageMetaBuilder().buildMeta('/hexplorer', context('fr'))?.image?.url, 'https://playhex.org/images/social-preview/hexplorer.jpg');
+    });
+
+    it('builds export games data dataset json-ld', () => {
+        const meta = new ExportGamesDataMetaBuilder().buildMeta({
+            description: 'All PlayHex games',
+            filename: '/export-data/playhex-games-2026-11-01.json.gz',
+            generated_at: '2026-11-01T03:00:00.000Z',
+            filesize: 1000,
+            filesizeUnzipped: 5000,
+            itemsCount: 42,
+        }, context());
+
+        const dataset = meta.jsonLd?.[0] as Dataset & { '@type': 'Dataset' };
+
+        assert.strictEqual(dataset['@type'], 'Dataset');
+        assert.strictEqual(dataset.dateModified, '2026-11-01T03:00:00.000Z');
+        assert.strictEqual(dataset.version, '2026-11-01T03:00:00');
+        assert.strictEqual(
+            ((dataset.distribution as DataDownload[])[0] as { contentUrl: string }).contentUrl,
+            'https://playhex.org/export-data/playhex-games-2026-11-01.json.gz',
+        );
+
+        assert.strictEqual(new StaticPageMetaBuilder().buildMeta('/export-games-data', context('fr'))?.title, 'Exporter les parties de PlayHex - PlayHex');
     });
 });

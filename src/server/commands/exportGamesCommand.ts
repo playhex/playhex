@@ -5,6 +5,7 @@ import hexProgram from './hexProgram.js';
 import { guessDemerHandicap } from '../../shared/app/demerHandicap.js';
 import { pseudoString } from '../../shared/app/pseudoUtils.js';
 import TimeControlType from '../../shared/time-control/TimeControlType.js';
+import type { ExportGamesDataManifest } from '../../shared/app/ExportGamesDataManifest.js';
 
 type ExportedGame = {
     /**
@@ -200,15 +201,6 @@ hexProgram
             });
         }
 
-        type FileStat = {
-            description: string;
-            filename: string;
-            generated_at: string;
-            filesize: number;
-            filesizeUnzipped: number;
-            itemsCount: number;
-        };
-
         const fileContent = JSON.stringify(exportedGames);
         const date = new Date();
         const serverPath = 'assets/export-data';
@@ -225,7 +217,7 @@ hexProgram
         fs.writeFileSync(serverPath + '/' + filename, gzipSync(fileContent), 'utf-8');
         const stat = fs.statSync(serverPath + '/' + filename);
 
-        const fileStat: FileStat = {
+        const fileStat: ExportGamesDataManifest = {
             description: 'All PlayHex games since the beginning, 1v1 and bots games.',
             filename: publicPath + '/' + filename,
             generated_at: date.toISOString(),

@@ -1955,6 +1955,10 @@
             "guide": {
                 "title": "Guide de PlayHex",
                 "description": "Comment jouer à Hex sur PlayHex : règles, analyse IA, coups conditionnels, modération."
+            },
+            "export_games_data": {
+                "title": "Exporter les parties de PlayHex",
+                "description": "Téléchargez un jeu de données de toutes les parties de Hex jouées sur PlayHex, libre de réutilisation."
             }
         }
     }

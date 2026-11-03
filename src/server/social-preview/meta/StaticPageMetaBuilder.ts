@@ -18,6 +18,7 @@ const staticPages: { [path: string]: string } = {
     '/hexplorer': 'hexplorer',
     '/swap-maps': 'swap_maps',
     '/guide': 'guide',
+    '/export-games-data': 'export_games_data',
 };
 
 /**

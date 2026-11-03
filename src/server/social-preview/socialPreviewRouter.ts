@@ -11,7 +11,8 @@ import PuzzleCollectionMetaBuilder from './meta/PuzzleCollectionMetaBuilder.js';
 import PlayerMetaBuilder from './meta/PlayerMetaBuilder.js';
 import LadderMetaBuilder from './meta/LadderMetaBuilder.js';
 import StaticPageMetaBuilder from './meta/StaticPageMetaBuilder.js';
-import { loadExternalGame, loadGame, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
+import ExportGamesDataMetaBuilder from './meta/ExportGamesDataMetaBuilder.js';
+import { loadExportGamesDataManifest, loadExternalGame, loadGame, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
 
 const param = (req: Request, name: string): string => String(req.params[name]);
 
@@ -95,6 +96,13 @@ export function socialPreviewRouter(): Router {
         const data = await loadPlayer(slug);
 
         return data && Container.get(PlayerMetaBuilder).buildMeta(data, context);
+    }));
+
+    router.get('/export-games-data', resolveMeta(async (_req, context) => {
+        const manifest = await loadExportGamesDataManifest();
+
+        // No export yet: page still exists, keep static page meta
+        return manifest ? Container.get(ExportGamesDataMetaBuilder).buildMeta(manifest, context) : {};
     }));
 
     router.get('/{*path}', (req, res, next) => {

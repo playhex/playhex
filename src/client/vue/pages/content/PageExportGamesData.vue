@@ -3,24 +3,17 @@ import { defineOrganization, useSchemaOrg } from '@unhead/schema-org';
 import { injectHead, useHead, useSeoMeta } from '@unhead/vue';
 import { IconDownload } from '../../icons.js';
 import { ref, watchEffect } from 'vue';
+import { t } from 'i18next';
+import type { ExportGamesDataManifest } from '../../../../shared/app/ExportGamesDataManifest.js';
 
-type FileStat = {
-    description: string;
-    filename: string;
-    generated_at: string;
-    filesize: number;
-    filesizeUnzipped: number;
-    itemsCount: number;
-};
-
-const fileStat = ref<null | false | FileStat>(null);
+const fileStat = ref<null | false | ExportGamesDataManifest>(null);
 
 useHead({
-    title: 'Export PlayHex games data',
+    title: () => t('social_preview.static.export_games_data.title'),
 });
 
 useSeoMeta({
-    description: 'Download dataset of all Hex games played on PlayHex.',
+    description: () => t('social_preview.static.export_games_data.description'),
 });
 
 const head = injectHead();
@@ -94,7 +87,7 @@ const getFilesize = (size: number): string => {
 </script>
 
 <template>
-    <h1>Export PlayHex games data</h1>
+    <h1>{{ $t('social_preview.static.export_games_data.title') }}</h1>
 
     <p v-if="null === fileStat">Loading…</p>
     <p v-else-if="false === fileStat">Error while listing files.</p>
