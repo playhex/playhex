@@ -1,12 +1,15 @@
 import { Service } from 'typedi';
 import type { Player, Tournament } from '../../../shared/app/models/index.js';
-import { withSiteName, type JsonLd, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
+import type { Event, EventStatusType, WithContext } from 'schema-dts';
+import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
-import { breadcrumbJsonLd, formatDate, formatIsoDate, joinTitle, personJsonLd, playerName, settingsLine, truncate } from './metaUtils.js';
+import { breadcrumbJsonLd, formatDate, formatIsoDate, joinTitle, personJsonLd, playerName, settingsLine, tournamentJsonLdId, tournamentSeriesJsonLdId, tournamentUrl, truncate } from './metaUtils.js';
 
-const eventStatus = (tournament: Tournament): string => {
+/**
+ * No EventCompleted in schema.org: past events stay EventScheduled.
+ */
+const eventStatus = (tournament: Tournament): EventStatusType => {
     switch (tournament.state) {
-        case 'ended': return 'https://schema.org/EventCompleted';
         case 'canceled': return 'https://schema.org/EventCancelled';
         default: return 'https://schema.org/EventScheduled';
     }
@@ -33,7 +36,7 @@ export default class TournamentMetaBuilder extends AbstractEntityMetaBuilder<Tou
 
     url(tournament: Tournament, context: SocialMetaContext): string
     {
-        return `${context.baseUrl}/tournaments/${encodeURIComponent(tournament.slug)}`;
+        return tournamentUrl(tournament, context);
     }
 
     /**
@@ -114,9 +117,10 @@ export default class TournamentMetaBuilder extends AbstractEntityMetaBuilder<Tou
             : lines.join(' · ')
         ;
 
-        const event: JsonLd = {
+        const event: WithContext<Event> = {
             '@context': 'https://schema.org',
             '@type': 'Event',
+            '@id': tournamentJsonLdId(tournament, context),
             name: tournament.title,
             url,
             image: image.url,
@@ -141,9 +145,7 @@ export default class TournamentMetaBuilder extends AbstractEntityMetaBuilder<Tou
 
         if (tournament.series) {
             event.superEvent = {
-                '@type': 'EventSeries',
-                name: tournament.series.title,
-                url: `${context.baseUrl}/tournament-series/${encodeURIComponent(tournament.series.slug)}`,
+                '@id': tournamentSeriesJsonLdId(tournament.series, context),
             };
         }
 

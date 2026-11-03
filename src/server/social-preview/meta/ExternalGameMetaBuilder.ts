@@ -1,6 +1,7 @@
 import { Service } from 'typedi';
 import type { ExternalGame } from '../../../shared/app/models/index.js';
-import { withSiteName, type JsonLd, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
+import type { SportsEvent, WithContext } from 'schema-dts';
+import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
 import { boardsizeString, formatDate, formatIsoDate, joinTitle } from './metaUtils.js';
 
@@ -86,25 +87,28 @@ export default class ExternalGameMetaBuilder extends AbstractEntityMetaBuilder<E
         const title = joinTitle(versus, winner && t('social_preview.game.winner', { winner }), formatIsoDate(date));
         const image = this.image(externalGame, context, t('social_preview.game.image_alt', { title: versus }));
 
-        const jsonLd: JsonLd = {
+        const jsonLd: WithContext<SportsEvent> = {
             '@context': 'https://schema.org',
             '@type': 'SportsEvent',
             name: `${red} vs ${blue}`,
             sport: 'Hex',
             url: context.url,
             description,
-            eventStatus: 'https://schema.org/EventCompleted',
+            // No EventCompleted in schema.org: past events stay EventScheduled
+            eventStatus: 'https://schema.org/EventScheduled',
+            eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+            location: {
+                '@type': 'VirtualLocation',
+                url: context.url,
+            },
             competitor: [
                 { '@type': 'Person', name: red },
                 { '@type': 'Person', name: blue },
             ],
+            startDate: (externalGame.startedAt ?? date).toISOString(),
             endDate: date.toISOString(),
             image: image.url,
         };
-
-        if (externalGame.startedAt) {
-            jsonLd.startDate = externalGame.startedAt.toISOString();
-        }
 
         return {
             title: withSiteName(title),

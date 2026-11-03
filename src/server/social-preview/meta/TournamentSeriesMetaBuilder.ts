@@ -2,8 +2,7 @@ import { Service } from 'typedi';
 import type { Tournament, TournamentSeries } from '../../../shared/app/models/index.js';
 import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
-import TournamentMetaBuilder from './TournamentMetaBuilder.js';
-import { breadcrumbJsonLd, formatDate, joinTitle, truncate } from './metaUtils.js';
+import { breadcrumbJsonLd, formatDate, joinTitle, tournamentJsonLdId, tournamentSeriesJsonLdId, tournamentSeriesUrl, truncate } from './metaUtils.js';
 
 export type TournamentSeriesPageData = {
     series: TournamentSeries;
@@ -14,12 +13,6 @@ export type TournamentSeriesPageData = {
 export default class TournamentSeriesMetaBuilder extends AbstractEntityMetaBuilder<TournamentSeriesPageData>
 {
     readonly imageType = 'tournament-series';
-
-    constructor(
-        private tournamentMetaBuilder: TournamentMetaBuilder,
-    ) {
-        super();
-    }
 
     imageId({ series }: TournamentSeriesPageData): string
     {
@@ -39,7 +32,7 @@ export default class TournamentSeriesMetaBuilder extends AbstractEntityMetaBuild
 
     url(series: TournamentSeries, context: SocialMetaContext): string
     {
-        return `${context.baseUrl}/tournament-series/${encodeURIComponent(series.slug)}`;
+        return tournamentSeriesUrl(series, context);
     }
 
     /**
@@ -95,6 +88,7 @@ export default class TournamentSeriesMetaBuilder extends AbstractEntityMetaBuild
                 {
                     '@context': 'https://schema.org',
                     '@type': 'EventSeries',
+                    '@id': tournamentSeriesJsonLdId(series, context),
                     name: series.title,
                     url,
                     image: image.url,
@@ -103,10 +97,7 @@ export default class TournamentSeriesMetaBuilder extends AbstractEntityMetaBuild
                         .filter(tournament => !tournament.hidden && tournament.state !== 'canceled')
                         .slice(0, 10)
                         .map(tournament => ({
-                            '@type': 'Event',
-                            name: tournament.title,
-                            url: this.tournamentMetaBuilder.url(tournament, context),
-                            startDate: tournament.startOfficialAt.toISOString(),
+                            '@id': tournamentJsonLdId(tournament, context),
                         })),
                 },
                 breadcrumbJsonLd([

@@ -1,5 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
+import type { BreadcrumbList, Event, ProfilePage, SportsEvent, WebSite } from 'schema-dts';
 import { ExternalGame, Game, GameToPlayer, Player, Puzzle, Rating, Tournament, TournamentParticipant } from '../../../shared/app/models/index.js';
 import { getSocialT } from '../../social-preview/socialI18n.js';
 import { createDefaultSocialMeta, type SocialLocale, type SocialMetaContext } from '../../social-preview/SocialMeta.js';
@@ -77,7 +78,7 @@ describe('social preview meta builders', () => {
 
         assert.strictEqual(meta.url, 'https://playhex.org/page');
         assert.strictEqual(meta.image.url, 'https://playhex.org/images/social-preview.jpg');
-        assert.strictEqual(meta.jsonLd[0]['@type'], 'WebSite');
+        assert.strictEqual((meta.jsonLd[0] as WebSite)['@type'], 'WebSite');
         assertTranslated(meta.description);
     });
 
@@ -91,7 +92,7 @@ describe('social preview meta builders', () => {
         assert.ok(!meta.description!.includes('10min + 5s'));
         assert.ok(meta.description!.includes('3 moves'));
         assert.strictEqual(meta.image?.url, `https://playhex.org/og/games/game-1.png?lang=en&v=${new Date('2026-03-12T10:30:00Z').getTime()}`);
-        assert.strictEqual(meta.jsonLd?.[0]['@type'], 'SportsEvent');
+        assert.strictEqual((meta.jsonLd?.[0] as SportsEvent)['@type'], 'SportsEvent');
 
         const metaFr = new GameMetaBuilder().buildMeta(createEndedGame(), context('fr'));
 
@@ -160,7 +161,7 @@ describe('social preview meta builders', () => {
         assert.strictEqual(meta.title, 'Alice (1870.9) vs Bob · Bob wins · 2026-03-12 - PlayHex');
         assert.strictEqual(meta.description, 'Bob won by resignation. Hex 13×13 · Little Golem · 3 moves · Mar 12, 2026');
         assert.strictEqual(meta.image?.url, `https://playhex.org/og/external-games/external-1.png?lang=en&v=${new Date('2026-04-01T00:00:00Z').getTime()}`);
-        assert.strictEqual(meta.jsonLd?.[0]['@type'], 'SportsEvent');
+        assert.strictEqual((meta.jsonLd?.[0] as SportsEvent)['@type'], 'SportsEvent');
 
         externalGame.winner = null;
 
@@ -194,9 +195,9 @@ describe('social preview meta builders', () => {
         // Only date: time in UTC would confuse players
         assert.ok(created.description!.includes('Starts Apr 1, 2026'));
         assert.ok(!created.description!.includes('UTC'));
-        assert.strictEqual(created.jsonLd?.[0]['@type'], 'Event');
-        assert.strictEqual(created.jsonLd?.[0].eventStatus, 'https://schema.org/EventScheduled');
-        assert.strictEqual(created.jsonLd?.[1]['@type'], 'BreadcrumbList');
+        assert.strictEqual((created.jsonLd?.[0] as Event)['@type'], 'Event');
+        assert.strictEqual((created.jsonLd?.[0] as Event).eventStatus, 'https://schema.org/EventScheduled');
+        assert.strictEqual((created.jsonLd?.[1] as BreadcrumbList)['@type'], 'BreadcrumbList');
 
         tournament.state = 'ended';
         tournament.endedAt = new Date('2026-04-01T21:00:00Z');
@@ -209,7 +210,7 @@ describe('social preview meta builders', () => {
 
         assert.ok(ended.description!.startsWith('1st: Alice · 2nd: Bob · 3rd: Charlie'));
         assert.ok(!ended.description!.includes('Dave'));
-        assert.strictEqual(ended.jsonLd?.[0].eventStatus, 'https://schema.org/EventCompleted');
+        assert.strictEqual((ended.jsonLd?.[0] as Event).eventStatus, 'https://schema.org/EventScheduled');
 
         tournament.hidden = true;
 
@@ -256,7 +257,7 @@ describe('social preview meta builders', () => {
         assert.strictEqual(meta.title, 'Alice, Hex player - PlayHex');
         assert.strictEqual(meta.description, 'Rating 1712 · 42 games played · Member since Jan 1, 2025');
         assert.strictEqual(meta.noindex, true);
-        assert.strictEqual(meta.jsonLd?.[0]['@type'], 'ProfilePage');
+        assert.strictEqual((meta.jsonLd?.[0] as ProfilePage)['@type'], 'ProfilePage');
 
         player.isBot = true;
 

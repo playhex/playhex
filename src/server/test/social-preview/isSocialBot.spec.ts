@@ -32,11 +32,12 @@ describe('isSocialBot', () => {
 
 describe('serializeJsonLd', () => {
     it('escapes characters that could close the script tag', () => {
-        const serialized = serializeJsonLd({ name: '</script><script>alert(1)</script> &  ' });
+        const jsonLd = { '@context': 'https://schema.org', '@type': 'Thing', name: '</script><script>alert(1)</script> &  ' } as const;
+        const serialized = serializeJsonLd(jsonLd);
 
         assert.ok(!serialized.includes('</script>'));
         assert.ok(!serialized.includes('<'));
         assert.ok(!serialized.includes(' '));
-        assert.deepStrictEqual(JSON.parse(serialized), { name: '</script><script>alert(1)</script> &  ' });
+        assert.deepStrictEqual(JSON.parse(serialized), jsonLd);
     });
 });

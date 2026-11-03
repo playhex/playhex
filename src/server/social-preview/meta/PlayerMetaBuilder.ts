@@ -1,4 +1,5 @@
 import { Service } from 'typedi';
+import type { Person } from 'schema-dts';
 import type { Player, PlayerStats } from '../../../shared/app/models/index.js';
 import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
@@ -79,7 +80,7 @@ export default class PlayerMetaBuilder extends AbstractEntityMetaBuilder<PlayerP
         const name = playerName(player);
         const url = playerUrl(player, context);
 
-        const person: { [key: string]: unknown } = {
+        const person: Person = {
             '@type': 'Person',
             '@id': `${url}#person`,
             name,

@@ -1,4 +1,4 @@
-import type { JsonLd } from './SocialMeta.js';
+import type { Thing, WithContext } from 'schema-dts';
 
 const LINE_SEPARATOR = String.fromCharCode(0x2028);
 const PARAGRAPH_SEPARATOR = String.fromCharCode(0x2029);
@@ -8,7 +8,7 @@ const PARAGRAPH_SEPARATOR = String.fromCharCode(0x2029);
  * Escapes characters that could close the script tag or break the page,
  * because values contain user content like pseudos or tournament titles.
  */
-export const serializeJsonLd = (jsonLd: JsonLd | JsonLd[]): string => {
+export const serializeJsonLd = (jsonLd: WithContext<Thing> | WithContext<Thing>[]): string => {
     return JSON.stringify(jsonLd)
         .replace(/</g, '\\u003c')
         .replace(/>/g, '\\u003e')

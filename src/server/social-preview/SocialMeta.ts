@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+import type { Thing, WebSite, WithContext } from 'schema-dts';
 import { seo } from '../../shared/app/seo.js';
 
 export const supportedSocialLocales = ['en', 'fr'] as const;
@@ -24,8 +25,6 @@ export type SocialImage = {
     alt: string;
 };
 
-export type JsonLd = { [key: string]: unknown };
-
 /**
  * Meta tags rendered in page <head>, read by social networks crawlers and search engines.
  */
@@ -42,7 +41,7 @@ export type SocialMeta = {
     type: 'website' | 'article' | 'profile';
     locale: SocialLocale;
     noindex: boolean;
-    jsonLd: JsonLd[];
+    jsonLd: WithContext<Thing>[];
 };
 
 /**
@@ -92,7 +91,7 @@ export const ogImage = (context: SocialMetaContext, path: string, version: strin
     };
 };
 
-export const websiteJsonLd = (baseUrl: string): JsonLd => ({
+export const websiteJsonLd = (baseUrl: string): WithContext<WebSite> => ({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${baseUrl}/#website`,

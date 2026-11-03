@@ -1,8 +1,9 @@
 import type { TFunction } from 'i18next';
-import type { Player, PuzzleCollection } from '../../../shared/app/models/index.js';
+import type { BreadcrumbList, Person, WithContext } from 'schema-dts';
+import type { Player, PuzzleCollection, Tournament, TournamentSeries } from '../../../shared/app/models/index.js';
 import type TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
-import type { JsonLd, SocialMetaContext } from '../SocialMeta.js';
+import type { SocialMetaContext } from '../SocialMeta.js';
 
 /**
  * "5min", "1h30min", "3d", with translated units.
@@ -110,14 +111,26 @@ export const playerUrl = (player: Player, context: SocialMetaContext): string =>
 
 export const puzzleCollectionUrl = (collection: PuzzleCollection, context: SocialMetaContext): string => `${context.baseUrl}/puzzles/collections/${encodeURIComponent(collection.publicId)}`;
 
-export const personJsonLd = (player: Player, context: SocialMetaContext): JsonLd => ({
+export const tournamentUrl = (tournament: Pick<Tournament, 'slug'>, context: SocialMetaContext): string => `${context.baseUrl}/tournaments/${encodeURIComponent(tournament.slug)}`;
+
+export const tournamentSeriesUrl = (series: Pick<TournamentSeries, 'slug'>, context: SocialMetaContext): string => `${context.baseUrl}/tournament-series/${encodeURIComponent(series.slug)}`;
+
+/**
+ * Ids of tournament Event and series EventSeries json-ld, to reference them from other pages
+ * without declaring an incomplete Event that Google would report as invalid.
+ */
+export const tournamentJsonLdId = (tournament: Pick<Tournament, 'slug'>, context: SocialMetaContext): string => `${tournamentUrl(tournament, context)}#event`;
+
+export const tournamentSeriesJsonLdId = (series: Pick<TournamentSeries, 'slug'>, context: SocialMetaContext): string => `${tournamentSeriesUrl(series, context)}#event-series`;
+
+export const personJsonLd = (player: Player, context: SocialMetaContext): Person => ({
     '@type': 'Person',
     '@id': `${playerUrl(player, context)}#person`,
     name: playerName(player),
     url: playerUrl(player, context),
 });
 
-export const breadcrumbJsonLd = (items: { name: string, url: string }[]): JsonLd => ({
+export const breadcrumbJsonLd = (items: { name: string, url: string }[]): WithContext<BreadcrumbList> => ({
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: items.map((item, index) => ({

@@ -1,8 +1,9 @@
 import { Service } from 'typedi';
 import type { Game, Player } from '../../../shared/app/models/index.js';
-import { withSiteName, type JsonLd, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
+import type { SportsEvent, WithContext } from 'schema-dts';
+import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
-import { boardsizeString, formatDate, formatIsoDate, formatTimeControl, joinTitle, personJsonLd, playerName } from './metaUtils.js';
+import { boardsizeString, formatDate, formatIsoDate, formatTimeControl, joinTitle, personJsonLd, playerName, tournamentJsonLdId } from './metaUtils.js';
 
 @Service()
 export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
@@ -131,14 +132,15 @@ export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
 
         const title = joinTitle(versus, t('social_preview.game.winner', { winner: playerName(winner) }), game.endedAt && formatIsoDate(game.endedAt));
 
-        const jsonLd: JsonLd = {
+        const jsonLd: WithContext<SportsEvent> = {
             '@context': 'https://schema.org',
             '@type': 'SportsEvent',
             name: `${playerName(red)} vs ${playerName(blue)}`,
             sport: 'Hex',
             url: context.url,
             description: `${outcome}. ${details.join(' · ')}`,
-            eventStatus: 'https://schema.org/EventCompleted',
+            // No EventCompleted in schema.org: past events stay EventScheduled
+            eventStatus: 'https://schema.org/EventScheduled',
             eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
             location: {
                 '@type': 'VirtualLocation',
@@ -147,8 +149,10 @@ export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
             competitor: [personJsonLd(red, context), personJsonLd(blue, context)],
         };
 
-        if (game.startedAt) {
-            jsonLd.startDate = game.startedAt.toISOString();
+        const startDate = game.startedAt ?? game.endedAt;
+
+        if (startDate) {
+            jsonLd.startDate = startDate.toISOString();
         }
 
         if (game.endedAt) {
@@ -157,9 +161,7 @@ export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
 
         if (game.tournamentMatch?.tournament) {
             jsonLd.superEvent = {
-                '@type': 'Event',
-                name: game.tournamentMatch.tournament.title,
-                url: `${context.baseUrl}/tournaments/${encodeURIComponent(game.tournamentMatch.tournament.slug)}`,
+                '@id': tournamentJsonLdId(game.tournamentMatch.tournament, context),
             };
         }
 

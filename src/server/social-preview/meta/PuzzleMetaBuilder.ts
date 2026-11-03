@@ -1,6 +1,7 @@
 import { Service } from 'typedi';
 import type { Puzzle } from '../../../shared/app/models/index.js';
-import { withSiteName, type JsonLd, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
+import type { CreativeWork, WithContext } from 'schema-dts';
+import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
 import { boardsizeString, breadcrumbJsonLd, joinTitle, personJsonLd, playerName, puzzleCollectionUrl } from './metaUtils.js';
 
@@ -63,7 +64,7 @@ export default class PuzzleMetaBuilder extends AbstractEntityMetaBuilder<Puzzle>
         const image = this.image(puzzle, context, title);
         const description = this.summary(puzzle, context);
 
-        const creativeWork: JsonLd = {
+        const creativeWork: WithContext<CreativeWork> = {
             '@context': 'https://schema.org',
             '@type': 'CreativeWork',
             name: title,
