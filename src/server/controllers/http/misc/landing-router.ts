@@ -4,7 +4,7 @@ import { seo } from '../../../../shared/app/seo.js';
 import { serializeJsonLd } from '../../../social-preview/serializeJsonLd.js';
 import { socialBaseUrl } from '../../../social-preview/SocialMeta.js';
 import { defaultLandingLocale, findLandingLocale, landingLocales, landingPath } from '../../../landing/landingLocales.js';
-import { buildLandingPage } from '../../../landing/landingPage.js';
+import { buildLandingPage, getLandingBootstrapCssUrl } from '../../../landing/landingPage.js';
 import { landingIcons } from '../../../landing/landingIcons.js';
 
 /**
@@ -29,7 +29,7 @@ export function landingRouter(): Router {
             page: buildLandingPage(locale, socialBaseUrl()),
             landingLocales,
             seo,
-            bootstrapCssUrl: getBootstrapStylesheetUrl(),
+            bootstrapCssUrl: getLandingBootstrapCssUrl(getBootstrapStylesheetUrl(), locale),
             blockRobotsIndex: process.env.BLOCK_ROBOTS_INDEX === 'true',
             serializeJsonLd,
             landingIcons,

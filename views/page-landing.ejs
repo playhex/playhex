@@ -94,7 +94,7 @@
         .landing-hero-hexes {
             position: absolute !important;
             top: 0;
-            left: -4rem;
+            inset-inline-start: -4rem;
             width: 38rem;
             height: auto;
             opacity: .14;
@@ -102,7 +102,7 @@
         }
         @media (max-width: 767.98px) {
             .landing-hero-hexes {
-                left: -10rem;
+                inset-inline-start: -10rem;
                 opacity: .08;
             }
         }
@@ -175,17 +175,17 @@
         .landing-feature-image-wrapper.has-inset {
             margin-bottom: 2.5rem;
         }
-        /* Smaller image over main image bottom left corner */
+        /* Smaller image over main image bottom corner, on reading start side */
         .landing-feature-image img.landing-inset {
             position: absolute;
-            left: -3rem;
+            inset-inline-start: -3rem;
             bottom: -2.5rem;
             width: 38%;
             max-height: none;
         }
         @media (max-width: 767.98px) {
             .landing-feature-image img.landing-inset {
-                left: -.5rem;
+                inset-inline-start: -.5rem;
                 bottom: -2rem;
             }
         }

@@ -38,6 +38,16 @@ export type LandingPage = {
 };
 
 /**
+ * Bootstrap ships a separate RTL build. Landing page has no app js to swap it on client side,
+ * see setBootstrapStylesheet().
+ */
+export const getLandingBootstrapCssUrl = (bootstrapCssUrl: string, locale: LandingLocale): string =>
+    locale.dir === 'rtl'
+        ? bootstrapCssUrl.replace('bootstrap.min.css', 'bootstrap.rtl.min.css')
+        : bootstrapCssUrl
+;
+
+/**
  * @param baseUrl e.g "https://playhex.org", without trailing slash
  */
 export const buildLandingPage = (locale: LandingLocale, baseUrl: string): LandingPage => {

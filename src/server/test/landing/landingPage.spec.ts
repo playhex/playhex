@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { describe, it } from 'mocha';
 import type { WebApplication, WebPage } from 'schema-dts';
-import { buildLandingPage } from '../../landing/landingPage.js';
+import { buildLandingPage, getLandingBootstrapCssUrl } from '../../landing/landingPage.js';
 import { findLandingLocale, landingFeatures, landingLocales } from '../../landing/landingLocales.js';
 import { staticSitemapUrls } from '../../seo/sitemapUrls.js';
 
@@ -76,6 +76,13 @@ describe('Landing page', () => {
 
     it('is right to left in arabic and urdu', () => {
         assert.deepStrictEqual(landingLocales.filter(locale => locale.dir === 'rtl').map(locale => locale.locale), ['ar', 'ur']);
+    });
+
+    it('uses bootstrap rtl build in right to left languages only', () => {
+        const url = '/statics/bootstrap-css/bootstrap.min.css?v=5.3.8';
+
+        assert.strictEqual(getLandingBootstrapCssUrl(url, findLandingLocale('ar')!), '/statics/bootstrap-css/bootstrap.rtl.min.css?v=5.3.8');
+        assert.strictEqual(getLandingBootstrapCssUrl(url, findLandingLocale('en')!), url);
     });
 
     it('has translated json-ld', () => {
