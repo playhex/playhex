@@ -1,4 +1,5 @@
 import type { Tournament, TournamentSeries } from '../../shared/app/models/index.js';
+import { landingLocales, landingPath } from '../landing/landingLocales.js';
 
 export type SitemapUrl = {
     /**
@@ -30,6 +31,7 @@ export const staticSitemapUrls: SitemapUrl[] = [
     '/export-games-data',
     '/tournoi-hex-paris-2025',
     '/tournoi-hex-paris-2026',
+    ...landingLocales.map(locale => landingPath(locale.locale)),
 ].map(path => ({ path }));
 
 const latestDate = (dates: (null | undefined | Date)[]): undefined | Date => {

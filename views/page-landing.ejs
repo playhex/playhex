@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="<%= page.locale.locale %>" dir="<%= page.locale.dir %>" data-bs-theme="dark">
+<%#
+    Landing page, fully rendered server side for search engines, without the Vue app.
+    See src/server/landing/
+%>
+<head>
+    <meta charset="utf-8">
+    <title><%= page.title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#DC3545">
+
+    <script>
+        // Follow system theme, like the app does by default
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+        }
+    </script>
+
+    <% if (blockRobotsIndex) { %>
+    <meta name="robots" content="noindex, nofollow">
+    <% } %>
+
+    <meta name="description" content="<%= page.content.metaDescription %>">
+    <link rel="canonical" href="<%= page.canonicalUrl %>">
+    <% for (const alternate of page.alternates) { %>
+    <link rel="alternate" hreflang="<%= alternate.hreflang %>" href="<%= alternate.url %>">
+    <% } %>
+
+    <link rel="icon" href="/images/logo-transparent.svg" type="image/svg+xml">
+    <link rel="manifest" href="/pwa-manifest.json">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= page.canonicalUrl %>">
+    <meta property="og:title" content="<%= page.title %>">
+    <meta property="og:description" content="<%= page.content.metaDescription %>">
+    <meta property="og:image" content="<%= page.ogImage.url %>">
+    <meta property="og:image:width" content="<%= page.ogImage.width %>">
+    <meta property="og:image:height" content="<%= page.ogImage.height %>">
+    <meta property="og:site_name" content="<%= seo.title %>">
+    <meta property="og:locale" content="<%= page.locale.ogLocale %>">
+    <% for (const other of landingLocales) { %>
+    <% if (other !== page.locale) { %>
+    <meta property="og:locale:alternate" content="<%= other.ogLocale %>">
+    <% } %>
+    <% } %>
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= page.title %>">
+    <meta name="twitter:description" content="<%= page.content.metaDescription %>">
+    <meta name="twitter:image" content="<%= page.ogImage.url %>">
+
+    <script type="application/ld+json"><%- serializeJsonLd(page.jsonLd) %></script>
+
+    <link rel="preload" as="image" href="<%= page.features[0].image.src %>">
+    <link rel="stylesheet" href="<%- bootstrapCssUrl %>">
+
+    <style>
+        .landing-nav {
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+        @media (max-width: 767.98px) {
+            /* Brand and language on first line, links on second line */
+            .landing-nav {
+                order: 3;
+                width: 100%;
+            }
+        }
+        .landing-lang summary {
+            cursor: pointer;
+            list-style: none;
+            white-space: nowrap;
+        }
+        .landing-lang summary::-webkit-details-marker {
+            display: none;
+        }
+        .landing-lang ul {
+            position: absolute;
+            inset-inline-end: 0;
+            z-index: 10;
+            min-width: 10em;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .landing-hero {
+            overflow: hidden;
+        }
+        .landing-hero > * {
+            position: relative;
+        }
+        /* Big hexagon outlines on hero side, very discreet */
+        .landing-hero-hexes {
+            position: absolute !important;
+            top: 0;
+            left: -4rem;
+            width: 38rem;
+            height: auto;
+            opacity: .14;
+            pointer-events: none;
+        }
+        @media (max-width: 767.98px) {
+            .landing-hero-hexes {
+                left: -10rem;
+                opacity: .08;
+            }
+        }
+        .landing-hero h1 {
+            font-size: calc(2rem + 2.5vw);
+        }
+        .landing-feature-image img {
+            max-width: 100%;
+            max-height: 70vh;
+            width: auto;
+            height: auto;
+        }
+        .landing-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            color: var(--bs-danger);
+            background: rgba(var(--bs-danger-rgb), .12);
+        }
+        .landing-icon-trophy,
+        .landing-icon-crown {
+            color: #e0a800;
+            background: rgba(255, 193, 7, .18);
+        }
+        .landing-highlights li {
+            display: flex;
+            align-items: baseline;
+            gap: .6em;
+            margin-bottom: .4em;
+        }
+        .landing-highlights li::before {
+            content: "✓";
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.4em;
+            height: 1.4em;
+            border-radius: 50%;
+            font-size: .85em;
+            font-weight: bold;
+            color: var(--bs-danger);
+            background: rgba(var(--bs-danger-rgb), .15);
+        }
+        .landing-card {
+            transition: transform .15s, box-shadow .15s;
+        }
+        .landing-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--bs-box-shadow) !important;
+        }
+        .landing-card-image {
+            min-height: 10rem;
+        }
+        .landing-card-image img {
+            max-width: 100%;
+            max-height: 12rem;
+            width: auto;
+            height: auto;
+        }
+        .landing-feature-image-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .landing-feature-image-wrapper.has-inset {
+            margin-bottom: 2.5rem;
+        }
+        /* Smaller image over main image bottom left corner */
+        .landing-feature-image img.landing-inset {
+            position: absolute;
+            left: -3rem;
+            bottom: -2.5rem;
+            width: 38%;
+            max-height: none;
+        }
+        @media (max-width: 767.98px) {
+            .landing-feature-image img.landing-inset {
+                left: -.5rem;
+                bottom: -2rem;
+            }
+        }
+        .landing-final {
+            background: linear-gradient(135deg, var(--bs-danger), #8b1c27);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="navbar bg-body-secondary shadow-sm">
+        <nav class="container d-flex flex-wrap flex-md-nowrap align-items-center justify-content-between column-gap-3">
+            <a class="navbar-brand" href="/">Play<span class="text-danger">Hex</span></a>
+
+            <ul class="landing-nav nav flex-nowrap flex-md-grow-1">
+                <li class="nav-item"><a class="nav-link link-body-emphasis" href="/"><%= page.content.nav.play %></a></li>
+                <li class="nav-item"><a class="nav-link link-body-emphasis" href="/tournaments"><%= page.content.nav.tournaments %></a></li>
+                <li class="nav-item"><a class="nav-link link-body-emphasis" href="/king-of-the-hill"><%= page.content.nav.ladder %></a></li>
+                <li class="nav-item"><a class="nav-link link-body-emphasis" href="/puzzles"><%= page.content.nav.puzzles %></a></li>
+                <li class="nav-item"><a class="nav-link link-body-emphasis" href="/tutorial"><%= page.content.nav.tutorial %></a></li>
+            </ul>
+
+            <details class="landing-lang position-relative">
+                <summary class="btn btn-sm btn-outline-secondary" aria-label="<%= page.content.nav.language %>"><%= page.locale.label %></summary>
+                <ul class="list-unstyled bg-body-tertiary border rounded shadow p-2 mt-1">
+                    <% for (const other of page.otherLocales) { %>
+                    <li><a class="d-block px-2 py-1 link-body-emphasis text-decoration-none" href="<%= other.path %>" hreflang="<%= other.locale %>" lang="<%= other.locale %>"><%= other.label %></a></li>
+                    <% } %>
+                </ul>
+            </details>
+        </nav>
+    </header>
+
+    <main>
+        <section class="landing-hero position-relative text-center py-5">
+            <%
+                // Pointy-top hexagon of radius 100 centered on (cx, cy)
+                const hexPoints = (cx, cy) => [30, 90, 150, 210, 270, 330]
+                    .map(angle => [cx + 100 * Math.cos(angle * Math.PI / 180), cy + 100 * Math.sin(angle * Math.PI / 180)].map(n => n.toFixed(1)).join(','))
+                    .join(' ');
+            %>
+            <svg class="landing-hero-hexes" viewBox="0 0 450 360" aria-hidden="true" fill="none" stroke-width="4">
+                <polygon points="<%= hexPoints(90, 90) %>" stroke="var(--bs-danger)" />
+                <polygon points="<%= hexPoints(310, 125) %>" stroke="var(--bs-primary)" />
+            </svg>
+            <div class="container">
+            <h1 class="fw-bold mb-3"><%= page.content.hero.title %></h1>
+            <p class="lead mb-2"><%= page.content.hero.subtitle %></p>
+            <p class="text-body-secondary fst-italic mb-4"><%= page.content.hero.tagline %></p>
+            <div class="d-flex justify-content-center flex-wrap gap-3">
+                <a class="btn btn-danger btn-lg px-4" href="/"><%= page.content.hero.cta %></a>
+                <a class="btn btn-outline-secondary btn-lg px-4" href="/tutorial"><%= page.content.hero.ctaSecondary %></a>
+            </div>
+            </div>
+        </section>
+
+        <%
+            /**
+             * Each band has its own background, alternating, first one same as hero.
+             */
+            let band = 0;
+            const bandClass = () => (band++ % 2) ? 'bg-body-tertiary' : '';
+            let spotlightIndex = 0;
+
+            // Points forward, depending on reading direction
+            const arrow = page.locale.dir === 'rtl' ? '←' : '→';
+        %>
+
+        <%_ const icon = (feature) => { _%>
+            <% if (feature.icon) { %>
+            <span class="landing-icon landing-icon-<%= feature.icon %>"><%- landingIcons[feature.icon] %></span>
+            <% } %>
+        <%_ } _%>
+
+        <%_ const title = (feature, featureContent, titleClass) => { _%>
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <% icon(feature) %>
+                <h2 class="<%= titleClass %> fw-bold mb-0"><%= featureContent.title %></h2>
+            </div>
+        <%_ } _%>
+
+        <%_ const highlights = (featureContent, listClass = '') => { _%>
+            <ul class="landing-highlights list-unstyled mb-4 <%= listClass %>">
+                <% for (const highlight of featureContent.highlights) { %>
+                <li><%= highlight %></li>
+                <% } %>
+            </ul>
+        <%_ } _%>
+
+        <% for (const section of page.sections) { %>
+
+        <% if (section.layout === 'spotlight') { %>
+        <% for (const feature of section.features) { %>
+        <% const featureContent = page.content.features[feature.key]; %>
+        <% const reversed = spotlightIndex++ % 2 === 1; %>
+        <section class="py-5 <%= bandClass() %>" id="<%= feature.key %>">
+            <div class="container">
+                <div class="row align-items-center justify-content-center g-5">
+                    <div class="landing-feature-image col-md-6 text-center <%= reversed ? 'order-md-2' : '' %>">
+                        <div class="landing-feature-image-wrapper <%= feature.inset ? 'has-inset' : '' %>">
+                            <img
+                                src="<%= feature.image.src %>"
+                                width="<%= feature.image.width %>"
+                                height="<%= feature.image.height %>"
+                                alt="<%= featureContent.imageAlt %>"
+                                <% if (feature !== page.features[0]) { %>loading="lazy"<% } %>
+                                decoding="async"
+                                class="rounded-3 shadow"
+                            >
+                            <% if (feature.inset) { %>
+                            <img
+                                src="<%= feature.inset.src %>"
+                                width="<%= feature.inset.width %>"
+                                height="<%= feature.inset.height %>"
+                                alt="<%= featureContent.highlights[0] %>"
+                                loading="lazy"
+                                decoding="async"
+                                class="landing-inset rounded-3 shadow-lg"
+                            >
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-5">
+                        <% title(feature, featureContent, '') %>
+                        <p class="fs-5 text-body-secondary"><%= featureContent.text %></p>
+                        <% highlights(featureContent) %>
+                        <a class="btn btn-outline-danger" href="<%= feature.link %>"><%= featureContent.linkLabel %> <%= arrow %></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <% } %>
+
+        <% } else if (section.layout === 'card') { %>
+        <section class="py-5 <%= bandClass() %>">
+            <div class="container">
+                <div class="row g-4">
+                    <% for (const feature of section.features) { %>
+                    <% const featureContent = page.content.features[feature.key]; %>
+                    <div class="col-md-6" id="<%= feature.key %>">
+                        <div class="landing-card card h-100 border-0 shadow-sm overflow-hidden">
+                            <div class="landing-card-image d-flex align-items-center justify-content-center bg-body-secondary p-4">
+                                <img
+                                    src="<%= feature.image.src %>"
+                                    width="<%= feature.image.width %>"
+                                    height="<%= feature.image.height %>"
+                                    alt="<%= featureContent.imageAlt %>"
+                                    loading="lazy"
+                                    decoding="async"
+                                    class="rounded"
+                                >
+                            </div>
+                            <div class="card-body d-flex flex-column p-4">
+                                <% title(feature, featureContent, 'h3') %>
+                                <p class="text-body-secondary"><%= featureContent.text %></p>
+                                <% highlights(featureContent) %>
+                                <a class="btn btn-outline-danger align-self-start mt-auto" href="<%= feature.link %>"><%= featureContent.linkLabel %> <%= arrow %></a>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </section>
+
+        <% } %>
+
+        <% } %>
+
+        <section class="container py-5">
+            <div class="landing-final text-white text-center rounded-4 shadow px-4 py-5">
+                <p class="fs-2 fw-bold mb-4"><%= page.content.footer.cta %></p>
+                <a class="btn btn-light btn-lg px-5 mb-3 fw-bold" href="/"><%= page.content.hero.cta %></a>
+                <p class="mb-0 opacity-75"><%= page.content.footer.free %></p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-body-secondary py-3">
+        <nav class="container d-flex flex-wrap justify-content-center gap-3 small">
+            <% for (const other of landingLocales) { %>
+            <a class="link-body-emphasis" href="<%= landingPath(other.locale) %>" hreflang="<%= other.locale %>" lang="<%= other.locale %>"><%= other.label %></a>
+            <% } %>
+        </nav>
+    </footer>
+</body>
+
+</html>

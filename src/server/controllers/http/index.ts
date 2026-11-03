@@ -6,6 +6,7 @@ import { staticsRouter } from './misc/statics-router.js';
 import { pagesRouter } from './misc/pages-router.js';
 import { reflectMetadataRouter } from './misc/reflect-metadata-router.js';
 import { seoRouter } from './misc/seo-router.js';
+import { landingRouter } from './misc/landing-router.js';
 import { pwaRouter } from './misc/pwa-router.js';
 import { socialPreviewRouter } from '../../social-preview/socialPreviewRouter.js';
 import { ogImageRouter } from '../../social-preview/ogImageRouter.js';
@@ -37,6 +38,7 @@ export const registerHttpControllers = async (app: Express, httpServer: http.Ser
     app.use(pwaRouter());
     app.use(seoRouter());
     app.use(ogImageRouter());
+    app.use(landingRouter());
     app.use(socialPreviewRouter());
     app.use(pagesRouter());
 
