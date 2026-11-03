@@ -1,3 +1,40 @@
+## November 3, 2026
+*New on PlayHex, since 2 weeks*
+
+Still working on the puzzle editor. I also played with Discord integration.
+
+### New
+- ✏️ **[Change your nickname](/settings#pseudo)** in settings. Your profile shows "formerly ..." for a while, so others still recognize you
+- 🤝 **Cancel a game by mutual agreement**: ask your opponent to cancel a game in progress, without anyone losing (suggested by [@comonoid](https://playhex.org/@comonoid))
+- 📬 **Read again your past notifications** in your mailbox (suggested by [@phlogistique](https://playhex.org/@phlogistique))
+- 🔗 **Link previews**: sharing a PlayHex game or page on social medias or chat apps now shows an image and a title
+- HexWorld links are shortened in chat, and HexWiki links are displayed prettier
+
+### Puzzles
+- ⚡ **Auto generate the puzzle tree** from a position with MoHex solver
+- 📈 Monitor **moves played by players but not covered by the tree**, to improve your puzzles
+- **Edge connections**: mark a stone as connected to an edge, with an arrow
+- Puzzle editor reorganized into panels, with a simpler tree navigation
+- Coordinates in puzzle messages are now clickable, like in game chat
+- Export and import a puzzle tree as JSON, for custom edits (suggested by [@Gib](https://playhex.org/@gib))
+
+### Discord
+- **[Log in with Discord](/settings#discord)**, or link your Discord account to your PlayHex account
+- New **PlayHex Discord bot** with a command `/analyze ...` with a link to any Hex game from any plateform: analyze the game with KataHex and show the chart in Discord, and make it possible to explore the game on PlayHex.
+
+### Fixed
+- [Little Golem](/external-games-archive) games import updated to work with the new Little Golem website
+- [Observe](/games) page no longer constantly changes the game miniatures when there are many games
+- Fixed page title sometimes not translated
+
+Again, **thanks to donors**:
+- [T0afer](https://playhex.org/@t0afer)
+- [defn](https://playhex.org/@defn)
+- [mason](https://playhex.org/@mason)
+- [falsifian](https://playhex.org/@falsifian)
+- [bobson](https://playhex.org/@bobson)
+- and 2 anonymous donors!
+
 ## October 19, 2026
 *New on PlayHex, since last month*
 
