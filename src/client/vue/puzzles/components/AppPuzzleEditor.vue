@@ -480,10 +480,10 @@ const isAnalyzerUnavailable = computed(() => analysisError.value === 'engine_una
     || (solverEnabled.value && aiAvailability.value?.solverAvailable === false));
 
 /**
- * Template the player is supposed to know when generating tree, bridge by default.
+ * Template the player is supposed to know when generating tree, ziggurat by default.
  * Not saved, kept while editing.
  */
-const generateTemplateId = ref<null | string>('bridge');
+const generateTemplateId = ref<null | string>('ziggurat');
 
 watch(expertMode, enabled => {
     if (!enabled) {
