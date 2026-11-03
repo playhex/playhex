@@ -44,7 +44,7 @@ const stepTools: Partial<Record<EditorStep, PositionTool[]>> = {
 };
 
 /**
- * Steps where board shows initial position, edited with position tools.
+ * Steps where initial position is edited with position tools. Generate step shows selected node on top of it.
  */
 const isPositionStep = (step: EditorStep): boolean => step in stepTools;
 
@@ -1001,7 +1001,8 @@ export const usePuzzleEditor = (puzzle: null | Puzzle, sourceGame: null | Game, 
     function redraw(): void
     {
         const position = { boardsize: boardsize.value, redStones: redStones.value, blueStones: blueStones.value, disabledCells: disabledCells.value, edgeConnections: edgeConnections.value, fixedFill: fixedFill.value };
-        const moves = step.value === 'tree' ? selectedMoves.value : [];
+        // Generate step keeps selected node, tree is generated from there
+        const moves = step.value === 'tree' || step.value === 'generate' ? selectedMoves.value : [];
         const solverFill: SolverFillStone[] = [];
 
         if (isSolverStep(step.value) && solverFillPreview.value) {
