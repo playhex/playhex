@@ -7,6 +7,7 @@ import cs from './content/cs.js';
 import da from './content/da.js';
 import de from './content/de.js';
 import es from './content/es.js';
+import fa from './content/fa.js';
 import fi from './content/fi.js';
 import hi from './content/hi.js';
 import hu from './content/hu.js';
@@ -22,8 +23,12 @@ import ru from './content/ru.js';
 import sv from './content/sv.js';
 import ta from './content/ta.js';
 import te from './content/te.js';
+import th from './content/th.js';
+import tl from './content/tl.js';
 import tr from './content/tr.js';
+import uk from './content/uk.js';
 import ur from './content/ur.js';
+import vi from './content/vi.js';
 import zhHans from './content/zh-Hans.js';
 import type { LandingIconName } from './landingIcons.js';
 
@@ -62,6 +67,7 @@ export const landingLocales: LandingLocale[] = [
     { locale: 'da', ogLocale: 'da_DK', label: 'Dansk', dir: 'ltr', content: da },
     { locale: 'de', ogLocale: 'de_DE', label: 'Deutsch', dir: 'ltr', content: de },
     { locale: 'es', ogLocale: 'es_ES', label: 'Español', dir: 'ltr', content: es },
+    { locale: 'fa', ogLocale: 'fa_IR', label: 'فارسی', dir: 'rtl', content: fa },
     { locale: 'fi', ogLocale: 'fi_FI', label: 'Suomi', dir: 'ltr', content: fi },
     { locale: 'hi', ogLocale: 'hi_IN', label: 'हिन्दी', dir: 'ltr', content: hi },
     { locale: 'hu', ogLocale: 'hu_HU', label: 'Magyar', dir: 'ltr', content: hu },
@@ -77,8 +83,12 @@ export const landingLocales: LandingLocale[] = [
     { locale: 'sv', ogLocale: 'sv_SE', label: 'Svenska', dir: 'ltr', content: sv },
     { locale: 'ta', ogLocale: 'ta_IN', label: 'தமிழ்', dir: 'ltr', content: ta },
     { locale: 'te', ogLocale: 'te_IN', label: 'తెలుగు', dir: 'ltr', content: te },
+    { locale: 'th', ogLocale: 'th_TH', label: 'ไทย', dir: 'ltr', content: th },
+    { locale: 'tl', ogLocale: 'tl_PH', label: 'Filipino', dir: 'ltr', content: tl },
     { locale: 'tr', ogLocale: 'tr_TR', label: 'Türkçe', dir: 'ltr', content: tr },
+    { locale: 'uk', ogLocale: 'uk_UA', label: 'Українська', dir: 'ltr', content: uk },
     { locale: 'ur', ogLocale: 'ur_PK', label: 'اردو', dir: 'rtl', content: ur },
+    { locale: 'vi', ogLocale: 'vi_VN', label: 'Tiếng Việt', dir: 'ltr', content: vi },
     { locale: 'zh', ogLocale: 'zh_CN', label: '简体中文', dir: 'ltr', content: zhHans },
 ];
 

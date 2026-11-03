@@ -74,8 +74,8 @@ describe('Landing page', () => {
         }
     });
 
-    it('is right to left in arabic and urdu', () => {
-        assert.deepStrictEqual(landingLocales.filter(locale => locale.dir === 'rtl').map(locale => locale.locale), ['ar', 'ur']);
+    it('is right to left in arabic, persian and urdu', () => {
+        assert.deepStrictEqual(landingLocales.filter(locale => locale.dir === 'rtl').map(locale => locale.locale), ['ar', 'fa', 'ur']);
     });
 
     it('uses bootstrap rtl build in right to left languages only', () => {
