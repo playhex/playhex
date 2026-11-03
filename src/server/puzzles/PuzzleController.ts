@@ -206,7 +206,7 @@ const toMonitorLine = (moves: Move[]): string => {
 /**
  * Body size limit, as a tree with many nodes and messages can exceed default 100kb.
  */
-const BODY_OPTIONS = { required: true, options: { limit: '1mb' } };
+const BODY_OPTIONS = { required: true, options: { limit: '4mb' } };
 
 @JsonController()
 @Service()

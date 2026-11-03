@@ -190,7 +190,7 @@ export type PuzzleInput = PuzzleDefinition & {
 export const PUZZLE_TITLE_MAX_LENGTH = 64;
 export const PUZZLE_DESCRIPTION_MAX_LENGTH = 2048;
 export const PUZZLE_MESSAGE_MAX_LENGTH = 512;
-export const PUZZLE_MAX_NODES = 512;
+export const PUZZLE_MAX_NODES = 2048;
 
 export const isElseNode = (node: PuzzleNode | PuzzleElseNode): node is PuzzleElseNode =>
     'else' in node;

@@ -8,7 +8,7 @@
 
 import type { Move } from '@playhex/move-notation';
 import { ANALYSIS_ENGINES } from '../hexplorer.js';
-import type { PuzzleDefinition, PuzzleError } from './puzzleTree.js';
+import { PUZZLE_MAX_NODES, type PuzzleDefinition, type PuzzleError } from './puzzleTree.js';
 import type { PuzzleEdgeConnection, PuzzleFixedFill } from './edgeConnections.js';
 
 export type PuzzleCheckWarningCode =
@@ -133,7 +133,7 @@ export const KATAHEX_COMPUTER_DELTA = 0.1;
 /**
  * Max positions analyzed for a puzzle.
  */
-export const KATAHEX_MAX_POSITIONS = 300;
+export const KATAHEX_MAX_POSITIONS = PUZZLE_MAX_NODES;
 
 /**
  * Max time of each solver search, in seconds.

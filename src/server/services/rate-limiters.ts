@@ -1,5 +1,6 @@
 import { RateLimiterMemory, RateLimiterRes } from 'rate-limiter-flexible';
 import { type RateLimitReachedErrorPayload } from '../../shared/app/rate-limiters.js';
+import { PUZZLE_MAX_NODES } from '../../shared/app/puzzles/puzzleTree.js';
 
 /**
  * Limit chat message posted by player.
@@ -151,7 +152,7 @@ const puzzleMonitorLimiter = new RateLimiterMemory({
  */
 const puzzleGenerateLimiter = new RateLimiterMemory({
     keyPrefix: 'rate_limiter.puzzle_generate',
-    points: 20,
+    points: 60,
     duration: 600,
 });
 
@@ -167,11 +168,12 @@ const analyzeMoveMctsLimiter = new RateLimiterMemory({
 
 /**
  * Limit jobs an AI worker key can take, to prevent a key taking jobs in loop without processing them.
- * Generous: fast jobs (raw neural network move) can take less than a second.
+ * Generous: fast jobs (raw neural network move) can take less than a second,
+ * and puzzle tree generation solves one position by node.
  */
 const aiWorkerNextJobLimiter = new RateLimiterMemory({
     keyPrefix: 'rate_limiter.ai_worker_next_job',
-    points: 600,
+    points: 2 * PUZZLE_MAX_NODES, // generate twice a puzzle tree of max size in a minute
     duration: 60,
 });
 
