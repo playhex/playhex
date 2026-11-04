@@ -260,9 +260,9 @@ importers:
       winston:
         specifier: ^3.19.0
         version: 3.19.0
-      winston-transport-sentry-node:
-        specifier: ^3.0.0
-        version: 3.0.0(@sentry/node@11.10.0)
+      winston-transport:
+        specifier: ^4.9.0
+        version: 4.9.0
     devDependencies:
       '@commander-js/extra-typings':
         specifier: ^15.0.0
@@ -4854,12 +4854,6 @@ packages:
     engines: {node: '>= 8'}
     hasBin: true
 
-  winston-transport-sentry-node@3.0.0:
-    resolution: {integrity: sha512-KT3peOJtKytdF/nInt7XWtqMwbc7M/O5nSACTEdCkuVxZL7d30dDQ9GNHq0evcP2p73Ztg3gAPuZnBX8Qns2QA==}
-    engines: {node: '>= 8.10.0'}
-    peerDependencies:
-      '@sentry/node': ^8.13.0
-
   winston-transport@4.9.0:
     resolution: {integrity: sha512-8drMJ4rkgaPo1Me4zD/3WLfI/zPdA9o2IipKODunnGDcuqbHwjsbB79ylv04LCGGzU0xQ6vTznOMpQGaLhhm6A==}
     engines: {node: '>= 12.0.0'}
@@ -9286,14 +9280,6 @@ snapshots:
   which@2.0.2:
     dependencies:
       isexe: 2.0.0
-
-  winston-transport-sentry-node@3.0.0(@sentry/node@11.10.0):
-    dependencies:
-      '@sentry/node': 11.10.0
-      triple-beam: 1.4.1
-      tslib: 2.8.1
-      winston: 3.19.0
-      winston-transport: 4.9.0
 
   winston-transport@4.9.0:
     dependencies:

@@ -119,7 +119,7 @@
     "vue-router": "^5.4.0",
     "web-push": "^3.6.7",
     "winston": "^3.19.0",
-    "winston-transport-sentry-node": "^3.0.0"
+    "winston-transport": "^4.9.0"
   },
   "devDependencies": {
     "@commander-js/extra-typings": "^15.0.0",
