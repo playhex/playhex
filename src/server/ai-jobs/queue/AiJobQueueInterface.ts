@@ -44,6 +44,11 @@ export type AiJobCompletedListener = (job: AiJobInfo, result: unknown) => void;
 export type AiJobFailedListener = (job: AiJobInfo, error: string) => void;
 
 /**
+ * Jobs waiting or being processed may have changed, see getCounts().
+ */
+export type AiJobCountsChangedListener = () => void;
+
+/**
  * Thrown when a worker uses a token it does not own anymore
  * (job lock expired and job has been given to another worker, or job finished/removed).
  */
@@ -120,6 +125,8 @@ export interface AiJobQueueInterface
     onCompleted(listener: AiJobCompletedListener): void;
 
     onFailed(listener: AiJobFailedListener): void;
+
+    onCountsChanged(listener: AiJobCountsChangedListener): void;
 
     close(): Promise<void>;
 }

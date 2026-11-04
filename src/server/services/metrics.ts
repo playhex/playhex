@@ -67,6 +67,42 @@ export const sendAiQueuePoint = (type: string, waiting: number, active: number, 
     });
 };
 
+/**
+ * Total of all AI queues.
+ */
+export const sendAiQueueStatePoint = (waiting: number, active: number): void => {
+    if (influxDBClient === null) {
+        return;
+    }
+
+    const point = Point.measurement('queue_state')
+        .setIntegerField('waitingCount', waiting)
+        .setIntegerField('activeCount', active)
+    ;
+
+    influxDBClient.write(point).catch(reason => {
+        logger.warning('Error while sending data to influxDB', { reason });
+    });
+};
+
+/**
+ * Number of remote AI workers connected, each worker counted once whatever the job types it processes.
+ * Measurement and field keep their name from when workers were peers, primary or secondary.
+ */
+export const sendAiWorkersConnectedPoint = (workersOnline: number): void => {
+    if (influxDBClient === null) {
+        return;
+    }
+
+    const point = Point.measurement('peers_connected')
+        .setIntegerField('primary', workersOnline)
+    ;
+
+    influxDBClient.write(point).catch(reason => {
+        logger.warning('Error while sending data to influxDB', { reason });
+    });
+};
+
 export class TimeMeasureMetric<T extends keyof MetricsTags>
 {
     private tStart: Date;

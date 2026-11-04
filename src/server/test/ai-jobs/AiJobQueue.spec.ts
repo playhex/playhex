@@ -226,6 +226,42 @@ const testQueue = (name: string, createQueue: () => AiJobQueueInterface) => desc
 
         assert.deepStrictEqual(await queue.getCounts(ANALYZE_MOVE), { waiting: 1, active: 1 });
     });
+
+    it('emits counts changed on each job state change, not on heartbeat', async () => {
+        let changes = 0;
+        const expectChanged = (message: string): void => {
+            assert.ok(changes > 0, message);
+            changes = 0;
+        };
+
+        queue.onCountsChanged(() => ++changes);
+
+        const canceledJobId = await queue.submit(task(), { expiresAt: null });
+        expectChanged('submit');
+
+        await queue.cancel(canceledJobId);
+        expectChanged('cancel');
+
+        await queue.submit(task(), { expiresAt: null });
+        changes = 0;
+
+        const first = await queue.reserve([ANALYZE_MOVE], { waitMs: 0 });
+        assert.ok(first);
+        expectChanged('reserve');
+
+        await queue.heartbeat(first.jobId, first.token);
+        assert.strictEqual(changes, 0, 'heartbeat');
+
+        await queue.fail(first.jobId, first.token, 'Engine crashed', true);
+        expectChanged('retryable fail');
+
+        const second = await queue.reserve([ANALYZE_MOVE], { waitMs: 0 });
+        assert.ok(second);
+        changes = 0;
+
+        await queue.complete(second.jobId, second.token, 'ok');
+        expectChanged('complete');
+    });
 });
 
 testQueue('InMemoryAiJobQueue', () => new InMemoryAiJobQueue(LOCK_MS));

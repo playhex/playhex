@@ -1,5 +1,5 @@
 import { EventEmitter } from 'node:events';
-import type { AiJobCompletedListener, AiJobFailedListener, AiJobInfo, AiJobQueueInterface, ReserveOptions, SubmitOptions } from './AiJobQueueInterface.js';
+import type { AiJobCompletedListener, AiJobCountsChangedListener, AiJobFailedListener, AiJobInfo, AiJobQueueInterface, ReserveOptions, SubmitOptions } from './AiJobQueueInterface.js';
 import { AI_JOB_TYPES, type AiJobType, type AiTask, type ReservedJob } from '../protocol.js';
 import logger from '../../services/logger.js';
 
@@ -47,6 +47,8 @@ export default abstract class AbstractAiJobQueue implements AiJobQueueInterface
             const reserved = await this.tryReserveFirst(typesByPriority);
 
             if (reserved !== null) {
+                this.emitCountsChanged();
+
                 return reserved;
             }
 
@@ -120,16 +122,24 @@ export default abstract class AbstractAiJobQueue implements AiJobQueueInterface
     protected notifyAvailable(type: AiJobType): void
     {
         this.emitter.emit('available', type);
+        this.emitCountsChanged();
     }
 
     protected emitCompleted(job: AiJobInfo, result: unknown): void
     {
         this.emitter.emit('completed', job, result);
+        this.emitCountsChanged();
     }
 
     protected emitFailed(job: AiJobInfo, error: string): void
     {
         this.emitter.emit('failed', job, error);
+        this.emitCountsChanged();
+    }
+
+    protected emitCountsChanged(): void
+    {
+        this.emitter.emit('countsChanged');
     }
 
     onCompleted(listener: AiJobCompletedListener): void
@@ -140,5 +150,10 @@ export default abstract class AbstractAiJobQueue implements AiJobQueueInterface
     onFailed(listener: AiJobFailedListener): void
     {
         this.emitter.on('failed', listener);
+    }
+
+    onCountsChanged(listener: AiJobCountsChangedListener): void
+    {
+        this.emitter.on('countsChanged', listener);
     }
 }

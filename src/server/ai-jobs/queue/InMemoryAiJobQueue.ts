@@ -71,6 +71,7 @@ export default class InMemoryAiJobQueue extends AbstractAiJobQueue
             }
 
             this.jobs.delete(jobId);
+            this.emitCountsChanged();
 
             return true;
         });

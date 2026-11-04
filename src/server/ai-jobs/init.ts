@@ -1,28 +1,12 @@
 import { Container } from 'typedi';
 import AiJobService from './AiJobService.js';
 import AiWorkersRegistry from './worker/AiWorkersRegistry.js';
-import { AI_JOB_TYPES } from './protocol.js';
-import { isMonitoringEnabled, sendAiQueuePoint } from '../services/metrics.js';
+import monitorAiQueues from './monitorAiQueues.js';
+import { isMonitoringEnabled } from '../services/metrics.js';
 import GameAnalyzeRepository from '../repositories/GameAnalyzeRepository.js';
 import ExternalGameRepository from '../external-games/ExternalGameRepository.js';
 import { appDataSourceInitialized } from '../data-source.js';
 import logger from '../services/logger.js';
-
-const MONITOR_INTERVAL_MS = 30_000;
-
-const monitorAiQueues = (): void => {
-    const aiJobService = Container.get(AiJobService);
-    const aiWorkersRegistry = Container.get(AiWorkersRegistry);
-
-    setInterval(() => {
-        for (const type of AI_JOB_TYPES) {
-            aiJobService.queue.getCounts(type)
-                .then(({ waiting, active }) => sendAiQueuePoint(type, waiting, active, aiWorkersRegistry.getOnlineWorkers(type).length))
-                .catch(e => logger.warning('Could not get AI queue counts', { type, message: e?.message }))
-            ;
-        }
-    }, MONITOR_INTERVAL_MS).unref();
-};
 
 /**
  * To call on server start.
@@ -34,7 +18,7 @@ export const initAiJobs = async (): Promise<void> => {
     aiJobService.startEmbeddedWorkers();
 
     if (isMonitoringEnabled()) {
-        monitorAiQueues();
+        monitorAiQueues(aiJobService.queue, Container.get(AiWorkersRegistry));
     }
 
     await appDataSourceInitialized;

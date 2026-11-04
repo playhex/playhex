@@ -1,4 +1,5 @@
 import { Service } from 'typedi';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import { LOCK_MS, LONG_POLL_MS, type AiJobType } from '../protocol.js';
 
 /**
@@ -31,11 +32,20 @@ export type AiWorkerState = {
     jobId: null | string;
 };
 
+interface AiWorkersRegistryEvents
+{
+    /**
+     * A worker connected or disconnected.
+     * Not emitted when a worker times out, this is only noticed on next getOnlineWorkers().
+     */
+    workersChanged: () => void;
+}
+
 /**
  * Keeps track of remote workers currently connected, in memory.
  */
 @Service()
-export default class AiWorkersRegistry
+export default class AiWorkersRegistry extends TypedEmitter<AiWorkersRegistryEvents>
 {
     /**
      * Keyed by keyId and workerId, a worker could otherwise pretend to be a worker of another key.
@@ -44,13 +54,20 @@ export default class AiWorkersRegistry
 
     seen(keyId: number, workerId: string, types: AiJobType[], jobId: null | string): void
     {
-        this.workers.set(`${keyId}:${workerId}`, {
+        const mapKey = `${keyId}:${workerId}`;
+        const isNew = !this.workers.has(mapKey);
+
+        this.workers.set(mapKey, {
             workerId,
             keyId,
             types,
             lastSeenAt: new Date(),
             jobId,
         });
+
+        if (isNew) {
+            this.emit('workersChanged');
+        }
     }
 
     /**
@@ -71,7 +88,9 @@ export default class AiWorkersRegistry
      */
     remove(keyId: number, workerId: string): void
     {
-        this.workers.delete(`${keyId}:${workerId}`);
+        if (this.workers.delete(`${keyId}:${workerId}`)) {
+            this.emit('workersChanged');
+        }
     }
 
     getOnlineWorkers(type?: AiJobType): AiWorkerState[]

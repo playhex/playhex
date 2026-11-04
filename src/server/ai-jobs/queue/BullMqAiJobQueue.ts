@@ -168,6 +168,7 @@ export default class BullMqAiJobQueue extends AbstractAiJobQueue
 
         try {
             await job.remove();
+            this.emitCountsChanged();
             return true;
         } catch (e) {
             // Job has been reserved meanwhile
