@@ -446,7 +446,9 @@
         "normal": "standard",
         "host_plays_first": "hôte joue 1er",
         "host_plays_second": "hôte joue 2e",
-        "no_swap": "pas d'échange"
+        "no_swap": "pas d'échange",
+        "handicap_for_host": "handicap {{n}} pour l'hôte",
+        "handicap_for_opponent": "handicap {{n}} pour l'adversaire"
     },
     "log_out": "Déconnexion",
     "log_in": "Connexion",
@@ -637,7 +639,33 @@
     "handicap": {
         "title": "Handicap",
         "none": "aucun",
-        "handicap_for_player": "{{n}} pour {{player}}"
+        "handicap_for_player": "{{n}} pour {{player}}",
+        "you": "vous",
+        "opponent": "l'adversaire",
+        "ai": "l'IA",
+        "increase": "Augmenter le handicap",
+        "decrease": "Diminuer le handicap",
+        "setup": {
+            "no_swap_one": "Swap désactivé : {{player}} place 1 pierre.",
+            "no_swap_other": "Swap désactivé : {{player}} place {{count}} pierres.",
+            "no_swap_you_one": "Swap désactivé : placez 1 pierre.",
+            "no_swap_you_other": "Swap désactivé : placez {{count}} pierres.",
+            "first_stone_then": "{{player}} place une pierre swappable, puis {{count}} de plus, ou {{swappedCount}} si elle est swappée.",
+            "first_stone_then_you": "Placez une pierre swappable, puis {{count}} de plus, ou {{swappedCount}} si elle est swappée.",
+            "first_stone_for_blue": "{{player}} place une pierre swappable, puis {{beneficiary}} joue {{count}} coups.",
+            "first_stone_for_blue_you": "Placez une pierre swappable, puis {{beneficiary}} joue {{count}} coups.",
+            "first_stone_for_blue_beneficiary": "{{player}} place une pierre swappable, puis vous jouez {{count}} coups.",
+            "swap_decision": "{{player}} choisit de swapper ou non : {{beneficiary}} place ensuite {{swappedCount}} pierres, ou {{count}} en cas de refus.",
+            "swap_decision_you": "Cliquez la pierre pour swapper : {{beneficiary}} place ensuite {{swappedCount}} pierres, ou {{count}} si vous refusez.",
+            "swap_decision_beneficiary": "{{player}} choisit de swapper ou non : vous placez ensuite {{swappedCount}} pierres, ou {{count}} en cas de refus.",
+            "stones_after_swap": "Pierre swappée : {{player}} place {{count}} pierres.",
+            "stones_after_swap_you": "Pierre swappée : placez {{count}} pierres.",
+            "stones_one": "{{player}} place encore 1 pierre.",
+            "stones_other": "{{player}} place encore {{count}} pierres.",
+            "stones_you_one": "Placez encore 1 pierre.",
+            "stones_you_other": "Placez encore {{count}} pierres.",
+            "refuse_swap": "Ne pas swapper"
+        }
     },
     "chat": "Tchat",
     "system": "Système",

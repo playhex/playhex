@@ -19,9 +19,9 @@ const props = defineProps({
     },
 });
 
-const { swapRule, firstPlayer } = props.gameOptions;
+const { swapRule, firstPlayer, presetHandicap } = props.gameOptions;
 
-let isDefaultRules = swapRule && firstPlayer === null;
+let isDefaultRules = swapRule && firstPlayer === null && !presetHandicap;
 </script>
 
 <template>
@@ -35,6 +35,8 @@ let isDefaultRules = swapRule && firstPlayer === null;
         <span v-if="!swapRule"> {{ ' ' + $t('game_rules.no_swap') }}</span>
         <span v-if="0 === firstPlayer"> {{ ' ' + $t('game_rules.host_plays_first') }}</span>
         <span v-if="1 === firstPlayer"> {{ ' ' + $t('game_rules.host_plays_second') }}</span>
+        <span v-if="presetHandicap > 0"> {{ ' ' + $t('game_rules.handicap_for_host', { n: presetHandicap }) }}</span>
+        <span v-if="presetHandicap < 0"> {{ ' ' + $t('game_rules.handicap_for_opponent', { n: -presetHandicap }) }}</span>
     </span>
 </template>
 

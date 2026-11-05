@@ -17,6 +17,11 @@ export default abstract class AbstractAiJobQueue implements AiJobQueueInterface
 {
     private emitter = new EventEmitter();
 
+    /**
+     * Incremented on each "available" notification, to detect one received while checking queue.
+     */
+    private availableNotifications = 0;
+
     constructor()
     {
         // One listener per waiting worker
@@ -44,6 +49,7 @@ export default abstract class AbstractAiJobQueue implements AiJobQueueInterface
         const typesByPriority = AI_JOB_TYPES.filter(type => types.includes(type));
 
         while (!signal?.aborted) {
+            const notificationsBeforeCheck = this.availableNotifications;
             const reserved = await this.tryReserveFirst(typesByPriority);
 
             if (reserved !== null) {
@@ -56,6 +62,11 @@ export default abstract class AbstractAiJobQueue implements AiJobQueueInterface
 
             if (remaining <= 0) {
                 break;
+            }
+
+            // A job may have been submitted after being checked, while no one was listening yet: check again now
+            if (this.availableNotifications !== notificationsBeforeCheck) {
+                continue;
             }
 
             await this.waitAvailable(typesByPriority, Math.min(remaining, POLL_FALLBACK_MS), signal);
@@ -121,6 +132,7 @@ export default abstract class AbstractAiJobQueue implements AiJobQueueInterface
      */
     protected notifyAvailable(type: AiJobType): void
     {
+        ++this.availableNotifications;
         this.emitter.emit('available', type);
         this.emitCountsChanged();
     }

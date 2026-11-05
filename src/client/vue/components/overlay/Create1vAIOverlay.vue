@@ -5,6 +5,8 @@ import { IconCaretDownFill, IconCaretRight, IconExclamationTriangle, IconRobot }
 import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
+import AppHandicap from './create-game/AppHandicap.vue';
+import { useHandicapOptions } from '../../composables/useHandicapOptions.js';
 import AppTimeControl from '../AppTimeControl.vue';
 import useAiConfigsStore from '../../../stores/aiConfigsStore.js';
 import { storeToRefs } from 'pinia';
@@ -23,6 +25,8 @@ const props = defineProps({
 });
 
 const gameOptions = reactive(props.gameOptions);
+
+const { swapRuleDisabled, firstPlayerDisabled } = useHandicapOptions(gameOptions);
 
 const timeControl = toRef(gameOptions.timeControlType);
 watch<TimeControlType>(timeControl, t => gameOptions.timeControlType = t);
@@ -164,11 +168,15 @@ watch(aiConfigs, () => {
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">
-                            <AppPlayFirstOrSecond v-model="gameOptions.firstPlayer" />
+                            <AppHandicap v-model="gameOptions.presetHandicap" :opponentLabel="$t('handicap.ai')" />
                         </div>
 
                         <div class="mb-3">
-                            <AppSwapRule v-model="gameOptions.swapRule" />
+                            <AppPlayFirstOrSecond v-model="gameOptions.firstPlayer" :disabled="firstPlayerDisabled" />
+                        </div>
+
+                        <div class="mb-3">
+                            <AppSwapRule v-model="gameOptions.swapRule" :disabled="swapRuleDisabled" />
                         </div>
                     </div>
                     <div class="modal-footer">

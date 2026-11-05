@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
 import { storeToRefs } from 'pinia';
-import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconScissors, IconTrophyFill, IconX } from '../icons.js';
+import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconHandicap, IconScissors, IconTrophyFill, IconX } from '../icons.js';
 import AppChrono from './AppChrono.vue';
 import AppPseudo from './AppPseudo.vue';
 import AppPlayerAvatar from './AppPlayerAvatar.vue';
@@ -56,6 +56,8 @@ const {
     gameUIMode,
     shouldDisplayAnswerUndoMove,
     shouldDisplayAnswerCancel,
+    handicapStatus,
+    localPlayerIndex,
 } = storeToRefs(useCurrentGameStore());
 
 const {
@@ -63,6 +65,7 @@ const {
     enableSimulationMode,
     disableSimulationMode,
     answerUndo,
+    sendPass,
     answerCancel,
 } = useCurrentGameStore();
 
@@ -83,6 +86,75 @@ const undoRequestPseudo = computed<string>(() => {
     const player = players.value[undoRequest];
 
     return player ? pseudoString(player, 'pseudo') : '';
+});
+
+/**
+ * Message explaining what is happening while handicap is being set up.
+ */
+const handicapMessage = computed<null | { key: string, params: Record<string, string | number> }>(() => {
+    const status = handicapStatus.value;
+
+    if (status === null) {
+        return null;
+    }
+
+    const pseudo = (playerIndex: number): string => {
+        const player = players.value[playerIndex];
+
+        return player ? pseudoString(player, 'pseudo') : '';
+    };
+
+    const me = localPlayerIndex.value;
+
+    switch (status.type) {
+        case 'first_stone': {
+            const params = { player: pseudo(0), beneficiary: pseudo(status.followUpPlayerIndex), count: status.followUpStones, swappedCount: status.followUpStones + 1 };
+            const suffix = me === 0 ? '_you' : '';
+
+            if (status.followUpPlayerIndex === 1) {
+                return { key: 'handicap.setup.first_stone_for_blue' + (me === 0 ? '_you' : me === 1 ? '_beneficiary' : ''), params };
+            }
+
+            if (!status.swappable) {
+                return { key: 'handicap.setup.no_swap' + suffix, params: { ...params, count: status.followUpStones + 1 } };
+            }
+
+            return { key: 'handicap.setup.first_stone_then' + suffix, params };
+        }
+
+        case 'swap_decision':
+            return {
+                key: 'handicap.setup.swap_decision' + (me === 1 ? '_you' : me === 0 ? '_beneficiary' : ''),
+                params: { player: pseudo(1), beneficiary: pseudo(status.beneficiaryIndex), count: status.stones, swappedCount: status.stones + 1 },
+            };
+
+        case 'stones':
+        case 'forced_pass': {
+            const beneficiaryIndex = status.type === 'stones' ? status.playerIndex : 1 - status.playerIndex;
+
+            return {
+                key: 'handicap.setup.stones' + (status.type === 'stones' && status.afterSwap ? '_after_swap' : '') + (me === beneficiaryIndex ? '_you' : ''),
+                params: { player: pseudo(beneficiaryIndex), count: status.stones },
+            };
+        }
+    }
+
+    return null;
+});
+
+/**
+ * Other bars have priority: same order as in template.
+ */
+const shouldDisplayHandicapBar = computed<boolean>(() => {
+    return handicapMessage.value !== null
+        && gameUIMode.value === 'play'
+        && !shouldDisplayAnswerCancel.value
+        && !shouldDisplayAnswerUndoMove.value
+    ;
+});
+
+const shouldDisplayRefuseSwap = computed<boolean>(() => {
+    return handicapStatus.value?.type === 'swap_decision' && localPlayerIndex.value === 1;
 });
 
 /**
@@ -217,7 +289,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="app-board" :class="{ 'has-rewind-controls': gameUIMode !== 'play' || shouldDisplayAnswerCancel || shouldDisplayAnswerUndoMove }">
+    <div class="app-board" :class="{ 'has-rewind-controls': gameUIMode !== 'play' || shouldDisplayAnswerCancel || shouldDisplayAnswerUndoMove || shouldDisplayHandicapBar, 'has-handicap-bar': shouldDisplayHandicapBar }">
         <div class="board-container" ref="pixiApp"></div>
 
         <div v-if="mountError || mountTooLong" class="board-mount-error">
@@ -373,6 +445,15 @@ onUnmounted(() => {
                 <span class="btn-label d-none d-lg-inline">{{ ' ' + $t('undo.reject') }}</span>
             </button>
         </div>
+
+        <!-- Handicap is being set up: explain what is happening -->
+        <div class="rewind-controls takeback-request handicap-bar" v-else-if="shouldDisplayHandicapBar && null !== handicapMessage">
+            <p class="handicap-text py-2 px-3 mb-1 rounded fw-bold text-bg-warning"><IconHandicap /> {{ $t(handicapMessage.key, handicapMessage.params) }}</p>
+
+            <button type="button" v-if="shouldDisplayRefuseSwap" @click="sendPass()" class="btn btn-warning mb-1">
+                {{ $t('handicap.setup.refuse_swap') }}
+            </button>
+        </div>
     </div>
 </template>
 
@@ -477,4 +558,20 @@ onUnmounted(() => {
         overflow hidden
         text-overflow ellipsis
         white-space nowrap
+
+    // Stick to bottom of the available space to stay close to game menu buttons
+    .handicap-bar
+        height 4rem
+        align-items flex-end
+
+    // Can be long, and must be fully readable on small screens
+    .handicap-text
+        max-height calc(4rem - 0.25rem) // 0.25rem = mb-1
+        overflow hidden
+        font-size 0.9em
+        line-height 1.2
+
+// Message has more padding, and can be on two lines
+.app-board.has-handicap-bar
+    height calc(100% - 4rem)
 </style>

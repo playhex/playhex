@@ -57,6 +57,7 @@ const {
     canRematch,
     shouldShowPass,
     shouldEnablePass,
+    handicapStatus,
     unreadMessages,
     isReadingChatMessages,
 } = storeToRefs(useCurrentGameStore());
@@ -598,7 +599,7 @@ const {
                         </button>
 
                         <!-- Conditional moves -->
-                        <button type="button" v-if="loggedInPlayer && shouldShowConditionalMoves(game, loggedInPlayer)" @click="startConditionalMoves()" class="btn btn-outline-primary">
+                        <button type="button" v-if="loggedInPlayer && shouldShowConditionalMoves(game, loggedInPlayer) && null === handicapStatus" @click="startConditionalMoves()" class="btn btn-outline-primary">
                             <IconSignpostSplit />
                         </button>
 

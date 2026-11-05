@@ -41,7 +41,9 @@
         "normal": "standard",
         "host_plays_first": "host plays first",
         "host_plays_second": "host plays second",
-        "no_swap": "no swap"
+        "no_swap": "no swap",
+        "handicap_for_host": "handicap {{n}} for host",
+        "handicap_for_opponent": "handicap {{n}} for opponent"
     },
     "game_state": {
         "created": "Created",
@@ -140,7 +142,33 @@
     "handicap": {
         "title": "Handicap",
         "none": "none",
-        "handicap_for_player": "{{n}} for {{player}}"
+        "handicap_for_player": "{{n}} for {{player}}",
+        "you": "you",
+        "opponent": "opponent",
+        "ai": "AI",
+        "increase": "Increase handicap",
+        "decrease": "Decrease handicap",
+        "setup": {
+            "no_swap_one": "Swap disabled: {{player}} places 1 stone.",
+            "no_swap_other": "Swap disabled: {{player}} places {{count}} stones.",
+            "no_swap_you_one": "Swap disabled: place 1 stone.",
+            "no_swap_you_other": "Swap disabled: place {{count}} stones.",
+            "first_stone_then": "{{player}} places a swappable stone, then {{count}} more, or {{swappedCount}} if swapped.",
+            "first_stone_then_you": "Place a swappable stone, then {{count}} more, or {{swappedCount}} if swapped.",
+            "first_stone_for_blue": "{{player}} places a swappable stone, then {{beneficiary}} plays {{count}} moves.",
+            "first_stone_for_blue_you": "Place a swappable stone, then {{beneficiary}} plays {{count}} moves.",
+            "first_stone_for_blue_beneficiary": "{{player}} places a swappable stone, then you play {{count}} moves.",
+            "swap_decision": "{{player}} chooses whether to swap: {{beneficiary}} then places {{swappedCount}} stones, or {{count}} if refused.",
+            "swap_decision_you": "Click the stone to swap: {{beneficiary}} then places {{swappedCount}} stones, or {{count}} if you refuse.",
+            "swap_decision_beneficiary": "{{player}} chooses whether to swap: you then place {{swappedCount}} stones, or {{count}} if refused.",
+            "stones_after_swap": "Stone swapped: {{player}} places {{count}} stones.",
+            "stones_after_swap_you": "Stone swapped: place {{count}} stones.",
+            "stones_one": "{{player}} places 1 more stone.",
+            "stones_other": "{{player}} places {{count}} more stones.",
+            "stones_you_one": "Place 1 more stone.",
+            "stones_you_other": "Place {{count}} more stones.",
+            "refuse_swap": "Don't swap"
+        }
     },
     "2dots": "{{s}}:",
     "game_created_short": "created {{ date }}",

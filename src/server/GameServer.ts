@@ -7,6 +7,7 @@ import baseLogger from './services/logger.js';
 import { AbstractTimeControl } from '../shared/time-control/TimeControl.js';
 import { createTimeControl } from '../shared/time-control/createTimeControl.js';
 import { canPassAgain } from '../shared/app/passUtils.js';
+import { canUndoWithHandicap, checkHandicapMove, getHandicapStatus, getPresetDemerHandicap, HandicapStatus, isGameInCancelWindow } from '../shared/app/handicap.js';
 import { Container } from 'typedi';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { makeAIPlayerMove } from './services/AIManager.js';
@@ -198,14 +199,67 @@ export default class GameServer extends TypedEmitter<GameEvents>
      * as soon as a it is a player turn.
      *
      * An automated move can be:
+     * - Pass forced by handicap
      * - AI move
      * - Conditional move
      */
     private async makeAutomatedMoves(): Promise<void>
     {
+        // Pass triggers makeAutomatedMoves() again: nothing else must be played here for this turn.
+        if (this.makeHandicapPassIfApplicable()) {
+            return;
+        }
+
         this.makePremoveIfApplicable();
         await this.makeAIMoveIfApplicable();
         await this.makeConditionalMovesIfApplicable();
+    }
+
+    private getEngineMoves(): HexMove[]
+    {
+        return this.engineGame?.getMovesHistory().map(({ move }) => move) ?? [];
+    }
+
+    /**
+     * Demer handicap imposed by game options. Positive for first player.
+     */
+    private getPresetDemerHandicap(): number
+    {
+        return getPresetDemerHandicap({
+            presetHandicap: this.game.presetHandicap,
+            host: this.game.host,
+            gameToPlayers: this.game.gameToPlayers,
+        });
+    }
+
+    /**
+     * What must happen next for handicap to be in place, or null if there is nothing left to do.
+     */
+    getHandicapStatus(): null | HandicapStatus
+    {
+        return getHandicapStatus(this.getPresetDemerHandicap(), this.getEngineMoves());
+    }
+
+    /**
+     * Bypass playerMove() because it is not a player decision.
+     *
+     * @returns Whether a pass has been played.
+     */
+    private makeHandicapPassIfApplicable(): boolean
+    {
+        if (this.engineGame === null || this.engineGame.isEnded()) {
+            return false;
+        }
+
+        const status = this.getHandicapStatus();
+
+        if (status?.type !== 'forced_pass') {
+            return false;
+        }
+
+        this.engineGame.move('pass', status.playerIndex, new Date());
+
+        return true;
     }
 
     private makePremoveIfApplicable()
@@ -279,7 +333,9 @@ export default class GameServer extends TypedEmitter<GameEvents>
                 return;
             }
 
-            const result = this.playerMove(player, move);
+            // Bot wants to refuse swap by placing a stone, but handicap gives no stone here
+            const refusesSwap = this.getHandicapStatus()?.type === 'swap_decision' && move !== 'swap-pieces';
+            const result = this.playerMove(player, refusesSwap ? 'pass' : move);
 
             if (result !== true) {
                 this.logger.error('Bot tried to move but get an error', { result });
@@ -312,6 +368,10 @@ export default class GameServer extends TypedEmitter<GameEvents>
         }
 
         if (this.engineGame === null) {
+            return;
+        }
+
+        if (this.getHandicapStatus() !== null) {
             return;
         }
 
@@ -493,7 +553,7 @@ export default class GameServer extends TypedEmitter<GameEvents>
             return;
         }
 
-        bindTimeControlToGame(this.engineGame, this.timeControl);
+        bindTimeControlToGame(this.engineGame, this.timeControl, this.getPresetDemerHandicap());
     }
 
     isPlayerInGame(player: Player): boolean
@@ -566,8 +626,9 @@ export default class GameServer extends TypedEmitter<GameEvents>
             return;
         }
 
-        // In case of rematch, alternate colors from previous game instead of random
-        if (this.game.rematchedFrom !== null) {
+        // In case of rematch, alternate colors from previous game instead of random.
+        // Except with half handicap: player who has the advantage must play first, so use fixed colors.
+        if (this.game.rematchedFrom !== null && Number.isInteger(this.game.presetHandicap)) {
             this.logger.info('Rematch alternate colors: should alternate?');
 
             if (this.shouldAlternateColorsFromRematchedGame()) {
@@ -736,6 +797,13 @@ export default class GameServer extends TypedEmitter<GameEvents>
             return 'cannot pass infinitely. Now, play';
         }
 
+        const handicapCheck = checkHandicapMove(this.getPresetDemerHandicap(), this.getEngineMoves(), move);
+
+        if (handicapCheck !== true) {
+            this.logger.notice('Move refused during handicap setup', { player: player.pseudo, move });
+            return handicapCheck;
+        }
+
         try {
             this.engineGame.move(move, this.getPlayerIndex(player) as PlayerIndex, playedAt);
 
@@ -774,6 +842,11 @@ export default class GameServer extends TypedEmitter<GameEvents>
         if (playerIndex === null) {
             this.logger.notice('A player not in the game tried to register a premove', { player: player.pseudo });
             return 'you are not a player of this game';
+        }
+
+        if (this.getHandicapStatus() !== null) {
+            this.logger.notice('Tried to register a premove during handicap setup', { player: player.pseudo });
+            return 'cannot premove while handicap is being set up';
         }
 
         if (premove.moveIndex <= this.engineGame.getLastMoveIndex()) {
@@ -838,6 +911,11 @@ export default class GameServer extends TypedEmitter<GameEvents>
 
         if (reason !== true) {
             return reason;
+        }
+
+        if (!canUndoWithHandicap(this.getPresetDemerHandicap(), this.getEngineMoves(), this.engineGame.playerUndoDryRun(playerIndex).length)) {
+            this.logger.notice('Player tried to undo a handicap move', { player: player.pseudo });
+            return 'cannot undo handicap moves';
         }
 
         game.undoRequest = playerIndex;
@@ -1112,7 +1190,7 @@ export default class GameServer extends TypedEmitter<GameEvents>
             return true;
         }
 
-        if (this.engineGame.getMovesHistory().length >= this.players.length) {
+        if (!isGameInCancelWindow(this.getPresetDemerHandicap(), this.getEngineMoves())) {
             this.logger.notice('A player tried to cancel, but too late, every player played a move', { player: player.pseudo });
             return 'cannot cancel now, each player has played at least one move';
         }

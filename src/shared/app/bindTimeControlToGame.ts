@@ -1,12 +1,13 @@
 import { EngineGame, PlayerIndex } from '../game-engine/index.js';
 import { AbstractTimeControl } from '../time-control/TimeControl.js';
+import { isGameInCancelWindow } from './handicap.js';
 
 /**
  * Connect a TimeControl to a Game
  * to allow timeControl switch when player moved,
  * or make game end by time when timeControl emitted elapsed event.
  */
-export const bindTimeControlToGame = (game: EngineGame, timeControl: AbstractTimeControl) => {
+export const bindTimeControlToGame = (game: EngineGame, timeControl: AbstractTimeControl, demerHandicap = 0) => {
     game.prependListener('played', (move, moveIndex, byPlayerIndex) => {
         // Start time control on first move
         if (timeControl.getState() === 'ready') {
@@ -30,7 +31,7 @@ export const bindTimeControlToGame = (game: EngineGame, timeControl: AbstractTim
             throw new Error('player lose by time is not the one playing…');
         }
 
-        if (game.getMovesHistory().length < 2) {
+        if (isGameInCancelWindow(demerHandicap, game.getMovesHistory().map(({ move }) => move))) {
             game.cancel(date);
         } else {
             game.loseByTime(date);

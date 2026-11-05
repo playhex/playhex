@@ -22,6 +22,7 @@ import { playAudio } from '../../shared/app/audioPlayer.js';
 import { halloweenSound } from '../services/halloween.js';
 import Premove from '../../shared/app/models/Premove.js';
 import { canPassAgain } from '../../shared/app/passUtils.js';
+import { checkHandicapMove, getHandicapStatus, getPresetDemerHandicap, HandicapStatus, isForcedHandicapPass, isGameInCancelWindow } from '../../shared/app/handicap.js';
 import { PlayerSettingsFacade } from '../services/board-view-facades/PlayerSettingsFacade.js';
 import { RichChat } from '../../shared/app/rich-chat.js';
 import ChatMessage from '../../shared/app/models/ChatMessage.js';
@@ -244,7 +245,9 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
             engineGame.value.move(timestampedMove.move, byPlayerIndex, timestampedMove.playedAt);
 
-            playSoundForMove(timestampedMove.move);
+            if (!isForcedHandicapPass(getPresetDemerHandicap(game.value), game.value.moves, moveIndex)) {
+                playSoundForMove(timestampedMove.move);
+            }
 
             if (!isSpecialHexMove(timestampedMove.move)) {
                 conditionalMovesEditor.value?.realMovePlayed(timestampedMove.move, byPlayerIndex);
@@ -593,7 +596,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                  * Premove
                  */
                 if (MoveSettings.PREMOVE === moveSettings.value && !isMyTurn.value) {
-                    if (engineGame.value.isEnded()) {
+                    if (engineGame.value.isEnded() || handicapStatus.value !== null) {
                         return;
                     }
 
@@ -626,6 +629,12 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 }
 
                 engineGame.value.checkMove(move, localPlayerIndex.value);
+
+                const engineMoves = engineGame.value.getMovesHistory().map(({ move }) => move);
+
+                if (checkHandicapMove(getPresetDemerHandicap(game.value), engineMoves, move) !== true) {
+                    return;
+                }
 
                 // Send move if move preview is not enabled
                 if (!shouldDisplayConfirmMove.value) {
@@ -717,6 +726,18 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         }
 
         return getPlayers(game.value);
+    });
+
+    /**
+     * What must happen next for handicap to be in place.
+     * Null if game has no handicap, or handicap is in place.
+     */
+    const handicapStatus = computed<null | HandicapStatus>(() => {
+        if (game.value === null || game.value.state !== 'playing') {
+            return null;
+        }
+
+        return getHandicapStatus(getPresetDemerHandicap(game.value), game.value.moves);
     });
 
     const isMyTurn = computed(() => {
@@ -841,6 +862,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         return game.value.state === 'playing'
             && isMyTurn.value
+            && handicapStatus.value === null
             && canPassAgain(engineGame.value)
         ;
     });
@@ -1076,7 +1098,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         return game.value.state !== 'canceled'
             && game.value.state !== 'ended'
-            && game.value.moves.length < 2
+            && isGameInCancelWindow(getPresetDemerHandicap(game.value), game.value.moves)
         ;
     });
 
@@ -1117,7 +1139,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             return false;
         }
 
-        if (game.value.moves.length < 2) {
+        if (isGameInCancelWindow(getPresetDemerHandicap(game.value), game.value.moves)) {
             return false;
         }
 
@@ -1416,6 +1438,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         players,
         localPlayerIndex,
         isMyTurn,
+        handicapStatus,
         moveSettings,
         shouldDisplayConfirmMove,
         confirmMove,

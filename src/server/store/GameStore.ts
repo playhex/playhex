@@ -582,6 +582,11 @@ export default class GameStore
         const otherPlayer = getOtherPlayer(game, host);
         gameOptions.opponentPublicId = otherPlayer?.publicId ?? null;
 
+        // Preset handicap is relative to host: keep advantage to same player if the other player rematches.
+        if (game.host !== null && game.host.publicId !== host.publicId && gameOptions.presetHandicap !== 0) {
+            gameOptions.presetHandicap = -gameOptions.presetHandicap;
+        }
+
         const params = { gameOptions, host, rematchedFrom: game };
 
         const rematch = await this.createGame(params, { persist: false, aiJoinAuto: false }); // do not persist because will persist later in the transaction, at same time as rematchId

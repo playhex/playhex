@@ -3,6 +3,7 @@ import { getCurrentPlayer, isBotGame } from '../../../../shared/app/gameUtils.js
 import { PushNotificationFactory } from '../../../../shared/app/PushNotificationFactory.js';
 import { PushNotificationsPool } from '../../../services/PushNotificationsPool.js';
 import { notifier } from '../notifier.js';
+import { getPresetDemerHandicap, isForcedHandicapPass } from '../../../../shared/app/handicap.js';
 
 const pushNotificationsPool = Container.get(PushNotificationsPool);
 
@@ -30,6 +31,12 @@ notifier.on('gameStart', game => {
 
 notifier.on('move', (game, timestampedMove) => {
     if (isBotGame(game)) {
+        return;
+    }
+
+    // Last move is checked instead of timestampedMove: when a stone triggers a forced pass,
+    // same player keeps playing and must not be notified for the stone he just played.
+    if (isForcedHandicapPass(getPresetDemerHandicap(game), game.moves, game.moves.length - 1)) {
         return;
     }
 

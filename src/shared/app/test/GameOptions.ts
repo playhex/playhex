@@ -24,6 +24,32 @@ describe('GameOptions', () => {
         assert.strictEqual(errors.length, 0);
     });
 
+    it('not validate ranked with handicap', async () => {
+        const options = new GameOptions();
+
+        options.ranked = true;
+        options.presetHandicap = 1;
+
+        const errors = await validate(options);
+
+        assert.ok(errors.some(error => error.property === 'ranked'));
+    });
+
+    it('validates handicap by steps of 0.5', async () => {
+        const options = new GameOptions();
+
+        options.ranked = false;
+
+        options.presetHandicap = -1.5;
+        assert.ok(!(await validate(options)).some(error => error.property === 'presetHandicap'));
+
+        options.presetHandicap = 1.25;
+        assert.ok((await validate(options)).some(error => error.property === 'presetHandicap'));
+
+        options.presetHandicap = 5.5;
+        assert.ok((await validate(options)).some(error => error.property === 'presetHandicap'));
+    });
+
     it('not validate ranked with boardsize = 9', async () => {
         const options = new GameOptions();
 

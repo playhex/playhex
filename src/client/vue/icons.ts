@@ -137,4 +137,6 @@ export { default as IconZoomIn } from '~icons/bi/zoom-in';
 export { default as IconZoomOut } from '~icons/bi/zoom-out';
 export { default as IconMuteOn } from '~icons/bi/volume-mute-fill';
 export { default as IconMuteOff } from '~icons/bi/volume-up-fill';
+export { default as IconDash } from '~icons/bi/dash';
+export { default as IconHandicap } from '~icons/tabler/scale';
 

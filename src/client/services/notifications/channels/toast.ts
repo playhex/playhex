@@ -4,6 +4,7 @@ import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
 import { getOpponent, iAmInGame, isMe, viewingGame } from '../../context-utils.js';
 import { notifier } from '../notifier.js';
+import { getPresetDemerHandicap, isForcedHandicapPass } from '../../../../shared/app/handicap.js';
 import { t } from 'i18next';
 import { IconPersonFillExclamation, IconTablerSwords } from '../../../vue/icons.js';
 
@@ -54,6 +55,10 @@ notifier.on('gameStart', game => {
 // Toast when my opponent passed, or, if I'm watching, any player passed
 notifier.on('move', (game, timestampedMove) => {
     if (timestampedMove.move !== 'pass') {
+        return;
+    }
+
+    if (isForcedHandicapPass(getPresetDemerHandicap(game), game.moves, game.moves.length - 1)) {
         return;
     }
 

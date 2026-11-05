@@ -7,6 +7,8 @@ import AppBoardsize from './create-game/AppBoardsize.vue';
 import AppTimeControl from '../AppTimeControl.vue';
 import AppPlayFirstOrSecond from './create-game/AppPlayFirstOrSecond.vue';
 import AppSwapRule from './create-game/AppSwapRule.vue';
+import AppHandicap from './create-game/AppHandicap.vue';
+import { useHandicapOptions } from '../../composables/useHandicapOptions.js';
 import AppAllowExploration from './create-game/AppAllowExploration.vue';
 import AppOpponentMustBeRegistered from './create-game/AppOpponentMustBeRegistered.vue';
 import AppOpponentPlayerSelect from './create-game/AppOpponentPlayerSelect.vue';
@@ -27,6 +29,8 @@ const props = defineProps({
 });
 
 const gameOptions = reactive(props.gameOptions);
+
+const { swapRuleDisabled, firstPlayerDisabled } = useHandicapOptions(gameOptions);
 
 const timeControl = toRef(gameOptions, 'timeControlType');
 watch(timeControl, t => {
@@ -75,11 +79,15 @@ const showSecondaryOptions = ref(props.presetOpponent !== null);
                     </div>
                     <div v-if="showSecondaryOptions" class="modal-body border-top">
                         <div class="mb-3">
-                            <AppPlayFirstOrSecond v-model="gameOptions.firstPlayer" />
+                            <AppHandicap v-model="gameOptions.presetHandicap" :opponentLabel="$t('handicap.opponent')" />
                         </div>
 
                         <div class="mb-3">
-                            <AppSwapRule v-model="gameOptions.swapRule" />
+                            <AppPlayFirstOrSecond v-model="gameOptions.firstPlayer" :disabled="firstPlayerDisabled" />
+                        </div>
+
+                        <div class="mb-3">
+                            <AppSwapRule v-model="gameOptions.swapRule" :disabled="swapRuleDisabled" />
                         </div>
 
                         <div class="mb-3">

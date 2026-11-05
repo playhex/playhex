@@ -4,11 +4,12 @@ import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsUUID, Max, Min, Vali
 import { Expose } from '../class-transformer-custom.js';
 import { GameOptionsTimeControl, GameOptionsTimeControlByoYomi, GameOptionsTimeControlFischer } from './GameOptionsTimeControl.js';
 import type TimeControlType from '../../time-control/TimeControlType.js';
-import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, OpponentTypeEligibleForRanked, SwapRuleEligibleForRanked } from '../validator/OptionsEligibleForRanked.js';
+import { BoardsizeEligibleForRanked, FirstPlayerEligibleForRanked, OpponentTypeEligibleForRanked, PresetHandicapEligibleForRanked, SwapRuleEligibleForRanked } from '../validator/OptionsEligibleForRanked.js';
 import { TimeControlBoardsize } from './TimeControlBoardsize.js';
 import { defaultTimeControlTypes } from '../timeControlUtils.js';
 import { TimeControlIsLiveOrCorrespondence } from '../validator/TimeControlIsLiveOrCorrespondence.js';
 import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../boardsizeLimits.js';
+import { PresetHandicapIsValid } from '../validator/PresetHandicapIsValid.js';
 
 export const DEFAULT_BOARDSIZE = BOARD_DEFAULT_SIZE;
 export { MIN_BOARDSIZE, MAX_BOARDSIZE };
@@ -25,6 +26,7 @@ export default class GameOptions implements TimeControlBoardsize
     @Validate(BoardsizeEligibleForRanked)
     @Validate(FirstPlayerEligibleForRanked)
     @Validate(SwapRuleEligibleForRanked)
+    @Validate(PresetHandicapEligibleForRanked)
     @Validate(OpponentTypeEligibleForRanked)
     ranked: boolean = true;
 
@@ -54,6 +56,18 @@ export default class GameOptions implements TimeControlBoardsize
     @IsBoolean()
     @Expose()
     swapRule: boolean = true;
+
+    /**
+     * Handicap imposed when creating the game, in Demer moves, by steps of 0.5.
+     * Positive: advantage for host. Negative: advantage for opponent or bot.
+     *
+     * This is not the actual handicap of the game, which is guessed from played moves
+     * with guessDemerHandicap(): a game with 0 here can still have an actual handicap.
+     */
+    @IsNumber()
+    @Validate(PresetHandicapIsValid)
+    @Expose()
+    presetHandicap: number = 0;
 
     /**
      * Which opponent type I want.
@@ -115,6 +129,7 @@ export const cloneGameOptions = (gameOptions: GameOptions): GameOptions => {
     clone.boardsize = gameOptions.boardsize;
     clone.firstPlayer = gameOptions.firstPlayer;
     clone.swapRule = gameOptions.swapRule;
+    clone.presetHandicap = gameOptions.presetHandicap;
     clone.opponentType = gameOptions.opponentType;
     clone.opponentPublicId = gameOptions.opponentPublicId;
     clone.timeControlType = gameOptions.timeControlType;

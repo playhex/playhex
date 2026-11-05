@@ -68,6 +68,20 @@ export class SwapRuleEligibleForRanked extends OptionsEligibleForRanked
     }
 }
 
+@ValidatorConstraint({ name: 'presetHandicapEligibleForRanked', async: false })
+export class PresetHandicapEligibleForRanked extends OptionsEligibleForRanked
+{
+    validateOptions(options: GameOptions): boolean
+    {
+        return options.presetHandicap === 0;
+    }
+
+    defaultMessage(): string
+    {
+        return 'Handicap is not allowed for ranked games';
+    }
+}
+
 @ValidatorConstraint({ name: 'opponentTypeEligibleForRanked', async: false })
 export class OpponentTypeEligibleForRanked extends OptionsEligibleForRanked
 {

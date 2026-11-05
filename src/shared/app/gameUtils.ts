@@ -6,6 +6,7 @@ import { isCorrespondence, TimeControlCadencyName, timeControlToCadencyName } fr
 import { GameData } from '../game-engine/normalization.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
 import { createTimeControl } from '../time-control/createTimeControl.js';
+import { canUndoWithHandicap, getPresetDemerHandicap } from './handicap.js';
 
 export const hasPlayer = (game: Game, player: Player): boolean => {
     if (game.host !== null && game.host.publicId === player.publicId) {
@@ -381,7 +382,10 @@ export const canPlayerUndo = (game: Game, playerIndex: 0 | 1): boolean => {
         return false;
     }
 
-    return true;
+    // Undo takes back opponent last move too when it is my turn
+    const undoneMovesCount = game.currentPlayerIndex === playerIndex ? 2 : 1;
+
+    return canUndoWithHandicap(getPresetDemerHandicap(game), game.moves, undoneMovesCount);
 };
 
 /**

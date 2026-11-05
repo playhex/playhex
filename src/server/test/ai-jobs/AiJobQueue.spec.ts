@@ -46,6 +46,41 @@ const collectEvents = (queue: AiJobQueueInterface) => {
     return { completed, failed };
 };
 
+/**
+ * Submits a job just after a worker found the queue empty,
+ * and before this worker starts waiting for a notification.
+ */
+class SubmitWhileReservingQueue extends InMemoryAiJobQueue
+{
+    private submitted = false;
+
+    protected override async tryReserve(type: Parameters<InMemoryAiJobQueue['tryReserve']>[0]): ReturnType<InMemoryAiJobQueue['tryReserve']>
+    {
+        const reserved = await super.tryReserve(type);
+
+        if (reserved === null && !this.submitted) {
+            this.submitted = true;
+            await this.submit(task(), { expiresAt: null });
+        }
+
+        return reserved;
+    }
+}
+
+describe('AI job queue reserve race', () => {
+    it('does not miss a job submitted while checking the queue', async () => {
+        const queue = new SubmitWhileReservingQueue();
+        const startedAt = Date.now();
+
+        const reserved = await queue.reserve([ANALYZE_MOVE], { waitMs: 3000 });
+
+        await queue.close();
+
+        assert.ok(reserved);
+        assert.ok(Date.now() - startedAt < 1000, 'must not wait for polling fallback');
+    });
+});
+
 const testQueue = (name: string, createQueue: () => AiJobQueueInterface) => describe(name, function () {
     this.timeout(10_000);
 

@@ -20,6 +20,7 @@ import { keysOf } from '../utils.js';
 import { type Outcome } from '../../game-engine/Types.js';
 import type { HexMove } from '@playhex/move-notation';
 import { deserializeMoves, serializeMoves } from '../movesSerializer.js';
+import { normalizeHandicapOptions } from '../handicap.js';
 
 @Entity()
 @Index(keysOf<Game>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
@@ -93,6 +94,14 @@ export default class Game implements TimeControlBoardsize, GameOptions
     @Column()
     @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     swapRule: boolean;
+
+    /**
+     * Handicap imposed when creating the game, see GameOptions.presetHandicap.
+     * Actual game handicap must be guessed from moves with guessDemerHandicap().
+     */
+    @Column({ type: 'float', default: 0 })
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
+    presetHandicap: number;
 
     /**
      * Which opponent type I want.
@@ -296,7 +305,7 @@ export type CreateGameParams = {
 export const createGame = (params: CreateGameParams = {}): Game => {
     const game = new Game();
 
-    const gameOptions = params.gameOptions ?? new GameOptions();
+    const gameOptions = normalizeHandicapOptions(params.gameOptions ?? new GameOptions());
 
     game.publicId = uuidv4();
     game.state = 'created';
@@ -304,6 +313,7 @@ export const createGame = (params: CreateGameParams = {}): Game => {
     game.boardsize = gameOptions.boardsize;
     game.firstPlayer = gameOptions.firstPlayer;
     game.swapRule = gameOptions.swapRule;
+    game.presetHandicap = gameOptions.presetHandicap;
     game.opponentType = gameOptions.opponentType;
     game.opponentPublicId = gameOptions.opponentPublicId;
     game.timeControlType = structuredClone(gameOptions.timeControlType);

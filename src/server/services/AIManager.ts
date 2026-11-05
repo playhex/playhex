@@ -174,6 +174,11 @@ export const makeAIPlayerMove = async (player: Player, gameServer: GameServer): 
             return opening.move;
         }
 
+        // Bot refused to swap, and handicap gives it no stone to place
+        if (opening.allowSwap === false && gameServer.getHandicapStatus()?.type === 'swap_decision') {
+            return 'pass';
+        }
+
         return Container.get(RemoteApiPlayer).makeMove(aiConfig.engine, gameServer, aiConfig.config, opening.allowSwap);
     }
 
