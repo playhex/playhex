@@ -38,6 +38,7 @@ import ChannelController from './ChannelController.js';
 import ChangelogController from './ChangelogController.js';
 import HexplorerController from './HexplorerController.js';
 import ClientErrorReportController from './ClientErrorReportController.js';
+import SurveyAnswerController from './SurveyAnswerController.js';
 import HexGameImporterController from './HexGameImporterController.js';
 import LadderController from '../../../ladder/LadderController.js';
 import AdminLadderController from '../../../ladder/AdminLadderController.js';
@@ -133,6 +134,7 @@ export const registerApi = (app: Express) => {
             ChangelogController,
             HexplorerController,
             ClientErrorReportController,
+            SurveyAnswerController,
             HexGameImporterController,
             OAuthController,
         ],

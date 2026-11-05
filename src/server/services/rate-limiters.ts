@@ -119,6 +119,15 @@ const clientErrorReportLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit lobby survey answers, by ip.
+ */
+const surveyAnswerLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.survey_answer',
+    points: 5,
+    duration: 600,
+});
+
+/**
  * Limit puzzle katahex checks started by a player.
  * Only new checks count, polling a running check or a cached one does not.
  */
@@ -315,6 +324,12 @@ export const rateLimiterConsumeAnalyzeMoveMcts = async (playerPublicId: string, 
 export const rateLimiterConsumeClientErrorReport = async (ip: string | undefined) => {
     if (ip) {
         await consume(clientErrorReportLimiter, ip);
+    }
+};
+
+export const rateLimiterConsumeSurveyAnswer = async (ip: string | undefined) => {
+    if (ip) {
+        await consume(surveyAnswerLimiter, ip);
     }
 };
 

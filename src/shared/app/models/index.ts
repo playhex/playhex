@@ -53,6 +53,7 @@ import PuzzleMonitorUncoveredLine from './PuzzleMonitorUncoveredLine.js';
 import PuzzleMonitorUncoveredLineIgnored from './PuzzleMonitorUncoveredLineIgnored.js';
 import Rating from './Rating.js';
 import SimilarPositionFlag from './SimilarPositionFlag.js';
+import SurveyAnswer from './SurveyAnswer.js';
 import Tournament from './Tournament.js';
 import TournamentAdmin from './TournamentAdmin.js';
 import TournamentBannedPlayer from './TournamentBannedPlayer.js';
@@ -120,6 +121,7 @@ export {
     PuzzleMonitorUncoveredLineIgnored,
     Rating,
     SimilarPositionFlag,
+    SurveyAnswer,
     Tournament,
     TournamentAdmin,
     TournamentBannedPlayer,
@@ -183,6 +185,7 @@ export const entities = {
     PuzzleMonitorUncoveredLineIgnored,
     Rating,
     SimilarPositionFlag,
+    SurveyAnswer,
     Tournament,
     TournamentAdmin,
     TournamentBannedPlayer,

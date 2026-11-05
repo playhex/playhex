@@ -1065,6 +1065,18 @@ export const apiPostClientErrorReport = async (clientErrorReport: ClientErrorRep
     await checkResponse(response);
 };
 
+export const apiPostSurveyAnswer = async (text: string): Promise<void> => {
+    const response = await fetch(`/api/survey-answers`, {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+    });
+
+    await checkResponse(response);
+};
+
 export const apiGetPlayerAiWorkerKeys = async (): Promise<PlayerAiWorkerKey[]> => {
     const response = await fetch(`/api/player-ai-worker-keys`, {
         method: 'get',
