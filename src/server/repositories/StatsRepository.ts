@@ -1,4 +1,4 @@
-import { GameToPlayer, PlayerHeadToHeadStats, PlayerStats } from '../../shared/app/models/index.js';
+import { GameToPlayer, PlayerBeatenBots, PlayerHeadToHeadStats, PlayerStats } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import { Repository } from 'typeorm';
 import { timeControlToCadencyName } from '../../shared/app/timeControlUtils.js';
@@ -11,6 +11,38 @@ export default class StatsRepository
         @Inject('Repository<GameToPlayer>')
         private gameToPlayerRepository: Repository<GameToPlayer>,
     ) {}
+
+    /**
+     * Bots this player has won at least one game against, whatever the game options.
+     */
+    async getBeatenBots(playerId: number): Promise<PlayerBeatenBots>
+    {
+        const rows: { publicId: string }[] = await this.gameToPlayerRepository
+            .createQueryBuilder('gp')
+            .comment('beaten bots')
+            .innerJoin('gp.game', 'game')
+            .innerJoin(
+                GameToPlayer,
+                'opponent',
+                'opponent.gameId = gp.gameId and opponent.order != gp.order',
+            )
+            .innerJoin('opponent.player', 'bot')
+            .select('bot.publicId', 'publicId')
+            .distinct(true)
+            .where('gp.playerId = :playerId')
+            .andWhere('gp.order = game.winner')
+            .andWhere('game.state = :state')
+            .andWhere('bot.isBot = :isBot')
+            .setParameters({ playerId, state: 'ended', isBot: true })
+            .getRawMany()
+        ;
+
+        const beatenBots = new PlayerBeatenBots();
+
+        beatenBots.botPublicIds = rows.map(row => row.publicId);
+
+        return beatenBots;
+    }
 
     async getPlayerStats(playerId: number): Promise<PlayerStats>
     {

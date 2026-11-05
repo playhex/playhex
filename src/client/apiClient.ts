@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AiAvailabilityData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { GameOptions, Game, Player, ClientErrorReport, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, PuzzleCollection, Video, ExternalGame, ExternalGameImportJob, PlayerLittleGolemAccount } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ClientErrorReport, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, PlayerBeatenBots, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, PuzzleCollection, Video, ExternalGame, ExternalGameImportJob, PlayerLittleGolemAccount } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
@@ -957,6 +957,23 @@ export const apiGetPlayerStats = async (playerPublicId: string): Promise<null | 
     await checkResponse(response);
 
     return plainToInstance(PlayerStats, await response.json());
+};
+
+export const apiGetBeatenBots = async (playerPublicId: string): Promise<null | PlayerBeatenBots> => {
+    const response = await fetch(`/api/players/${playerPublicId}/beaten-bots`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return plainToInstance(PlayerBeatenBots, await response.json());
 };
 
 /**

@@ -64,6 +64,14 @@ export class LocalSettings
      */
     @Expose()
     puzzleEditorExpertMode?: boolean;
+
+    /**
+     * Play vs AI overlay shows all AIs and options, instead of only easy, medium and hard buttons.
+     *
+     * undefined defaults to false (simple mode).
+     */
+    @Expose()
+    showAllAis?: boolean;
 }
 
 const loadLocalSettings = (): LocalSettings => {

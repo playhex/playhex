@@ -13,6 +13,7 @@ describe('Favorite time controls', () => {
 
         // 1. Create a game with "Normal 10 + 5"
         cy.createAIGameWithRandom(false);
+        cy.openAIMoreOptions();
         modal().contains('Normal 5 + 10').click();
         cy.submitAIGame();
 
@@ -21,6 +22,7 @@ describe('Favorite time controls', () => {
         cy.get('.menu-top').contains(pseudo);
 
         cy.createAIGameWithRandom(false);
+        cy.openAIMoreOptions();
         modal().contains('Normal 5 + 10 (last)');
 
         // 3. Slide to a custom TC "5min + 30s"
@@ -46,6 +48,7 @@ describe('Favorite time controls', () => {
         cy.get('.menu-top').contains(pseudo);
 
         cy.createAIGameWithRandom(false);
+        cy.openAIMoreOptions();
         modal().contains('Hex Monthly');
     });
 
@@ -58,6 +61,7 @@ describe('Favorite time controls', () => {
 
         // 1. Create a game with a custom TC, without saving it
         cy.createAIGameWithRandom(false);
+        cy.openAIMoreOptions();
         cy.slidePrimaryTimeControl(5, 'min');
         cy.slideSecondaryTimeControl(30, 's');
         modal().contains('button', 'Save');
@@ -68,6 +72,7 @@ describe('Favorite time controls', () => {
         cy.get('.menu-top').contains(pseudo);
 
         cy.createAIGameWithRandom(false);
+        cy.openAIMoreOptions();
         modal().contains('5min + 30s (last)');
         modal().contains('button', 'Save').click();
         modal().contains('button', 'Save').should('not.exist');
@@ -77,6 +82,7 @@ describe('Favorite time controls', () => {
         cy.get('.menu-top').contains(pseudo);
 
         cy.createAIGameWithRandom(false);
+        cy.openAIMoreOptions();
         modal().contains('5min + 30s (last)');
         modal().contains('button', 'Save').should('not.exist');
 

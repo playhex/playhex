@@ -91,6 +91,24 @@ Cypress.Commands.add('goToMyProfilePage', () => {
 Cypress.Commands.add('createAIGameWithRandom', (submit = true, wait = false) => {
     cy.contains('Play vs AI').click();
 
+    // Difficulty buttons are only shown when Davies bots exist
+    cy
+        .contains('h5', 'Play vs AI')
+        .closest('.modal-content')
+        .find('.form-check, button.difficulty')
+        .should('exist')
+    ;
+
+    cy
+        .contains('h5', 'Play vs AI')
+        .closest('.modal-content')
+        .then($modal => {
+            if ($modal.text().includes('Unlock stronger AIs')) {
+                cy.wrap($modal).contains('Unlock stronger AIs').click();
+            }
+        })
+    ;
+
     cy
         .contains('h5', 'Play vs AI')
         .closest('.modal-content')
@@ -103,6 +121,15 @@ Cypress.Commands.add('createAIGameWithRandom', (submit = true, wait = false) => 
     }
 
     cy.submitAIGame();
+});
+
+Cypress.Commands.add('openAIMoreOptions', () => {
+    cy
+        .contains('h5', 'Play vs AI')
+        .closest('.modal-content')
+        .contains('More options')
+        .click()
+    ;
 });
 
 Cypress.Commands.add('submitAIGame', () => {

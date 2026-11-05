@@ -216,7 +216,8 @@
     },
     "workers": {
         "engine_unavailable": "Some AI engines have no worker online right now, these AIs are not available.",
-        "see_how_to_spawn_a_worker": "See how to compute AI moves for PlayHex from my computer"
+        "see_how_to_spawn_a_worker": "See how to compute AI moves for PlayHex from my computer",
+        "ai_not_available": "Not available right now"
     },
     "game_analysis": {
         "game_analysis": "AI game analysis",
@@ -287,7 +288,12 @@
     },
     "1vAI_friendly": {
         "title": "Play vs AI",
-        "create": "Play vs AI"
+        "create": "Play vs AI",
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard",
+        "beaten": "Already beaten",
+        "unlock_stronger_ais": "Unlock stronger AIs and more options"
     },
     "1vAI_offline": {
         "title": "Offline AI",

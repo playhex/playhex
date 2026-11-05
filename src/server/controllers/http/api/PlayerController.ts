@@ -107,6 +107,26 @@ export default class PlayerController
     }
 
     /**
+     * Bots this player has already beaten.
+     */
+    @Get('/api/players/:publicId/beaten-bots')
+    async getBeatenBots(
+        @Param('publicId') publicId: string,
+    ) {
+        const player = await this.playerRepository.getPlayer(publicId);
+
+        if (player === null) {
+            throw new DomainHttpError(404, 'player_not_found');
+        }
+
+        if (!player.id) {
+            throw new Error('Player has not id');
+        }
+
+        return this.statsRepository.getBeatenBots(player.id);
+    }
+
+    /**
      * Stats of a player against another player, from `publicId` player point of view.
      */
     @Get('/api/players/:publicId/head-to-head/:opponentPublicId')

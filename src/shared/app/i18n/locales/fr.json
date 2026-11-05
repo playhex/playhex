@@ -498,7 +498,12 @@
     },
     "1vAI_friendly": {
         "title": "Contre l'IA",
-        "create": "Jouer contre l'IA"
+        "create": "Jouer contre l'IA",
+        "easy": "Facile",
+        "medium": "Moyen",
+        "hard": "Difficile",
+        "beaten": "Déjà battue",
+        "unlock_stronger_ais": "Débloquer des IA plus fortes et plus d'options"
     },
     "1vAI_offline": {
         "title": "IA hors-ligne",
@@ -785,7 +790,8 @@
     },
     "workers": {
         "engine_unavailable": "Certains moteurs d'IA n'ont aucun worker en ligne actuellement, ces IA ne sont pas disponibles.",
-        "see_how_to_spawn_a_worker": "Voir comment calculer les coups de l'IA pour PlayHex depuis mon ordinateur"
+        "see_how_to_spawn_a_worker": "Voir comment calculer les coups de l'IA pour PlayHex depuis mon ordinateur",
+        "ai_not_available": "Indisponible pour le moment"
     },
     "player_made_a_move": "{{player}} a joué",
     "rate_limit_reached": "Cette action ({{rateLimiterName}}) vous a été limitée. Attendez {{seconds}} secondes avant de réessayer.",

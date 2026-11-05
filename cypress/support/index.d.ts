@@ -31,6 +31,11 @@ declare namespace Cypress {
         createAIGameWithRandom(submit?: boolean, wait?: boolean): Chainable;
 
         /**
+         * To use after createAIGameWithRandom(false), to access time control and other options.
+         */
+        openAIMoreOptions(): Chainable;
+
+        /**
          * To use after createAIGameWithRandom(false),
          * submit game options and create game.
          */

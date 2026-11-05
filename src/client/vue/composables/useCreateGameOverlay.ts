@@ -97,7 +97,6 @@ export const useCreateGameOverlay = () => {
 
         try {
             gameOptions = await create1vAIOverlay({ gameOptions });
-            setLastCustomTimeControl(gameOptions.timeControlType);
 
             const game = await apiPostGame(gameOptions);
             await goToGame(game.publicId);

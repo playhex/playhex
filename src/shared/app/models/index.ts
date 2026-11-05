@@ -45,6 +45,7 @@ import PlayerFavoriteTimeControl from './PlayerFavoriteTimeControl.js';
 import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
 import PlayerHeadToHeadStats from './PlayerHeadToHeadStats.js';
+import PlayerBeatenBots from './PlayerBeatenBots.js';
 import Premove from './Premove.js';
 import Puzzle from './Puzzle.js';
 import PuzzleCollection from './PuzzleCollection.js';
@@ -108,6 +109,7 @@ export {
     PlayerSettings,
     PlayerStats,
     PlayerHeadToHeadStats,
+    PlayerBeatenBots,
     PlayerAiWorkerKey,
     PlayerPushSubscription,
     PlayerPseudoHistory,
