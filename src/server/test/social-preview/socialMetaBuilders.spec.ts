@@ -67,6 +67,21 @@ const createEndedGame = (): Game => {
 };
 
 /**
+ * Tournament as loaded on a game page: without participants.
+ */
+const createGameTournament = (): Tournament => Object.assign(new Tournament(), {
+    title: 'Hex Monthly 42',
+    slug: 'hex-monthly-42',
+    state: 'ended',
+    boardsize: 11,
+    timeControlType: { family: 'fischer', options: { initialTime: 600000, timeIncrement: 5000 } },
+    description: 'Monthly tournament.',
+    startOfficialAt: new Date('2026-03-01T10:00:00Z'),
+    endedAt: new Date('2026-03-02T10:00:00Z'),
+    organizer: createPlayer(3, 'Carol'),
+});
+
+/**
  * Untranslated keys are returned as is by i18next.
  */
 const assertTranslated = (text: undefined | string): void => {
@@ -108,7 +123,7 @@ describe('social preview meta builders', () => {
         const game = createEndedGame();
 
         game.tournamentMatch = Object.assign(new TournamentMatch(), {
-            tournament: Object.assign(new Tournament(), { title: 'Hex Monthly 42' }),
+            tournament: createGameTournament(),
             label: 'semi_final',
             round: 3,
             number: 2,
@@ -120,6 +135,29 @@ describe('social preview meta builders', () => {
         game.tournamentMatch.label = null;
 
         assert.ok(new GameMetaBuilder().buildMeta(game, context()).title!.startsWith('Match 3.2 of Hex Monthly 42 · '));
+    });
+
+    it('references game tournament with Event required fields, Google does not follow @id to another page', () => {
+        const game = createEndedGame();
+
+        game.tournamentMatch = Object.assign(new TournamentMatch(), {
+            tournament: createGameTournament(),
+        });
+
+        const jsonLd = new GameMetaBuilder().buildMeta(game, context()).jsonLd![0] as SportsEvent;
+
+        const superEvent = jsonLd.superEvent as Exclude<Event, string>;
+
+        assert.strictEqual(superEvent['@type'], 'Event');
+        assert.strictEqual(superEvent['@id'], 'https://playhex.org/tournaments/hex-monthly-42#event');
+        assert.strictEqual(superEvent.name, 'Hex Monthly 42');
+        assert.strictEqual(superEvent.url, 'https://playhex.org/tournaments/hex-monthly-42');
+        assert.strictEqual(superEvent.startDate, '2026-03-01T10:00:00.000Z');
+        assert.strictEqual(superEvent.endDate, '2026-03-02T10:00:00.000Z');
+        assert.strictEqual(superEvent.eventStatus, 'https://schema.org/EventScheduled');
+        assert.deepStrictEqual(superEvent.location, { '@type': 'VirtualLocation', url: 'https://playhex.org/tournaments/hex-monthly-42' });
+        assert.strictEqual((superEvent.organizer as { name: string }).name, 'Carol');
+        assert.strictEqual(superEvent.description, 'Hex 11×11 · 10min + 5s. Monthly tournament.');
     });
 
     it('shows position of a running game, not indexed', () => {

@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import type { Tournament, TournamentSeries } from '../../../shared/app/models/index.js';
 import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
-import { breadcrumbJsonLd, formatDate, joinTitle, tournamentJsonLdId, tournamentSeriesJsonLdId, tournamentSeriesUrl, truncate } from './metaUtils.js';
+import { breadcrumbJsonLd, formatDate, joinTitle, tournamentEventJsonLd, tournamentSeriesJsonLdId, tournamentSeriesUrl, truncate } from './metaUtils.js';
 
 export type TournamentSeriesPageData = {
     series: TournamentSeries;
@@ -96,9 +96,7 @@ export default class TournamentSeriesMetaBuilder extends AbstractEntityMetaBuild
                     subEvent: tournaments
                         .filter(tournament => !tournament.hidden && tournament.state !== 'canceled')
                         .slice(0, 10)
-                        .map(tournament => ({
-                            '@id': tournamentJsonLdId(tournament, context),
-                        })),
+                        .map(tournament => tournamentEventJsonLd(tournament, context)),
                 },
                 breadcrumbJsonLd([
                     { name: t('tournament_series_list_page.title'), url: `${context.baseUrl}/tournament-series` },

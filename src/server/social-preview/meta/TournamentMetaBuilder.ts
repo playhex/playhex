@@ -1,19 +1,9 @@
 import { Service } from 'typedi';
 import type { Player, Tournament } from '../../../shared/app/models/index.js';
-import type { Event, EventStatusType, WithContext } from 'schema-dts';
+import type { Event, WithContext } from 'schema-dts';
 import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
-import { breadcrumbJsonLd, formatDate, formatIsoDate, joinTitle, personJsonLd, playerName, settingsLine, tournamentJsonLdId, tournamentSeriesJsonLdId, tournamentUrl, truncate } from './metaUtils.js';
-
-/**
- * No EventCompleted in schema.org: past events stay EventScheduled.
- */
-const eventStatus = (tournament: Tournament): EventStatusType => {
-    switch (tournament.state) {
-        case 'canceled': return 'https://schema.org/EventCancelled';
-        default: return 'https://schema.org/EventScheduled';
-    }
-};
+import { breadcrumbJsonLd, formatDate, formatIsoDate, joinTitle, playerName, settingsLine, tournamentEventJsonLd, tournamentUrl, truncate } from './metaUtils.js';
 
 @Service()
 export default class TournamentMetaBuilder extends AbstractEntityMetaBuilder<Tournament>
@@ -119,35 +109,10 @@ export default class TournamentMetaBuilder extends AbstractEntityMetaBuilder<Tou
 
         const event: WithContext<Event> = {
             '@context': 'https://schema.org',
-            '@type': 'Event',
-            '@id': tournamentJsonLdId(tournament, context),
-            name: tournament.title,
-            url,
+            ...tournamentEventJsonLd(tournament, context),
             image: image.url,
             description,
-            startDate: tournament.startOfficialAt.toISOString(),
-            eventStatus: eventStatus(tournament),
-            eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
-            isAccessibleForFree: true,
-            location: {
-                '@type': 'VirtualLocation',
-                url,
-            },
         };
-
-        if (tournament.endedAt) {
-            event.endDate = tournament.endedAt.toISOString();
-        }
-
-        if (tournament.organizer) {
-            event.organizer = personJsonLd(tournament.organizer, context);
-        }
-
-        if (tournament.series) {
-            event.superEvent = {
-                '@id': tournamentSeriesJsonLdId(tournament.series, context),
-            };
-        }
 
         return {
             title: withSiteName(joinTitle(tournament.title, t('social_preview.tournament.hex_tournament'), formatIsoDate(tournament.startedAt ?? tournament.startOfficialAt))),

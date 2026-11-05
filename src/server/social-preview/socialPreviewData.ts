@@ -29,7 +29,7 @@ export const loadGame = async (publicId: string): Promise<null | Game> => {
             host: true,
             gameToPlayers: { player: true },
             ratings: { player: true },
-            tournamentMatch: { tournament: true },
+            tournamentMatch: { tournament: { organizer: true } },
             ladderChallenge: true,
         },
     });
@@ -52,7 +52,7 @@ export const loadTournamentSeries = async (slug: string): Promise<null | Tournam
 
     return {
         series,
-        tournaments: await Container.get(TournamentRepository).findBySeries(series.id),
+        tournaments: await Container.get(TournamentRepository).findBySeries(series.id, true),
     };
 };
 

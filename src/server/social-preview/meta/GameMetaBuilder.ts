@@ -4,7 +4,7 @@ import type { SportsEvent, WithContext } from 'schema-dts';
 import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
 import AbstractEntityMetaBuilder from './AbstractEntityMetaBuilder.js';
 import { tournamentMatchFullTitle } from '../../../shared/app/tournamentUtils.js';
-import { boardsizeString, formatDate, formatIsoDate, formatTimeControl, joinTitle, personJsonLd, playerName, tournamentJsonLdId } from './metaUtils.js';
+import { boardsizeString, formatDate, formatIsoDate, formatTimeControl, joinTitle, personJsonLd, playerName, tournamentEventJsonLd } from './metaUtils.js';
 
 @Service()
 export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
@@ -162,9 +162,7 @@ export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
         }
 
         if (game.tournamentMatch?.tournament) {
-            jsonLd.superEvent = {
-                '@id': tournamentJsonLdId(game.tournamentMatch.tournament, context),
-            };
+            jsonLd.superEvent = tournamentEventJsonLd(game.tournamentMatch.tournament, context);
         }
 
         const image = this.image(game, context, t('social_preview.game.image_alt', { title: versus }));

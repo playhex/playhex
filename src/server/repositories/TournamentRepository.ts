@@ -126,13 +126,14 @@ export default class TournamentRepository
      * All tournaments of a series. Active ones may be outdated,
      * up to date instances are in TournamentStore.
      */
-    async findBySeries(tournamentSeriesId: number): Promise<Tournament[]>
+    async findBySeries(tournamentSeriesId: number, withOrganizer = false): Promise<Tournament[]>
     {
         return await this.tournamentRepository.find({
             relations: {
                 participants: {
                     player: true,
                 },
+                organizer: withOrganizer,
             },
             where: {
                 series: { id: tournamentSeriesId },

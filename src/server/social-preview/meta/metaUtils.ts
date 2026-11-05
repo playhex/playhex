@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { BreadcrumbList, Person, WithContext } from 'schema-dts';
+import type { BreadcrumbList, Event, EventStatusType, Person, WithContext } from 'schema-dts';
 import type { Player, PuzzleCollection, Tournament, TournamentSeries } from '../../../shared/app/models/index.js';
 import type TimeControlType from '../../../shared/time-control/TimeControlType.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
@@ -116,8 +116,7 @@ export const tournamentUrl = (tournament: Pick<Tournament, 'slug'>, context: Soc
 export const tournamentSeriesUrl = (series: Pick<TournamentSeries, 'slug'>, context: SocialMetaContext): string => `${context.baseUrl}/tournament-series/${encodeURIComponent(series.slug)}`;
 
 /**
- * Ids of tournament Event and series EventSeries json-ld, to reference them from other pages
- * without declaring an incomplete Event that Google would report as invalid.
+ * Ids of tournament Event and series EventSeries json-ld, to link same entity across pages.
  */
 export const tournamentJsonLdId = (tournament: Pick<Tournament, 'slug'>, context: SocialMetaContext): string => `${tournamentUrl(tournament, context)}#event`;
 
@@ -129,6 +128,55 @@ export const personJsonLd = (player: Player, context: SocialMetaContext): Person
     name: playerName(player),
     url: playerUrl(player, context),
 });
+
+/**
+ * No EventCompleted in schema.org: past events stay EventScheduled.
+ */
+const tournamentEventStatus = (tournament: Tournament): EventStatusType => {
+    switch (tournament.state) {
+        case 'canceled': return 'https://schema.org/EventCancelled';
+        default: return 'https://schema.org/EventScheduled';
+    }
+};
+
+/**
+ * Tournament Event, on tournament page and when referenced from another page.
+ * Google does not follow @id to another page: a reference with only @id is reported
+ * as an Event with missing name, so references must be complete Events.
+ *
+ * Only needs tournament columns and organizer,
+ * not participants, which are not loaded on other pages.
+ */
+export const tournamentEventJsonLd = (tournament: Tournament, context: SocialMetaContext): Event => {
+    const url = tournamentUrl(tournament, context);
+    const settings = settingsLine(tournament.boardsize, tournament.timeControlType, context.t);
+
+    const event: Event = {
+        '@type': 'Event',
+        '@id': tournamentJsonLdId(tournament, context),
+        name: tournament.title,
+        url,
+        description: truncate(tournament.description ? `${settings}. ${tournament.description}` : settings),
+        startDate: tournament.startOfficialAt.toISOString(),
+        eventStatus: tournamentEventStatus(tournament),
+        eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+        isAccessibleForFree: true,
+        location: {
+            '@type': 'VirtualLocation',
+            url,
+        },
+    };
+
+    if (tournament.endedAt) {
+        event.endDate = tournament.endedAt.toISOString();
+    }
+
+    if (tournament.organizer) {
+        event.organizer = personJsonLd(tournament.organizer, context);
+    }
+
+    return event;
+};
 
 export const breadcrumbJsonLd = (items: { name: string, url: string }[]): WithContext<BreadcrumbList> => ({
     '@context': 'https://schema.org',
