@@ -101,6 +101,7 @@ export { default as IconPhone } from '~icons/bi/phone';
 export { default as IconPlayFill } from '~icons/bi/play-fill';
 export { default as IconPlus } from '~icons/bi/plus';
 export { default as IconPuzzle } from '~icons/bi/puzzle';
+export { default as IconQuestionCircle } from '~icons/bi/question-circle';
 export { default as IconRecordFill } from '~icons/bi/record-fill';
 export { default as IconRepeat } from '~icons/bi/repeat';
 export { default as IconRewind } from '~icons/bi/rewind';

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { apiPostSurveyAnswer } from '../../apiClient.js';
+import { IconQuestionCircle } from '../icons.js';
 
 /**
  * Asks visitors what they miss the most on PlayHex.
@@ -39,14 +40,14 @@ const submit = async (): Promise<void> => {
 </script>
 
 <template>
-    <div v-if="!alreadyAnswered" class="card mt-3 mb-3">
+    <div v-if="!alreadyAnswered" class="card text-bg-info mt-3 mb-3">
         <div class="card-body">
-            <h5 class="card-title">{{ $t('lobby_survey_title') }}</h5>
+            <h5 class="card-title"><IconQuestionCircle /> {{ $t('lobby_survey_title') }}</h5>
 
             <p v-if="submitted" class="card-text">{{ $t('lobby_survey_thanks') }}</p>
 
             <form v-else @submit.prevent="submit">
-                <label for="lobby-survey-input" class="form-label">{{ $t('lobby_survey_question') }}</label>
+                <label for="lobby-survey-input" class="form-label lead">{{ $t('lobby_survey_question') }}</label>
 
                 <div class="input-group">
                     <input
@@ -60,9 +61,9 @@ const submit = async (): Promise<void> => {
                     <button type="submit" class="btn btn-primary" :disabled="submitting">{{ $t('lobby_survey_submit') }}</button>
                 </div>
 
-                <small v-if="failed" class="text-danger">{{ $t('lobby_survey_error') }}</small>
+                <small v-if="failed" class="d-block text-bg-danger rounded px-2 py-1 mt-2">{{ $t('lobby_survey_error') }}</small>
 
-                <small class="text-secondary">{{ $t('lobby_survey_privacy') }}</small>
+                <small>{{ $t('lobby_survey_privacy') }}</small>
             </form>
         </div>
     </div>
