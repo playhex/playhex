@@ -1,37 +1,43 @@
 import { defineStore } from 'pinia';
 import useSocketStore from './socketStore.js';
 import { ref } from 'vue';
+import { getMedianShift, getNextMeasureDelay, MAX_MEASURES, UNSTABLE_MEASURE_INTERVAL } from '../../shared/app/serverDateShift.js';
 
 /**
  *
  */
 const useServerDateStore = defineStore('serverDateStore', () => {
 
-    const { socket } = useSocketStore();
+    const socketStore = useSocketStore();
+    const { socket } = socketStore;
 
     /**
      * Last measured shifts to get a median value.
      */
     const lastShifts: number[] = [];
-    const MAX_MEASURES = 5;
 
     const pingTime = ref<null | number>(null);
     const medianShift = ref<number>(0);
 
-    /**
-     * Get current shift in milliseconds, between client and server date.
-     */
-    const getMedianShift = (): number => {
-        if (lastShifts.length === 0) {
-            return 0;
+    let nextMeasureTimeout: null | ReturnType<typeof setTimeout> = null;
+
+    const scheduleNextMeasure = (delay: number) => {
+        if (nextMeasureTimeout !== null) {
+            clearTimeout(nextMeasureTimeout);
         }
 
-        const sorted = [...lastShifts].sort();
-
-        return sorted[Math.floor(lastShifts.length / 2)];
+        nextMeasureTimeout = setTimeout(() => measureCurrentShift(), delay);
     };
 
     const measureCurrentShift = () => {
+        // Retry later if server does not answer, answer may be lost on disconnection
+        scheduleNextMeasure(UNSTABLE_MEASURE_INTERVAL);
+
+        // Do not emit while disconnected: socket.io would buffer and send them all on reconnection
+        if (!socketStore.connected) {
+            return;
+        }
+
         const t0 = new Date();
 
         socket.emit('getServerStatus', ({ serverDate }) => {
@@ -45,12 +51,14 @@ const useServerDateStore = defineStore('serverDateStore', () => {
                 lastShifts.shift();
             }
 
-            medianShift.value = getMedianShift();
+            medianShift.value = getMedianShift(lastShifts);
+
+            scheduleNextMeasure(getNextMeasureDelay(lastShifts));
         });
     };
 
+    socket.on('connect', () => measureCurrentShift());
     measureCurrentShift();
-    setInterval(() => measureCurrentShift(), 5000);
 
     /**
      * Create a date synchronized with playhex server.
