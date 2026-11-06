@@ -815,7 +815,6 @@
         "evaluation": "评估",
         "engine": "引擎",
         "move_history": "棋步历史",
-        "current_analysis": "当前分析",
         "load": "载入",
         "save": "保存",
         "download_sgf": "下载为SGF",

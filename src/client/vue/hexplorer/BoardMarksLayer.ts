@@ -1,15 +1,14 @@
 import { BoardEntity, CircleMark, CrossMark, GameView, SelectMark, SquareMark, TextMark, TriangleMark } from '@playhex/pixi-board';
 import { Move } from '@playhex/move-notation';
+import type { MarkPlacement, MarkType } from '../../../shared/app/hexplorerStudy.js';
 
-export type MarkType = 'cross' | 'triangle' | 'square' | 'circle' | 'select' | 'label';
+export type { MarkPlacement, MarkType };
 
 /**
  * Mark types drawn as a single shape/text mark on a cell, at most one per cell.
  * `select` (highlight) is handled separately, as it can be layered on top of any of these.
  */
 export type ShapeMarkType = Exclude<MarkType, 'select'>;
-
-export type MarkPlacement = { move: Move, type: MarkType, text?: string };
 
 const MARKS_GROUP = '_hexplorer_marks';
 const SELECTS_GROUP = '_hexplorer_selects';

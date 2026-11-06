@@ -47,6 +47,7 @@ import PlayerStats from './PlayerStats.js';
 import PlayerHeadToHeadStats from './PlayerHeadToHeadStats.js';
 import PlayerBeatenBots from './PlayerBeatenBots.js';
 import Premove from './Premove.js';
+import HexplorerStudy from './HexplorerStudy.js';
 import Puzzle from './Puzzle.js';
 import PuzzleCollection from './PuzzleCollection.js';
 import PuzzleMonitorUncoveredLine from './PuzzleMonitorUncoveredLine.js';
@@ -115,6 +116,7 @@ export {
     PlayerPushSubscription,
     PlayerPseudoHistory,
     Premove,
+    HexplorerStudy,
     Puzzle,
     PuzzleCollection,
     PuzzleMonitorUncoveredLine,
@@ -179,6 +181,7 @@ export const entities = {
     PlayerPseudoHistory,
     PlayerSettings,
     PlayerStats,
+    HexplorerStudy,
     Puzzle,
     PuzzleCollection,
     PuzzleMonitorUncoveredLine,

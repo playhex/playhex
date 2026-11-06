@@ -6,7 +6,8 @@ import sharp from 'sharp';
 import { Container } from 'typedi';
 import logger from '../services/logger.js';
 import { avatarsPath } from '../services/PlayerAvatarService.js';
-import type { Game, Player, Puzzle } from '../../shared/app/models/index.js';
+import type { Game, HexplorerStudy, Player, Puzzle } from '../../shared/app/models/index.js';
+import { getHexplorerPositionAt } from '../../shared/app/hexplorerStudy.js';
 import { boardSvgColors, gameMovesToBoardSvgPosition } from '../../shared/app/boardSvg.js';
 import { isCorrespondence } from '../../shared/app/timeControlUtils.js';
 import { resolveSocialLocale } from './resolveSocialLocale.js';
@@ -15,6 +16,7 @@ import { socialBaseUrl, type SocialMetaContext } from './SocialMeta.js';
 import { brandText, greyText, renderBoardImageSvg, renderCardImageSvg, svgToPng, withRenderSlot, wrapText, type OgBoard, type OgIcon, type OgText } from './OgImageRenderer.js';
 import GameMetaBuilder from './meta/GameMetaBuilder.js';
 import ExternalGameMetaBuilder from './meta/ExternalGameMetaBuilder.js';
+import HexplorerStudyMetaBuilder from './meta/HexplorerStudyMetaBuilder.js';
 import PuzzleMetaBuilder from './meta/PuzzleMetaBuilder.js';
 import PuzzleCollectionMetaBuilder, { COLLECTION_IMAGE_PUZZLES } from './meta/PuzzleCollectionMetaBuilder.js';
 import TournamentMetaBuilder from './meta/TournamentMetaBuilder.js';
@@ -23,7 +25,7 @@ import PlayerMetaBuilder from './meta/PlayerMetaBuilder.js';
 import LadderMetaBuilder from './meta/LadderMetaBuilder.js';
 import StaticPageMetaBuilder from './meta/StaticPageMetaBuilder.js';
 import { playerName, settingsLine } from './meta/metaUtils.js';
-import { loadExternalGame, loadGame, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
+import { loadExternalGame, loadGame, loadHexplorerStudy, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
 
 const cachePath = path.resolve(process.env.OG_CACHE_PATH || 'var/og-cache/');
 
@@ -98,6 +100,23 @@ const puzzleBoard = (puzzle: Puzzle): OgBoard => ({
     disabledCells: puzzle.hideDisabledCells ? [] : puzzle.disabledCells ?? [],
     hiddenCells: puzzle.hideDisabledCells ? puzzle.disabledCells ?? [] : [],
 });
+
+/**
+ * Position displayed when opening study.
+ */
+const hexplorerStudyBoard = ({ data }: HexplorerStudy): OgBoard => {
+    const { stones, lastMove } = getHexplorerPositionAt(data.nodes, data.currentNodeId);
+    const cells = [...stones];
+
+    return {
+        boardsize: data.boardsize,
+        stones: {
+            red: cells.filter(([, color]) => color === 0).map(([move]) => move),
+            blue: cells.filter(([, color]) => color === 1).map(([move]) => move),
+        },
+        lastMove,
+    };
+};
 
 /**
  * Waiting game: only its host and settings, there is no position yet.
@@ -210,6 +229,7 @@ const staticPageIllustrations: { [key: string]: OgBoard } = {
 const createResolvers = (): { [type: string]: OgImageResolver } => {
     const gameMetaBuilder = Container.get(GameMetaBuilder);
     const externalGameMetaBuilder = Container.get(ExternalGameMetaBuilder);
+    const hexplorerStudyMetaBuilder = Container.get(HexplorerStudyMetaBuilder);
     const puzzleMetaBuilder = Container.get(PuzzleMetaBuilder);
     const puzzleCollectionMetaBuilder = Container.get(PuzzleCollectionMetaBuilder);
     const tournamentMetaBuilder = Container.get(TournamentMetaBuilder);
@@ -279,6 +299,30 @@ const createResolvers = (): { [type: string]: OgImageResolver } => {
                     moves: externalGame.moves,
                     players: [{ name: red, rating: redRating }, { name: blue, rating: blueRating }],
                 }, winner === null ? [] : [winnerLine(winner === 0 ? red : blue, winner)]),
+            };
+        },
+
+        [hexplorerStudyMetaBuilder.imageType]: async (publicId, context) => {
+            const study = await loadHexplorerStudy(publicId);
+
+            if (study === null) {
+                return null;
+            }
+
+            return {
+                version: hexplorerStudyMetaBuilder.imageVersion(study),
+                immutable: false,
+                renderSvg: () => renderBoardImageSvg({
+                    ...hexplorerStudyBoard(study),
+                    corners: {
+                        topLeft: [
+                            { text: context.t('social_preview.hexplorer_study.label'), color: boardSvgColors.highlight, size: 30, bold: true },
+                            { text: hexplorerStudyMetaBuilder.title(study, context), color: '#ffffff', size: 36, bold: true },
+                            ...(study.author ? [greyLine(context.t('social_preview.by', { author: playerName(study.author) }))] : []),
+                        ],
+                        bottomRight: [brandText()],
+                    },
+                }),
             };
         },
 

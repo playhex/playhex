@@ -2,13 +2,14 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Container } from 'typedi';
 import { AppDataSource } from '../data-source.js';
-import { ExternalGame, Game, type Puzzle, type Tournament } from '../../shared/app/models/index.js';
+import { ExternalGame, Game, type HexplorerStudy, type Puzzle, type Tournament } from '../../shared/app/models/index.js';
 import type { LadderDto } from '../../shared/app/models/LadderDto.js';
 import type { ExportGamesDataManifest } from '../../shared/app/ExportGamesDataManifest.js';
 import PlayerRepository from '../repositories/PlayerRepository.js';
 import StatsRepository from '../repositories/StatsRepository.js';
 import TournamentRepository from '../repositories/TournamentRepository.js';
 import TournamentSeriesRepository from '../repositories/TournamentSeriesRepository.js';
+import HexplorerStudyRepository from '../repositories/HexplorerStudyRepository.js';
 import PuzzleRepository from '../puzzles/PuzzleRepository.js';
 import PuzzleCollectionRepository from '../puzzles/PuzzleCollectionRepository.js';
 import LadderService from '../ladder/LadderService.js';
@@ -54,6 +55,10 @@ export const loadTournamentSeries = async (slug: string): Promise<null | Tournam
         series,
         tournaments: await Container.get(TournamentRepository).findBySeries(series.id, true),
     };
+};
+
+export const loadHexplorerStudy = async (publicId: string): Promise<null | HexplorerStudy> => {
+    return await Container.get(HexplorerStudyRepository).findByPublicId(publicId);
 };
 
 export const loadPuzzle = async (publicId: string): Promise<null | Puzzle> => {

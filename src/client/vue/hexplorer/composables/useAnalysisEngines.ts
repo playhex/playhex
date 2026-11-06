@@ -52,6 +52,7 @@ export const useAnalysisEngines = (analysisError: Ref<null | 'engine_unavailable
 
     return {
         aiAvailability,
+        refreshEnginesStatus,
         isAnalyzerAvailable,
     };
 };

@@ -63,6 +63,7 @@ const playerIndex = computed<0 | 1>(() => {
         >
             <AppConditionalMoveButton :label :playerIndex :class="{ 'setup-node': isSetup }" />
             <IconPencilSquare v-if="isSetup" class="setup-icon" />
+            <span v-if="node.comment" class="comment-dot bg-info"></span>
         </button>
 
         <!--
@@ -140,6 +141,15 @@ const playerIndex = computed<0 | 1>(() => {
     transform translate(-50%, -50%)
     color var(--bs-white)
     font-size 0.7rem
+    pointer-events none
+
+.comment-dot
+    position absolute
+    top 0
+    right 0
+    width 0.45rem
+    height 0.45rem
+    border-radius 50%
     pointer-events none
 
 .tree-stem

@@ -29,6 +29,20 @@ type SGFNode = {
     AW?: string[];
 
     /**
+     * Clear points (setup, not a played move).
+     *
+     * https://www.red-bean.com/sgf/properties.html#AE
+     */
+    AE?: string[];
+
+    /**
+     * Whose turn it is to play.
+     *
+     * https://www.red-bean.com/sgf/properties.html#PL
+     */
+    PL?: SGFColor;
+
+    /**
      * Mark points with a triangle.
      *
      * https://www.red-bean.com/sgf/properties.html#TR
@@ -197,13 +211,6 @@ export type SGF = SGFNode & {
      * https://www.red-bean.com/sgf/properties.html#RE
      */
     RE?: string;
-
-    /**
-     * Whose turn it is to play.
-     *
-     * https://www.red-bean.com/sgf/properties.html#PL
-     */
-    PL?: SGFColor;
 
     /**
      * If this game is from an event, like a tournament, meet, ..., name of this event.

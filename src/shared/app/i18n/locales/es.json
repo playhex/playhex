@@ -846,7 +846,6 @@
         "evaluation": "Evaluación",
         "engine": "Motor",
         "move_history": "Historial de jugadas",
-        "current_analysis": "Análisis actual",
         "load": "Cargar",
         "save": "Guardar",
         "download_sgf": "Descargar como SGF",

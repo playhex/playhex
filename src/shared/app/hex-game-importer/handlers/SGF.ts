@@ -2,6 +2,7 @@ import { HexMove, parseMove } from '@playhex/move-notation';
 import { sgfFromString } from '../../../sgf/index.js';
 import { ImporterHandlerInterface } from '../ImporterHandlerInterface.js';
 import { ImportedGame } from '../types.js';
+import { sgfToTreeNodes } from '../../hexplorerSgf.js';
 
 /**
  * Import from SGF content.
@@ -42,9 +43,12 @@ export class SGF implements ImporterHandlerInterface
             }
         }
 
+        const boardsize = this.parseSgfSZ(sgf.SZ) ?? maxSize;
+
         return Promise.resolve({
-            boardsize: this.parseSgfSZ(sgf.SZ) ?? maxSize,
+            boardsize,
             moves,
+            tree: sgfToTreeNodes(sgf, boardsize),
             playerBlackName: sgf.PB ?? undefined,
             playerWhiteName: sgf.PW ?? undefined,
         });

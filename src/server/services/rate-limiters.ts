@@ -215,6 +215,15 @@ const importExternalGameLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit new hexplorer studies by player, forks included. Deleting a study gives back a point.
+ */
+const createHexplorerStudyLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.create_hexplorer_study',
+    points: 5,
+    duration: 3600,
+});
+
+/**
  * Error thrown from rate limiter
  */
 export class RateLimiterError extends Error {}
@@ -359,6 +368,23 @@ export const rateLimiterConsumeLinkExternalAccount = async (playerPublicId: stri
 
 export const rateLimiterConsumeImportExternalGames = async (playerPublicId: string) => {
     await consume(importExternalGamesLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumeCreateHexplorerStudy = async (playerPublicId: string) => {
+    try {
+        await consume(createHexplorerStudyLimiter, playerPublicId);
+    } catch (e) {
+        // Refused attempts are also counted, then deleting a study would not unblock player
+        if (e instanceof RateLimitReachedError) {
+            await createHexplorerStudyLimiter.reward(playerPublicId);
+        }
+
+        throw e;
+    }
+};
+
+export const rateLimiterRewardCreateHexplorerStudy = async (playerPublicId: string) => {
+    await createHexplorerStudyLimiter.reward(playerPublicId);
 };
 
 export const rateLimiterConsumeImportExternalGame = async (oauthClientId: string) => {

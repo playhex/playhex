@@ -6,13 +6,14 @@ import GameMetaBuilder from './meta/GameMetaBuilder.js';
 import ExternalGameMetaBuilder from './meta/ExternalGameMetaBuilder.js';
 import TournamentMetaBuilder from './meta/TournamentMetaBuilder.js';
 import TournamentSeriesMetaBuilder from './meta/TournamentSeriesMetaBuilder.js';
+import HexplorerStudyMetaBuilder from './meta/HexplorerStudyMetaBuilder.js';
 import PuzzleMetaBuilder from './meta/PuzzleMetaBuilder.js';
 import PuzzleCollectionMetaBuilder from './meta/PuzzleCollectionMetaBuilder.js';
 import PlayerMetaBuilder from './meta/PlayerMetaBuilder.js';
 import LadderMetaBuilder from './meta/LadderMetaBuilder.js';
 import StaticPageMetaBuilder from './meta/StaticPageMetaBuilder.js';
 import ExportGamesDataMetaBuilder from './meta/ExportGamesDataMetaBuilder.js';
-import { loadExportGamesDataManifest, loadExternalGame, loadGame, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
+import { loadExportGamesDataManifest, loadExternalGame, loadGame, loadHexplorerStudy, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
 
 const param = (req: Request, name: string): string => String(req.params[name]);
 
@@ -53,6 +54,12 @@ export function socialPreviewRouter(): Router {
         const data = await loadTournamentSeries(param(req, 'slug'));
 
         return data && Container.get(TournamentSeriesMetaBuilder).buildMeta(data, context);
+    }));
+
+    router.get('/hexplorer/:publicId', resolveMeta(async (req, context) => {
+        const study = await loadHexplorerStudy(param(req, 'publicId'));
+
+        return study && Container.get(HexplorerStudyMetaBuilder).buildMeta(study, context);
     }));
 
     router.get('/puzzles/collections/:publicId', resolveMeta(async (req, context) => {

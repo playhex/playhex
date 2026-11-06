@@ -825,7 +825,6 @@
         "evaluation": "Bewertung",
         "engine": "Engine",
         "move_history": "Zughistorie",
-        "current_analysis": "Aktuelle Analyse",
         "load": "Laden",
         "save": "Speichern",
         "download_sgf": "Als SGF herunterladen",

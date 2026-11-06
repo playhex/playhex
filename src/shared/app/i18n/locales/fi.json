@@ -825,7 +825,6 @@
         "evaluation": "Arviointi",
         "engine": "Moottori",
         "move_history": "Siirtohistoria",
-        "current_analysis": "Nykyinen analyysi",
         "load": "Lataa",
         "save": "Tallenna",
         "download_sgf": "Lataa SGF-muodossa",

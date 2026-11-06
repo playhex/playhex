@@ -109,7 +109,7 @@ const routes: RouteRecordRaw[] = [
     },
     {
         name: 'hexplorer',
-        path: '/hexplorer',
+        path: '/hexplorer/:publicId?',
         component: () => import('./hexplorer/pages/PageHexplorer.vue'),
         meta: {
             displayFooter: false,

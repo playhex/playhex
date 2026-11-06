@@ -1,18 +1,20 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
 import type { BreadcrumbList, DataDownload, Dataset, Event, LearningResource, ProfilePage, SportsEvent, TechArticle, WebApplication, WebSite } from 'schema-dts';
-import { ExternalGame, Game, GameToPlayer, Player, Puzzle, Rating, Tournament, TournamentMatch, TournamentParticipant } from '../../../shared/app/models/index.js';
+import { ExternalGame, Game, GameToPlayer, HexplorerStudy, Player, Puzzle, Rating, Tournament, TournamentMatch, TournamentParticipant } from '../../../shared/app/models/index.js';
 import { getSocialT } from '../../social-preview/socialI18n.js';
 import { createDefaultSocialMeta, type SocialLocale, type SocialMetaContext } from '../../social-preview/SocialMeta.js';
 import GameMetaBuilder from '../../social-preview/meta/GameMetaBuilder.js';
 import ExternalGameMetaBuilder from '../../social-preview/meta/ExternalGameMetaBuilder.js';
 import TournamentMetaBuilder from '../../social-preview/meta/TournamentMetaBuilder.js';
+import HexplorerStudyMetaBuilder from '../../social-preview/meta/HexplorerStudyMetaBuilder.js';
 import PuzzleMetaBuilder from '../../social-preview/meta/PuzzleMetaBuilder.js';
 import PlayerMetaBuilder from '../../social-preview/meta/PlayerMetaBuilder.js';
 import StaticPageMetaBuilder from '../../social-preview/meta/StaticPageMetaBuilder.js';
 import LadderMetaBuilder from '../../social-preview/meta/LadderMetaBuilder.js';
 import ExportGamesDataMetaBuilder from '../../social-preview/meta/ExportGamesDataMetaBuilder.js';
 import type { LadderDto } from '../../../shared/app/models/LadderDto.js';
+import { createHexplorerState } from '../../../shared/app/hexplorerStudy.js';
 import { tutorialSeoKey, tutorialSeoSteps } from '../../../shared/app/tutorial/tutorialSteps.js';
 
 const context = (locale: SocialLocale = 'en', url = 'https://playhex.org/page'): SocialMetaContext => ({
@@ -273,6 +275,22 @@ describe('social preview meta builders', () => {
         tournament.hidden = true;
 
         assert.strictEqual(new TournamentMetaBuilder().buildMeta(tournament, context()).noindex, true);
+    });
+
+    it('builds hexplorer study meta, not indexed', () => {
+        const study = new HexplorerStudy();
+        study.publicId = 'study-1';
+        study.title = 'Ladder escape';
+        study.data = createHexplorerState(9);
+        study.author = createPlayer(1, 'Alice');
+        study.updatedAt = new Date('2026-01-01T00:00:00Z');
+
+        const meta = new HexplorerStudyMetaBuilder().buildMeta(study, context());
+
+        assert.ok(meta.title?.startsWith('Ladder escape'));
+        assert.strictEqual(meta.description, 'Hex 9×9 · by Alice');
+        assert.strictEqual(meta.noindex, true);
+        assert.ok(meta.image?.url.includes('/hexplorer-studies/study-1'));
     });
 
     it('builds puzzle meta without solution, and does not index drafts', () => {

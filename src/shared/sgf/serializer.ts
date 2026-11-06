@@ -61,6 +61,7 @@ const writeList = (key: string, values: undefined | string[]): string => {
 const writeMarkup = (sgf: SGF & SGFMove): string => {
     return writeList('AB', sgf.AB)
         + writeList('AW', sgf.AW)
+        + writeList('AE', sgf.AE)
         + writeList('TR', sgf.TR)
         + writeList('CR', sgf.CR)
         + writeList('SQ', sgf.SQ)
@@ -108,6 +109,9 @@ const writeNode = (sgfMove: SGFMove): string => {
 
         // Time control values
         'BL', 'WL', 'OB', 'OW',
+
+        // Whose turn it is, after a setup
+        'PL',
 
         // Node name and comment
         'N', 'C',

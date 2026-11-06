@@ -1,18 +1,20 @@
 import { SGF, SGFMove } from '../../../shared/sgf/types.js';
 import { GameTree, ROOT_ID, TreeNode } from './GameTree.js';
 import { MarkType } from './BoardMarksLayer.js';
+import { getHexplorerPositionAt } from '../../../shared/app/hexplorerStudy.js';
+import { SGF_MARKS } from '../../../shared/app/hexplorerSgf.js';
 
-const MARK_TYPE_TO_SGF: Record<MarkType, 'TR' | 'CR' | 'SQ' | 'MA' | 'SL' | 'LB'> = {
-    triangle: 'TR',
-    circle: 'CR',
-    square: 'SQ',
-    cross: 'MA',
-    select: 'SL',
+const MARK_TYPE_TO_SGF = {
+    ...Object.fromEntries(SGF_MARKS.map(([property, type]) => [type, property])),
     label: 'LB',
-};
+} as Record<MarkType, 'TR' | 'CR' | 'SQ' | 'MA' | 'SL' | 'LB'>;
 
 const nodeToSgfMove = (tree: GameTree, node: TreeNode): SGFMove => {
     const sgfMove: SGFMove = {};
+
+    if (node.comment) {
+        sgfMove.C = node.comment;
+    }
 
     if (node.data === null) {
         return sgfMove;
@@ -28,8 +30,15 @@ const nodeToSgfMove = (tree: GameTree, node: TreeNode): SGFMove => {
         return sgfMove;
     }
 
-    const black = node.data.stones.filter(stone => stone.color === 0).map(stone => stone.move);
-    const white = node.data.stones.filter(stone => stone.color === 1).map(stone => stone.move);
+    // Setup node holds all stones, but in SGF they are added to stones already on board
+    const { stones: previous } = getHexplorerPositionAt(tree.nodes.value, node.parentId as number);
+    const added = node.data.stones.filter(({ move, color }) => previous.get(move) !== color);
+    const black = added.filter(stone => stone.color === 0).map(stone => stone.move);
+    const white = added.filter(stone => stone.color === 1).map(stone => stone.move);
+    const kept = new Set(node.data.stones.map(stone => stone.move));
+    const removed = [...previous.keys()].filter(move => !kept.has(move));
+
+    sgfMove.PL = node.data.nextPlayer === 0 ? 'B' : 'W';
 
     if (black.length > 0) {
         sgfMove.AB = black;
@@ -37,6 +46,10 @@ const nodeToSgfMove = (tree: GameTree, node: TreeNode): SGFMove => {
 
     if (white.length > 0) {
         sgfMove.AW = white;
+    }
+
+    if (removed.length > 0) {
+        sgfMove.AE = removed;
     }
 
     for (const mark of node.data.marks) {
@@ -88,6 +101,12 @@ export const gameTreeToSgf = (
         AP: 'PlayHex:1.0.0',
         moves: buildSgfMoves(tree, ROOT_ID),
     };
+
+    const rootComment = tree.getNode(ROOT_ID).comment;
+
+    if (rootComment) {
+        sgf.C = rootComment;
+    }
 
     if (playerBlackName) {
         sgf.PB = playerBlackName;

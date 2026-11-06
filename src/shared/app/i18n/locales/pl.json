@@ -835,7 +835,6 @@
         "evaluation": "Ocena",
         "engine": "Silnik",
         "move_history": "Historia ruchów",
-        "current_analysis": "Bieżąca analiza",
         "load": "Wczytaj",
         "save": "Zapisz",
         "download_sgf": "Pobierz jako SGF",

@@ -1,6 +1,6 @@
 import qs from 'qs';
 import { AiAvailabilityData, PlayHexContributors, WithRequired } from '../shared/app/Types.js';
-import { GameOptions, Game, Player, ClientErrorReport, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, PlayerBeatenBots, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, Puzzle, PuzzleCollection, Video, ExternalGame, ExternalGameImportJob, PlayerLittleGolemAccount } from '../shared/app/models/index.js';
+import { GameOptions, Game, Player, ClientErrorReport, ChatMessage, OnlinePlayers, PlayerFavoriteTimeControl, PlayerSettings, AIConfig, GameAnalyze, Rating, PlayerStats, PlayerHeadToHeadStats, PlayerBeatenBots, ConditionalMoves, PlayerPushSubscription, PlayerAiWorkerKey, Tournament, TournamentSeries, TournamentSubscription, TournamentBannedPlayer, PlayerNotification, PlayerModerationAction, ChannelChatMessage, HexplorerStudy, Puzzle, PuzzleCollection, Video, ExternalGame, ExternalGameImportJob, PlayerLittleGolemAccount } from '../shared/app/models/index.js';
 import { TournamentListItemDto } from '../shared/app/models/TournamentListItemDto.js';
 import { TournamentSeriesDto, TournamentSeriesListItemDto } from '../shared/app/models/TournamentSeriesDto.js';
 import { denormalizeDomainHttpError, isDomainHttpErrorPayload } from '../shared/app/DomainHttpError.js';
@@ -22,6 +22,8 @@ import { GameChatSubscriptionItem } from '../shared/app/GameChatSubscriptionItem
 import { LadderDto, LadderHallOfFameDto, LadderMeDto, LadderPlayerStatusDto } from '../shared/app/models/LadderDto.js';
 import { LadderChallenge, LadderEvent, LadderPlayer } from '../shared/app/models/index.js';
 import type TimeControlType from '../shared/time-control/TimeControlType.js';
+import type { HexplorerStudyInput } from '../shared/app/hexplorerStudy.js';
+import type SearchHexplorerStudiesParameters from '../shared/app/SearchHexplorerStudiesParameters.js';
 import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
 import type { PuzzleCheckInput, PuzzleCheckState, PuzzleSolvePositionInput, PuzzleSolvePositionOutput } from '../shared/app/puzzles/puzzleCheck.js';
 import type { PuzzleGenerateInput, PuzzleGenerateState } from '../shared/app/puzzles/puzzleGenerate.js';
@@ -1513,6 +1515,68 @@ export const apiUpdatePlayerCountryFlag = async (publicId: string, countryFlag: 
         },
         body: JSON.stringify({ countryFlag }),
     });
+
+    await checkResponse(response);
+};
+
+export const apiGetHexplorerStudies = async (params: SearchHexplorerStudiesParameters = {}): Promise<{ results: HexplorerStudy[], count: null | number }> => {
+    const response = await fetch(`/api/hexplorer/studies?${qs.stringify(params)}`);
+
+    await checkResponse(response);
+
+    return {
+        results: (await response.json() as object[]).map(study => plainToInstance(HexplorerStudy, study)),
+        count: parse(response.headers.get('Content-Range') ?? '')?.size ?? null,
+    };
+};
+
+/**
+ * @returns Null if this study does not exist
+ */
+export const apiGetHexplorerStudy = async (publicId: string): Promise<null | HexplorerStudy> => {
+    const response = await fetch(`/api/hexplorer/studies/${publicId}`);
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return plainToInstance(HexplorerStudy, await response.json());
+};
+
+export const apiPostHexplorerStudy = async (input: HexplorerStudyInput): Promise<HexplorerStudy> => {
+    const response = await fetch('/api/hexplorer/studies', {
+        method: 'post',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(HexplorerStudy, await response.json());
+};
+
+export const apiPutHexplorerStudy = async (publicId: string, input: HexplorerStudyInput): Promise<HexplorerStudy> => {
+    const response = await fetch(`/api/hexplorer/studies/${publicId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify(input),
+    });
+
+    await checkResponse(response);
+
+    return plainToInstance(HexplorerStudy, await response.json());
+};
+
+export const apiDeleteHexplorerStudy = async (publicId: string): Promise<void> => {
+    const response = await fetch(`/api/hexplorer/studies/${publicId}`, { method: 'DELETE' });
 
     await checkResponse(response);
 };

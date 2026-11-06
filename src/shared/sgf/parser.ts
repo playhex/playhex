@@ -1,6 +1,6 @@
 import { SGF } from './types.js';
 
-type RawSGFNode = Record<string, string>;
+type RawSGFNode = Record<string, string | string[]>;
 type RawSGFTree = { nodes: RawSGFNode[], children: RawSGFTree[] };
 
 /**
@@ -12,6 +12,11 @@ const numericProperties = new Set(['FF', 'GM', 'TM', 'LC', 'LT', 'BL', 'WL', 'OB
  * Properties whose value can be either a number or a composed/string value (e.g `SZ[19:13]`).
  */
 const numericOrStringProperties = new Set(['SZ', 'HA']);
+
+/**
+ * Properties with a list of values, e.g `AB[a1][b2]`.
+ */
+const listProperties = new Set(['AB', 'AW', 'AE', 'TR', 'CR', 'SQ', 'MA', 'SL', 'LB']);
 
 class SGFParser
 {
@@ -87,7 +92,7 @@ class SGFParser
             const ident = this.parsePropIdent();
             const values = this.parsePropValues();
 
-            props[ident] = values[0] ?? '';
+            props[ident] = listProperties.has(ident) ? values : values[0] ?? '';
 
             this.skipWhitespace();
         }
@@ -156,7 +161,7 @@ const castNodeProperties = (raw: RawSGFNode): Record<string, unknown> => {
     for (const [key, value] of Object.entries(raw)) {
         if (numericProperties.has(key)) {
             node[key] = Number(value);
-        } else if (numericOrStringProperties.has(key) && /^\d+$/.test(value)) {
+        } else if (numericOrStringProperties.has(key) && typeof value === 'string' && /^\d+$/.test(value)) {
             node[key] = Number(value);
         } else {
             node[key] = value;

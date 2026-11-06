@@ -72,6 +72,14 @@ export class LocalSettings
      */
     @Expose()
     showAllAis?: boolean;
+
+    /**
+     * Hexplorer opens on tree tab instead of help tab.
+     *
+     * undefined defaults to false (help displayed first).
+     */
+    @Expose()
+    hexplorerHelpDismissed?: boolean;
 }
 
 const loadLocalSettings = (): LocalSettings => {

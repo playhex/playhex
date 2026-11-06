@@ -1,35 +1,8 @@
 import { ref, Ref } from 'vue';
-import { HexMove, Move } from '@playhex/move-notation';
-import { MarkPlacement } from './BoardMarksLayer.js';
+import { HexMove } from '@playhex/move-notation';
+import { createRootNodes, ROOT_ID, type MarkPlacement, type SetupStone, type TreeNode, type TreeNodeData } from '../../../shared/app/hexplorerStudy.js';
 
-export type SetupStone = { move: Move, color: 0 | 1 };
-
-export type TreeNodeData =
-    | { type: 'move', move: HexMove }
-    | { type: 'setup', stones: SetupStone[], marks: MarkPlacement[], nextPlayer: 0 | 1 }
-;
-
-export type TreeNode = {
-    id: number;
-    parentId: number | null;
-    children: number[];
-    data: TreeNodeData | null; // null only for the root (empty board)
-};
-
-export const ROOT_ID = 0;
-
-const createRootNode = (): TreeNode => ({
-    id: ROOT_ID,
-    parentId: null,
-    children: [],
-    data: null,
-});
-
-/**
- * Initial node list of a fresh tree: just the (empty board) root.
- * Used to seed the state that backs a GameTree.
- */
-export const createRootNodes = (): TreeNode[] => [createRootNode()];
+export { createRootNodes, ROOT_ID, type SetupStone, type TreeNode, type TreeNodeData };
 
 /**
  * A branching move tree: every played move is a node, branching when an
