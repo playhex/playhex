@@ -2,7 +2,6 @@
 import { PropType, computed, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
 import { IconAlphabet, IconChatDots, IconMeditation, IconMailbox, IconMailboxFlag, IconMuteOff, IconMuteOn, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit, Icon123, IconCrown } from '../icons.js';
 import { storeToRefs } from 'pinia';
-import copy from 'copy-to-clipboard';
 import useAuthStore from '../../stores/authStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import AppPseudo from './AppPseudo.vue';
@@ -17,6 +16,7 @@ import useAnalyzeStore from '../../stores/analyzeStore.js';
 import useServerDateStore from '../../stores/serverDateStore.js';
 import { downloadString } from '../../services/fileDownload.js';
 import { shareUrl } from '../../services/shareUrl.js';
+import { useShareLink } from '../composables/useShareLink.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { gameToSGF } from '../../../shared/app/gameToSGF.js';
 import { autoLocale } from '../../../shared/app/i18n/index.js';
@@ -235,75 +235,9 @@ onUnmounted(() => document.removeEventListener('keydown', ctrlSListener));
 /*
  * Share game link to send to a friend.
  * Useful on PWA when url bar is not displayed.
- * On desktop, just copy link.
- * On mobile, use share api to allow share to other apps, or just copy.
  */
 const href = shareUrl(window.location.href);
-const copiedResult = ref<null | true | false>(null);
-let copiedResultTimeout: null | number = null;
-type CopyResult = 'copied' | 'shared' | 'canceled' | 'unsupported';
-
-const shareWithShareApi = async (): Promise<CopyResult> => {
-    const shareData = {
-        title: document.title,
-        url: href,
-    };
-
-    if (!navigator.canShare || !navigator.canShare(shareData)) {
-        return 'unsupported';
-    }
-
-    try {
-        await navigator.share(shareData);
-
-        return 'shared';
-    } catch (e) {
-        return 'canceled';
-    }
-};
-
-const shareGameLink = async (): Promise<CopyResult> => {
-    const result = await shareWithShareApi();
-
-    if (result !== 'unsupported') {
-        return result;
-    }
-
-    return (await copy(href)) ? 'copied' : 'unsupported';
-};
-
-const shareGameLinkAndShowResult = async (): Promise<void> => {
-    // In case "copied!" is already displayed, make it blink before copy again to show it worked again
-    if (copiedResultTimeout !== null) {
-        clearTimeout(copiedResultTimeout);
-        copiedResult.value = null;
-        await new Promise(resolve => setTimeout(resolve, 80));
-    }
-
-    const result = await shareGameLink();
-
-    if (result === 'shared' || result === 'canceled') {
-        copiedResult.value = null;
-        return;
-    }
-
-    if (result === 'copied') {
-        copiedResult.value = true;
-    }
-
-    if (result === 'unsupported') {
-        copiedResult.value = false;
-    }
-
-    copiedResultTimeout = window.setTimeout(() => {
-        copiedResult.value = null;
-
-        if (copiedResultTimeout !== null) {
-            clearTimeout(copiedResultTimeout);
-            copiedResultTimeout = null;
-        }
-    }, 30000);
-};
+const { copiedResult, shareLink } = useShareLink(href);
 
 const renderMessage = (str: string): string => renderMessageWithCoords(str, game.value.boardsize);
 
@@ -637,7 +571,7 @@ watch(gameUIMode, () => {
                 <a
                     :href="href"
                     class="btn btn-sm btn-outline-primary me-2 mb-2"
-                    @click.prevent="shareGameLinkAndShowResult()"
+                    @click.prevent="shareLink()"
                     :aria-label="$t('share_game')"
                     :title="$t('share_game')"
                 ><IconShareFill /></a>

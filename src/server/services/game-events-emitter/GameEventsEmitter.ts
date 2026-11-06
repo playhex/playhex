@@ -2,7 +2,7 @@ import { Container, Service } from 'typedi';
 import { Game, Player, ChatMessage, Rating } from '../../../shared/app/models/index.js';
 import { HexServer } from '../../server.js';
 import Rooms from '../../../shared/app/Rooms.js';
-import { isBotGame, isChallengeGame } from '../../../shared/app/gameUtils.js';
+import { isBotGame, isChallengeGame, isWaitingClosedGame } from '../../../shared/app/gameUtils.js';
 import { instanceToInstance } from '../../../shared/app/class-transformer-custom.js';
 import { Outcome, TimestampedMove } from '../../../shared/game-engine/Types.js';
 import { AbstractTimeControl } from '../../../shared/time-control/TimeControl.js';
@@ -32,10 +32,18 @@ const gamePlayersRooms = (game: Game): string[] => {
 
 /**
  * Rooms for game lobby, or bot lobby.
- * Challenge games are reserved for a specific opponent and must never appear in a public lobby.
+ * Challenge games are reserved for a specific opponent and must never appear in a public lobby:
+ * only the host and the challenged opponent should see it there.
+ * Closed games are not sent at all: their id is what allows to join.
+ *
+ * Can be empty: do not emit in this case, io().to([]) would broadcast to all sockets.
  */
 const lobbyRooms = (game: Game): string[] => {
     if (isChallengeGame(game)) {
+        return gamePlayersRooms(game);
+    }
+
+    if (isWaitingClosedGame(game)) {
         return [];
     }
 
@@ -55,6 +63,19 @@ const startedGameLobbyRooms = (game: Game): string[] => [
 ];
 
 /**
+ * Rooms for lobby to notify a game has been canceled.
+ * A closed game that never started has never been public: its id must stay private.
+ * Cannot rely on isWaitingClosedGame() here: game state is already canceled.
+ */
+const canceledGameLobbyRooms = (game: Game): string[] => {
+    if (game.closed && game.startedAt === null) {
+        return [];
+    }
+
+    return startedGameLobbyRooms(game);
+};
+
+/**
  * Emits game events through websocket.
  * Knows which rooms to emit given event,
  * and how to serialize the event.
@@ -64,9 +85,11 @@ export class GameEventsEmitter
 {
     emitGameCreated(game: Game): void
     {
-        io().to([
-            ...lobbyRooms(game),
-        ]).emit('lobbyGameCreated', instanceToInstance(game, { groups: ['lobby'] }));
+        const rooms = lobbyRooms(game);
+
+        if (rooms.length > 0) {
+            io().to(rooms).emit('lobbyGameCreated', instanceToInstance(game, { groups: ['lobby'] }));
+        }
 
         io().to([
             ...gamePlayersRooms(game),
@@ -192,7 +215,7 @@ export class GameEventsEmitter
     {
         io().to([
             Rooms.game(game.publicId),
-            ...startedGameLobbyRooms(game),
+            ...canceledGameLobbyRooms(game),
             ...gamePlayersRooms(game),
             Rooms.thumbnailGame(game.publicId),
         ]).emit('gameCanceled', game.publicId, canceledAt);

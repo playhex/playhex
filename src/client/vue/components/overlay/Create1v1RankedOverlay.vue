@@ -10,6 +10,8 @@ import TimeControlType from '../../../../shared/time-control/TimeControlType.js'
 import AppAllowExploration from './create-game/AppAllowExploration.vue';
 import AppOpponentMustBeRegistered from './create-game/AppOpponentMustBeRegistered.vue';
 import AppOpponentPlayerSelect from './create-game/AppOpponentPlayerSelect.vue';
+import AppClosedGame from './create-game/AppClosedGame.vue';
+import { useClosedGameOption } from '../../composables/useClosedGameOption.js';
 import useLobbyStore from '../../../stores/lobbyStore.js';
 import { storeToRefs } from 'pinia';
 
@@ -29,6 +31,7 @@ const props = defineProps({
 
 const gameOptions = reactive(props.gameOptions);
 const { currentLobby } = storeToRefs(useLobbyStore());
+const { closedDisabled } = useClosedGameOption(gameOptions);
 
 const timeControl = toRef(gameOptions.timeControlType);
 watch<TimeControlType>(timeControl, t => gameOptions.timeControlType = t);
@@ -36,7 +39,7 @@ watch<TimeControlType>(timeControl, t => gameOptions.timeControlType = t);
 // ranked: by default, exploration is enabled for correspondence (and can be changed by host)
 watch(currentLobby, () => {
     gameOptions.explorationAllowed = currentLobby.value === 'correspondence';
-    gameOptions.opponentMustBeRegistered = currentLobby.value === 'correspondence';
+    gameOptions.opponentMustBeRegistered = !gameOptions.closed && currentLobby.value === 'correspondence';
 }, { immediate: true });
 
 const selectedOpponent = ref<null | Player>(props.presetOpponent);
@@ -71,6 +74,10 @@ watch(selectedOpponent, player => {
                         <div class="mb-3">
                             <h6>{{ $t('challenge_player') }}</h6>
                             <AppOpponentPlayerSelect v-model="selectedOpponent" />
+                        </div>
+
+                        <div class="mb-3">
+                            <AppClosedGame v-model="gameOptions.closed" :disabled="closedDisabled" />
                         </div>
 
                         <AppOpponentMustBeRegistered v-model="gameOptions.opponentMustBeRegistered" />

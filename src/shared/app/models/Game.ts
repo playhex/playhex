@@ -127,6 +127,15 @@ export default class Game implements TimeControlBoardsize, GameOptions
     @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     opponentMustBeRegistered: boolean;
 
+    /**
+     * If true, game is not listed while waiting for an opponent:
+     * only people having the game link can join.
+     * Once started, it is a public game like any other.
+     */
+    @Column({ default: false })
+    @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
+    closed: boolean;
+
     @Column({ type: 'json' })
     @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     @Type((type) => {
@@ -320,6 +329,7 @@ export const createGame = (params: CreateGameParams = {}): Game => {
     game.timeControl = null;
     game.explorationAllowed = params.gameOptions?.explorationAllowed ?? true;
     game.opponentMustBeRegistered = params.gameOptions?.opponentMustBeRegistered ?? false;
+    game.closed = params.gameOptions?.closed ?? false;
     game.host = params.host ?? null;
     game.chatMessages = [];
     game.moves = [];

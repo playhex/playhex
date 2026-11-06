@@ -124,10 +124,17 @@
     "allow_exploration_help": "Allows to try lines by playing both colors before submit a move. If disabled, conditional moves are also disabled.",
     "opponent_must_be_registered": "Registered players only",
     "opponent_must_be_registered_help": "Guests cannot join this game. Only players with an account are allowed.",
+    "closed_game": "Closed game",
+    "closed_game_help": "This game does not appear in the lobby. Only people with the link can join, even if they are not on PlayHex yet.",
+    "closed_game_invite": {
+        "link_label": "Link to send to a friend",
+        "share": "Share"
+    },
     "cannot_join_registered_only": "This game is restricted to players with an account. Create an account or log in to join.",
     "cannot_join_reason": {
         "not_logged_in": "Log in to join this game.",
         "is_host": "You are the host of this game, waiting for an opponent to join.",
+        "is_host_closed": "This game is closed: only someone with the link to this game can join.",
         "is_host_challenge": "You are the host of this game, waiting for {{pseudo}} to accept.",
         "reserved_for_other_player": "This game is a challenge reserved for another player.",
         "reserved_for_other_player_named": "This game is a challenge reserved for {{pseudo}}.",

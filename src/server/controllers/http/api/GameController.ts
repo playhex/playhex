@@ -13,7 +13,7 @@ import GameRepository from '../../../repositories/GameRepository.js';
 import type { HexMove } from '@playhex/move-notation';
 import logger from '../../../services/logger.js';
 import { rateLimiterConsumeCreateGame, rateLimiterConsumeChallengePlayer, rateLimiterConsumeChallengeSameTarget } from '../../../services/rate-limiters.js';
-import { isChallengeGame } from '../../../../shared/app/gameUtils.js';
+import { isChallengeGame, isWaitingClosedGame } from '../../../../shared/app/gameUtils.js';
 
 class AnswerRequestBody
 {
@@ -71,7 +71,9 @@ export default class GameController
     @Get('/api/games/active')
     getActiveGames(
     ) {
-        return this.gameStore.getActiveGamesData();
+        return this.gameStore.getActiveGamesData()
+            .filter(game => !isWaitingClosedGame(game))
+        ;
     }
 
     @Get('/api/games/:publicId')

@@ -116,6 +116,15 @@ export default class GameOptions implements TimeControlBoardsize
     @IsOptional()
     @Expose()
     opponentMustBeRegistered = false;
+
+    /**
+     * If true, game is not listed while waiting for an opponent:
+     * only people having the game link can join.
+     */
+    @IsBoolean()
+    @IsOptional()
+    @Expose()
+    closed = false;
 }
 
 /**
@@ -135,6 +144,7 @@ export const cloneGameOptions = (gameOptions: GameOptions): GameOptions => {
     clone.timeControlType = gameOptions.timeControlType;
     clone.explorationAllowed = gameOptions.explorationAllowed;
     clone.opponentMustBeRegistered = gameOptions.opponentMustBeRegistered;
+    clone.closed = gameOptions.closed;
 
     return clone;
 };

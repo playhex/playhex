@@ -2,6 +2,7 @@
 import 'bootstrap/js/dist/dropdown.js';
 import useLobbyStore from '../../stores/lobbyStore.js';
 import { ref, computed, watch } from 'vue';
+import AppClosedGameInvite from '../components/AppClosedGameInvite.vue';
 import AppBoard from '../components/AppBoard.vue';
 import ConfirmationOverlay from '../components/overlay/ConfirmationOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
@@ -179,11 +180,27 @@ watch([cannotJoinReasonType, game], async ([reasonType, game]) => {
     }
 }, { immediate: true });
 
+/**
+ * Host of a closed game has to send the link to someone, nobody will find this game otherwise.
+ * Rematch of a closed game is reserved to the opponent, there is nobody to invite.
+ */
+const showClosedGameInvite = computed<boolean>(() => {
+    return cannotJoinReasonType.value === 'cannot_join_reason.is_host'
+        && game.value !== null
+        && game.value.closed
+        && game.value.opponentPublicId === null
+    ;
+});
+
 const cannotJoinReasonKey = computed<null | string>(() => {
     const type = cannotJoinReasonType.value;
 
     if (!type) {
         return null;
+    }
+
+    if (showClosedGameInvite.value) {
+        return 'cannot_join_reason.is_host_closed';
     }
 
     if (type === 'cannot_join_reason.is_host' && cannotJoinOpponentPseudo.value) {
@@ -563,24 +580,28 @@ const {
                     :gameView="gameView"
                 />
 
-                <div v-if="game && (showAcceptButton || canDeclineChallenge || cannotJoinReasonKey)" class="join-button-container">
-                    <div class="d-flex flex-column align-items-center gap-2">
-                        <button
-                            v-if="showAcceptButton"
-                            class="btn btn-lg"
-                            :class="isGuestJoiningCorrepondence(game) ? 'btn-outline-warning' : 'btn-success'"
-                            @click="join()"
-                        >{{ $t('game.accept') }}</button>
+                <div v-if="game && (showAcceptButton || canDeclineChallenge || cannotJoinReasonKey)" class="join-overlay" :class="{ 'join-overlay-invite': showClosedGameInvite }">
+                    <div class="join-button-container">
+                        <div class="d-flex flex-column align-items-center gap-2">
+                            <button
+                                v-if="showAcceptButton"
+                                class="btn btn-lg"
+                                :class="isGuestJoiningCorrepondence(game) ? 'btn-outline-warning' : 'btn-success'"
+                                @click="join()"
+                            >{{ $t('game.accept') }}</button>
 
-                        <p v-else-if="cannotJoinReasonKey" class="text-center mb-0">{{ $t(cannotJoinReasonKey, { pseudo: cannotJoinOpponentPseudo }) }}</p>
+                            <p v-else-if="cannotJoinReasonKey" class="text-center mb-0">{{ $t(cannotJoinReasonKey, { pseudo: cannotJoinOpponentPseudo }) }}</p>
 
-                        <button
-                            v-if="canDeclineChallenge"
-                            type="button"
-                            class="btn btn-outline-warning"
-                            @click="declineChallenge()"
-                        >{{ $t('decline_challenge') }}</button>
+                            <button
+                                v-if="canDeclineChallenge"
+                                type="button"
+                                class="btn btn-outline-warning"
+                                @click="declineChallenge()"
+                            >{{ $t('decline_challenge') }}</button>
+                        </div>
                     </div>
+
+                    <AppClosedGameInvite v-if="showClosedGameInvite" :gameId="game.publicId" />
                 </div>
             </div>
 
@@ -768,12 +789,34 @@ const {
 </template>
 
 <style scoped lang="stylus">
-.join-button-container
+.join-overlay
     top 15%
+    bottom 0
     position absolute
     width 100%
+    display flex
+    flex-direction column
+    pointer-events none // only its content blocks the board
+
+.join-button-container
     background rgba(0, 0, 0, 0.1)
     padding 1em 0
+    pointer-events auto
+
+// Small phones and landscape: keep as much height as possible for the QR code
+@media (max-height: 600px)
+    .join-overlay-invite
+        top 0
+
+        // Placed over player names and clocks here, text would not be readable with transparency
+        .join-button-container
+            padding 0.25em 0.5em
+            background var(--bs-body-bg)
+
+// On narrow screens, header wraps on two lines and overflows on the board
+@media (max-height: 600px) and (max-width: 400px)
+    .join-overlay-invite
+        top 3rem
 
 .board-container
     position relative // center "Accept" button relative to this container

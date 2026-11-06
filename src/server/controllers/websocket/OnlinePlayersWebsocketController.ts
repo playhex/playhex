@@ -133,6 +133,8 @@ export default class OnlinePlayersWebsocketController implements WebsocketContro
     onJoinRoom(socket: HexSocket, room: string): void
     {
         if (room === Rooms.onlinePlayers) {
+            // Includes players current page, so also the id of a private game a player is looking at, like a waiting closed game.
+            // Kept to allow clients to know whether their opponent is looking at the game or somewhere else.
             const onlinePlayers = this.onlinePlayersService.getOnlinePlayers();
             socket.emit('onlinePlayersUpdate', onlinePlayers);
         }

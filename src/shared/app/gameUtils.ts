@@ -196,6 +196,14 @@ export const isChallengeGame = (game: GameOptions): game is GameOptions & { oppo
 };
 
 /**
+ * Whether this game is closed and still waiting for an opponent.
+ * Such games must not be listed anywhere publicly: their link is what allows to join.
+ */
+export const isWaitingClosedGame = (game: Game): boolean => {
+    return game.closed && game.state === 'created';
+};
+
+/**
  * Whether player is the target of a nominative challenge, and has not joined it yet.
  */
 export const isChallengeTargetOf = (game: Game, player: null | Player): boolean => {

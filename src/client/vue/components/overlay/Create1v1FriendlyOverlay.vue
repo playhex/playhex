@@ -12,6 +12,8 @@ import { useHandicapOptions } from '../../composables/useHandicapOptions.js';
 import AppAllowExploration from './create-game/AppAllowExploration.vue';
 import AppOpponentMustBeRegistered from './create-game/AppOpponentMustBeRegistered.vue';
 import AppOpponentPlayerSelect from './create-game/AppOpponentPlayerSelect.vue';
+import AppClosedGame from './create-game/AppClosedGame.vue';
+import { useClosedGameOption } from '../../composables/useClosedGameOption.js';
 import { isCorrespondence } from '../../../../shared/app/timeControlUtils.js';
 
 const { visible, confirm, cancel } = useDisclosure();
@@ -31,11 +33,12 @@ const props = defineProps({
 const gameOptions = reactive(props.gameOptions);
 
 const { swapRuleDisabled, firstPlayerDisabled } = useHandicapOptions(gameOptions);
+const { closedDisabled } = useClosedGameOption(gameOptions);
 
 const timeControl = toRef(gameOptions, 'timeControlType');
 watch(timeControl, t => {
     gameOptions.timeControlType = t;
-    gameOptions.opponentMustBeRegistered = isCorrespondence({ ...gameOptions, timeControlType: t });
+    gameOptions.opponentMustBeRegistered = !gameOptions.closed && isCorrespondence({ ...gameOptions, timeControlType: t });
 }, { immediate: true });
 
 const selectedOpponent = ref<null | Player>(props.presetOpponent);
@@ -97,6 +100,10 @@ const showSecondaryOptions = ref(props.presetOpponent !== null);
                         <div class="mb-3">
                             <h6>{{ $t('challenge_player') }}</h6>
                             <AppOpponentPlayerSelect v-model="selectedOpponent" />
+                        </div>
+
+                        <div class="mb-3">
+                            <AppClosedGame v-model="gameOptions.closed" :disabled="closedDisabled" />
                         </div>
 
                         <AppOpponentMustBeRegistered v-model="gameOptions.opponentMustBeRegistered" />

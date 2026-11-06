@@ -239,7 +239,15 @@ export default class GameRepository
             }
         }
 
-        if (Array.isArray(params.states) && params.states.length > 0) {
+        // Closed games must not be found while waiting: having their link is what allows to join.
+        // Skipped when searching only other states: it cannot match, and would slow down indexed searches.
+        const hasStates = Array.isArray(params.states) && params.states.length > 0;
+
+        if (!hasStates || params.states?.includes('created')) {
+            queryBuilder.andWhere('not (game.closed = 1 and game.state = \'created\')');
+        }
+
+        if (hasStates) {
             queryBuilder
                 .andWhere('game.state in (:states)')
                 .setParameter('states', params.states)

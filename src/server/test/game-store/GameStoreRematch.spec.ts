@@ -93,6 +93,20 @@ const createGameStoreWithArchivedGames = (players: Player[], archivedGames: Game
  * even if we already have a pending challenge against this player.
  */
 describe('GameStore rematch', () => {
+    it('keeps a rematch of a closed game closed', async () => {
+        const playerA = createPlayer('Player A');
+        const playerB = createPlayer('Player B');
+
+        const game = createEndedChallengeGame(playerA, playerB);
+
+        game.closed = true;
+
+        const gameStore = createGameStoreWithArchivedGames([playerA, playerB], [game]);
+        const rematch = await gameStore.rematchGame(playerA, game.publicId);
+
+        assert.strictEqual(rematch.closed, true);
+    });
+
     it('can rematch two finished games against a same opponent', async () => {
         // Two players who finished two games together.
         // Both games came from a nominative challenge, so rematches are challenges too.

@@ -5,6 +5,7 @@ import StatsRepository from '../../../repositories/StatsRepository.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import GameStore from '../../../store/GameStore.js';
 import { type FormerPseudo, getFormerPseudo } from '../../../../shared/app/pseudoHistoryRules.js';
+import { isWaitingClosedGame } from '../../../../shared/app/gameUtils.js';
 
 @JsonController()
 @Service()
@@ -86,6 +87,7 @@ export default class PlayerController
 
         return this.gameStore.getPlayerActiveGames(player)
             .map(g => g.getGame())
+            .filter(game => !isWaitingClosedGame(game))
         ;
     }
 
