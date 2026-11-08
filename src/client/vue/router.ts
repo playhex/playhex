@@ -316,6 +316,11 @@ const routes: RouteRecordRaw[] = [
                 path: 'moderation',
                 component: () => import('./pages/guide/PageModeration.vue'),
             },
+            {
+                name: 'guide-engine-use',
+                path: 'engine-use',
+                component: () => import('./pages/guide/PageEngineUse.vue'),
+            },
         ],
     },
     {

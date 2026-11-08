@@ -110,6 +110,10 @@ const currentExample = ref<null | PlayerModerationAction>(null);
         If you create a new account and reoffend, you'll be IP-banned.
     </p>
 
+    <p>
+        For cheating and engine use, see the <router-link :to="{ name: 'guide-engine-use' }">engine use</router-link> page.
+    </p>
+
     <h2>Moderation action</h2>
 
     <p>A moderation action can be one of the following:</p>
