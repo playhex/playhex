@@ -1,9 +1,10 @@
-import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn, type Relation } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, type Relation } from 'typeorm';
 import { Type } from 'class-transformer';
 import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
 import { ColumnUUID } from '../custom-typeorm.js';
 import { keysOf } from '../utils.js';
 import Player from './Player.js';
+import VideoAlternateLink from './VideoAlternateLink.js';
 
 /**
  * External link to a video about Hex (youtube or other).
@@ -28,6 +29,16 @@ export default class Video
     @Column({ length: 512, unique: true })
     @Expose({ groups: [GROUP_DEFAULT, 'video'] })
     url: string;
+
+    /**
+     * Alternate links, when same video is also published on other platforms,
+     * ordered by position. Empty if none. Main link stays this.url.
+     * Undefined when relation is not loaded.
+     */
+    @OneToMany(() => VideoAlternateLink, link => link.video, { cascade: ['insert'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'video'] })
+    @Type(() => VideoAlternateLink)
+    alternateLinks?: VideoAlternateLink[];
 
     @Column({ length: 255 })
     @Expose({ groups: [GROUP_DEFAULT, 'video'] })

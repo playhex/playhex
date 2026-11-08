@@ -2,6 +2,7 @@ export const VIDEO_URL_MAX_LENGTH = 512;
 export const VIDEO_TITLE_MAX_LENGTH = 255;
 export const VIDEO_AUTHOR_NAME_MAX_LENGTH = 128;
 export const VIDEO_KEYWORDS_MAX_LENGTH = 512;
+export const VIDEO_SECONDARY_URLS_MAX = 5;
 
 /**
  * Prefilled values from a video link (youtube, vimeo, or any page).
@@ -45,6 +46,11 @@ export type VideoInput = {
      * Optional, empty string if none.
      */
     keywords: string;
+
+    /**
+     * Same video on other platforms, displayed after main url. Empty if none.
+     */
+    secondaryUrls: string[];
 };
 
 /**
@@ -111,6 +117,19 @@ export const isHttpUrl = (url: string): boolean => {
     }
 };
 
+export const isValidVideoSecondaryUrl = (url: string): boolean =>
+    isHttpUrl(url) && url.length <= VIDEO_URL_MAX_LENGTH
+;
+
+/**
+ * At most VIDEO_SECONDARY_URLS_MAX, all valid, no duplicates, and different from main url.
+ */
+export const areValidVideoSecondaryUrls = (url: string, secondaryUrls: string[]): boolean =>
+    secondaryUrls.length <= VIDEO_SECONDARY_URLS_MAX
+    && secondaryUrls.every(isValidVideoSecondaryUrl)
+    && new Set([url, ...secondaryUrls]).size === secondaryUrls.length + 1
+;
+
 /**
  * @returns List of errors, empty if input is valid
  */
@@ -127,6 +146,10 @@ export const validateVideoInput = (input: VideoInput): string[] => {
 
     if (input.authorName.trim().length === 0 || input.authorName.length > VIDEO_AUTHOR_NAME_MAX_LENGTH) {
         errors.push('invalid author name');
+    }
+
+    if (!areValidVideoSecondaryUrls(input.url, input.secondaryUrls)) {
+        errors.push('invalid secondary urls');
     }
 
     if (input.keywords.length > VIDEO_KEYWORDS_MAX_LENGTH) {

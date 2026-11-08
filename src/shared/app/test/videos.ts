@@ -2,7 +2,8 @@ import assert from 'assert';
 import { describe, it } from 'mocha';
 import { normalizeVideoUrl, parseYoutubeVideoId } from '../videos/youtube.js';
 import { formatVideoDuration, parseIsoDuration, parseVideoDuration } from '../videos/duration.js';
-import { isValidVideoPublishedAt, toVideoPublishedAt } from '../videos/videoInput.js';
+import { areValidVideoSecondaryUrls, isValidVideoPublishedAt, toVideoPublishedAt } from '../videos/videoInput.js';
+import { parsePeertubeVideo, videoPlatform } from '../videos/videoPlatform.js';
 import { filterVideos, sortVideos } from '../videos/videoSearch.js';
 
 describe('videos', () => {
@@ -22,6 +23,39 @@ describe('videos', () => {
         assert.strictEqual(parseYoutubeVideoId('https://www.youtube.com/watch?v=short'), null);
         assert.strictEqual(parseYoutubeVideoId(`https://vimeo.com/${id}`), null);
         assert.strictEqual(parseYoutubeVideoId('not an url'), null);
+    });
+
+    it('parses peertube video links', () => {
+        assert.deepStrictEqual(parsePeertubeVideo('https://framatube.org/w/2d86Btz3Y7NGB8f1wR8nzH'), { origin: 'https://framatube.org', videoId: '2d86Btz3Y7NGB8f1wR8nzH' });
+        assert.deepStrictEqual(parsePeertubeVideo('https://tube.example.org/videos/watch/09ca6ffb-5a72-4210-abb3-e3145cd7f37f?start=10'), { origin: 'https://tube.example.org', videoId: '09ca6ffb-5a72-4210-abb3-e3145cd7f37f' });
+        assert.deepStrictEqual(parsePeertubeVideo('https://tube.example.org/videos/embed/2d86Btz3Y7NGB8f1wR8nzH'), { origin: 'https://tube.example.org', videoId: '2d86Btz3Y7NGB8f1wR8nzH' });
+
+        assert.strictEqual(parsePeertubeVideo('https://framatube.org/w/p/2d86Btz3Y7NGB8f1wR8nzH'), null); // playlist
+        assert.strictEqual(parsePeertubeVideo('https://framatube.org/c/channel/videos'), null);
+        assert.strictEqual(parsePeertubeVideo('https://example.org/w/short'), null);
+        assert.strictEqual(parsePeertubeVideo('not an url'), null);
+    });
+
+    it('detects video platform', () => {
+        assert.deepStrictEqual(videoPlatform('https://youtu.be/dQw4w9WgXcQ'), { key: 'youtube', name: 'YouTube' });
+        assert.deepStrictEqual(videoPlatform('https://www.youtube.com/watch?v=dQw4w9WgXcQ'), { key: 'youtube', name: 'YouTube' });
+        assert.deepStrictEqual(videoPlatform('https://vimeo.com/123'), { key: 'vimeo', name: 'Vimeo' });
+        assert.deepStrictEqual(videoPlatform('https://dai.ly/x8j7qvf'), { key: 'dailymotion', name: 'Dailymotion' });
+        assert.deepStrictEqual(videoPlatform('https://www.twitch.tv/videos/123'), { key: 'twitch', name: 'Twitch' });
+        assert.deepStrictEqual(videoPlatform('https://www.tiktok.com/@user/video/123'), { key: 'tiktok', name: 'TikTok' });
+        assert.deepStrictEqual(videoPlatform('https://framatube.org/w/2d86Btz3Y7NGB8f1wR8nzH'), { key: 'peertube', name: 'PeerTube' });
+        assert.deepStrictEqual(videoPlatform('https://www.example.org/hex-video'), { key: 'other', name: 'example.org' });
+    });
+
+    it('validates secondary urls', () => {
+        const url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+
+        assert.strictEqual(areValidVideoSecondaryUrls(url, []), true);
+        assert.strictEqual(areValidVideoSecondaryUrls(url, ['https://vimeo.com/1', 'https://dai.ly/x8j7qvf']), true);
+        assert.strictEqual(areValidVideoSecondaryUrls(url, [url]), false);
+        assert.strictEqual(areValidVideoSecondaryUrls(url, ['https://vimeo.com/1', 'https://vimeo.com/1']), false);
+        assert.strictEqual(areValidVideoSecondaryUrls(url, ['ftp://vimeo.com/1']), false);
+        assert.strictEqual(areValidVideoSecondaryUrls(url, [1, 2, 3, 4, 5, 6].map(i => `https://vimeo.com/${i}`)), false);
     });
 
     it('normalizes video url', () => {

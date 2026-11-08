@@ -9,8 +9,12 @@ import { apiGetVideoMetadata, apiPostVideo } from '../../../apiClient.js';
 import AppBreadcrumb from '../../components/AppBreadcrumb.vue';
 import { videoSubmitBreadcrumb } from '../services/videoBreadcrumb.js';
 import { formatVideoDuration, parseVideoDuration } from '../../../../shared/app/videos/duration.js';
-import { isHttpUrl, isValidVideoPublishedAt, maxVideoPublishedAt, VIDEO_AUTHOR_NAME_MAX_LENGTH, VIDEO_KEYWORDS_MAX_LENGTH, VIDEO_TITLE_MAX_LENGTH, VIDEO_URL_MAX_LENGTH, validateVideoInput, type VideoInput } from '../../../../shared/app/videos/videoInput.js';
+import { isHttpUrl, isValidVideoPublishedAt, isValidVideoSecondaryUrl, maxVideoPublishedAt, VIDEO_AUTHOR_NAME_MAX_LENGTH, VIDEO_KEYWORDS_MAX_LENGTH, VIDEO_SECONDARY_URLS_MAX, VIDEO_TITLE_MAX_LENGTH, VIDEO_URL_MAX_LENGTH, validateVideoInput, type VideoInput } from '../../../../shared/app/videos/videoInput.js';
 import { apiErrorMessage } from '../../../services/apiErrorMessage.js';
+import { normalizeVideoUrl } from '../../../../shared/app/videos/youtube.js';
+import { videoPlatform } from '../../../../shared/app/videos/videoPlatform.js';
+import AppVideoPlatformIcon from '../components/AppVideoPlatformIcon.vue';
+import { IconPlus, IconTrash } from '../../icons.js';
 
 useHead({
     title: () => t('videos.submit'),
@@ -39,6 +43,44 @@ const duration = ref('');
  */
 const publishedAt = ref('');
 const keywords = ref('');
+
+/**
+ * Same video on other platforms. Empty lines are ignored.
+ */
+const secondaryUrls = ref<{ key: number, url: string }[]>([]);
+
+/**
+ * Stable v-for key, so removing a line does not shift state (focus, validation) to next line.
+ */
+let nextSecondaryUrlKey = 0;
+
+const addSecondaryUrl = (): void => {
+    if (secondaryUrls.value.length < VIDEO_SECONDARY_URLS_MAX) {
+        secondaryUrls.value.push({ key: nextSecondaryUrlKey++, url: '' });
+    }
+};
+
+const removeSecondaryUrl = (index: number): void => {
+    secondaryUrls.value.splice(index, 1);
+};
+
+/**
+ * Not a valid link, or same as main link or a previous line.
+ */
+const isInvalidSecondaryUrl = (index: number): boolean => {
+    const secondaryUrl = normalizeVideoUrl(secondaryUrls.value[index].url);
+
+    if (secondaryUrl === '') {
+        return false;
+    }
+
+    if (!isValidVideoSecondaryUrl(secondaryUrl)) {
+        return true;
+    }
+
+    return [url.value, ...secondaryUrls.value.slice(0, index).map(line => line.url)]
+        .some(otherUrl => normalizeVideoUrl(otherUrl) === secondaryUrl);
+};
 
 const thumbnailMode = ref<'url' | 'file'>('url');
 const thumbnailUrl = ref('');
@@ -117,12 +159,15 @@ const submitError = ref<null | string>(null);
 const durationSeconds = computed(() => parseVideoDuration(duration.value));
 
 const input = computed((): VideoInput => ({
-    url: url.value.trim(),
+    url: normalizeVideoUrl(url.value),
     title: title.value.trim(),
     authorName: authorName.value.trim(),
     durationSeconds: durationSeconds.value ?? 0,
     publishedAt: publishedAt.value === '' ? null : publishedAt.value,
     keywords: keywords.value.trim(),
+    secondaryUrls: secondaryUrls.value
+        .map(line => normalizeVideoUrl(line.url))
+        .filter(secondaryUrl => secondaryUrl !== ''),
 }));
 
 const hasThumbnail = computed(() => thumbnailMode.value === 'file'
@@ -194,6 +239,34 @@ const submit = async (): Promise<void> => {
                     </div>
                     <small id="video-url-help" class="form-text">{{ $t('videos.prefill_help') }}</small>
                     <div v-if="prefillError" class="text-danger mt-1">{{ prefillError }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label d-block">{{ $t('videos.field_secondary_urls') }} <small class="text-body-secondary">({{ $t('videos.optional') }})</small></label>
+                    <small class="form-text d-block mt-0 mb-2">{{ $t('videos.field_secondary_urls_help') }}</small>
+
+                    <div v-for="(line, index) in secondaryUrls" :key="line.key" class="input-group mb-2">
+                        <span class="input-group-text"><AppVideoPlatformIcon :platform="videoPlatform(line.url).key" /></span>
+                        <input
+                            v-model="line.url"
+                            type="url"
+                            class="form-control"
+                            :class="{ 'is-invalid': isInvalidSecondaryUrl(index) }"
+                            :maxlength="VIDEO_URL_MAX_LENGTH"
+                            placeholder="https://…"
+                            :aria-label="$t('videos.field_secondary_urls')"
+                        />
+                        <button type="button" class="btn btn-outline-danger" :aria-label="$t('videos.remove_link')" :title="$t('videos.remove_link')" @click="removeSecondaryUrl(index)">
+                            <IconTrash />
+                        </button>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary"
+                        :disabled="secondaryUrls.length >= VIDEO_SECONDARY_URLS_MAX"
+                        @click="addSecondaryUrl"
+                    ><IconPlus /> {{ $t('videos.add_link') }}</button>
                 </div>
 
                 <div class="mb-3">

@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
 import type { Request } from 'express';
 import { AuthenticatedPlayer } from '../controllers/http/middlewares.js';
-import { Player, Video } from '../../shared/app/models/index.js';
+import { Player, Video, VideoAlternateLink } from '../../shared/app/models/index.js';
 import { instanceToPlain } from '../../shared/app/class-transformer-custom.js';
 import { normalizeVideoUrl } from '../../shared/app/videos/youtube.js';
 import { isHttpUrl, validateVideoInput, type VideoInput, type VideoMetadata } from '../../shared/app/videos/videoInput.js';
@@ -35,10 +35,24 @@ const mustBeAllowedToSubmit = (player: Player): void => {
  * @throws {BadRequestError}
  */
 const parseMultipartVideoInput = (body: Record<string, unknown>): VideoInput => {
-    const { url, title, authorName, durationSeconds, publishedAt, keywords } = body;
+    const { url, title, authorName, durationSeconds, publishedAt, keywords, secondaryUrls } = body;
 
     if (typeof url !== 'string' || typeof title !== 'string' || typeof authorName !== 'string' || typeof durationSeconds !== 'string' || (publishedAt !== undefined && typeof publishedAt !== 'string') || (keywords !== undefined && typeof keywords !== 'string')) {
         throw new BadRequestError('Missing fields');
+    }
+
+    let parsedSecondaryUrls: unknown = [];
+
+    if (secondaryUrls !== undefined && secondaryUrls !== '') {
+        try {
+            parsedSecondaryUrls = typeof secondaryUrls === 'string' ? JSON.parse(secondaryUrls) : null;
+        } catch {
+            parsedSecondaryUrls = null;
+        }
+    }
+
+    if (!Array.isArray(parsedSecondaryUrls) || !parsedSecondaryUrls.every(secondaryUrl => typeof secondaryUrl === 'string')) {
+        throw new BadRequestError('Invalid secondaryUrls, expected json array of strings');
     }
 
     const input: VideoInput = {
@@ -48,6 +62,9 @@ const parseMultipartVideoInput = (body: Record<string, unknown>): VideoInput => 
         durationSeconds: Number(durationSeconds),
         publishedAt: publishedAt || null,
         keywords: (keywords ?? '').trim(),
+        secondaryUrls: parsedSecondaryUrls
+            .map(secondaryUrl => normalizeVideoUrl(secondaryUrl))
+            .filter(secondaryUrl => secondaryUrl !== ''),
     };
 
     const errors = validateVideoInput(input);
@@ -122,7 +139,7 @@ export default class VideoController
         const body = (req.body ?? {}) as Record<string, unknown>;
         const input = parseMultipartVideoInput(body);
 
-        if (await this.videoRepository.existsByUrl(input.url)) {
+        if (await this.videoRepository.existsByAnyUrl([input.url, ...input.secondaryUrls])) {
             throw new HttpError(409, 'This video has already been submitted');
         }
 
@@ -153,6 +170,14 @@ export default class VideoController
         video.durationSeconds = input.durationSeconds;
         video.publishedAt = input.publishedAt === null ? null : new Date(input.publishedAt);
         video.keywords = input.keywords === '' ? null : input.keywords;
+        video.alternateLinks = input.secondaryUrls.map((secondaryUrl, position) => {
+            const link = new VideoAlternateLink();
+
+            link.url = secondaryUrl;
+            link.position = position;
+
+            return link;
+        });
         video.thumbnailPath = thumbnailPath;
         video.submittedBy = player;
         video.accepted = true;

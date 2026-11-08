@@ -2100,6 +2100,7 @@ export const apiPostVideo = async (input: VideoInput, thumbnail: { file: File } 
     formData.append('durationSeconds', String(input.durationSeconds));
     formData.append('publishedAt', input.publishedAt ?? '');
     formData.append('keywords', input.keywords);
+    formData.append('secondaryUrls', JSON.stringify(input.secondaryUrls));
 
     if ('file' in thumbnail) {
         formData.append('thumbnail', thumbnail.file);

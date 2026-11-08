@@ -65,6 +65,7 @@ import TournamentParticipant from './TournamentParticipant.js';
 import TournamentSeries from './TournamentSeries.js';
 import TournamentSeriesAdmin from './TournamentSeriesAdmin.js';
 import Video from './Video.js';
+import VideoAlternateLink from './VideoAlternateLink.js';
 
 export {
     Game,
@@ -134,6 +135,7 @@ export {
     TournamentSeries,
     TournamentSeriesAdmin,
     Video,
+    VideoAlternateLink,
 };
 
 export const entities = {
@@ -199,6 +201,7 @@ export const entities = {
     TournamentSeries,
     TournamentSeriesAdmin,
     Video,
+    VideoAlternateLink,
 };
 
 const errored = Object.keys(entities).filter(name => !entities[name as keyof typeof entities]);

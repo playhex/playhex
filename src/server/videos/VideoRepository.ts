@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
-import { Repository } from 'typeorm';
-import { Video } from '../../shared/app/models/index.js';
+import { In, Repository } from 'typeorm';
+import { Video, VideoAlternateLink } from '../../shared/app/models/index.js';
 
 @Service()
 export default class VideoRepository
@@ -8,6 +8,9 @@ export default class VideoRepository
     constructor(
         @Inject('Repository<Video>')
         private videoRepository: Repository<Video>,
+
+        @Inject('Repository<VideoAlternateLink>')
+        private videoAlternateLinkRepository: Repository<VideoAlternateLink>,
     ) {}
 
     /**
@@ -18,13 +21,19 @@ export default class VideoRepository
     {
         return await this.videoRepository.find({
             where: { accepted: true },
-            order: { createdAt: 'DESC' },
+            relations: { alternateLinks: true },
+            order: { createdAt: 'DESC', alternateLinks: { position: 'ASC' } },
         });
     }
 
-    async existsByUrl(url: string): Promise<boolean>
+    /**
+     * Whether one of these urls is already used, as main or secondary link of a video.
+     */
+    async existsByAnyUrl(urls: string[]): Promise<boolean>
     {
-        return await this.videoRepository.existsBy({ url });
+        return await this.videoRepository.existsBy({ url: In(urls) })
+            || await this.videoAlternateLinkRepository.existsBy({ url: In(urls) })
+        ;
     }
 
     /**
@@ -33,8 +42,8 @@ export default class VideoRepository
     async findLastForModeration(limit = 100): Promise<Video[]>
     {
         return await this.videoRepository.find({
-            relations: { submittedBy: true },
-            order: { createdAt: 'DESC' },
+            relations: { submittedBy: true, alternateLinks: true },
+            order: { createdAt: 'DESC', alternateLinks: { position: 'ASC' } },
             take: limit,
         });
     }
@@ -43,7 +52,8 @@ export default class VideoRepository
     {
         return await this.videoRepository.findOne({
             where: { publicId },
-            relations: { submittedBy: true },
+            relations: { submittedBy: true, alternateLinks: true },
+            order: { alternateLinks: { position: 'ASC' } },
         });
     }
 
