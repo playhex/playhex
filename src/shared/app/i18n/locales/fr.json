@@ -1731,12 +1731,12 @@
             "climber": "Grimpeur"
         },
         "title_help": {
-            "giant_slayer": "A détrôné un Roi qui s'était défendu 5 fois ou plus",
+            "giant_slayer": "A détrôné une personne qui avait défendu sa place 5 fois ou plus",
             "climber": "A gagné 3 défis d'affilée"
         },
         "hall": {
             "longest_reigns": "Plus longs règnes",
-            "most_defended_reigns": "Plus de défenses en tant que Roi",
+            "most_defended_reigns": "Plus de défenses du trône",
             "best_defense_streaks": "Meilleures séries de défenses",
             "giant_slayers": "Régicides",
             "climbers": "Grimpeurs",

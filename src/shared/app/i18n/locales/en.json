@@ -1768,12 +1768,12 @@
             "climber": "Climber"
         },
         "title_help": {
-            "giant_slayer": "Dethroned a King who defended 5 times or more",
+            "giant_slayer": "Dethroned someone who defended their seat 5 times or more",
             "climber": "Won 3 challenges in a row"
         },
         "hall": {
             "longest_reigns": "Longest reigns",
-            "most_defended_reigns": "Most defenses as King",
+            "most_defended_reigns": "Most throne defenses",
             "best_defense_streaks": "Best defense streaks",
             "giant_slayers": "Giant Slayers",
             "climbers": "Climbers",
