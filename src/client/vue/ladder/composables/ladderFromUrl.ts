@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { LadderDto, LadderMeDto } from '../../../../shared/app/models/LadderDto.js';
@@ -6,6 +6,7 @@ import { apiGetLadder, apiGetLadderMe } from '../../../apiClient.js';
 import useAuthStore from '../../../stores/authStore.js';
 import useToastsStore from '../../../stores/toastsStore.js';
 import { t } from 'i18next';
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 
 /**
  * Loads ladder from url slug, and my state in this ladder.
@@ -50,6 +51,7 @@ export const useLadderFromUrl = () => {
 
     return {
         slug,
+        leaderGender: computed(() => playerGender(ladderDto.value ? ladderDto.value.currentReign?.player : null)),
         ladderDto,
         me,
         reload,

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
@@ -128,7 +129,7 @@ const submit = async (action: 'confirm' | 'abort') => {
                     <ul class="list-unstyled">
                         <li v-for="scope in displayedScopes" :key="scope" class="mb-2">
                             <IconCheck class="text-success" />
-                            <strong>{{ $t(`oauth.scope.${scope}.title`) }}</strong>
+                            <strong>{{ $t(`oauth.scope.${scope}.title`, { context: playerGender(loggedInPlayer) }) }}</strong>
                             <br>
                             <small class="text-secondary">{{ $t(`oauth.scope.${scope}.description`) }}</small>
                         </li>

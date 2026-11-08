@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../shared/app/playerPronouns.js';
 import { PropType, computed, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
 import { IconAlphabet, IconChatDots, IconMeditation, IconMailbox, IconMailboxFlag, IconMuteOff, IconMuteOn, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit, Icon123, IconCrown } from '../icons.js';
 import { storeToRefs } from 'pinia';
@@ -420,7 +421,7 @@ watch(gameUIMode, () => {
                     <AppRatingChange v-if="game.ranked" :ratingChange="getRating(game, getStrictWinnerPlayer(game))?.ratingChange ?? 0" class="smaller ms-2" />
                 </h3>
                 <p v-if="game.state === 'ended'" class="mb-0">
-                    <i18next :translation="$t('player_loses_reason.' + (game.outcome ?? 'default'))">
+                    <i18next :translation="$t('player_loses_reason.' + (game.outcome ?? 'default'), { context: playerGender(getStrictLoserPlayer(game)) })">
                         <template #player>
                             <AppPseudo :player="getStrictLoserPlayer(game)" :classes="playerColor(getStrictLoserPlayer(game))" />
                         </template>
@@ -616,7 +617,7 @@ watch(gameUIMode, () => {
                 </p>
                 <p v-else>
                     <span class="text-success"><IconPeopleFill /> {{ $t('friendly') }}</span>
-                    <small class="ms-2"><AppGameRulesSummary :showIcon="false" :gameOptions="game" /></small>
+                    <small class="ms-2"><AppGameRulesSummary :showIcon="false" :gameOptions="game" :host="game.host" /></small>
                 </p>
             </div>
         </div>

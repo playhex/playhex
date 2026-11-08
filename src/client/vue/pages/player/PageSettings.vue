@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { IconDiscord, IconBrightnessHighFill, IconMoonStarsFill, IconCircleHalf, IconPcDisplayHorizontal, IconPhone, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconAlphabet, IconDot, IconCheck, IconX, IconExclamationTriangleFill, IconMuteOn, IconMuteOff } from '../../icons.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
@@ -30,6 +31,7 @@ import AppFlagSelector from '../../components/AppFlagSelector.vue';
 import copy from 'copy-to-clipboard';
 import useServerDateStore from '../../../stores/serverDateStore.js';
 import useSocketStore from '../../../stores/socketStore.js';
+import AppPlayerPronounsSelect from '../../components/AppPlayerPronounsSelect.vue';
 
 const head = injectHead();
 
@@ -756,6 +758,12 @@ const {
 
                 <!-- Account -->
                 <div v-show="'account' === currentPanel">
+                    <section v-if="loggedInPlayer && !loggedInPlayer.isGuest" id="pronouns">
+                        <h3><label for="player-pronouns">{{ $t('pronouns.title') }}</label></h3>
+                        <p id="pronouns-help">{{ $t('pronouns.explain') }}</p>
+                        <AppPlayerPronounsSelect :player="loggedInPlayer" id="player-pronouns" aria-describedby="pronouns-help" />
+                    </section>
+
                     <section id="country-flag" v-if="loggedInPlayer && !loggedInPlayer.isGuest">
                         <h3>{{ $t('country_flag.title') }}</h3>
 
@@ -1243,7 +1251,7 @@ const {
                                         </template>
                                     </p>
                                     <p class="small mb-1">
-                                        <span v-for="scope in application.scopes.filter(s => s !== 'openid')" :key="scope" class="badge text-bg-secondary me-1">{{ $t(`oauth.scope.${scope}.title`) }}</span>
+                                        <span v-for="scope in application.scopes.filter(s => s !== 'openid')" :key="scope" class="badge text-bg-secondary me-1">{{ $t(`oauth.scope.${scope}.title`, { context: playerGender(loggedInPlayer) }) }}</span>
                                     </p>
                                     <p class="text-secondary small mb-0">{{ $t('oauth.authorized_at', { date: application.authorizedAt.toLocaleDateString(autoLocale()) }) }}</p>
                                 </div>

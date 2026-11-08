@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
+import useAuthStore from '../../../stores/authStore.js';
 import { toRefs } from 'vue';
 import { IconBell, IconPeopleFill, IconPlayFill, IconTrophy, IconTrophyFill } from '../../icons.js';
 import { Tournament } from '../../../../shared/app/models/index.js';
@@ -54,7 +56,7 @@ const subscribeAndPrompt = async () => {
                 v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
                 @click.prevent="subscribeAndPrompt"
                 class="btn btn-sm btn-outline-info"
-            ><IconBell /> {{ $t('tournament_subscribe') }}</button>
+            ><IconBell /> {{ $t('tournament_subscribe', { context: playerGender(useAuthStore().loggedInPlayer) }) }}</button>
 
             <button
                 v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"

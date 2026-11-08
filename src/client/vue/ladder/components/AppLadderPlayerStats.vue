@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { computed, PropType } from 'vue';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { LadderPlayer } from '../../../../shared/app/models/index.js';
@@ -40,7 +41,7 @@ const isFuture = (date: null | Date): boolean => date !== null && date.getTime()
         <dt class="col-7 fw-normal text-secondary">{{ $t('ladder.title_name.giant_slayer') }}</dt>
         <dd class="col-5">{{ ladderPlayer.giantSlayerCount }}</dd>
 
-        <dt class="col-7 fw-normal text-secondary">{{ $t('ladder.title_name.climber') }}</dt>
+        <dt class="col-7 fw-normal text-secondary">{{ $t('ladder.title_name.climber', { context: playerGender(ladderPlayer.player) }) }}</dt>
         <dd class="col-5">{{ ladderPlayer.climberCount }}</dd>
 
         <dt class="col-7 fw-normal text-secondary">{{ $t('ladder.stats.strikes') }}</dt>

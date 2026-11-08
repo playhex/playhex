@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { computed, PropType, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { defineOverlay } from '@overlastic/vue';
@@ -143,7 +144,7 @@ const answerLive = async (challenge: LadderChallenge, accept: boolean) => {
 
                     <!-- Outgoing slots -->
                     <h6><IconSword /> {{ $t('ladder.outgoing_slots', { used: me.outgoingUsed, total: me.outgoingTotal }) }}</h6>
-                    <p v-if="position === 1 && myOutgoingChallenges.length === 0" class="small text-secondary">{{ $t('ladder.nobody_to_challenge') }}</p>
+                    <p v-if="position === 1 && myOutgoingChallenges.length === 0" class="small text-secondary">{{ $t('ladder.nobody_to_challenge', { context: playerGender(loggedInPlayer) }) }}</p>
                     <AppLadderSlots v-else :player="me.ladderPlayer.player" :challenges="myOutgoingChallenges" :total="me.outgoingTotal" :seatsIfWon="me.seatsIfWon" />
 
                     <!-- Incoming slots -->

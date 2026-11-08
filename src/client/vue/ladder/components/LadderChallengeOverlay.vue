@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { useDisclosure } from '@overlastic/vue';
 import { computed, PropType, ref, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
@@ -84,7 +85,7 @@ const submit = () => {
             <div class="modal-dialog">
                 <form class="modal-content" @submit.prevent="submit()">
                     <div class="modal-header">
-                        <h5 class="modal-title"><IconTablerSwords /> {{ $t('ladder.challenge_overlay.title', { player: pseudoString(defender) }) }}</h5>
+                        <h5 class="modal-title"><IconTablerSwords /> {{ $t('ladder.challenge_overlay.title', { player: pseudoString(defender), context: playerGender(defender) }) }}</h5>
                         <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
@@ -98,7 +99,7 @@ const submit = () => {
                             <input v-model="proposeLive" class="form-check-input" type="checkbox" id="ladder-propose-live" :disabled="!defenderActive">
                             <label class="form-check-label" for="ladder-propose-live">{{ $t('ladder.challenge_overlay.propose_live') }}</label>
                         </div>
-                        <p v-if="!defenderActive" class="form-text text-secondary">{{ $t('ladder.challenge_overlay.defender_not_active', { player: pseudoString(defender) }) }}</p>
+                        <p v-if="!defenderActive" class="form-text text-secondary">{{ $t('ladder.challenge_overlay.defender_not_active', { player: pseudoString(defender), context: playerGender(defender) }) }}</p>
                         <p v-else class="form-text">{{ $t('ladder.challenge_overlay.propose_live_help') }}</p>
 
                         <div v-if="proposeLive" class="mb-3">

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
+import useAuthStore from '../../../stores/authStore.js';
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useHead } from '@unhead/vue';
@@ -171,7 +173,7 @@ const deleteTournamentSeries = async (): Promise<void> => {
     try {
         await confirmationOverlay({
             title: t('tournament_series_manage_page.delete'),
-            message: t('tournament_series_manage_page.delete_confirm'),
+            message: t('tournament_series_manage_page.delete_confirm', { context: playerGender(useAuthStore().loggedInPlayer) }),
             confirmLabel: t('tournament_series_manage_page.delete'),
             confirmClass: 'btn-danger',
             cancelLabel: t('cancel'),

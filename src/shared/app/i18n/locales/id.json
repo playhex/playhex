@@ -293,6 +293,7 @@
     "tournament_unsubscribe": "Saya tidak lagi tertarik.",
     "tournament_checkin": "Check-in",
     "tournament_checkedin": "Sudah check-in",
+    "tournament_checked_in_players": "Sudah check-in",
     "no_player_checked_in_yet": "Belum ada pemain yang check-in.",
     "not_yet_checked_in": "Belum check-in",
     "every_subscribers_checked_in": "Semua orang yang tertarik telah check-in.",

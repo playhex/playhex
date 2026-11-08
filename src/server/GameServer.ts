@@ -1,3 +1,4 @@
+import { playerGender } from '../shared/app/playerPronouns.js';
 import { EngineGame, IllegalMove, PlayerIndex } from '../shared/game-engine/index.js';
 import { CancelGameReason, GameState } from '../shared/app/Types.js';
 import { ChatMessage, Player, GameToPlayer, Game, Premove } from '../shared/app/models/index.js';
@@ -989,7 +990,7 @@ export default class GameServer extends TypedEmitter<GameEvents>
                 this.postSystemChatMessage(
                     pseudoString(playerUndoing) + ' took back their move.',
                     'undo.player_takeback_his_move',
-                    { player: pseudoString(playerUndoing) },
+                    { player: pseudoString(playerUndoing), context: playerGender(playerUndoing) },
                     now,
                 );
             }

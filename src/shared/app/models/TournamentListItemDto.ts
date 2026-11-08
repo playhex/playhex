@@ -1,3 +1,4 @@
+import type { PlayerPronouns } from '../playerPronouns.js';
 import { Expose } from '../class-transformer-custom.js';
 import type { TournamentState } from './Tournament.js';
 import type Tournament from './Tournament.js';
@@ -12,6 +13,9 @@ export class TournamentListItemPlayerDto
 
     @Expose()
     isGuest: boolean;
+
+    @Expose()
+    pronouns: PlayerPronouns | null = null;
 }
 
 export class TournamentListItemDto
@@ -63,6 +67,7 @@ export class TournamentListItemDto
             pseudo: rank1Player.pseudo,
             publicId: rank1Player.publicId,
             isGuest: rank1Player.isGuest,
+            pronouns: rank1Player.pronouns ?? null,
         };
 
         dto.participantsCount = tournament.participants.length;

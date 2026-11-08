@@ -529,6 +529,18 @@ export default class PlayerRepository
         Object.assign(this.playerIdentityMap.get(publicId) ?? {}, { avatarPath, avatarThumbnailPath, avatarUpdatedAt });
     }
 
+    async updatePronouns(publicId: string, pronouns: Player['pronouns']): Promise<void>
+    {
+        await this.playerRepository.createQueryBuilder('player')
+            .update()
+            .where('publicId = :publicId', { publicId })
+            .set({ pronouns })
+            .execute()
+        ;
+
+        Object.assign(this.playerIdentityMap.get(publicId) ?? {}, { pronouns });
+    }
+
     async updateCountryFlag(publicId: string, countryFlag: string | null): Promise<void>
     {
         await this.playerRepository.createQueryBuilder('player')

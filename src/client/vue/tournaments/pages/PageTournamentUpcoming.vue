@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { formatDistance } from 'date-fns';
 import { storeToRefs } from 'pinia';
 import { useHead } from '@unhead/vue';
@@ -174,7 +175,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                                     v-if="!isCheckInOpen(tournament) && null === currentTournamentSubscription"
                                     @click="subscribeAndPrompt"
                                     class="btn btn-outline-info"
-                                ><IconBell /> {{ $t('tournament_subscribe') }}</button>
+                                ><IconBell /> {{ $t('tournament_subscribe', { context: playerGender(loggedInPlayer) }) }}</button>
 
                                 <button
                                     v-if="isCheckInOpen(tournament) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"
@@ -194,7 +195,7 @@ const duration = (s: number) => formatDistance(0, s * 1000, { includeSeconds: tr
                             <!-- Subscribed/Checked-in players list -->
                             <template v-if="isCheckInOpen(tournament)">
                                 <!-- players who checked in -->
-                                <h6>{{ $t('tournament_checkedin') }}</h6>
+                                <h6>{{ $t('tournament_checked_in_players') }}</h6>
 
                                 <ul
                                     v-if="tournament.subscriptions.some(subscription => subscription.checkedIn)"

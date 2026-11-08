@@ -291,6 +291,7 @@
     "tournament_subscribe": "Ik ben geïnteresseerd!",
     "tournament_checkin": "Inchecken",
     "tournament_checkedin": "Ingecheckt",
+    "tournament_checked_in_players": "Ingecheckt",
     "no_player_checked_in_yet": "Nog geen speler ingecheckt.",
     "not_yet_checked_in": "Nog niet ingecheckt",
     "every_subscribers_checked_in": "Alle geabonneerden zijn ingecheckt.",

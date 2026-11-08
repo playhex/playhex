@@ -1,4 +1,13 @@
 {
+    "pronouns": {
+        "title": "Pronouns",
+        "explain": "These pronouns are public: they appear on your profile and when clicking your nickname. They are also used to adapt the interface wording to you, and the way it refers to you for other players.",
+        "save_error": "Unable to save pronouns. Please try again.",
+        "he/him": "he/him",
+        "she/her": "she/her",
+        "they/them": "they/them",
+        "unspecified": "Pronouns not specified"
+    },
     "player_popover": {
         "on_playhex_since": "On PlayHex for {{duration}}"
     },
@@ -581,6 +590,7 @@
     "tournament_unsubscribe": "I am no longer interested.",
     "tournament_checkin": "Check-in",
     "tournament_checkedin": "Checked-in",
+    "tournament_checked_in_players": "Checked-in players",
     "no_player_checked_in_yet": "No player checked-in yet.",
     "not_yet_checked_in": "Not yet checked-in",
     "every_subscribers_checked_in": "Every interested person has checked in.",
@@ -870,8 +880,14 @@
     "invalid_pseudo": "Username is invalid",
     "undo": {
         "player_wants_to_takeback": "{{ player }} wants to take back their move",
+        "player_wants_to_takeback_male": "{{ player }} wants to take back his move",
+        "player_wants_to_takeback_female": "{{ player }} wants to take back her move",
         "player_takeback_his_move": "{{ player }} took back their move.",
+        "player_takeback_his_move_male": "{{ player }} took back his move.",
+        "player_takeback_his_move_female": "{{ player }} took back her move.",
         "takeback_request_denied": "{{ player }}'s request to take back their move has been denied.",
+        "takeback_request_denied_male": "{{ player }}'s request to take back his move has been denied.",
+        "takeback_request_denied_female": "{{ player }}'s request to take back her move has been denied.",
         "undo_move": "Takeback",
         "accept": "Accept undo",
         "reject": "Reject",
@@ -1724,9 +1740,12 @@
     },
     "ladder": {
         "title": "King of the Hill",
+        "title_female": "Queen of the Hill",
         "intro": "One ladder, one throne. Challenge a player above you: if you win, you take their seat. The higher you sit, the more you have to defend.",
         "king": "King of the Hill",
+        "king_female": "Queen of the Hill",
         "king_for": "King for {{duration}}",
+        "king_for_female": "Queen for {{duration}}",
         "no_king": "The throne is empty. Join and take it!",
         "join": "Join King of the Hill",
         "leave": "Leave this hill",
@@ -1752,6 +1771,7 @@
         "no_running_challenges": "No running challenge.",
         "vs": "vs",
         "nobody_to_challenge": "Nobody to challenge: you are the King!",
+        "nobody_to_challenge_female": "Nobody to challenge: you are the Queen!",
         "live": "Live",
         "challenge_overlay": {
             "title": "Challenge {{player}}",
@@ -1793,8 +1813,11 @@
             "challenge_won": "{{player}} beat {{opponent}} and moved from #{{from}} to #{{position}}",
             "challenge_won_no_move": "{{player}} beat {{opponent}}",
             "challenge_defended": "{{opponent}} defended their seat against {{player}}",
+            "challenge_defended_male": "{{opponent}} defended his seat against {{player}}",
+            "challenge_defended_female": "{{opponent}} defended her seat against {{player}}",
             "challenge_voided": "Game {{player}} vs {{opponent}} has been canceled",
             "new_king": "{{player}} is the new King of the Hill!",
+            "new_king_female": "{{player}} is the new Queen of the Hill!",
             "giant_slayer": "{{player}} is a Giant Slayer: dethroned {{opponent}}!",
             "climber": "{{player}} won {{wins}} challenges in a row!",
             "strike": "{{player}} timed out a game (strike {{strikes}})",
@@ -1985,6 +2008,8 @@
             "friendly": "friendly",
             "playing_description": "Game in progress, watch it live on PlayHex.",
             "outcome_path": "{{winner}} won by connecting their sides",
+            "outcome_path_male": "{{winner}} won by connecting his sides",
+            "outcome_path_female": "{{winner}} won by connecting her sides",
             "outcome_resign": "{{winner}} won by resignation",
             "outcome_time": "{{winner}} won on time",
             "outcome_forfeit": "{{winner}} won by forfeit",
@@ -2045,6 +2070,7 @@
         },
         "ladder": {
             "king": "King: {{player}}",
+            "king_female": "Queen: {{player}}",
             "reign_one": "Reigning for {{duration}}, {{count}} defense",
             "reign_other": "Reigning for {{duration}}, {{count}} defenses",
             "n_players_one": "{{count}} player on the hill",

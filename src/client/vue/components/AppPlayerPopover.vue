@@ -133,6 +133,9 @@ onMounted(async () => {
                     <span v-if="player.countryFlag">{{ player.countryFlag }}</span>
                     <AppPlayerRating :player="player" />
                 </div>
+                <p v-if="!player.isBot && player.pronouns" class="small text-body-secondary mb-0">
+                    {{ $t('pronouns.' + player.pronouns) }}
+                </p>
             </div>
         </div>
 

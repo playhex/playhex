@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+import { computed } from 'vue';
+import useAuthStore from '../../../../stores/authStore.js';
+import { playerGender } from '../../../../../shared/app/playerPronouns.js';
+
+const gender = computed(() => playerGender(useAuthStore().loggedInPlayer));
 const firstPlayer = defineModel<null | 0 | 1>({
     required: true,
 });
@@ -19,10 +24,10 @@ defineProps({
         <label class="btn btn-outline-secondary" for="first-random">{{ $t('i_play.random') }}</label>
 
         <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="firstPlayer" :value="0" id="first-0" :disabled="disabled">
-        <label class="btn btn-outline-danger" for="first-0">{{ $t('i_play.first') }}</label>
+        <label class="btn btn-outline-danger" for="first-0">{{ $t('i_play.first', { context: gender }) }}</label>
 
         <input type="radio" name="firstPlayer-radio" class="btn-check" v-model="firstPlayer" :value="1" id="first-1" :disabled="disabled">
-        <label class="btn btn-outline-primary" for="first-1">{{ $t('i_play.second') }}</label>
+        <label class="btn btn-outline-primary" for="first-1">{{ $t('i_play.second', { context: gender }) }}</label>
     </div>
 </template>
 

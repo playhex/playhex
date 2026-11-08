@@ -10,6 +10,7 @@ import type { ComponentExposed } from 'vue-component-type-helpers';
 import { format } from 'date-fns';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
 import AppPseudo from '../../components/AppPseudo.vue';
+import AppPlayerPronounsSelect from '../../components/AppPlayerPronounsSelect.vue';
 import AppOnlineStatus from '../../components/AppOnlineStatus.vue';
 import AppTimeControlLabel from '../../components/AppTimeControlLabel.vue';
 import AppGameRulesSummary from '../../components/AppGameRulesSummary.vue';
@@ -539,6 +540,8 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                     ><IconFlag /></button>
                 </h2>
 
+                <AppPlayerPronounsSelect v-if="player && isMe(player) && !player.isGuest" :player class="form-select-sm my-1" />
+                <p v-else-if="player?.pronouns" class="mb-0 text-body-secondary">{{ $t('pronouns.' + player.pronouns) }}</p>
                 <p v-if="formerPseudo" class="mb-0 text-body-secondary">{{ $t('formerly') }} <strong>{{ formerPseudo.pseudo }}</strong></p>
 
                 <p v-if="player && !player.isGuest" class="mb-0">{{ $t('account_created_on', { date: player?.createdAt
@@ -685,7 +688,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                         <td><AppPseudo rating onlineStatus :player="getOtherPlayerStrict(game, player)" /></td>
                         <td>{{ game.boardsize }}</td>
                         <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
-                        <td><AppGameRulesSummary :gameOptions="game" /></td>
+                        <td><AppGameRulesSummary :gameOptions="game" :host="game.host" /></td>
                         <td>{{
                             formatDistanceToNowStrict(game.startedAt ?? 0, { addSuffix: true })
                         }}</td>
@@ -768,7 +771,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 
                                 <td>{{ game.boardsize }}</td>
                                 <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
-                                <td><AppGameRulesSummary :gameOptions="game" /></td>
+                                <td><AppGameRulesSummary :gameOptions="game" :host="game.host" /></td>
                                 <td>{{
                                     game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
                                 }}</td>

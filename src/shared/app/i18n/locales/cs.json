@@ -357,6 +357,7 @@
     "tournament_unsubscribe": "Už nemám zájem.",
     "tournament_checkin": "Registrace",
     "tournament_checkedin": "Registrován",
+    "tournament_checked_in_players": "Registrován",
     "no_player_checked_in_yet": "Zatím se nikdo nezaregistroval.",
     "not_yet_checked_in": "Ještě nezaregistrován",
     "every_subscribers_checked_in": "Všichni zájemci se zaregistrovali.",

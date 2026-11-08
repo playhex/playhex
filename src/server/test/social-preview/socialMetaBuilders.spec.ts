@@ -346,6 +346,33 @@ describe('social preview meta builders', () => {
         );
     });
 
+    it('names the hill after its current leader and refreshes images when pronouns change', () => {
+        const player = createPlayer(1, 'Alice');
+        const ladderDto = {
+            ladder: { slug: 'blitz', name: 'Blitz' },
+            currentReign: { player, defenses: 2, startedAt: new Date('2026-03-01T00:00:00Z') },
+            standings: [],
+        } as unknown as LadderDto;
+        const builder = new LadderMetaBuilder();
+        const now = new Date('2026-03-03T01:00:00Z');
+        const originalVersion = builder.imageVersion(ladderDto, now);
+
+        assert.strictEqual(builder.title(ladderDto, context('fr')), 'Roi de la colline · Blitz');
+        player.pronouns = 'she/her';
+        assert.strictEqual(builder.title(ladderDto, context('fr')), 'Reine de la colline · Blitz');
+        assert.strictEqual(builder.title(ladderDto, context('en')), 'Queen of the Hill · Blitz');
+        assert.notStrictEqual(builder.imageVersion(ladderDto, now), originalVersion);
+        ladderDto.ladder.name = 'Roi de la colline · Blitz';
+        assert.strictEqual(builder.title(ladderDto, context('fr')), 'Reine de la colline · Blitz');
+        ladderDto.ladder.name = 'Blitz';
+        player.pronouns = 'he/him';
+        assert.strictEqual(builder.title(ladderDto, context('fr')), 'Roi de la colline · Blitz');
+        player.pronouns = 'they/them';
+        assert.strictEqual(builder.title(ladderDto, context('en')), 'King of the Hill · Blitz');
+        ladderDto.currentReign = null;
+        assert.strictEqual(builder.title(ladderDto, context('fr')), 'Roi de la colline · Blitz');
+    });
+
     it('refreshes ladder image when displayed reign duration changes', () => {
         const ladderDto = {
             ladder: { slug: 'blitz', name: 'Blitz' },

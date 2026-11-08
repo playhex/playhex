@@ -1,3 +1,5 @@
+import useAuthStore from '../../../stores/authStore.js';
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { t } from 'i18next';
 import { computed, Ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -82,7 +84,7 @@ export const useTournamentCurrentSubscription = (tournament: Ref<null | false | 
                 if (e instanceof DomainHttpError) {
                     if (e.type === 'tournament_player_is_banned') {
                         useToastsStore().addToast(
-                            t(e.type),
+                            t(e.type, { context: playerGender(useAuthStore().loggedInPlayer) }),
                             {
                                 level: 'danger',
                             },

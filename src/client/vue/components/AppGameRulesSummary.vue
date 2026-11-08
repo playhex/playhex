@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { playerGender } from '../../../shared/app/playerPronouns.js';
+import type Player from '../../../shared/app/models/Player.js';
 import { IconCheck, IconExclamationTriangleFill } from '../icons.js';
 import GameOptions from '../../../shared/app/models/GameOptions.js';
 import { PropType } from 'vue';
@@ -7,6 +9,11 @@ const props = defineProps({
     gameOptions: {
         type: Object as PropType<GameOptions>,
         required: true,
+    },
+
+    host: {
+        type: Object as PropType<null | Player>,
+        default: null,
     },
 
     /**
@@ -33,7 +40,7 @@ let isDefaultRules = swapRule && firstPlayer === null && !presetHandicap;
     <span class="game-rules" v-else>
         <IconExclamationTriangleFill v-if="showIcon" class="text-warning" />
         <span v-if="!swapRule"> {{ ' ' + $t('game_rules.no_swap') }}</span>
-        <span v-if="0 === firstPlayer"> {{ ' ' + $t('game_rules.host_plays_first') }}</span>
+        <span v-if="0 === firstPlayer"> {{ ' ' + $t('game_rules.host_plays_first', { context: playerGender(host) }) }}</span>
         <span v-if="1 === firstPlayer"> {{ ' ' + $t('game_rules.host_plays_second') }}</span>
         <span v-if="presetHandicap > 0"> {{ ' ' + $t('game_rules.handicap_for_host', { n: presetHandicap }) }}</span>
         <span v-if="presetHandicap < 0"> {{ ' ' + $t('game_rules.handicap_for_opponent', { n: -presetHandicap }) }}</span>

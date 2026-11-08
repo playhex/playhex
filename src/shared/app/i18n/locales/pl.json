@@ -294,6 +294,7 @@
     "tournament_subscribe": "Zapisz się",
     "tournament_checkin": "Potwierdź udział",
     "tournament_checkedin": "Udział potwierdzony",
+    "tournament_checked_in_players": "Udział potwierdzony",
     "no_player_checked_in_yet": "Żaden gracz jeszcze się nie potwierdził.",
     "not_yet_checked_in": "Jeszcze niepotwierdzony",
     "every_subscribers_checked_in": "Wszyscy zapisani się potwierdzili.",

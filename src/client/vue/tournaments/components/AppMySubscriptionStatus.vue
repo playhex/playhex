@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { toRefs } from 'vue';
 import { Tournament } from '../../../../shared/app/models/index.js';
 import { useTournamentCurrentSubscription } from '../composables/tournamentCurrentSubscription.js';
@@ -39,15 +40,15 @@ const { currentTournamentSubscription, unsub } = useTournamentCurrentSubscriptio
 
         <!-- before check in period -->
         <template v-if="!isCheckInOpen(tournament)">
-            <span class="text-info"><IconBellCheckFill /> {{ $t('tournament_subscription.subscribed') }}</span>
-            <small v-if="full" class="ms-3"><a href="#" @click.prevent="unsub" class="link-secondary">{{ $t('tournament_unsubscribe') }}</a></small>
+            <span class="text-info"><IconBellCheckFill /> {{ $t('tournament_subscription.subscribed', { context: playerGender(currentTournamentSubscription.player) }) }}</span>
+            <small v-if="full" class="ms-3"><a href="#" @click.prevent="unsub" class="link-secondary">{{ $t('tournament_unsubscribe', { context: playerGender(currentTournamentSubscription.player) }) }}</a></small>
         </template>
 
         <!-- check in period open -->
         <template v-else>
             <template v-if="currentTournamentSubscription.checkedIn">
                 <span class="text-success"><IconCheck /> {{ $t('tournament_subscription.checked_in') }}</span>
-                <small v-if="full" class="ms-3"><a href="#" @click.prevent="unsub" class="link-secondary">{{ $t('tournament_unsubscribe') }}</a></small>
+                <small v-if="full" class="ms-3"><a href="#" @click.prevent="unsub" class="link-secondary">{{ $t('tournament_unsubscribe', { context: playerGender(currentTournamentSubscription.player) }) }}</a></small>
             </template>
             <span v-else class="text-warning"><IconExclamationTriangleFill /> {{ $t('tournament_subscription.must_check_in') }}</span>
         </template>

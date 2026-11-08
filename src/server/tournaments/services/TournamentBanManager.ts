@@ -1,3 +1,4 @@
+import { playerGender } from '../../../shared/app/playerPronouns.js';
 import { Inject, Service } from 'typedi';
 import Tournament from '../../../shared/app/models/Tournament.js';
 import TournamentBannedPlayer from '../../../shared/app/models/TournamentBannedPlayer.js';
@@ -91,6 +92,7 @@ export class TournamentBanManager
         if (subscription) {
             addTournamentHistory(tournament, 'player_banned', {
                 playerPseudo: player.pseudo,
+                context: playerGender(player),
                 playerPublicId: player.publicId,
             });
         }

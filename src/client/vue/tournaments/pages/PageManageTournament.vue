@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
+import useAuthStore from '../../../stores/authStore.js';
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import { t } from 'i18next';
 import { apiDeleteTournamentBannedPlayer, apiDeleteTournamentSubscription, apiGetTournamentBannedPlayers, apiPatchTournament, apiPostIterateTournament, apiPostStartTournament, apiPutTournamentBannedPlayer, apiCancelTournament, apiPutTournamentAdmins } from '../../../apiClient.js';
@@ -158,7 +160,7 @@ const startTournament = async () => {
     try {
         await confirmationOverlay({
             title: t('manage_tournament_page.start_now'),
-            message: t('manage_tournament_page.start_now_confirm'),
+            message: t('manage_tournament_page.start_now_confirm', { context: playerGender(useAuthStore().loggedInPlayer) }),
             confirmLabel: t('manage_tournament_page.start_now'),
             confirmClass: 'btn-success',
             cancelLabel: t('cancel'),
@@ -249,7 +251,7 @@ const cancelTournament = async () => {
     try {
         await confirmationOverlay({
             title: t('manage_tournament_page.cancel_tournament'),
-            message: t('manage_tournament_page.cancel_tournament_confirm'),
+            message: t('manage_tournament_page.cancel_tournament_confirm', { context: playerGender(useAuthStore().loggedInPlayer) }),
             confirmLabel: t('manage_tournament_page.cancel_tournament'),
             confirmClass: 'btn-danger',
             cancelLabel: t('cancel'),
@@ -377,7 +379,7 @@ const updateAdmins = async () => {
                             <button @click="kickPlayer(subscription)" class="btn btn-sm btn-outline-warning me-2">{{ $t('manage_tournament_page.kick') }}</button>
                             <button @click="banPlayer(subscription.player)" class="btn btn-sm btn-outline-danger me-2">{{ $t('manage_tournament_page.kick_and_ban') }}</button>
                             {{ subscription.player.pseudo }}
-                            <span v-if="subscription.checkedIn">({{ $t('tournament_checkedin') }})</span>
+                            <span v-if="subscription.checkedIn">({{ $t('tournament_checkedin', { context: playerGender(subscription.player) }) }})</span>
                         </li>
                     </ul>
                 </section>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
+import useAuthStore from '../../../stores/authStore.js';
 import { ref } from 'vue';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
@@ -14,11 +16,12 @@ import AppLadderHallOfFame from '../components/AppLadderHallOfFame.vue';
 import AppChannel from '../../components/AppChannel.vue';
 import { IconChatRightText, IconClockHistory, IconCrown, IconInfoCircle, IconListOl, IconTablerSwords, IconTrophyFill } from '../../icons.js';
 
+const { slug, ladderDto, me, reload, leaderGender } = useLadderFromUrl();
+
 useHead({
-    title: () => t('ladder.title'),
+    title: () => t('ladder.title', { context: leaderGender.value }),
 });
 
-const { slug, ladderDto, me, reload } = useLadderFromUrl();
 const { challenge } = useLadderChallenge();
 
 type Tab = 'standings' | 'running_games' | 'hall_of_fame' | 'history' | 'chat';
@@ -36,8 +39,8 @@ const onChallenge = async (defender: Player): Promise<void> => {
 
 <template>
     <div class="container my-3">
-        <h1><IconCrown class="text-warning" /> {{ $t('ladder.title') }}</h1>
-        <p class="lead mb-1">{{ $t('ladder.intro') }}</p>
+        <h1><IconCrown class="text-warning" /> {{ $t('ladder.title', { context: leaderGender }) }}</h1>
+        <p class="lead mb-1">{{ $t('ladder.intro', { context: playerGender(useAuthStore().loggedInPlayer) }) }}</p>
         <p><router-link :to="{ name: 'ladder-rules', params: { slug } }"><IconInfoCircle /> {{ $t('ladder.rules') }}</router-link></p>
 
         <p v-if="ladderDto === false">{{ $t('ladder.not_found') }}</p>

@@ -385,6 +385,7 @@
     "tournament_subscribe": "Estoy interesado!",
     "tournament_checkin": "Check-in",
     "tournament_checkedin": "Check-in realizado",
+    "tournament_checked_in_players": "Check-in realizado",
     "no_player_checked_in_yet": "Ningún jugador ha hecho check-in todavía.",
     "not_yet_checked_in": "Aún no ha hecho check-in",
     "every_subscribers_checked_in": "Todos los interesados han hecho check-in.",

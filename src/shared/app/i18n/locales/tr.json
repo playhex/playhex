@@ -325,6 +325,7 @@
     "tournament_subscribe": "Abone ol",
     "tournament_checkin": "Check-in yap",
     "tournament_checkedin": "Check-in yapıldı",
+    "tournament_checked_in_players": "Check-in yapıldı",
     "no_player_checked_in_yet": "Henüz hiçbir oyuncu check-in yapmadı.",
     "not_yet_checked_in": "Henüz check-in yapılmadı",
     "every_subscribers_checked_in": "Tüm aboneler check-in yaptı.",

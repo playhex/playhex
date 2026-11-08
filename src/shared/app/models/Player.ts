@@ -6,6 +6,7 @@ import { IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
 import Rating from './Rating.js';
 import { keysOf } from '../utils.js';
+import type { PlayerPronouns } from '../playerPronouns.js';
 
 @Entity()
 @Index(keysOf<Player>()('isGuest', 'isBot', 'pseudo'))
@@ -96,6 +97,10 @@ export default class Player
     @Column({ type: Date, nullable: true, default: null })
     @Expose({ groups: ['moderation'] })
     avatarUpdatedAt?: null | Date;
+
+    @Column({ type: String, nullable: true, default: null, length: 9 })
+    @Expose({ groups: [GROUP_DEFAULT, 'ai_config', 'rating', 'playerNotification', 'lobby', 'puzzle', 'player_moderation_action', 'channel'] })
+    pronouns: PlayerPronouns | null = null;
 
     @Column({ type: String, nullable: true, default: null, length: 8 })
     @Expose({ groups: [GROUP_DEFAULT, 'playerNotification', 'lobby', 'puzzle'] })

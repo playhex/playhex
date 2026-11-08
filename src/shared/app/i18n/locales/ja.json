@@ -283,6 +283,7 @@
     "tournament_subscribe": "通知登録",
     "tournament_checkin": "チェックイン",
     "tournament_checkedin": "チェックイン済み",
+    "tournament_checked_in_players": "チェックイン済み",
     "no_player_checked_in_yet": "まだ誰もチェックインしていません。",
     "not_yet_checked_in": "未チェックイン",
     "every_subscribers_checked_in": "全員がチェックイン済みです。",

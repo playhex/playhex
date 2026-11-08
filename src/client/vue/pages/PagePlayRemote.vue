@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../shared/app/playerPronouns.js';
 import 'bootstrap/js/dist/dropdown.js';
 import useLobbyStore from '../../stores/lobbyStore.js';
 import { ref, computed, watch } from 'vue';
@@ -313,7 +314,7 @@ const resign = async (): Promise<void> => {
     try {
         await confirmationOverlay({
             title: t('resign_confirm_overlay.title'),
-            message: t('resign_confirm_overlay.message'),
+            message: t('resign_confirm_overlay.message', { context: playerGender(useAuthStore().loggedInPlayer) }),
             confirmLabel: t('resign_confirm_overlay.confirmLabel'),
             confirmClass: 'btn-danger',
             cancelLabel: t('resign_confirm_overlay.cancelLabel'),
@@ -457,7 +458,7 @@ const pass = async () => {
     try {
         await confirmationOverlay({
             title: t('pass_confirm_overlay.title'),
-            message: t('pass_confirm_overlay.message'),
+            message: t('pass_confirm_overlay.message', { context: playerGender(useAuthStore().loggedInPlayer) }),
             confirmLabel: t('pass_confirm_overlay.confirmLabel'),
             confirmClass: 'btn-warning',
             cancelLabel: t('pass_confirm_overlay.cancelLabel'),

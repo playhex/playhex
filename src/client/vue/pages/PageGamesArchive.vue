@@ -229,7 +229,7 @@ const chartBackgroundPlugin = {
 
                             <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
 
-                            <td><AppGameRulesSummary :gameOptions="game" /></td>
+                            <td><AppGameRulesSummary :gameOptions="game" :host="game.host" /></td>
 
                             <td>{{
                                 game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'

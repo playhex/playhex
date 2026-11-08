@@ -1,3 +1,4 @@
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import useToastsStore from '../../../../client/stores/toastsStore.js';
 import { apiPostCancel } from '../../../apiClient.js';
 import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/gameUtils.js';
@@ -89,7 +90,7 @@ notifier.on('takebackRequested', (game, byPlayer) => {
     }
 
     useToastsStore().addToast(
-        t('undo.player_wants_to_takeback', { player: pseudoString(byPlayer, 'pseudo') }),
+        t('undo.player_wants_to_takeback', { player: pseudoString(byPlayer, 'pseudo'), context: playerGender(byPlayer) }),
         {
             level: 'warning',
         },
@@ -106,12 +107,12 @@ notifier.on('takebackAnswered', (game, accepted, playerTakeback) => {
 
     if (accepted) {
         useToastsStore().addToast(
-            t('undo.player_takeback_his_move', { player: pseudoString(playerTakeback, 'pseudo') }),
+            t('undo.player_takeback_his_move', { player: pseudoString(playerTakeback, 'pseudo'), context: playerGender(playerTakeback) }),
             { level: 'success' },
         );
     } else {
         useToastsStore().addToast(
-            t('undo.takeback_request_denied', { player: pseudoString(playerTakeback, 'pseudo') }),
+            t('undo.takeback_request_denied', { player: pseudoString(playerTakeback, 'pseudo'), context: playerGender(playerTakeback) }),
             { level: 'danger' },
         );
     }
@@ -124,7 +125,7 @@ notifier.on('cancelRequested', (game, byPlayer) => {
     }
 
     useToastsStore().addToast(
-        t('cancel_request.player_wants_to_cancel', { player: pseudoString(byPlayer, 'pseudo') }),
+        t('cancel_request.player_wants_to_cancel', { player: pseudoString(byPlayer, 'pseudo'), context: playerGender(byPlayer) }),
         {
             level: 'warning',
         },

@@ -15,7 +15,7 @@ defineProps({
     <p class="text-info">
         <IconShieldCheck />
 
-        {{ $t('notification.opponent_moderated', { player: playerNotification.parameters.player }) }}
+        {{ $t('notification.opponent_moderated', { player: playerNotification.parameters.player, context: playerNotification.parameters.context }) }}
 
         <small class="float-end text-secondary">{{ formatDistanceToNowStrict(playerNotification.createdAt, {
             addSuffix: true,

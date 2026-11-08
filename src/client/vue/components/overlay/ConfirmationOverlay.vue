@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { t } from 'i18next';
+import useAuthStore from '../../../stores/authStore.js';
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { useDisclosure } from '@overlastic/vue';
 
 const { visible, confirm, cancel } = useDisclosure();
@@ -42,7 +44,7 @@ const props = defineProps({
                         <button type="button" class="btn-close" @click="cancel()"></button>
                     </div>
                     <div class="modal-body">
-                        <p class="card-text">{{ props.message ?? $t('confirm_overlay.are_you_sure?') }}</p>
+                        <p class="card-text">{{ props.message ?? $t('confirm_overlay.are_you_sure?', { context: playerGender(useAuthStore().loggedInPlayer) }) }}</p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn" :class="cancelClass" @click="cancel()">{{ props.cancelLabel }}</button>

@@ -1519,6 +1519,19 @@ export const apiUpdatePlayerCountryFlag = async (publicId: string, countryFlag: 
     await checkResponse(response);
 };
 
+export const apiUpdatePlayerPronouns = async (publicId: string, pronouns: Player['pronouns']): Promise<void> => {
+    const response = await fetch(`/api/players/${publicId}/pronouns`, {
+        method: 'PATCH',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pronouns }),
+    });
+
+    await checkResponse(response);
+};
+
 export const apiGetHexplorerStudies = async (params: SearchHexplorerStudiesParameters = {}): Promise<{ results: HexplorerStudy[], count: null | number }> => {
     const response = await fetch(`/api/hexplorer/studies?${qs.stringify(params)}`);
 

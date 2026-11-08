@@ -2,6 +2,7 @@ import { Container } from 'typedi';
 import { notifier } from '../notifier.js';
 import { truncateText } from '../../../../shared/app/utils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { createPlayerNotification } from '../../../../shared/app/models/PlayerNotification.js';
 import { getLoserPlayer, getOtherPlayer, getPlayers, getWinnerPlayer, hasPlayer } from '../../../../shared/app/gameUtils.js';
 import logger from '../../../services/logger.js';
@@ -215,6 +216,7 @@ notifier.on('moderationActionTaken', async action => {
             'myOpponentHasBeenModerated',
             {
                 player: pseudoString(action.player),
+                context: playerGender(action.player),
                 game: undefined,
             },
             participant,

@@ -1,3 +1,4 @@
+import { playerGender } from '../../../shared/app/playerPronouns.js';
 import { Service } from 'typedi';
 import type { Person } from 'schema-dts';
 import type { Player, PlayerStats } from '../../../shared/app/models/index.js';
@@ -24,6 +25,7 @@ export default class PlayerMetaBuilder extends AbstractEntityMetaBuilder<PlayerP
     {
         return [
             player.avatarUpdatedAt?.getTime() ?? 0,
+            playerGender(player),
             this.rating(player) ?? 0,
             stats?.totalPlayedGames ?? 0,
         ].join('-');
@@ -97,7 +99,7 @@ export default class PlayerMetaBuilder extends AbstractEntityMetaBuilder<PlayerP
         }
 
         return {
-            title: withSiteName(t('social_preview.player.title', { player: name })),
+            title: withSiteName(t('social_preview.player.title', { player: name, context: playerGender(player) })),
             description: this.summaryLines(data, context).join(' · '),
             type: 'profile',
             image: this.image(data, context, name),

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { PropType } from 'vue';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { LadderReign } from '../../../../shared/app/models/index.js';
@@ -24,10 +25,10 @@ defineProps({
             <IconCrown v-else class="text-warning fs-1" />
 
             <div v-if="currentReign">
-                <small class="text-secondary">{{ $t('ladder.king') }}</small>
+                <small class="text-secondary">{{ $t('ladder.king', { context: playerGender(currentReign.player) }) }}</small>
                 <h3 class="m-0"><AppPseudo :player="currentReign.player" flag /></h3>
                 <p class="m-0">
-                    {{ $t('ladder.king_for', { duration: formatDistanceToNowStrict(currentReign.startedAt) }) }}
+                    {{ $t('ladder.king_for', { duration: formatDistanceToNowStrict(currentReign.startedAt), context: playerGender(currentReign.player) }) }}
                     <span v-if="currentReign.defenses > 0" class="ms-2 text-secondary">· {{ $t('ladder.hall.defenses', { count: currentReign.defenses }) }}</span>
                 </p>
             </div>

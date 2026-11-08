@@ -281,6 +281,7 @@
     "tournament_subscribe": "订阅",
     "tournament_checkin": "签到",
     "tournament_checkedin": "已签到",
+    "tournament_checked_in_players": "已签到",
     "no_player_checked_in_yet": "尚无玩家签到。",
     "not_yet_checked_in": "尚未签到",
     "every_subscribers_checked_in": "所有订阅者均已签到。",

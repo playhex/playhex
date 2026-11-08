@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../shared/app/playerPronouns.js';
 import { computed, onMounted, onUnmounted, ref, Ref, PropType, toRefs } from 'vue';
 import { storeToRefs } from 'pinia';
 import { IconCheck, IconChevronBarLeft, IconChevronBarRight, IconChevronLeft, IconChevronRight, IconCrosshair, IconHandicap, IconScissors, IconTrophyFill, IconX } from '../icons.js';
@@ -76,6 +77,8 @@ const {
 /**
  * Pseudo of the player who asked for a takeback, to show it in the takeback request bar.
  */
+const undoRequestGender = computed(() => playerGender(game.value?.undoRequest == null ? null : players.value[game.value.undoRequest]));
+
 const undoRequestPseudo = computed<string>(() => {
     const undoRequest = game.value?.undoRequest;
 
@@ -431,7 +434,7 @@ onUnmounted(() => {
 
         <!-- Opponent asked for a takeback: accept or reject it -->
         <div class="rewind-controls takeback-request" v-else-if="shouldDisplayAnswerUndoMove">
-            <p class="takeback-request-text">{{ $t('undo.player_wants_to_takeback', { player: undoRequestPseudo }) }}</p>
+            <p class="takeback-request-text">{{ $t('undo.player_wants_to_takeback', { player: undoRequestPseudo, context: undoRequestGender }) }}</p>
 
             <!-- Accept takeback -->
             <button type="button" @click="answerUndo(true)" class="btn btn-success">

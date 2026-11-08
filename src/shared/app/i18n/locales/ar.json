@@ -378,6 +378,7 @@
     "tournament_unsubscribe": "لم أعد مهتمًا.",
     "tournament_checkin": "تسجيل الحضور",
     "tournament_checkedin": "تم تسجيل الحضور",
+    "tournament_checked_in_players": "تم تسجيل الحضور",
     "no_player_checked_in_yet": "لم يسجّل أي لاعب حضوره بعد.",
     "not_yet_checked_in": "لم يُسجّل الحضور بعد",
     "every_subscribers_checked_in": "سجّل كل المهتمين حضورهم.",

@@ -406,6 +406,7 @@
     "tournament_subscribe": "Подписаться",
     "tournament_checkin": "Подтвердить участие",
     "tournament_checkedin": "Участие подтверждено",
+    "tournament_checked_in_players": "Участие подтверждено",
     "no_player_checked_in_yet": "Ни один игрок ещё не подтвердил участие.",
     "not_yet_checked_in": "Участие не подтверждено",
     "every_subscribers_checked_in": "Все подписчики подтвердили участие.",

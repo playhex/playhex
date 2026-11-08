@@ -469,6 +469,7 @@
     "tournament_player_games_win_history": "வரலாறு",
     "tournament_checkin": "செக்-இன்",
     "tournament_checkedin": "செக்-இன் செய்யப்பட்டது",
+    "tournament_checked_in_players": "செக்-இன் செய்யப்பட்டது",
     "tournament_description": "விளக்கம்",
     "round_n": "சுற்று {{ n }}",
     "losers_bracket": "தோல்வியாளர் பிரிவு",

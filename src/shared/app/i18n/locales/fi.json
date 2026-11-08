@@ -345,6 +345,7 @@
     "tournament_unsubscribe": "En ole enää kiinnostunut.",
     "tournament_checkin": "Ilmoittaudu",
     "tournament_checkedin": "Ilmoittautunut",
+    "tournament_checked_in_players": "Ilmoittautunut",
     "no_player_checked_in_yet": "Ei vielä ilmoittautuneita pelaajia.",
     "not_yet_checked_in": "Ei vielä ilmoittautunut",
     "every_subscribers_checked_in": "Kaikki kiinnostuneet ovat ilmoittautuneet.",

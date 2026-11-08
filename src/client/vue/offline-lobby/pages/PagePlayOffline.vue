@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
+import useAuthStore from '../../../stores/authStore.js';
 import { t } from 'i18next';
 import { computed, Ref, ref, shallowRef, onUnmounted } from 'vue';
 import { EngineGame, IllegalMove, PlayerIndex } from '../../../../shared/game-engine/index.js';
@@ -93,6 +95,7 @@ const offlinePlayer: Player = {
     isBot: false,
     pseudo: t('player'),
     isGuest: false,
+    pronouns: null,
     createdAt: new Date(),
     slug: '',
 };
@@ -191,6 +194,7 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
         {
             isBot: true,
             isGuest: false,
+            pronouns: null,
             pseudo: localAI.label,
             slug: '',
             publicId: localAI.name,
@@ -291,7 +295,7 @@ const resign = async (): Promise<void> => {
     try {
         await confirmationOverlay({
             title: t('resign_confirm_overlay.title'),
-            message: t('resign_confirm_overlay.message'),
+            message: t('resign_confirm_overlay.message', { context: playerGender(useAuthStore().loggedInPlayer) }),
             confirmLabel: t('resign_confirm_overlay.confirmLabel'),
             confirmClass: 'btn-danger',
             cancelLabel: t('resign_confirm_overlay.cancelLabel'),

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { computed, PropType, ref } from 'vue';
 import { LadderChallenge, LadderPlayer, Player } from '../../../../shared/app/models/index.js';
 import { LadderChallengeCandidateDto, LadderMeDto } from '../../../../shared/app/models/LadderDto.js';
@@ -74,6 +75,7 @@ const refusalText = (ladderPlayer: LadderPlayer): string => {
     const candidate = candidatesByPlayer.value.get(ladderPlayer.player.publicId);
 
     return t(`ladder.refusal.${candidate?.refusal}`, {
+        context: playerGender(ladderPlayer.player),
         date: candidate?.refusalEndsAt ? formatRefusalEnd(candidate.refusalEndsAt) : '',
     });
 };

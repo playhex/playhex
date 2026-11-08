@@ -363,6 +363,7 @@
     "tournament_subscribe": "Ich bin interessiert!",
     "tournament_checkin": "Einchecken",
     "tournament_checkedin": "Eingecheckt",
+    "tournament_checked_in_players": "Eingecheckt",
     "no_player_checked_in_yet": "Noch kein Spieler eingecheckt.",
     "not_yet_checked_in": "Noch nicht eingecheckt",
     "every_subscribers_checked_in": "Alle Interessenten sind eingecheckt.",

@@ -61,6 +61,12 @@ type PlayerNotificationTypes = {
         player: string;
 
         /**
+         * Grammatical gender of the moderated player when the notification was created.
+         * Missing on older notifications.
+         */
+        context?: 'male' | 'female' | 'other';
+
+        /**
          * One of the game with the relevant moderated chat messages
          */
         game?: Game;

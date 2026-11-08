@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { computed, PropType } from 'vue';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { RouterLink } from 'vue-router';
@@ -155,7 +156,7 @@ const getMyTimeData = (challenge: LadderChallenge): null | PlayerTimeData => {
                             timeControl: challenge.proposedLiveTimeControlType ? timeControlToString(challenge.proposedLiveTimeControlType) : '',
                         }) }}
                     </p>
-                    <p v-if="!isChallengerActive(challenge)" class="small mb-2 text-warning">{{ $t('ladder.challenger_not_active', { player: pseudoString(challenge.challenger) }) }}</p>
+                    <p v-if="!isChallengerActive(challenge)" class="small mb-2 text-warning">{{ $t('ladder.challenger_not_active', { player: pseudoString(challenge.challenger), context: playerGender(challenge.challenger) }) }}</p>
                     <p class="small mb-2 text-secondary">{{ $t('ladder.live_proposal_expires', { date: formatDistanceToNowStrict(getLiveProposalExpiry(challenge.createdAt), { addSuffix: true }) }) }}</p>
                     <button type="button" class="btn btn-sm btn-success me-2" :disabled="loading || !isChallengerActive(challenge)" @click="emit('answerLive', challenge, true)"><IconLightningChargeFill /> {{ $t('ladder.accept_live') }}</button>
                     <button type="button" class="btn btn-sm btn-outline-secondary" :disabled="loading" @click="emit('answerLive', challenge, false)">{{ $t('ladder.decline_live') }}</button>

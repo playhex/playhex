@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { PropType } from 'vue';
 import { intlFormat } from 'date-fns';
 import { autoLocale } from '../../../../shared/app/i18n/index.js';
@@ -59,7 +60,7 @@ const formatDate = (date: Date): string => intlFormat(date, {
             </p>
 
             <p v-if="tournamentSeries.lastTournament?.rank1Participant" class="card-text mb-0">
-                {{ $t('tournament_series_list_page.last_winner') }}
+                {{ $t('tournament_series_list_page.last_winner', { context: playerGender(tournamentSeries.lastTournament.rank1Participant) }) }}
                 <IconTrophyFill class="text-warning" />
                 {{ tournamentSeries.lastTournament.rank1Participant.pseudo }}
                 <small class="text-body-secondary">({{ tournamentSeries.lastTournament.title }})</small>

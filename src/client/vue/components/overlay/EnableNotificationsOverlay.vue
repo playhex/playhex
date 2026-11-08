@@ -2,6 +2,8 @@
 import { computed } from 'vue';
 import { useDisclosure } from '@overlastic/vue';
 import useNotificationStore from '../../../stores/notificationStore.js';
+import useAuthStore from '../../../stores/authStore.js';
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { IconBell, IconTrophyFill, IconHourglass, IconArrowCounterclockwise } from '../../icons.js';
 
 export type NotificationType = 'tournament_checkin_opens' | 'correspondence_your_turn' | 'rematch';
@@ -13,6 +15,7 @@ const props = defineProps<{
 const { visible, confirm, cancel } = useDisclosure();
 
 const { requestPermission } = useNotificationStore();
+const gender = computed(() => playerGender(useAuthStore().loggedInPlayer));
 
 const enable = async () => {
     await requestPermission();
@@ -43,7 +46,7 @@ const secondaryNotifications = computed(() => allNotifications.filter(n => n !==
                         </div>
 
                         <h5 class="mb-1 text-center">{{ $t('enable_notifications_overlay.title') }}</h5>
-                        <p class="my-3">{{ $t('enable_notifications_overlay.you_will_be_notified') }}</p>
+                        <p class="my-3">{{ $t('enable_notifications_overlay.you_will_be_notified', { context: gender }) }}</p>
 
                         <!-- Featured notification -->
                         <div
@@ -55,7 +58,7 @@ const secondaryNotifications = computed(() => allNotifications.filter(n => n !==
                         </div>
 
                         <!-- Other notifications list -->
-                        <p v-if="props.featuredNotification" class="text-body-secondary text-start small mb-2">{{ $t('enable_notifications_overlay.also_notified_for') }}</p>
+                        <p v-if="props.featuredNotification" class="text-body-secondary text-start small mb-2">{{ $t('enable_notifications_overlay.also_notified_for', { context: gender }) }}</p>
                         <ul
                             class="list-unstyled text-start mb-0"
                             :class="props.featuredNotification ? 'text-body-secondary small' : ''"

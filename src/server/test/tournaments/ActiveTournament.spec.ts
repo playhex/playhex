@@ -39,6 +39,34 @@ class MockedOrganizer implements TournamentEngineInterface
 }
 
 describe('ActiveTournament', () => {
+    it('preserves player gender in participation history after account pronouns change', async () => {
+        const input = createTournamentDefaultsCreate();
+        input.title = 'History';
+        input.startOfficialAt = new Date(Date.now() + 60 * 60 * 1000);
+        const tournament = createTournamentFromCreateInput(input);
+        const activeTournament = new ActiveTournament(
+            tournament,
+            new MockedOrganizer(),
+            new NoopGameAccessor(),
+            new NoopAutoSave(tournament),
+        );
+        const player = Object.assign(new Player(), { publicId: uuidv4(), pseudo: 'Alex', isGuest: false, pronouns: 'she/her' });
+        await activeTournament.subscribeCheckIn(player);
+        assert.strictEqual(tournament.history.at(-1)?.type, 'player_subscribed');
+        assert.strictEqual(tournament.history.at(-1)?.parameters.context, 'female');
+
+        tournament.startOfficialAt = new Date(Date.now() + 60 * 1000);
+        await activeTournament.subscribeCheckIn(player);
+        assert.strictEqual(tournament.history.at(-1)?.type, 'player_checked_in');
+        assert.strictEqual(tournament.history.at(-1)?.parameters.context, 'female');
+
+        player.pronouns = 'he/him';
+        await activeTournament.playerSelfUnsubscribe(player.publicId);
+        assert.strictEqual(tournament.history.at(-1)?.type, 'player_unsubscribed');
+        assert.strictEqual(tournament.history.at(-1)?.parameters.context, 'male');
+        assert.strictEqual(tournament.history.find(event => event.type === 'player_checked_in')?.parameters.context, 'female');
+    });
+
     describe('iterateTournament', () => {
         it('starts and ends tournament', async () => {
             let tournament = new Tournament();

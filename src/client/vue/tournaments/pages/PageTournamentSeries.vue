@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
+import useAuthStore from '../../../stores/authStore.js';
 import { computed, ref, watch } from 'vue';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
@@ -263,7 +265,7 @@ const formatStartDate = (date: Date): string => intlFormat(date, {
                                     v-if="!isCheckInOpen(nextTournamentFull) && null === currentTournamentSubscription"
                                     @click="subscribeAndPrompt"
                                     class="btn btn-outline-info"
-                                ><IconBell /> {{ $t('tournament_subscribe') }}</button>
+                                ><IconBell /> {{ $t('tournament_subscribe', { context: playerGender(useAuthStore().loggedInPlayer) }) }}</button>
 
                                 <button
                                     v-if="isCheckInOpen(nextTournamentFull) && (null === currentTournamentSubscription || !currentTournamentSubscription.checkedIn)"

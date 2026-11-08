@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../../shared/app/playerPronouns.js';
+import useAuthStore from '../../../../stores/authStore.js';
 import { bridgePuzzles } from '../../../../../shared/app/tutorial/tutorialPuzzles.js';
 import { useTutorialControls } from '../../../composables/tutorialControls.js';
 import { sanitizedT } from '../tutorialUtils.js';
@@ -36,7 +38,7 @@ const { markCompleted } = useTutorialControls();
 
     <p v-html="sanitizedT('tutorial.bridge_how_to_defend')"></p>
 
-    <p class="alert alert-info"><IconInfoCircle /> {{ $t('tutorial.bridge_why_useful') }}</p>
+    <p class="alert alert-info"><IconInfoCircle /> {{ $t('tutorial.bridge_why_useful', { context: playerGender(useAuthStore().loggedInPlayer) }) }}</p>
 
     <h2>{{ $t('tutorial.puzzles_title') }}</h2>
 

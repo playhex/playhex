@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
+import useAuthStore from '../../../stores/authStore.js';
 import { t } from 'i18next';
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch, watchEffect } from 'vue';
 import { useHead } from '@unhead/vue';
@@ -543,7 +545,7 @@ const resign = async (seat: Seat): Promise<void> => {
     try {
         await confirmationOverlay({
             title: t('resign_confirm_overlay.title'),
-            message: t('resign_confirm_overlay.message'),
+            message: t('resign_confirm_overlay.message', { context: playerGender(useAuthStore().loggedInPlayer) }),
             confirmLabel: t('resign_confirm_overlay.confirmLabel'),
             confirmClass: 'btn-danger',
             cancelLabel: t('resign_confirm_overlay.cancelLabel'),

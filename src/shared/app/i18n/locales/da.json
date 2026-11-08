@@ -375,6 +375,7 @@
     "tournament_subscribe": "Tilmeld",
     "tournament_checkin": "Tjek ind",
     "tournament_checkedin": "Indtjekket",
+    "tournament_checked_in_players": "Indtjekket",
     "no_player_checked_in_yet": "Ingen spillere har tjekket ind endnu.",
     "not_yet_checked_in": "Ikke tjekket ind endnu",
     "every_subscribers_checked_in": "Alle tilmeldte har tjekket ind.",

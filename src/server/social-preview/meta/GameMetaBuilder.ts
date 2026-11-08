@@ -1,3 +1,4 @@
+import { playerGender } from '../../../shared/app/playerPronouns.js';
 import { Service } from 'typedi';
 import type { Game, Player } from '../../../shared/app/models/index.js';
 import type { SportsEvent, WithContext } from 'schema-dts';
@@ -123,7 +124,7 @@ export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
         }
 
         const winner = players[game.winner];
-        const outcome = t(`social_preview.game.outcome_${game.outcome ?? 'path'}`, { winner: playerName(winner) });
+        const outcome = t(`social_preview.game.outcome_${game.outcome ?? 'path'}`, { winner: playerName(winner), context: playerGender(winner) });
         const movesCount = game.moves.filter(move => move !== 'pass').length;
 
         details.push(t('social_preview.game.n_moves', { count: movesCount }));
@@ -132,7 +133,7 @@ export default class GameMetaBuilder extends AbstractEntityMetaBuilder<Game>
             details.push(formatDate(game.endedAt, context));
         }
 
-        const title = joinTitle(tournamentMatchTitle, versus, t('social_preview.game.winner', { winner: playerName(winner) }), game.endedAt && formatIsoDate(game.endedAt));
+        const title = joinTitle(tournamentMatchTitle, versus, t('social_preview.game.winner', { winner: playerName(winner), context: playerGender(winner) }), game.endedAt && formatIsoDate(game.endedAt));
 
         const jsonLd: WithContext<SportsEvent> = {
             '@context': 'https://schema.org',

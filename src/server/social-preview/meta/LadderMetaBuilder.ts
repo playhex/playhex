@@ -1,3 +1,4 @@
+import { playerGender } from '../../../shared/app/playerPronouns.js';
 import { Service } from 'typedi';
 import type { LadderDto } from '../../../shared/app/models/LadderDto.js';
 import { withSiteName, type SocialMeta, type SocialMetaContext } from '../SocialMeta.js';
@@ -29,6 +30,7 @@ export default class LadderMetaBuilder extends AbstractEntityMetaBuilder<LadderD
 
         return [
             reign.player.publicId,
+            playerGender(reign.player),
             reign.defenses,
             `${count}${unit}`,
             ladderDto.standings.length,
@@ -45,11 +47,14 @@ export default class LadderMetaBuilder extends AbstractEntityMetaBuilder<LadderD
      */
     title(ladderDto: LadderDto, context: SocialMetaContext): string
     {
-        const kingOfTheHill = context.t('ladder.title');
+        const kingOfTheHill = context.t('ladder.title', { context: playerGender(ladderDto.currentReign?.player) });
+        const defaultTitle = context.t('ladder.title');
         const { name } = ladderDto.ladder;
 
-        return name.toLowerCase().includes(kingOfTheHill.toLowerCase())
-            ? name
+        const titleIndex = name.toLowerCase().indexOf(defaultTitle.toLowerCase());
+
+        return titleIndex >= 0
+            ? name.slice(0, titleIndex) + kingOfTheHill + name.slice(titleIndex + defaultTitle.length)
             : joinTitle(kingOfTheHill, name)
         ;
     }
@@ -61,7 +66,7 @@ export default class LadderMetaBuilder extends AbstractEntityMetaBuilder<LadderD
         const lines: string[] = [];
 
         if (reign) {
-            lines.push(t('social_preview.ladder.king', { player: playerName(reign.player) }));
+            lines.push(t('social_preview.ladder.king', { player: playerName(reign.player), context: playerGender(reign.player) }));
             lines.push(t('social_preview.ladder.reign', {
                 duration: formatLongDuration(now.getTime() - reign.startedAt.getTime(), t),
                 count: reign.defenses,
@@ -86,7 +91,7 @@ export default class LadderMetaBuilder extends AbstractEntityMetaBuilder<LadderD
             description: this.summaryLines(ladderDto, context).join(' · '),
             image: this.image(ladderDto, context, title),
             jsonLd: [breadcrumbJsonLd([
-                { name: t('ladder.title'), url: `${context.baseUrl}/king-of-the-hill` },
+                { name: t('ladder.title', { context: playerGender(ladderDto.currentReign?.player) }), url: `${context.baseUrl}/king-of-the-hill` },
                 { name: ladderDto.ladder.name, url },
             ])],
         };

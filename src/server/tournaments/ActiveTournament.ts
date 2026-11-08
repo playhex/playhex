@@ -1,3 +1,4 @@
+import { playerGender } from '../../shared/app/playerPronouns.js';
 import { TypedEmitter } from 'tiny-typed-emitter';
 import { areSamePlayers, deduplicatePlayers } from '../../shared/app/playerUtils.js';
 import { Player, Tournament, TournamentAdmin, TournamentMatch, TournamentParticipant, TournamentSubscription } from '../../shared/app/models/index.js';
@@ -147,6 +148,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
                 addTournamentHistory(this.tournament, 'player_subscribed', {
                     playerPublicId: player.publicId,
                     playerPseudo: pseudoString(player),
+                    context: playerGender(player),
                 }, now);
             }
         }
@@ -158,6 +160,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
             addTournamentHistory(this.tournament, 'player_checked_in', {
                 playerPublicId: player.publicId,
                 playerPseudo: pseudoString(player),
+                context: playerGender(player),
             }, now);
         }
 
@@ -192,6 +195,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         addTournamentHistory(this.tournament, 'player_unsubscribed', {
             playerPublicId: subscription.player.publicId,
             playerPseudo: pseudoString(subscription.player),
+            context: playerGender(subscription.player),
         });
 
         await this.save();
@@ -219,6 +223,7 @@ export class ActiveTournament extends TypedEmitter<TournamentEvents>
         addTournamentHistory(this.tournament, 'player_kicked', {
             playerPublicId: subscription.player.publicId,
             playerPseudo: pseudoString(subscription.player),
+            context: playerGender(subscription.player),
         });
 
         return subscription;

@@ -6,11 +6,11 @@ import { defaultLadderRulesConfig as config } from '../../../../shared/app/ladde
 import { timeControlToString } from '../../../../shared/app/timeControlUtils.js';
 import { IconCrown } from '../../icons.js';
 
-useHead({
-    title: () => `${t('ladder.rules')} · ${t('ladder.title')}`,
-});
+const { slug, ladderDto, leaderGender } = useLadderFromUrl();
 
-const { slug, ladderDto } = useLadderFromUrl();
+useHead({
+    title: () => `${t('ladder.rules')} · ${t('ladder.title', { context: leaderGender.value })}`,
+});
 
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
@@ -23,7 +23,7 @@ const minutes = (ms: number): number => Math.round(ms / MINUTE);
 
 <template>
     <div class="container my-3">
-        <p><router-link :to="{ name: 'ladder', params: { slug } }"><IconCrown class="text-warning" /> {{ $t('ladder.title') }}</router-link></p>
+        <p><router-link :to="{ name: 'ladder', params: { slug } }"><IconCrown class="text-warning" /> {{ $t('ladder.title', { context: leaderGender }) }}</router-link></p>
 
         <h1>King of the Hill: rules</h1>
 

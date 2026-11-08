@@ -299,7 +299,7 @@ for (const locale of getPlayerLocales()) {
                                         <template v-if="!game.softRemoved">
                                             <td :class="{ 'text-warning': isUncommonBoardsize(game) }">{{ game.boardsize }}×{{ game.boardsize }}</td>
                                             <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
-                                            <td class="small"><AppGameRulesSummary :gameOptions="game" /></td>
+                                            <td class="small"><AppGameRulesSummary :gameOptions="game" :host="game.host" /></td>
                                             <td class="text-body-secondary small">{{ formatDistanceToNowStrict(game.createdAt, { addSuffix: true }) }}</td>
                                         </template>
                                         <td v-else colspan="4"><small>{{ $t('lobby_game_no_longer_available') }}</small></td>

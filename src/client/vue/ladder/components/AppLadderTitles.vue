@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { PropType } from 'vue';
 import { LadderPlayer } from '../../../../shared/app/models/index.js';
 import { IconStairsUp, IconSword } from '../../icons.js';
@@ -16,6 +17,6 @@ defineProps({
         <IconSword /> {{ $t('ladder.title_name.giant_slayer') }}<template v-if="ladderPlayer.giantSlayerCount > 1"> ×{{ ladderPlayer.giantSlayerCount }}</template>
     </span>
     <span v-if="ladderPlayer.climberCount > 0" class="badge text-bg-success me-1" :title="$t('ladder.title_help.climber')">
-        <IconStairsUp /> {{ $t('ladder.title_name.climber') }}<template v-if="ladderPlayer.climberCount > 1"> ×{{ ladderPlayer.climberCount }}</template>
+        <IconStairsUp /> {{ $t('ladder.title_name.climber', { context: playerGender(ladderPlayer.player) }) }}<template v-if="ladderPlayer.climberCount > 1"> ×{{ ladderPlayer.climberCount }}</template>
     </span>
 </template>

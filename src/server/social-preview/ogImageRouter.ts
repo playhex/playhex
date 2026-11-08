@@ -1,3 +1,4 @@
+import { playerGender } from '../../shared/app/playerPronouns.js';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -462,7 +463,7 @@ const createResolvers = (): { [type: string]: OgImageResolver } => {
                         lines.push({ text: String(rating), size: 44, color: '#ffffff' });
                     }
 
-                    lines.push({ text: context.t(player.isBot ? 'social_preview.player.bot' : 'social_preview.player.on_playhex') });
+                    lines.push({ text: context.t(player.isBot ? 'social_preview.player.bot' : 'social_preview.player.on_playhex', { context: playerGender(player) }) });
                     lines.push(...playerMetaBuilder.statsLines(data, context).map(text => ({ text })));
 
                     return renderCardImageSvg({

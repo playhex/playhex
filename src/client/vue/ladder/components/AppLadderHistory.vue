@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
@@ -71,35 +72,36 @@ const eventText = (event: LadderEvent): string => {
     const player = pseudoString(event.player);
     const opponent = pseudoStringOptional(event.otherPlayer);
     const p = event.parameters;
+    const context = playerGender(event.player);
 
     switch (event.type) {
         case 'challenge_result': {
             if (p.result === 'challenger_won') {
                 return p.challengerPositionAfter !== null && p.challengerPositionAfter !== p.challengerPositionBefore
-                    ? t('ladder.event.challenge_won', { player, opponent, from: p.challengerPositionBefore, position: p.challengerPositionAfter })
-                    : t('ladder.event.challenge_won_no_move', { player, opponent })
+                    ? t('ladder.event.challenge_won', { player, context, opponent, from: p.challengerPositionBefore, position: p.challengerPositionAfter })
+                    : t('ladder.event.challenge_won_no_move', { player, context, opponent })
                 ;
             }
 
             if (p.result === 'defender_won') {
-                return t('ladder.event.challenge_defended', { player, opponent });
+                return t('ladder.event.challenge_defended', { player, opponent, context: playerGender(event.otherPlayer) });
             }
 
-            return t('ladder.event.challenge_voided', { player, opponent });
+            return t('ladder.event.challenge_voided', { player, context, opponent });
         }
 
-        case 'join': return t('ladder.event.join', { player, position: p.position });
-        case 'leave': return t('ladder.event.leave', { player, position: p.position });
-        case 'removed_inactive': return t('ladder.event.removed_inactive', { player, position: p.position });
+        case 'join': return t('ladder.event.join', { player, context, position: p.position });
+        case 'leave': return t('ladder.event.leave', { player, context, position: p.position });
+        case 'removed_inactive': return t('ladder.event.removed_inactive', { player, context, position: p.position });
         case 'removed_strikes': return p.beforeFirstGame
-            ? t('ladder.event.removed_strikes_before_first_game', { player, position: p.position })
-            : t('ladder.event.removed_strikes', { player, strikes: p.strikes, position: p.position });
-        case 'new_king': return t('ladder.event.new_king', { player });
-        case 'giant_slayer': return t('ladder.event.giant_slayer', { player, opponent });
-        case 'climber': return t('ladder.event.climber', { player, wins: p.wins });
-        case 'strike': return t('ladder.event.strike', { player, strikes: p.strikes });
-        case 'cheat': return t('ladder.event.cheat', { player, opponent });
-        case 'excluded': return t('ladder.event.excluded', { player, position: p.position });
+            ? t('ladder.event.removed_strikes_before_first_game', { player, context, position: p.position })
+            : t('ladder.event.removed_strikes', { player, context, strikes: p.strikes, position: p.position });
+        case 'new_king': return t('ladder.event.new_king', { player, context });
+        case 'giant_slayer': return t('ladder.event.giant_slayer', { player, context, opponent });
+        case 'climber': return t('ladder.event.climber', { player, context, wins: p.wins });
+        case 'strike': return t('ladder.event.strike', { player, context, strikes: p.strikes });
+        case 'cheat': return t('ladder.event.cheat', { player, context, opponent });
+        case 'excluded': return t('ladder.event.excluded', { player, context, position: p.position });
     }
 };
 </script>

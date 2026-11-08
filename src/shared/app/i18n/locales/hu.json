@@ -350,6 +350,7 @@
     "tournament_unsubscribe": "Már nem érdekel.",
     "tournament_checkin": "Bejelentkezés",
     "tournament_checkedin": "Bejelentkezve",
+    "tournament_checked_in_players": "Bejelentkezve",
     "no_player_checked_in_yet": "Még senki nem jelentkezett be.",
     "not_yet_checked_in": "Még nincs bejelentkezve",
     "every_subscribers_checked_in": "Minden érdeklődő bejelentkezett.",
