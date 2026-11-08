@@ -1923,7 +1923,7 @@
                 "description": "Créer et rejoindre des parties, jouer des coups, discuter, modifier vos paramètres… Jamais votre mot de passe."
             },
             "offline_access": {
-                "title": "Rester connectée",
+                "title": "Rester connecté(e)",
                 "description": "Garder l’accès même quand vous n’utilisez pas l’application."
             }
         },
