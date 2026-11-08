@@ -74,13 +74,14 @@ const isAIConfigAvailable = (aiConfig: AIConfig): boolean => {
 const hasUnavailableAIConfig = computed((): boolean => aiAvailability.value !== null
     && aiConfigs.value.some(aiConfig => !isAIConfigAvailable(aiConfig)));
 
-// Automatically select first (easiest) AI on load if none selected yet
+// Select the requested AI, or the first (easiest) AI when none was requested.
 const selectFirstAiConfig = () => {
     if (aiConfigs.value.length === 0 || selectedAiConfig.value !== null) {
         return;
     }
 
-    const firstAiConfig = aiConfigs.value[0];
+    const firstAiConfig = aiConfigs.value.find(aiConfig => aiConfig.player.publicId === gameOptions.opponentPublicId)
+        ?? aiConfigs.value[0];
     gameOptions.opponentPublicId = firstAiConfig.player.publicId;
     selectAiConfig(firstAiConfig);
 };

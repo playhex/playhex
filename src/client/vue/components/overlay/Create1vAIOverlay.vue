@@ -28,6 +28,7 @@ const props = defineProps({
 });
 
 const gameOptions = reactive(props.gameOptions);
+const presetOpponentPublicId = props.gameOptions.opponentPublicId;
 
 const { swapRuleDisabled, firstPlayerDisabled } = useHandicapOptions(gameOptions);
 
@@ -116,17 +117,20 @@ const toggleUnavailableNotice = (aiConfig: AIConfig): void => {
     unavailableNoticeFor.value = unavailableNoticeFor.value === publicId ? null : publicId;
 };
 
-// Automatically select first (easiest) available AI on load if none selected yet
+// Keep a requested opponent, including when its availability arrives after the AI list.
+// Otherwise, select the first (easiest) available AI.
 const selectFirstAiConfig = () => {
     if (aiConfigs.value.length === 0) {
         return;
     }
 
-    if (selectedAiConfig.value !== null && (aiAvailability.value === null || isAIConfigAvailable(selectedAiConfig.value))) {
+    if (selectedAiConfig.value !== null && (presetOpponentPublicId !== null || aiAvailability.value === null || isAIConfigAvailable(selectedAiConfig.value))) {
         return;
     }
 
-    const firstAiConfig = aiConfigs.value.find(isAIConfigAvailable) ?? aiConfigs.value[0];
+    const firstAiConfig = aiConfigs.value.find(aiConfig => aiConfig.player.publicId === presetOpponentPublicId)
+        ?? aiConfigs.value.find(isAIConfigAvailable)
+        ?? aiConfigs.value[0];
     gameOptions.opponentPublicId = firstAiConfig.player.publicId;
     selectAiConfig(firstAiConfig);
 };
@@ -155,7 +159,8 @@ const difficulties = computed(() => DIFFICULTY_PRESETS.flatMap(preset => {
 
 const { localSettings } = storeToRefs(usePlayerLocalSettingsStore());
 
-const simpleMode = computed((): boolean => !localSettings.value.showAllAis
+const simpleMode = computed((): boolean => presetOpponentPublicId === null
+    && !localSettings.value.showAllAis
     && (aiConfigs.value.length === 0 || difficulties.value.length === DIFFICULTY_PRESETS.length));
 
 const playAgainst = (aiConfig: AIConfig): void => {
