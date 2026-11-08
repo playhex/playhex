@@ -1,4 +1,7 @@
 {
+    "player_popover": {
+        "on_playhex_since": "On PlayHex for {{duration}}"
+    },
     "lobby_title": "Play Hex online",
     "lobby": {
         "no_waiting_games": "No games available right now. Create a new one!",

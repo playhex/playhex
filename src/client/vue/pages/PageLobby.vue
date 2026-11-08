@@ -177,7 +177,7 @@ for (const locale of getPlayerLocales()) {
                                     </div>
 
                                     <span class="fw-semibold small text-truncate text-body">
-                                        <AppPseudo v-if="myGame.game.host" :player="myGame.game.host" rating onlineStatus />
+                                        <AppPseudo v-if="myGame.game.host" :interactive="false" :player="myGame.game.host" rating onlineStatus />
                                     </span>
 
                                     <div class="btn-group btn-group-sm">
@@ -206,7 +206,7 @@ for (const locale of getPlayerLocales()) {
                                     <div class="d-flex align-items-center gap-1 w-100 justify-content-between">
                                         <span class="small text-body-secondary">vs</span>
                                         <span class="fw-semibold small text-truncate text-body text-right">
-                                            <AppPseudo v-if="myGame.game" :player="getOpponent(myGame.game)!" rating onlineStatus />
+                                            <AppPseudo v-if="myGame.game" :interactive="false" :player="getOpponent(myGame.game)!" rating onlineStatus />
                                         </span>
                                     </div>
 

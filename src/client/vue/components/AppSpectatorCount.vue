@@ -12,7 +12,7 @@ const popupOpen = ref(false);
 const el = ref<HTMLElement>();
 
 const togglePopup = () => { popupOpen.value = !popupOpen.value; };
-onClickOutside(el, () => { popupOpen.value = false; });
+onClickOutside(el, () => { popupOpen.value = false; }, { ignore: ['.player-popover'] });
 
 watch(spectators, spectator => {
     if (spectator.length === 0) {

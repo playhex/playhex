@@ -35,7 +35,7 @@ watch(gameView, async () => {
             <div v-if="game" class="mb-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="player-col text-start">
-                        <AppPseudo v-if="game.gameToPlayers[0]" :player="game.gameToPlayers[0].player" flag classes="fw-bold small text-danger" />
+                        <AppPseudo v-if="game.gameToPlayers[0]" :interactive="false" :player="game.gameToPlayers[0].player" flag classes="fw-bold small text-danger" />
                     </div>
                     <small v-if="game.state !== 'playing'">
                         Just ended
@@ -44,7 +44,7 @@ watch(gameView, async () => {
                         <IconCircleFill class="live-dot" /> LIVE
                     </span>
                     <div class="player-col text-end">
-                        <AppPseudo v-if="game.gameToPlayers[1]" :player="game.gameToPlayers[1].player" flag classes="fw-bold small text-primary" />
+                        <AppPseudo v-if="game.gameToPlayers[1]" :interactive="false" :player="game.gameToPlayers[1].player" flag classes="fw-bold small text-primary" />
                     </div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mt-1">

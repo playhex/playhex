@@ -48,6 +48,7 @@ const { playerSettings } = storeToRefs(playerSettingsStore);
  * Open/close menu
  */
 const showMenu = ref(false);
+const accountPopoverOpen = ref(false);
 const menuElement = ref<HTMLElement>();
 
 /**
@@ -83,6 +84,10 @@ const hover = (show: boolean): void => {
         return;
     }
 
+    if (accountPopoverOpen.value) {
+        return;
+    }
+
     closeTimeout = setTimeout(() => showMenu.value = false, CLOSE_ON_LEAVE_DELAY);
 };
 
@@ -90,16 +95,22 @@ onUnmounted(() => cancelClose());
 
 const closeMenu = (): void => {
     cancelClose();
+    accountPopoverOpen.value = false;
     showMenu.value = false;
 };
 
 const toggleMenu = (): void => {
     cancelClose();
+    accountPopoverOpen.value = false;
     showMenu.value = !showMenu.value;
 };
 
-onClickOutside(menuElement, () => closeMenu());
-onKeyStroke('Escape', () => closeMenu());
+onClickOutside(menuElement, () => closeMenu(), { ignore: ['.player-popover'] });
+onKeyStroke('Escape', () => {
+    if (!accountPopoverOpen.value) {
+        closeMenu();
+    }
+});
 
 // Close menu when navigating to another page
 watch(router.currentRoute, () => closeMenu());
@@ -218,7 +229,7 @@ const clickLogout = async (): Promise<void> => {
                                 is="strong"
                                 flag
                                 rating
-                                @click="closeMenu()"
+                                @update:popoverOpen="accountPopoverOpen = $event"
                             />
 
                             <router-link

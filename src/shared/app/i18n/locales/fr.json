@@ -1,4 +1,7 @@
 {
+    "player_popover": {
+        "on_playhex_since": "Sur PlayHex depuis {{duration}}"
+    },
     "lobby_title": "Jouer au Hex en ligne",
     "lobby": {
         "no_waiting_games": "Pas de partie en attente pour l'instant. Créez-en une !",
