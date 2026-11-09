@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
-import { IconPerson, IconPersonUp, IconBoxArrowRight, IconGear, IconTrophyFill, IconX, IconFlag } from '../../icons.js';
+import { IconPerson, IconPersonUp, IconTrophyFill, IconX, IconFlag } from '../../icons.js';
 import { Game, GameOptions, Player, PlayerHeadToHeadStats, PlayerLittleGolemAccount, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
 import { getPlayerBySlug, apiGetPlayerFormerPseudo, apiGetPlayerStats, apiGetHeadToHeadStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames, getExternalGames, apiGetPlayerLittleGolemAccount } from '../../../apiClient.js';
 import { useCreateGameOverlay } from '../../composables/useCreateGameOverlay.js';
@@ -238,18 +238,6 @@ const { loading: gamesLoading } = useSerialRequest(searchGamesParameters, async 
     gamesHistory.value = results;
     totalResults.value = count;
 });
-
-const clickLogout = async () => {
-    gamesHistory.value = [];
-    const newPlayer = await useAuthStore().logout();
-
-    void router.push({
-        name: 'player',
-        params: {
-            slug: newPlayer.slug,
-        },
-    });
-};
 
 /*
  * Player stats
@@ -556,31 +544,16 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
                     : '…' })
                 }}</p>
 
-                <div v-if="player && isMe(player)" class="player-btns mt-3">
-                    <template v-if="player.isGuest">
-                        <router-link
-                            :to="{ name: 'signup' }"
-                            class="btn btn-success"
-                        ><IconPersonUp /> {{ $t('create_account') }}</router-link>
-
-                        <router-link
-                            :to="{ name: 'login' }"
-                            class="btn btn-primary"
-                        >{{ $t('log_in') }}</router-link>
-                    </template>
-
-                    <template v-else>
-                        <button
-                            type="button"
-                            class="btn btn-sm btn-outline-warning"
-                            @click="clickLogout()"
-                        >{{ $t('log_out') }} <IconBoxArrowRight /></button>
-                    </template>
+                <div v-if="player && isMe(player) && player.isGuest" class="player-btns mt-3">
+                    <router-link
+                        :to="{ name: 'signup' }"
+                        class="btn btn-success"
+                    ><IconPersonUp /> {{ $t('create_account') }}</router-link>
 
                     <router-link
-                        :to="{ name: 'settings' }"
-                        class="btn btn-sm btn-outline-primary"
-                    ><IconGear /> {{ $t('player_settings.title') }}</router-link>
+                        :to="{ name: 'login' }"
+                        class="btn btn-primary"
+                    >{{ $t('log_in') }}</router-link>
                 </div>
 
             </div>

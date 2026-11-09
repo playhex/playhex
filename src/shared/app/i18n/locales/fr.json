@@ -448,7 +448,7 @@
         "cancel_tournament_confirm_female": "Êtes-vous sûre de vouloir annuler ce tournoi ? Cette action est irréversible.",
         "tournament_canceled": "Le tournoi {{ slug }} a été annulé."
     },
-    "account_created_on": "Compte créé le {{date}}",
+    "account_created_on": "Sur PlayHex depuis le {{date}}",
     "board_orientation": {
         "title": "Orientation",
         "flat": "Plat",

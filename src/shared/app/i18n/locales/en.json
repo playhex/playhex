@@ -218,7 +218,7 @@
     "show_coords_by_default": "Show coordinates by default",
     "username": "Username",
     "password": "Password",
-    "account_created_on": "Account created on {{date}}",
+    "account_created_on": "On PlayHex since {{date}}",
     "player_current_games": "Current games",
     "player_game_history": "Game history",
     "waiting": "waiting…",
