@@ -3,7 +3,7 @@ import { Game, Player, Rating } from './models/index.js';
 import { TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
 
 export const RANKED_BOARDSIZE_MIN = 11;
-export const RANKED_BOARDSIZE_MAX = 19;
+export const RANKED_BOARDSIZE_MAX = 23;
 
 export type BoardsizeCategory = 'small' | 'medium' | 'large';
 
