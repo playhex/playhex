@@ -8,6 +8,7 @@ import { Service } from 'typedi';
 import { Expose } from '../../../../shared/app/class-transformer-custom.js';
 import { TranslatableHttpError } from '../../../../shared/app/TranslatableHttpError.js';
 import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
+import GamesStatsParameters from '../../../../shared/app/GamesStatsParameters.js';
 import { IsBoolean } from 'class-validator';
 import GameRepository from '../../../repositories/GameRepository.js';
 import type { HexMove } from '@playhex/move-notation';
@@ -58,9 +59,10 @@ export default class GameController
 
     @Get('/api/games-stats')
     async getStatsAll(
-        @QueryParams() searchParams: SearchGamesParameters,
+        @QueryParams() statsParams: GamesStatsParameters,
     ) {
-        const results = await this.gameRepository.searchStatsByDay(searchParams);
+        const { groupBy, ...searchParams } = statsParams;
+        const results = await this.gameRepository.searchStats(searchParams, groupBy);
 
         return results;
     }

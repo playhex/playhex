@@ -2257,5 +2257,13 @@
     "n_games_found_many": "{{count}} parties trouvées.",
     "n_games_found_other": "{{count}} parties trouvées.",
     "show_all_filters": "Tous les filtres",
-    "hide_filters": "Moins de filtres"
+    "hide_filters": "Moins de filtres",
+    "week_of": "Semaine du {{date}}",
+    "chart_grouping": {
+        "label": "Grouper par",
+        "auto": "Auto",
+        "day": "Jour",
+        "week": "Semaine",
+        "month": "Mois"
+    }
 }

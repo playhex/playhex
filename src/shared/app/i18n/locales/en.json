@@ -2188,5 +2188,13 @@
     "n_games_found_one": "{{count}} game found.",
     "n_games_found_other": "{{count}} games found.",
     "show_all_filters": "All filters",
-    "hide_filters": "Fewer filters"
+    "hide_filters": "Fewer filters",
+    "week_of": "Week of {{date}}",
+    "chart_grouping": {
+        "label": "Group by",
+        "auto": "Auto",
+        "day": "Day",
+        "week": "Week",
+        "month": "Month"
+    }
 }

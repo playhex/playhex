@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { formatEndedAt } from '../../services/formatEndedAt.js';
 import { computed, ref } from 'vue';
+import { t } from 'i18next';
+import { intlFormat } from 'date-fns';
+import { autoLocale } from '../../../shared/app/i18n/index.js';
 import { useSeoMeta } from '@unhead/vue';
 import { Chart, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ChartData, ChartOptions, TimeScale, Colors } from 'chart.js';
 import { Bar } from 'vue-chartjs';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import '../../services/chartJsDateFnsAdapter.js';
 import SearchGamesParameters, { createDefaultSearchGamesParameters } from '../../../shared/app/SearchGamesParameters.js';
+import { statsGroupings, StatsGrouping } from '../../../shared/app/GamesStatsParameters.js';
 import { Game } from '../../../shared/app/models/index.js';
 import AppSearchGamesParameters from '../components/AppSearchGamesParameters.vue';
 import { getGames, getGamesStats } from '../../apiClient.js';
@@ -72,9 +76,47 @@ const statsSearchParameters = computed(() => {
     return filters;
 });
 
-useSerialRequest(() => JSON.stringify(statsSearchParameters.value), async () => {
-    const gamesStats = await getGamesStats(statsSearchParameters.value);
+const chartGroupingChoices = ['auto', ...statsGroupings] as const;
+type ChartGroupingChoice = typeof chartGroupingChoices[number];
 
+const chartGroupingChoice = ref<ChartGroupingChoice>('auto');
+
+const SIX_MONTHS_MS = 183 * 86400 * 1000;
+
+/**
+ * Auto: by week when showing more than 6 months, else by day.
+ * No start date means all history, so by week.
+ */
+const chartGrouping = computed((): StatsGrouping => {
+    if (chartGroupingChoice.value !== 'auto') {
+        return chartGroupingChoice.value;
+    }
+
+    const { fromEndedAt, toEndedAt } = statsSearchParameters.value;
+
+    if (undefined === fromEndedAt) {
+        return 'week';
+    }
+
+    const to = toEndedAt ?? new Date();
+
+    return to.getTime() - fromEndedAt.getTime() > SIX_MONTHS_MS
+        ? 'week'
+        : 'day'
+    ;
+});
+
+/**
+ * Grouping of currently displayed data, updated with data,
+ * so that chart unit always matches data.
+ */
+const displayedChartGrouping = ref<StatsGrouping>('week');
+
+useSerialRequest(() => JSON.stringify([statsSearchParameters.value, chartGrouping.value]), async () => {
+    const groupBy = chartGrouping.value;
+    const gamesStats = await getGamesStats({ ...statsSearchParameters.value, groupBy });
+
+    displayedChartGrouping.value = groupBy;
     gamesChartData.value = {
         datasets: [
             {
@@ -97,18 +139,39 @@ const timeRangeReset = () => {
     searchGamesParameters.value.toEndedAt = undefined;
 };
 
-const gamesChartOptions: ChartOptions<'bar'> = {
+const formatPeriod = (date: Date, grouping: StatsGrouping): string => {
+    switch (grouping) {
+        case 'day':
+            return intlFormat(date, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }, { locale: autoLocale() });
+
+        case 'week':
+            return t('week_of', {
+                date: intlFormat(date, { day: 'numeric', month: 'short', year: 'numeric' }, { locale: autoLocale() }),
+            });
+
+        case 'month':
+            return intlFormat(date, { month: 'long', year: 'numeric' }, { locale: autoLocale() });
+    }
+};
+
+const gamesChartOptions = computed((): ChartOptions<'bar'> => ({
     scales: {
         x: {
             type: 'time',
             time: {
-                minUnit: 'day',
+                minUnit: displayedChartGrouping.value,
+                isoWeekday: true,
             },
         },
     },
     plugins: {
         legend: {
             display: false,
+        },
+        tooltip: {
+            callbacks: {
+                title: items => formatPeriod((items[0].raw as { x: Date }).x, displayedChartGrouping.value),
+            },
         },
         zoom: {
             zoom: {
@@ -137,7 +200,7 @@ const gamesChartOptions: ChartOptions<'bar'> = {
         duration: 200,
     },
     maintainAspectRatio: false,
-};
+}));
 
 const chartBackgroundPlugin = {
     id: 'chartBackground',
@@ -158,6 +221,22 @@ const chartBackgroundPlugin = {
         <div class="archive-layout">
             <div class="archive-header pt-3">
                 <h1 class="h2 mb-3">Games archive</h1>
+
+                <div class="d-flex justify-content-end mb-1">
+                    <div class="btn-group btn-group-sm" role="group" :aria-label="$t('chart_grouping.label')">
+                        <template v-for="choice in chartGroupingChoices" :key="choice">
+                            <input
+                                type="radio"
+                                class="btn-check"
+                                name="chart-grouping"
+                                :id="`chart-grouping-${choice}`"
+                                :value="choice"
+                                v-model="chartGroupingChoice"
+                            >
+                            <label class="btn btn-outline-secondary" :for="`chart-grouping-${choice}`">{{ $t(`chart_grouping.${choice}`) }}</label>
+                        </template>
+                    </div>
+                </div>
 
                 <div class="chart-container">
                     <Bar

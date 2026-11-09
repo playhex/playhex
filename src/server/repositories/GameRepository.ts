@@ -3,6 +3,7 @@ import { Inject, Service } from 'typedi';
 import logger from '../services/logger.js';
 import { Brackets, FindManyOptions, FindOptionsOrder, FindOptionsRelations, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
 import SearchGamesParameters, { gameTypes, searchableOutcomes } from '../../shared/app/SearchGamesParameters.js';
+import type { StatsGrouping } from '../../shared/app/GamesStatsParameters.js';
 import type { AnalyzeGameRequest } from '../ai-jobs/gameAnalyze.js';
 
 /**
@@ -413,17 +414,37 @@ export default class GameRepository
         }
     }
 
-    async searchStatsByDay(params: SearchGamesParameters): Promise<{ date: string, totalGames: number }[]>
+    /**
+     * Number of ended games per day, week or month.
+     * Returned date is the first day of the period, weeks starting on monday.
+     */
+    async searchStats(params: SearchGamesParameters, groupBy: StatsGrouping = 'day'): Promise<{ date: string, totalGames: number }[]>
     {
         const queryBuilder = this.queryBuilderSearchMinimal(params, false);
+        const isPostgres = this.gameRepository.manager.connection.options.type === 'postgres';
+
+        const periodStartExpressions: { [key in StatsGrouping]: string } = isPostgres
+            ? {
+                day: 'date(game.endedAt)',
+                week: 'date(date_trunc(\'week\', game.endedAt))',
+                month: 'date(date_trunc(\'month\', game.endedAt))',
+            }
+            : {
+                day: 'date(game.endedAt)',
+                week: 'date(game.endedAt) - interval weekday(game.endedAt) day',
+                month: 'date(game.endedAt) - interval (dayofmonth(game.endedAt) - 1) day',
+            }
+        ;
+
+        const periodStart = periodStartExpressions[groupBy];
 
         // we search stats only on ended games, so endedAt should not be null
         queryBuilder
-            .select('date(game.endedAt)', 'date')
-            .addSelect('count(*) as totalGames')
+            .select(periodStart, 'date')
+            .addSelect('count(*)', 'totalGames')
             .andWhere('game.endedAt is not null')
-            .groupBy('date(game.endedAt)')
-            .orderBy('date(game.endedAt)', 'ASC')
+            .groupBy(periodStart)
+            .orderBy(periodStart, 'ASC')
         ;
 
         const results: { date: string, totalGames: string }[] = await queryBuilder.getRawMany();

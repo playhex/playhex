@@ -8,6 +8,7 @@ import { isTranslatableHttpErrorPayload } from '../shared/app/TranslatableHttpEr
 import { instanceToPlain, plainToInstance } from '../shared/app/class-transformer-custom.js';
 import { RatingCategory } from '../shared/app/ratingUtils.js';
 import SearchGamesParameters from '../shared/app/SearchGamesParameters.js';
+import type GamesStatsParameters from '../shared/app/GamesStatsParameters.js';
 import { parse } from 'content-range';
 import SearchPlayersParameters from '../shared/app/SearchPlayersParameters.js';
 import type SearchExternalGamesParameters from '../shared/app/SearchExternalGamesParameters.js';
@@ -454,8 +455,8 @@ export const apiGetMyLastImport = async (): Promise<null | ExternalGameImportJob
     return plainToInstance(ExternalGameImportJob, await response.json());
 };
 
-export const getGamesStats = async (searchGamesParameters: SearchGamesParameters = {}): Promise<{ date: Date, totalGames: number }[]> => {
-    const response = await fetch(`/api/games-stats?${qs.stringify(searchGamesParameters)}`, {
+export const getGamesStats = async (gamesStatsParameters: GamesStatsParameters = {}): Promise<{ date: Date, totalGames: number }[]> => {
+    const response = await fetch(`/api/games-stats?${qs.stringify(gamesStatsParameters)}`, {
         method: 'get',
         headers: {
             'Accept': 'application/json',
