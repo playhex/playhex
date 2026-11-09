@@ -103,8 +103,8 @@ Cypress.Commands.add('createAIGameWithRandom', (submit = true, wait = false) => 
         .contains('h5', 'Play vs AI')
         .closest('.modal-content')
         .then($modal => {
-            if ($modal.text().includes('Unlock stronger AIs')) {
-                cy.wrap($modal).contains('Unlock stronger AIs').click();
+            if ($modal.text().includes('Show more AI options')) {
+                cy.wrap($modal).contains('Show more AI options').click();
             }
         })
     ;

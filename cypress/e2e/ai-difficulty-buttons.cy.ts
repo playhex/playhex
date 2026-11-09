@@ -39,7 +39,7 @@ describe('Play vs AI difficulty buttons', () => {
         modal().contains('Boardsize').should('not.exist');
         modal().find('button[type=submit]').should('not.exist');
 
-        modal().contains('button', 'Unlock stronger AIs').should('have.class', 'btn-link').click();
+        modal().contains('button', 'Show more AI options').should('have.class', 'btn-link').click();
 
         modal().contains('button', 'Easy').should('not.exist');
         modal().contains('Davies 9');
@@ -62,7 +62,7 @@ describe('Play vs AI difficulty buttons', () => {
         modal().contains('button', 'Hard').contains('small', 'Not available right now');
         cy.contains('h5', 'Play vs AI');
 
-        modal().contains('button', 'Unlock stronger AIs').click();
+        modal().contains('button', 'Show more AI options').click();
         modal().contains('.form-check', 'Davies 9').find('button').click();
         modal().contains('.form-check', 'Davies 9').contains('small', 'Not available right now');
     });
@@ -72,13 +72,13 @@ describe('Play vs AI difficulty buttons', () => {
 
         modal().contains('button', 'Easy').find('svg');
         modal().contains('button', 'Medium').find('svg').should('not.exist');
-        modal().contains('button', 'Unlock stronger AIs').should('have.class', 'btn-link');
+        modal().contains('button', 'Show more AI options').should('have.class', 'btn-link');
     });
 
     it('turns unlock text to a button when all difficulties are beaten', () => {
         openOverlay([1, 4, 7], [1, 4, 7]);
 
-        modal().contains('button', 'Unlock stronger AIs').should('have.class', 'btn-primary');
+        modal().contains('button', 'Show more AI options').should('have.class', 'btn-primary');
     });
 
     it('creates the game on click, without remembering default time control', () => {
@@ -103,7 +103,7 @@ describe('Play vs AI difficulty buttons', () => {
 
         cy.intercept('POST', '/api/games', { statusCode: 500 }).as('postGame');
 
-        modal().contains('button', 'Unlock stronger AIs').click();
+        modal().contains('button', 'Show more AI options').click();
         modal().contains('More options').click();
         modal().contains('Long 10 + 20').click();
         modal().find('button[type=submit]').click();

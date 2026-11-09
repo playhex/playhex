@@ -558,7 +558,7 @@
         "medium": "Moyen",
         "hard": "Difficile",
         "beaten": "Déjà battue",
-        "unlock_stronger_ais": "Débloquer des IA plus fortes et plus d'options"
+        "unlock_stronger_ais": "Afficher plus d'options pour les IA"
     },
     "1vAI_offline": {
         "title": "IA hors-ligne",
