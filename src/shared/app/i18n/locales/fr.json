@@ -170,8 +170,6 @@
         "load_error": "Impossible de charger les séries de tournois",
         "next": "Prochain :",
         "last_winner": "Dernier(ère) gagnant(e) :",
-        "last_winner_male": "Dernier gagnant :",
-        "last_winner_female": "Dernière gagnante :",
         "see_all": "Voir toutes les séries"
     },
     "tournament_series_page": {
@@ -227,8 +225,6 @@
         "delete": "Supprimer la série",
         "delete_help": "Supprimer définitivement cette série. Possible uniquement si elle ne contient aucun tournoi.",
         "delete_confirm": "Êtes-vous sûr(e) de vouloir supprimer cette série de tournois ?",
-        "delete_confirm_male": "Êtes-vous sûr de vouloir supprimer cette série de tournois ?",
-        "delete_confirm_female": "Êtes-vous sûre de vouloir supprimer cette série de tournois ?",
         "deleted": "Série de tournois supprimée."
     },
     "tournament_series_auto_create": {
@@ -299,8 +295,6 @@
     "n_matches_played_other": "{{ count }} matchs joués",
     "tournament_subscription": {
         "subscribed": "Vous êtes intéressé(e)",
-        "subscribed_male": "Vous êtes intéressé",
-        "subscribed_female": "Vous êtes intéressée",
         "checked_in": "Votre participation est confirmée !",
         "must_check_in": "Vous devez vous enregistrer !",
         "can_subscribe": "L'enregistrement n'est pas encore ouvert, mais les joueurs intéressés peuvent s'abonner pour être avertis quand ce sera le cas.",
@@ -315,15 +309,9 @@
     "tournament_organized_by": "Organisé par { player }",
     "checkin_opens_time_before": "L'enregistrement ouvre {{ time }} avant.",
     "tournament_subscribe": "Je suis intéressé(e) !",
-    "tournament_subscribe_male": "Je suis intéressé !",
-    "tournament_subscribe_female": "Je suis intéressée !",
     "tournament_unsubscribe": "Je ne suis plus intéressé(e).",
-    "tournament_unsubscribe_male": "Je ne suis plus intéressé.",
-    "tournament_unsubscribe_female": "Je ne suis plus intéressée.",
     "tournament_checkin": "Enregistrement",
     "tournament_checkedin": "Enregistré(e)",
-    "tournament_checkedin_male": "Enregistré",
-    "tournament_checkedin_female": "Enregistrée",
     "tournament_checked_in_players": "Personnes enregistrées",
     "no_player_checked_in_yet": "Aucun joueur encore enregistré.",
     "not_yet_checked_in": "Pas encore enregistré(e)",
@@ -388,20 +376,10 @@
         "created": "{{organizerPseudo}} a créé le tournoi",
         "edited": "L’organisateur a modifié « {{ field }} » du tournoi : nouvelle valeur « {{ value }} ». (Ancienne valeur : « {{ oldValue }} »)",
         "player_subscribed": "{{ playerPseudo }} est intéressé(e)",
-        "player_subscribed_male": "{{ playerPseudo }} est intéressé",
-        "player_subscribed_female": "{{ playerPseudo }} est intéressée",
         "player_unsubscribed": "{{ playerPseudo }} n'est plus intéressé(e)",
-        "player_unsubscribed_male": "{{ playerPseudo }} n'est plus intéressé",
-        "player_unsubscribed_female": "{{ playerPseudo }} n'est plus intéressée",
         "player_kicked": "{{ playerPseudo }} a été exclu(e)",
-        "player_kicked_male": "{{ playerPseudo }} a été exclu",
-        "player_kicked_female": "{{ playerPseudo }} a été exclue",
         "player_checked_in": "{{ playerPseudo }} s’est enregistré(e)",
-        "player_checked_in_male": "{{ playerPseudo }} s’est enregistré",
-        "player_checked_in_female": "{{ playerPseudo }} s’est enregistrée",
         "player_banned": "{{ playerPseudo }} a été banni(e) de ce tournoi",
-        "player_banned_male": "{{ playerPseudo }} a été banni de ce tournoi",
-        "player_banned_female": "{{ playerPseudo }} a été bannie de ce tournoi",
         "started": "Le tournoi a commencé !",
         "match_ended": "Match {{ round }}.{{ number }} terminé : {{ winnerPseudo }} a battu {{ loserPseudo }}.",
         "match_canceled_recreated": "Le match {{ round }}.{{ number }} a été recréé suite à une annulation.",
@@ -409,8 +387,6 @@
         "changed_admins": "L'organisateur a désigné les admins : {{ newAdmins }}"
     },
     "tournament_player_is_banned": "Banni(e) de ce tournoi",
-    "tournament_player_is_banned_male": "Banni de ce tournoi",
-    "tournament_player_is_banned_female": "Bannie de ce tournoi",
     "tournament_account_required": "Ce tournoi nécessite un compte, les invités ne sont pas autorisés. Veuillez vous connecter ou créer un compte.",
     "tournament_not_enough_participants_to_start": "Impossible de démarrer le tournoi. Il n'y a pas assez de participants enregistrés pour ce format.",
     "manage_tournament_page": {
@@ -439,15 +415,11 @@
         "start_now": "Démarrer le tournoi maintenant",
         "start_now_help": "Démarre le tournoi immédiatement, sans attendre la date de début prévue. Les joueurs enregistrés sont placés et les premières parties sont créées.",
         "start_now_confirm": "Êtes-vous sûr(e) de vouloir démarrer ce tournoi maintenant ?",
-        "start_now_confirm_male": "Êtes-vous sûr de vouloir démarrer ce tournoi maintenant ?",
-        "start_now_confirm_female": "Êtes-vous sûre de vouloir démarrer ce tournoi maintenant ?",
         "progress_now": "Faire progresser maintenant",
         "progress_now_help": "Si le tournoi semble bloqué (les parties suivantes ne démarrent pas), ce bouton devrait le débloquer en vérifiant l'état complet du tournoi.",
         "cancel_tournament": "Annuler le tournoi",
         "cancel_tournament_help": "Annule le tournoi. Il n'apparaîtra plus dans la liste des tournois. Si le tournoi avait démarré, les parties en cours seront annulées.",
         "cancel_tournament_confirm": "Êtes-vous sûr(e) de vouloir annuler ce tournoi ? Cette action est irréversible.",
-        "cancel_tournament_confirm_male": "Êtes-vous sûr de vouloir annuler ce tournoi ? Cette action est irréversible.",
-        "cancel_tournament_confirm_female": "Êtes-vous sûre de vouloir annuler ce tournoi ? Cette action est irréversible.",
         "tournament_canceled": "Le tournoi {{ slug }} a été annulé."
     },
     "account_created_on": "Sur PlayHex depuis le {{date}}",
@@ -498,8 +470,6 @@
     "game_rules": {
         "normal": "standard",
         "host_plays_first": "hôte joue 1er(ère)",
-        "host_plays_first_male": "hôte joue 1er",
-        "host_plays_first_female": "hôte joue 1ère",
         "host_plays_second": "hôte joue 2e",
         "no_swap": "pas d'échange",
         "handicap_for_host": "handicap {{n}} pour l'hôte",
@@ -537,9 +507,7 @@
         "path": "{player} perd.",
         "time": "{player} n'a plus de temps.",
         "resign": "{player} abandonne.",
-        "forfeit": "{player} est déclaré(e) forfait.",
-        "forfeit_male": "{player} est déclaré forfait.",
-        "forfeit_female": "{player} est déclarée forfait."
+        "forfeit": "{player} est déclaré(e) forfait."
     },
     "1v1_ranked": {
         "title": "Classée",
@@ -709,8 +677,10 @@
         "decrease": "Diminuer le handicap",
         "setup": {
             "no_swap_one": "Swap désactivé : {{player}} place 1 pierre.",
+            "no_swap_many": "",
             "no_swap_other": "Swap désactivé : {{player}} place {{count}} pierres.",
             "no_swap_you_one": "Swap désactivé : placez 1 pierre.",
+            "no_swap_you_many": "",
             "no_swap_you_other": "Swap désactivé : placez {{count}} pierres.",
             "first_stone_then": "{{player}} place une pierre swappable, puis {{count}} de plus, ou {{swappedCount}} si elle est swappée.",
             "first_stone_then_you": "Placez une pierre swappable, puis {{count}} de plus, ou {{swappedCount}} si elle est swappée.",
@@ -723,8 +693,10 @@
             "stones_after_swap": "Pierre swappée : {{player}} place {{count}} pierres.",
             "stones_after_swap_you": "Pierre swappée : placez {{count}} pierres.",
             "stones_one": "{{player}} place encore 1 pierre.",
+            "stones_many": "",
             "stones_other": "{{player}} place encore {{count}} pierres.",
             "stones_you_one": "Placez encore 1 pierre.",
+            "stones_you_many": "",
             "stones_you_other": "Placez encore {{count}} pierres.",
             "refuse_swap": "Ne pas swapper"
         }
@@ -735,8 +707,6 @@
     "resign_confirm_overlay": {
         "title": "Abandonner la partie",
         "message": "Êtes-vous sûr(e) de vouloir abandonner la partie ?",
-        "message_male": "Êtes-vous sûr de vouloir abandonner la partie ?",
-        "message_female": "Êtes-vous sûre de vouloir abandonner la partie ?",
         "confirmLabel": "Oui, j'abandonne",
         "cancelLabel": "Non, continuer à jouer"
     },
@@ -830,8 +800,6 @@
         "title": "Je joue",
         "random": "Aléatoire",
         "first": "Premier(ère)",
-        "first_male": "Premier",
-        "first_female": "Première",
         "second": "Deuxième"
     },
     "swap_rule": "Règle d'échange",
@@ -844,9 +812,7 @@
     "host_waiting_typical_join_time": "En général, une partie est rejointe en ~{{duration}} à cette heure.",
     "confirm_overlay": {
         "confirmation": "Confirmation",
-        "are_you_sure?": "Êtes-vous sûr(e) ?",
-        "are_you_sure?_male": "Êtes-vous sûr ?",
-        "are_you_sure?_female": "Êtes-vous sûre ?"
+        "are_you_sure?": "Êtes-vous sûr(e) ?"
     },
     "hex_tournament_paris": {
         "title": "Tournoi de Hex à Paris",
@@ -899,8 +865,6 @@
     "pass_confirm_overlay": {
         "title": "Passer mon tour ?",
         "message": "Vous êtes sur le point de passer votre tour. Êtes-vous sûr(e) ?",
-        "message_male": "Vous êtes sur le point de passer votre tour. Êtes-vous sûr ?",
-        "message_female": "Vous êtes sur le point de passer votre tour. Êtes-vous sûre ?",
         "confirmLabel": "Oui, passer",
         "cancelLabel": "Oups non, je vais jouer"
     },
@@ -928,11 +892,7 @@
         "enable": "Activer les notifications",
         "later": "Ignorer",
         "you_will_be_notified": "Vous serez notifié(e) :",
-        "you_will_be_notified_male": "Vous serez notifié :",
-        "you_will_be_notified_female": "Vous serez notifiée :",
         "also_notified_for": "Vous serez aussi notifié(e) :",
-        "also_notified_for_male": "Vous serez aussi notifié :",
-        "also_notified_for_female": "Vous serez aussi notifiée :",
         "notifications": {
             "tournament_checkin_opens": "Quand les inscriptions au tournoi ouvrent",
             "correspondence_your_turn": "Quand c'est votre tour dans une partie par correspondance",
@@ -1059,8 +1019,6 @@
         "bridge_edge_diagram": "Un pont marche aussi avec le bord : cette pierre est connectée au bord par les deux cases vertes.",
         "bridge_how_to_defend": "Si votre adversaire joue dans l'une des deux cases, <strong>jouez l'autre</strong> : vos pierres restent connectées. Votre adversaire ne peut jamais couper un pont, sauf si vous oubliez de répondre !",
         "bridge_why_useful": "Un pont va plus loin que des pierres côte à côte : vous avancez plus vite tout en restant connecté(e).",
-        "bridge_why_useful_male": "Un pont va plus loin que des pierres côte à côte : vous avancez plus vite tout en restant connecté.",
-        "bridge_why_useful_female": "Un pont va plus loin que des pierres côte à côte : vous avancez plus vite tout en restant connectée.",
         "ziggurat_intro": "Après le pont, la <strong>ziggourat</strong> est la deuxième forme à connaître : elle apparaît, elle aussi, très souvent dans les parties. Une pierre sur la <strong>troisième ligne</strong> peut être connectée à son bord, si toutes les cases de cette zone sont vides : cette forme s'appelle une ziggourat.",
         "ziggurat_diagram": "La pierre rouge est connectée au bord du bas tant que les 8 cases vertes sont vides.",
         "ziggurat_how_it_works": "Quel que soit le coup de votre adversaire dans la ziggourat, vous avez toujours une réponse qui garde la connexion, grâce aux <strong>ponts</strong>. Deux exemples :",
@@ -1127,9 +1085,7 @@
     "notification": {
         "you_won": "Vous avez gagné la partie !",
         "you_lost": "Vous avez perdu la partie :(",
-        "opponent_moderated": "{{player}} a été modéré(e). Désolé pour les messages inappropriés que vous avez reçus.",
-        "opponent_moderated_male": "{{player}} a été modéré. Désolé pour les messages inappropriés que vous avez reçus.",
-        "opponent_moderated_female": "{{player}} a été modérée. Désolé pour les messages inappropriés que vous avez reçus."
+        "opponent_moderated": "{{player}} a été modéré(e). Désolé pour les messages inappropriés que vous avez reçus."
     },
     "muted": {
         "on": "Muet",
@@ -1641,6 +1597,7 @@
         "tools_marks": "Marques",
         "tools_label": "Texte",
         "study_nodes_one": "{{count}} nœud",
+        "study_nodes_many": "",
         "study_nodes_other": "{{count}} nœuds",
         "study_discard_confirm": "Vous avez des modifications non enregistrées, elles seront perdues. Continuer ?",
         "tab_help": "Aide",
@@ -1823,8 +1780,6 @@
         "title": "Roi de la colline",
         "title_female": "Reine de la colline",
         "intro": "Une échelle, un trône. Défiez un joueur au-dessus de vous : si vous gagnez, vous prenez sa place. Plus vous êtes haut(e), plus vous devez défendre.",
-        "intro_male": "Une échelle, un trône. Défiez un joueur au-dessus de vous : si vous gagnez, vous prenez sa place. Plus vous êtes haut, plus vous devez défendre.",
-        "intro_female": "Une échelle, un trône. Défiez un joueur au-dessus de vous : si vous gagnez, vous prenez sa place. Plus vous êtes haute, plus vous devez défendre.",
         "king": "Roi de la colline",
         "king_female": "Reine de la colline",
         "king_for": "Roi depuis {{duration}}",
@@ -1862,22 +1817,16 @@
             "propose_live": "Proposer de jouer en direct",
             "propose_live_help": "Votre adversaire peut accepter, ou refuser et jouer par correspondance. Sans réponse sous 10 minutes, la partie par correspondance commence.",
             "defender_not_active": "{{player}} n'est pas actif(ve) sur PlayHex en ce moment, vous ne pouvez proposer une partie en direct qu'à un joueur(se) actif(ve).",
-            "defender_not_active_male": "{{player}} n'est pas actif sur PlayHex en ce moment, vous ne pouvez proposer une partie en direct qu'à un joueur actif.",
-            "defender_not_active_female": "{{player}} n'est pas active sur PlayHex en ce moment, vous ne pouvez proposer une partie en direct qu'à une joueuse active.",
             "live_time_control": "Cadence en direct",
             "submit": "Défier"
         },
         "live_proposal_expires": "Sans réponse {{date}}, la partie par correspondance commence.",
         "challenger_not_active": "{{player}} n'est plus actif(ve), vous ne pouvez pas accepter la partie en direct. Vous pouvez jouer par correspondance.",
-        "challenger_not_active_male": "{{player}} n'est plus actif, vous ne pouvez pas accepter la partie en direct. Vous pouvez jouer par correspondance.",
-        "challenger_not_active_female": "{{player}} n'est plus active, vous ne pouvez pas accepter la partie en direct. Vous pouvez jouer par correspondance.",
         "accept_live": "Jouer en direct",
         "decline_live": "Jouer par correspondance",
         "title_name": {
             "giant_slayer": "Régicide",
-            "climber": "Grimpeur(se)",
-            "climber_male": "Grimpeur",
-            "climber_female": "Grimpeuse"
+            "climber": "Grimpeur(se)"
         },
         "title_help": {
             "giant_slayer": "A détrôné une personne qui avait défendu sa place 5 fois ou plus",
@@ -1897,14 +1846,8 @@
             "join": "{{player}} a rejoint à la place n°{{position}}",
             "leave": "{{player}} a quitté le Roi de la colline depuis la place n°{{position}}",
             "removed_inactive": "{{player}} a été retiré(e) de la place n°{{position}} pour inactivité",
-            "removed_inactive_male": "{{player}} a été retiré de la place n°{{position}} pour inactivité",
-            "removed_inactive_female": "{{player}} a été retirée de la place n°{{position}} pour inactivité",
             "removed_strikes": "{{player}} a été retiré(e) de la place n°{{position}} après {{strikes}} dépassements de temps",
-            "removed_strikes_male": "{{player}} a été retiré de la place n°{{position}} après {{strikes}} dépassements de temps",
-            "removed_strikes_female": "{{player}} a été retirée de la place n°{{position}} après {{strikes}} dépassements de temps",
             "removed_strikes_before_first_game": "{{player}} a été retiré(e) de la place n°{{position}} après un dépassement de temps sans avoir terminé aucune partie",
-            "removed_strikes_before_first_game_male": "{{player}} a été retiré de la place n°{{position}} après un dépassement de temps sans avoir terminé aucune partie",
-            "removed_strikes_before_first_game_female": "{{player}} a été retirée de la place n°{{position}} après un dépassement de temps sans avoir terminé aucune partie",
             "challenge_won": "{{player}} a battu {{opponent}} et passe de la place n°{{from}} à la place n°{{position}}",
             "challenge_won_no_move": "{{player}} a battu {{opponent}}",
             "challenge_defended": "{{opponent}} a défendu sa place contre {{player}}",
@@ -1915,11 +1858,7 @@
             "climber": "{{player}} a gagné {{wins}} défis d'affilée !",
             "strike": "{{player}} a perdu une partie au temps (avertissement {{strikes}})",
             "cheat": "{{player}} a été renvoyé(e) tout en bas pour triche, partie contre {{opponent}} annulée",
-            "cheat_male": "{{player}} a été renvoyé tout en bas pour triche, partie contre {{opponent}} annulée",
-            "cheat_female": "{{player}} a été renvoyée tout en bas pour triche, partie contre {{opponent}} annulée",
-            "excluded": "{{player}} a été exclu(e) par un modérateur depuis la place n°{{position}}",
-            "excluded_male": "{{player}} a été exclu par un modérateur depuis la place n°{{position}}",
-            "excluded_female": "{{player}} a été exclue par un modérateur depuis la place n°{{position}}"
+            "excluded": "{{player}} a été exclu(e) par un modérateur depuis la place n°{{position}}"
         },
         "load_more": "Voir plus",
         "load_error": "Impossible de charger le Roi de la colline",
@@ -1933,35 +1872,17 @@
             "not_member": "Vous ne participez pas au Roi de la colline.",
             "cannot_challenge_yourself": "Vous ne pouvez pas vous défier vous-même.",
             "defender_not_member": "Ce(tte) joueur(se) ne participe pas au Roi de la colline.",
-            "defender_not_member_male": "Ce joueur ne participe pas au Roi de la colline.",
-            "defender_not_member_female": "Cette joueuse ne participe pas au Roi de la colline.",
             "out_of_range": "Ce(tte) joueur(se) est hors de votre portée.",
-            "out_of_range_male": "Ce joueur est hors de votre portée.",
-            "out_of_range_female": "Cette joueuse est hors de votre portée.",
             "invalid_boardsize": "Cette taille de plateau n'est pas autorisée.",
             "no_outgoing_slot": "Vous avez déjà envoyé autant de défis que votre place le permet.",
             "defender_incoming_full": "Ce(tte) joueur(se) ne peut pas recevoir plus de défis pour le moment.",
-            "defender_incoming_full_male": "Ce joueur ne peut pas recevoir plus de défis pour le moment.",
-            "defender_incoming_full_female": "Cette joueuse ne peut pas recevoir plus de défis pour le moment.",
             "defender_cooling_down": "Ce(tte) joueur(se) vient de finir une partie et pourra être défié(e) à partir du {{date}}.",
-            "defender_cooling_down_male": "Ce joueur vient de finir une partie et pourra être défié à partir du {{date}}.",
-            "defender_cooling_down_female": "Cette joueuse vient de finir une partie et pourra être défiée à partir du {{date}}.",
             "opponent_cooldown": "Vous avez joué contre ce(tte) joueur(se) récemment. Vous pourrez le/la défier à nouveau à partir du {{date}}.",
-            "opponent_cooldown_male": "Vous avez joué contre ce joueur récemment. Vous pourrez le défier à nouveau à partir du {{date}}.",
-            "opponent_cooldown_female": "Vous avez joué contre cette joueuse récemment. Vous pourrez la défier à nouveau à partir du {{date}}.",
             "diversity_limit": "Trop de vos dernières parties étaient contre ce(tte) joueur(se).",
-            "diversity_limit_male": "Trop de vos dernières parties étaient contre ce joueur.",
-            "diversity_limit_female": "Trop de vos dernières parties étaient contre cette joueuse.",
             "defender_diversity_limit": "Trop des dernières parties de ce(tte) joueur(se) étaient contre vous.",
-            "defender_diversity_limit_male": "Trop des dernières parties de ce joueur étaient contre vous.",
-            "defender_diversity_limit_female": "Trop des dernières parties de cette joueuse étaient contre vous.",
             "already_playing_opponent": "Vous avez déjà une partie en cours contre ce(tte) joueur(se).",
-            "already_playing_opponent_male": "Vous avez déjà une partie en cours contre ce joueur.",
-            "already_playing_opponent_female": "Vous avez déjà une partie en cours contre cette joueuse.",
             "live_time_control_not_live": "Cette cadence n'est pas une cadence en direct.",
             "defender_not_active": "Votre adversaire n'est pas actif(ve) en ce moment, vous ne pouvez pas lui proposer une partie en direct.",
-            "defender_not_active_male": "Votre adversaire n'est pas actif en ce moment, vous ne pouvez pas lui proposer une partie en direct.",
-            "defender_not_active_female": "Votre adversaire n'est pas active en ce moment, vous ne pouvez pas lui proposer une partie en direct.",
             "challenger_not_active": "Votre challenger n'est plus actif(ve), vous ne pouvez pas accepter la partie en direct."
         },
         "not_found": "Roi de la colline introuvable.",
@@ -1976,27 +1897,13 @@
         "game_creation_failed": "Impossible de créer la partie, veuillez réessayer.",
         "notification": {
             "challenge": "{{player}} vous a défié(e) au Roi de la colline !",
-            "challenge_male": "{{player}} vous a défié au Roi de la colline !",
-            "challenge_female": "{{player}} vous a défiée au Roi de la colline !",
             "live_proposal": "{{player}} vous a défié(e) au Roi de la colline et propose de jouer en direct.",
-            "live_proposal_male": "{{player}} vous a défié au Roi de la colline et propose de jouer en direct.",
-            "live_proposal_female": "{{player}} vous a défiée au Roi de la colline et propose de jouer en direct.",
             "strike": "Vous avez perdu au temps une partie du Roi de la colline (avertissement {{strikes}}).",
             "strike_removed": "Vous avez perdu au temps une partie du Roi de la colline et avez été retiré(e) après {{strikes}} avertissements.",
-            "strike_removed_male": "Vous avez perdu au temps une partie du Roi de la colline et avez été retiré après {{strikes}} avertissements.",
-            "strike_removed_female": "Vous avez perdu au temps une partie du Roi de la colline et avez été retirée après {{strikes}} avertissements.",
             "strike_removed_before_first_game": "Vous avez perdu au temps une partie du Roi de la colline sans avoir terminé aucune partie auparavant, et avez été retiré(e).",
-            "strike_removed_before_first_game_male": "Vous avez perdu au temps une partie du Roi de la colline sans avoir terminé aucune partie auparavant, et avez été retiré.",
-            "strike_removed_before_first_game_female": "Vous avez perdu au temps une partie du Roi de la colline sans avoir terminé aucune partie auparavant, et avez été retirée.",
             "removed_inactive": "Vous avez été retiré(e) du Roi de la colline après 60 jours sans partie.",
-            "removed_inactive_male": "Vous avez été retiré du Roi de la colline après 60 jours sans partie.",
-            "removed_inactive_female": "Vous avez été retirée du Roi de la colline après 60 jours sans partie.",
             "cheater": "Une triche a été détectée dans une de vos parties du Roi de la colline ({{reason}}). Vous avez été déplacé(e) tout en bas du classement.",
-            "cheater_male": "Une triche a été détectée dans une de vos parties du Roi de la colline ({{reason}}). Vous avez été déplacé tout en bas du classement.",
-            "cheater_female": "Une triche a été détectée dans une de vos parties du Roi de la colline ({{reason}}). Vous avez été déplacée tout en bas du classement.",
             "excluded": "Vous avez été exclu(e) du Roi de la colline par un modérateur. Vous pourrez revenir dans 30 jours.",
-            "excluded_male": "Vous avez été exclu du Roi de la colline par un modérateur. Vous pourrez revenir dans 30 jours.",
-            "excluded_female": "Vous avez été exclue du Roi de la colline par un modérateur. Vous pourrez revenir dans 30 jours.",
             "cheat_victim": "Votre adversaire {{player}} a triché dans une partie du Roi de la colline. Le résultat a été annulé et vous avez retrouvé votre place."
         },
         "account_age_one": "Votre compte a {{count}} jour.",
@@ -2116,8 +2023,6 @@
             },
             "offline_access": {
                 "title": "Rester connecté(e)",
-                "title_male": "Rester connecté",
-                "title_female": "Rester connectée",
                 "description": "Garder l’accès même quand vous n’utilisez pas l’application."
             }
         },
@@ -2198,17 +2103,13 @@
         },
         "player": {
             "title": "{{player}}, joueur(se) de Hex",
-            "title_male": "{{player}}, joueur de Hex",
-            "title_female": "{{player}}, joueuse de Hex",
             "bot": "IA de Hex",
             "rating": "Classement {{rating}}",
             "n_games_one": "{{count}} partie jouée",
             "n_games_many": "{{count}} parties jouées",
             "n_games_other": "{{count}} parties jouées",
             "member_since": "Membre depuis le {{date}}",
-            "on_playhex": "Joueur(se) sur PlayHex",
-            "on_playhex_male": "Joueur sur PlayHex",
-            "on_playhex_female": "Joueuse sur PlayHex"
+            "on_playhex": "Joueur(se) sur PlayHex"
         },
         "ladder": {
             "king": "Roi : {{player}}",
