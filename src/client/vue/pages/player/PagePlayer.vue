@@ -8,6 +8,7 @@ import { useCreateGameOverlay } from '../../composables/useCreateGameOverlay.js'
 import { Ref, computed, ref, useTemplateRef, watch } from 'vue';
 import type { ComponentExposed } from 'vue-component-type-helpers';
 import { format } from 'date-fns';
+import { formatEndedAt } from '../../../services/formatEndedAt.js';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppPlayerPronounsSelect from '../../components/AppPlayerPronounsSelect.vue';
@@ -19,6 +20,9 @@ import AppPlayerHeadToHead from '../../components/AppPlayerHeadToHead.vue';
 import AppPlayerRatingChart from '../../components/AppPlayerRatingChart.vue';
 import AppTablePlayerRating from '../../components/AppTablePlayerRating.vue';
 import AppSearchGamesParameters from '../../components/AppSearchGamesParameters.vue';
+import AppGameListIcons from '../../components/AppGameListIcons.vue';
+import AppPaginationButtons from '../../components/AppPaginationButtons.vue';
+import AppGameTypeIcon from '../../components/AppGameTypeIcon.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
@@ -26,9 +30,11 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import { watchEffect } from 'vue';
 import { RatingCategory } from '../../../../shared/app/ratingUtils.js';
 import { Directive } from 'vue';
-import SearchGamesParameters from '../../../../shared/app/SearchGamesParameters.js';
-import { getOtherPlayerStrict, hasWon } from '../../../../shared/app/gameUtils.js';
+import SearchGamesParameters, { createDefaultSearchGamesParameters } from '../../../../shared/app/SearchGamesParameters.js';
+import { getGameType, getOtherPlayerStrict, hasWon } from '../../../../shared/app/gameUtils.js';
 import { useSearchGamesPagination } from '../../composables/searchGamesPagination.js';
+import { useSearchGamesSyncHash } from '../../composables/searchGamesSyncHash.js';
+import { useSerialRequest } from '../../composables/useSerialRequest.js';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
 import { isMe } from '../../../services/context-utils.js';
 import { apiGetPlayerIsCurrentlyChatRestricted, apiUploadPlayerAvatar, apiUpdatePlayerCountryFlag } from '../../../apiClient.js';
@@ -185,16 +191,19 @@ const gamesHistory = ref<null | Game[]>(null);
 const totalResults = ref<null | number>(null);
 const DEFAULT_PAGE_SIZE = 15;
 
+const defaultSearchGamesParameters = createDefaultSearchGamesParameters();
+
 const searchGamesParameters = ref<SearchGamesParameters>({
+    ...createDefaultSearchGamesParameters(),
     players: player.value === null
         ? undefined
         : [{ publicId: player.value.publicId }]
     ,
-    opponentType: 'player',
-    states: ['ended'],
-    endedAtSort: 'desc',
     paginationPageSize: DEFAULT_PAGE_SIZE,
 });
+
+// Keep filters when going back to this page
+useSearchGamesSyncHash(searchGamesParameters);
 
 const { totalPages, goPagePrevious, goPageNext } = useSearchGamesPagination(
     searchGamesParameters,
@@ -202,15 +211,14 @@ const { totalPages, goPagePrevious, goPageNext } = useSearchGamesPagination(
     DEFAULT_PAGE_SIZE,
 );
 
-// Set filter to current player, but keep same filter if already set on this player
+// Set filter to current player, but keep same filter (e.g selected opponent) if already set on this player.
+// Current player must be the first one, as expected by AppSearchGamesParameters lockedPlayer.
 watch(player, newPlayer => {
     if (newPlayer === null) {
         return;
     }
 
-    if (undefined === searchGamesParameters.value.players
-        || searchGamesParameters.value.players.every(p => p.publicId !== newPlayer.publicId)
-    ) {
+    if (searchGamesParameters.value.players?.[0]?.publicId !== newPlayer.publicId) {
         searchGamesParameters.value.players = [
             { publicId: newPlayer.publicId },
         ];
@@ -218,7 +226,7 @@ watch(player, newPlayer => {
 });
 
 // Update games list when filters change
-watchEffect(async () => {
+const { loading: gamesLoading } = useSerialRequest(searchGamesParameters, async () => {
     // Do not search yet to prevent having games without current player,
     // which is impossible to display in this page table because we need to display the opponent to currentPlayer
     if (undefined === searchGamesParameters.value.players || searchGamesParameters.value.players.length === 0) {
@@ -488,8 +496,7 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
     }
 
     if (isZoomed) {
-        searchGamesParameters.value.ranked = true;
-        searchGamesParameters.value.opponentType = undefined;
+        searchGamesParameters.value.gameTypes = ['ranked'];
         searchGamesParameters.value.endedAtSort = 'asc';
         searchGamesParameters.value.states = ['ended'];
     } else {
@@ -720,73 +727,80 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
             :externalPlayerId="littleGolemExternalPlayerId"
         />
 
-        <template v-else>
-            <AppSearchGamesParameters :searchGamesParameters />
+        <div v-else class="row">
+            <div class="col-md-4 col-lg-3 col-xxl-2">
+                <AppSearchGamesParameters
+                    v-if="player"
+                    :searchGamesParameters
+                    :defaults="defaultSearchGamesParameters"
+                    :lockedPlayer="player"
+                />
+            </div>
 
-            <p v-if="null !== totalResults">{{ $t('n_total_games', { count: totalResults }) }}</p>
-            <p v-else>…</p>
+            <div class="col-md-8 col-lg-9 col-xxl-10 games-results" :class="{ 'results-loading': gamesLoading }" :aria-busy="gamesLoading">
+                <p v-if="null !== totalResults">{{ $t('n_games_found', { count: totalResults }) }}</p>
+                <p v-else>…</p>
 
-            <div class="card">
-                <div class="card-header d-flex align-items-center gap-2">
-                    <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
-                    <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
-                    <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
-                </div>
+                <div class="card">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <AppPaginationButtons :page="searchGamesParameters.paginationPage ?? 0" :totalPages @previous="goPagePrevious" @next="goPageNext" />
+                    </div>
 
-                <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
-                    <table class="table text-nowrap mb-0">
-                        <thead>
-                            <tr>
-                                <th scope="col"></th>
-                                <th scope="col"></th>
-                                <th scope="col">{{ $t('game.outcome') }}</th>
-                                <th scope="col">{{ $t('game.opponent') }}</th>
-                                <th scope="col">{{ $t('game.size') }}</th>
-                                <th scope="col">{{ $t('game.time_control') }}</th>
-                                <th scope="col">{{ $t('game.rules') }}</th>
-                                <th scope="col">{{ $t('game.finished') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody v-if="player">
-                            <tr
-                                v-for="game in gamesHistory"
-                                :key="game.publicId"
-                            >
-                                <td class="ps-0">
-                                    <router-link
-                                        :to="{ name: 'online-game', params: { gameId: game.publicId } }"
-                                        class="btn btn-sm btn-link"
-                                    >{{ $t('game.review') }}</router-link>
-                                </td>
-                                <td>
-                                    <span v-if="game.ranked" class="text-warning"><IconTrophyFill /> <span class="d-none d-md-inline">{{ $t('ranked') }}</span></span>
-                                </td>
+                    <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
+                        <table class="table text-nowrap mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
+                                    <th scope="col">{{ $t('game.outcome') }}</th>
+                                    <th scope="col">{{ $t('game.opponent') }}</th>
+                                    <th scope="col">{{ $t('game.size') }}</th>
+                                    <th scope="col">{{ $t('game.moves_count') }}</th>
+                                    <th scope="col">{{ $t('game.time_control') }}</th>
+                                    <th scope="col">{{ $t('game.rules') }}</th>
+                                    <th scope="col"></th>
+                                    <th scope="col">{{ $t('game.finished') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody v-if="player">
+                                <tr
+                                    v-for="game in gamesHistory"
+                                    :key="game.publicId"
+                                >
+                                    <td class="ps-0">
+                                        <router-link
+                                            :to="{ name: 'online-game', params: { gameId: game.publicId } }"
+                                            class="btn btn-sm btn-link"
+                                        >{{ $t('game.review') }}</router-link>
+                                    </td>
+                                    <td><AppGameTypeIcon :gameType="getGameType(game)" /></td>
 
-                                <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
-                                <td v-else-if="hasWon(game, player)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
-                                <td v-else style="width: 7em" class="text-danger">{{ $t(game.outcome === 'path' ? 'outcome.loss' : 'outcome.' + (game.outcome ?? 'loss')) }}</td>
+                                    <td v-if="'canceled' === game.state" style="width: 7em">{{ $t('game_state.canceled') }}</td>
+                                    <td v-else-if="hasWon(game, player)" style="width: 7em" class="text-success">{{ $t('outcome.win') }}</td>
+                                    <td v-else style="width: 7em" class="text-danger">{{ $t(game.outcome === 'path' ? 'outcome.loss' : 'outcome.' + (game.outcome ?? 'loss')) }}</td>
 
-                                <td v-if="game.gameToPlayers.length < 2">-</td>
-                                <td v-else><AppPseudo rating onlineStatus :player="getOtherPlayerStrict(game, player)" /></td>
+                                    <td v-if="game.gameToPlayers.length < 2">-</td>
+                                    <td v-else><AppPseudo rating onlineStatus :player="getOtherPlayerStrict(game, player)" /></td>
 
-                                <td>{{ game.boardsize }}</td>
-                                <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
-                                <td><AppGameRulesSummary :gameOptions="game" :host="game.host" /></td>
-                                <td>{{
-                                    game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
-                                }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                                    <td>{{ game.boardsize }}x{{ game.boardsize }}</td>
+                                    <td>{{ game.moves.length }}</td>
+                                    <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
+                                    <td><AppGameRulesSummary :gameOptions="game" :host="game.host" /></td>
 
-                <div v-if="gamesHistory && gamesHistory.length > 0" class="card-footer d-flex align-items-center gap-2">
-                    <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
-                    <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
-                    <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+                                    <td><AppGameListIcons :game /></td>
+
+                                    <td>{{ game.endedAt ? formatEndedAt(game.endedAt) : '-' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div v-if="gamesHistory && gamesHistory.length > 0" class="card-footer d-flex align-items-center gap-2">
+                        <AppPaginationButtons :page="searchGamesParameters.paginationPage ?? 0" :totalPages @previous="goPagePrevious" @next="goPageNext" />
+                    </div>
                 </div>
             </div>
-        </template>
+        </div>
 
         <p v-if="player" class="text-body-secondary text-end mt-4"><small>{{ $t('technical_info.public_id') }}: <code>{{ player.publicId }}</code></small></p>
     </div>
@@ -797,6 +811,12 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
 </template>
 
 <style lang="stylus" scoped>
+.games-results
+    transition opacity .15s
+
+    &.results-loading
+        opacity .5
+
 .site-logo
     width 1em
     height 1em

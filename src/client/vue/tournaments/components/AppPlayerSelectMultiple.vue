@@ -16,6 +16,15 @@ defineProps({
         required: false,
         default: t('players'),
     },
+
+    /**
+     * Max number of players that can be selected
+     */
+    max: {
+        type: Number,
+        required: false,
+        default: undefined,
+    },
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -49,6 +58,7 @@ const searchPlayer = async (input: string) => {
         @open="searchPlayer('a')"
         :loading
         :multiple="true"
+        :max
         :closeOnSelect="false"
         :placeholder
         :aria-label="placeholder"

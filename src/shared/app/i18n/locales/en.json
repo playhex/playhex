@@ -47,7 +47,11 @@
         "playing": "Playing",
         "watch": "Watch",
         "title_your_turn": "Your turn!",
-        "title_waiting": "Waiting for an opponent: hosted by"
+        "title_waiting": "Waiting for an opponent: hosted by",
+        "winner": "Winner",
+        "loser": "Loser",
+        "issue": "Outcome",
+        "moves_count": "Moves"
     },
     "game_rules": {
         "normal": "standard",
@@ -2163,5 +2167,26 @@
                 "description": "Giant Hex tournament on Sunday, May 24, 2026, at the Culture & Mathematical Games Fair, Place Saint-Sulpice, Paris. Free, all levels, from age 8."
             }
         }
-    }
+    },
+    "game_outcome": {
+        "path": "Connection",
+        "resign": "Resign",
+        "time": "Time",
+        "forfeit": "Forfeit"
+    },
+    "has_chat_messages": "Has chat messages",
+    "has_analyze": "Has an AI analysis",
+    "filters": "Filters",
+    "reset_filters": "Reset filters",
+    "reset_dates": "Reset dates",
+    "game_type": "Game type",
+    "game_state_filter": "State",
+    "opponent_or_players": "Players",
+    "one_or_two_players_help": "1 player: games of this player. 2 players: games between them.",
+    "search_opponent": "Opponent",
+    "n_plus": "{{ n }}+",
+    "n_games_found_one": "{{count}} game found.",
+    "n_games_found_other": "{{count}} games found.",
+    "show_all_filters": "All filters",
+    "hide_filters": "Fewer filters"
 }

@@ -47,7 +47,11 @@
         "board_size": "Taille du plateau",
         "outcome": "Résultat",
         "title_waiting": "En attente d'un adversaire : créée par",
-        "title_your_turn": "Votre tour !"
+        "title_your_turn": "Votre tour !",
+        "winner": "Gagnant",
+        "loser": "Perdant",
+        "issue": "Issue",
+        "moves_count": "Coups"
     },
     "last_move": "Dernier coup",
     "player_settings": {
@@ -2231,5 +2235,27 @@
                 "description": "Tournoi géant de Hex le dimanche 24 mai 2026, au Salon Culture & Jeux Mathématiques, place Saint-Sulpice à Paris. Gratuit, tous niveaux, dès 8 ans."
             }
         }
-    }
+    },
+    "game_outcome": {
+        "path": "Connexion",
+        "resign": "Abandon",
+        "time": "Temps",
+        "forfeit": "Forfait"
+    },
+    "has_chat_messages": "Contient des messages",
+    "has_analyze": "Analysée par l'IA",
+    "filters": "Filtres",
+    "reset_filters": "Réinitialiser les filtres",
+    "reset_dates": "Réinitialiser les dates",
+    "game_type": "Type de partie",
+    "game_state_filter": "État",
+    "opponent_or_players": "Joueurs",
+    "one_or_two_players_help": "1 joueur : ses parties. 2 joueurs : leurs parties l'un contre l'autre.",
+    "search_opponent": "Adversaire",
+    "n_plus": "{{ n }}+",
+    "n_games_found_one": "{{count}} partie trouvée.",
+    "n_games_found_many": "{{count}} parties trouvées.",
+    "n_games_found_other": "{{count}} parties trouvées.",
+    "show_all_filters": "Tous les filtres",
+    "hide_filters": "Moins de filtres"
 }

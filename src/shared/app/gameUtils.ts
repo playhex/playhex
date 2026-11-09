@@ -1,7 +1,7 @@
 import { Game, GameOptions, GameToPlayer, Player, Rating } from './models/index.js';
 import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
-import SearchGamesParameters from './SearchGamesParameters.js';
+import SearchGamesParameters, { type GameType } from './SearchGamesParameters.js';
 import { isCorrespondence, TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
 import { GameData } from '../game-engine/normalization.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
@@ -577,4 +577,15 @@ export const computeTimeControlAtMoveIndex = (
     timeControl.finish(freezeAt);
 
     return timeControl.getValues();
+};
+
+/**
+ * Game type as filtered in games search: ranked or friendly between humans, or against an AI.
+ */
+export const getGameType = (game: Pick<Game, 'opponentType' | 'ranked'>): GameType => {
+    if (game.opponentType === 'ai') {
+        return 'ai';
+    }
+
+    return game.ranked ? 'ranked' : 'friendly';
 };

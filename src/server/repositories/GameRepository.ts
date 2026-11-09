@@ -1,8 +1,8 @@
-import { ChatMessage, Game, GameToPlayer } from '../../shared/app/models/index.js';
+import { ChatMessage, Game, GameAnalyze, GameToPlayer } from '../../shared/app/models/index.js';
 import { Inject, Service } from 'typedi';
 import logger from '../services/logger.js';
-import { FindManyOptions, FindOptionsOrder, FindOptionsRelations, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
-import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
+import { Brackets, FindManyOptions, FindOptionsOrder, FindOptionsRelations, IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
+import SearchGamesParameters, { gameTypes, searchableOutcomes } from '../../shared/app/SearchGamesParameters.js';
 import type { AnalyzeGameRequest } from '../ai-jobs/gameAnalyze.js';
 
 /**
@@ -43,6 +43,11 @@ const relations: FindOptionsRelations<Game> = {
     },
     ladderChallenge: true,
 };
+
+/**
+ * SQL expression to count moves of a game, from moves column which is like "a1 swap-pieces c4".
+ */
+const MOVES_COUNT_SQL = '(case when game.moves = \'\' then 0 else char_length(game.moves) - char_length(replace(game.moves, \' \', \'\')) + 1 end)';
 
 const order: FindOptionsOrder<Game> = {
     chatMessages: {
@@ -204,6 +209,69 @@ export default class GameRepository
             ;
         }
 
+        const types = new Set(params.gameTypes);
+
+        if (types.size > 0 && types.size < gameTypes.length) {
+            const conditions: string[] = [];
+
+            // Simplify conditions to keep using opponentType/ranked indexes
+            if (types.has('ranked') && types.has('friendly')) {
+                conditions.push('game.opponentType = \'player\'');
+            } else if (types.has('ranked')) {
+                conditions.push('(game.opponentType = \'player\' and game.ranked = 1)');
+            } else if (types.has('friendly')) {
+                conditions.push('(game.opponentType = \'player\' and game.ranked = 0)');
+            }
+
+            if (types.has('ai')) {
+                conditions.push('game.opponentType = \'ai\'');
+            }
+
+            queryBuilder.andWhere(new Brackets(qb => {
+                for (const condition of conditions) {
+                    qb.orWhere(condition);
+                }
+            }));
+        }
+
+        if (undefined !== params.minBoardsize) {
+            queryBuilder
+                .andWhere('game.boardsize >= :minBoardsize')
+                .setParameter('minBoardsize', params.minBoardsize)
+            ;
+        }
+
+        if (undefined !== params.maxBoardsize) {
+            queryBuilder
+                .andWhere('game.boardsize <= :maxBoardsize')
+                .setParameter('maxBoardsize', params.maxBoardsize)
+            ;
+        }
+
+        if (undefined !== params.minMovesCount && params.minMovesCount > 0) {
+            queryBuilder
+                .andWhere(`${MOVES_COUNT_SQL} >= :minMovesCount`)
+                .setParameter('minMovesCount', params.minMovesCount)
+            ;
+        }
+
+        if (undefined !== params.maxMovesCount) {
+            queryBuilder
+                .andWhere(`${MOVES_COUNT_SQL} <= :maxMovesCount`)
+                .setParameter('maxMovesCount', params.maxMovesCount)
+            ;
+        }
+
+        // Only filters ended games, canceled games have no outcome
+        const outcomes = new Set(params.outcomes);
+
+        if (outcomes.size > 0 && outcomes.size < searchableOutcomes.length) {
+            queryBuilder
+                .andWhere('(game.state <> \'ended\' or game.outcome in (:outcomes))')
+                .setParameter('outcomes', [...outcomes])
+            ;
+        }
+
         if (undefined !== params.players) {
             /*
                 Filter games containing player0 AND player1 (if defined).
@@ -299,10 +367,50 @@ export default class GameRepository
     {
         // cannot use getManyAndCount because the many is fast because indexed and paginated,
         // but the count part will fetch all data relations, not paginated, just to count.
+        const results = await this.queryBuilderSearch(params).getMany();
+
+        await this.setHasChatAndAnalyze(results);
+
         return {
-            results: await this.queryBuilderSearch(params).getMany(),
+            results,
             count: await this.queryBuilderSearchMinimal(params).getCount(),
         };
+    }
+
+    /**
+     * Set game.hasChat and game.hasAnalyze, to show in games list.
+     */
+    private async setHasChatAndAnalyze(games: Game[]): Promise<void>
+    {
+        if (games.length === 0) {
+            return;
+        }
+
+        const gameIds = games.flatMap(game => undefined === game.id ? [] : [game.id]);
+
+        const [chatRows, analyzeRows]: [{ gameId: number }[], { gameId: number }[]] = await Promise.all([
+            this.gameRepository.manager
+                .createQueryBuilder(ChatMessage, 'chatMessage')
+                .select('distinct chatMessage.gameId', 'gameId')
+                .where('chatMessage.gameId in (:gameIds)', { gameIds })
+                .andWhere('chatMessage.playerId is not null')
+                .getRawMany(),
+
+            this.gameRepository.manager
+                .createQueryBuilder(GameAnalyze, 'gameAnalyze')
+                .select('gameAnalyze.gameId', 'gameId')
+                .where('gameAnalyze.gameId in (:gameIds)', { gameIds })
+                .andWhere('gameAnalyze.analyze is not null')
+                .getRawMany(),
+        ]);
+
+        const withChat = new Set(chatRows.map(row => +row.gameId));
+        const withAnalyze = new Set(analyzeRows.map(row => +row.gameId));
+
+        for (const game of games) {
+            game.hasChat = undefined !== game.id && withChat.has(game.id);
+            game.hasAnalyze = undefined !== game.id && withAnalyze.has(game.id);
+        }
     }
 
     async searchStatsByDay(params: SearchGamesParameters): Promise<{ date: string, totalGames: number }[]>

@@ -1,21 +1,25 @@
 <script setup lang="ts">
-import { format } from 'date-fns';
-import { ref, watchEffect } from 'vue';
+import { formatEndedAt } from '../../services/formatEndedAt.js';
+import { computed, ref } from 'vue';
 import { useSeoMeta } from '@unhead/vue';
 import { Chart, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ChartData, ChartOptions, TimeScale, Colors } from 'chart.js';
 import { Bar } from 'vue-chartjs';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import '../../services/chartJsDateFnsAdapter.js';
-import SearchGamesParameters from '../../../shared/app/SearchGamesParameters.js';
+import SearchGamesParameters, { createDefaultSearchGamesParameters } from '../../../shared/app/SearchGamesParameters.js';
 import { Game } from '../../../shared/app/models/index.js';
 import AppSearchGamesParameters from '../components/AppSearchGamesParameters.vue';
 import { getGames, getGamesStats } from '../../apiClient.js';
 import AppPseudo from '../components/AppPseudo.vue';
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
-import { getStrictWinnerPlayer } from '../../../shared/app/gameUtils.js';
+import AppGameListIcons from '../components/AppGameListIcons.vue';
+import AppPaginationButtons from '../components/AppPaginationButtons.vue';
+import AppGameTypeIcon from '../components/AppGameTypeIcon.vue';
+import { getGameType, getStrictLoserPlayer, getStrictWinnerPlayer } from '../../../shared/app/gameUtils.js';
 import { useSearchGamesPagination } from '../composables/searchGamesPagination.js';
 import { useSearchGamesSyncHash } from '../composables/searchGamesSyncHash.js';
+import { useSerialRequest } from '../composables/useSerialRequest.js';
 
 useSeoMeta({
     title: 'Games archive',
@@ -26,11 +30,10 @@ const totalResults = ref<null | number>(null);
 
 const DEFAULT_PAGE_SIZE = 15;
 
-// Defaults to last ended 1v1 to show fresh data, and not too much (filters out bot games, canceled...)
+const defaultSearchGamesParameters = createDefaultSearchGamesParameters();
+
 const searchGamesParameters = ref<SearchGamesParameters>({
-    opponentType: 'player',
-    states: ['ended'],
-    endedAtSort: 'desc',
+    ...createDefaultSearchGamesParameters(),
     paginationPageSize: DEFAULT_PAGE_SIZE,
     paginationPage: 0,
 });
@@ -44,7 +47,7 @@ const { totalPages, goPagePrevious, goPageNext } = useSearchGamesPagination(
 );
 
 // Re-search games when changing filters
-watchEffect(async () => {
+const { loading: gamesLoading } = useSerialRequest(searchGamesParameters, async () => {
     const { results, count } = await getGames(searchGamesParameters.value);
 
     gamesHistory.value = results;
@@ -62,8 +65,15 @@ Chart.register(CategoryScale, LinearScale, TimeScale, BarElement, zoomPlugin, Ti
 const gameChart = ref<HTMLElement>();
 const gamesChartData = ref<null | ChartData<'bar', { x: Date, y: number }[]>>(null);
 
-watchEffect(async () => {
-    const gamesStats = await getGamesStats(searchGamesParameters.value);
+// Stats do not depend on pagination
+const statsSearchParameters = computed(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { paginationPage, paginationPageSize, ...filters } = searchGamesParameters.value;
+    return filters;
+});
+
+useSerialRequest(() => JSON.stringify(statsSearchParameters.value), async () => {
+    const gamesStats = await getGamesStats(statsSearchParameters.value);
 
     gamesChartData.value = {
         datasets: [
@@ -144,111 +154,149 @@ const chartBackgroundPlugin = {
 </script>
 
 <template>
-    <div class="container-fluid my-3">
-        <h1 class="h2 mb-3">Games archive</h1>
+    <div class="container-fluid">
+        <div class="archive-layout">
+            <div class="archive-header pt-3">
+                <h1 class="h2 mb-3">Games archive</h1>
 
-        <div class="chart-container">
-            <Bar
-                v-if="null !== gamesChartData"
-                :data="(gamesChartData as unknown as ChartData<'bar'>)"
-                :options="gamesChartOptions"
-                :plugins="[chartBackgroundPlugin]"
-                ref="gameChart"
-            />
-        </div>
-
-        <AppSearchGamesParameters :searchGamesParameters />
-
-        <p v-if="null !== totalResults">{{ $t('n_total_games', { count: totalResults }) }}</p>
-        <p v-else>…</p>
-
-        <div class="card">
-            <div class="card-header d-flex align-items-center gap-2">
-                <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
-                <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
-                <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+                <div class="chart-container">
+                    <Bar
+                        v-if="null !== gamesChartData"
+                        :data="(gamesChartData as unknown as ChartData<'bar'>)"
+                        :options="gamesChartOptions"
+                        :plugins="[chartBackgroundPlugin]"
+                        ref="gameChart"
+                    />
+                </div>
             </div>
 
-            <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
-                <table class="table text-nowrap mb-0">
-                    <thead>
-                        <tr>
-                            <th scope="col"></th>
-                            <th scope="col"></th>
-                            <th scope="col">{{ $t('game.red') }}</th>
-                            <th scope="col">{{ $t('game.blue') }}</th>
-                            <th scope="col">{{ $t('game.outcome') }}</th>
-                            <th scope="col">{{ $t('game.size') }}</th>
-                            <th scope="col">{{ $t('game.time_control') }}</th>
-                            <th scope="col">{{ $t('game.rules') }}</th>
-                            <th scope="col">{{ $t('game.finished') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr
-                            v-for="game in gamesHistory"
-                            :key="game.publicId"
-                        >
-                            <td class="ps-0">
-                                <router-link
-                                    :to="{ name: 'online-game', params: { gameId: game.publicId } }"
-                                    class="btn btn-sm btn-link"
-                                >Open</router-link>
-                            </td>
+            <aside class="filters-column py-3">
+                <AppSearchGamesParameters
+                    :searchGamesParameters
+                    :defaults="defaultSearchGamesParameters"
+                />
+            </aside>
 
-                            <td>
-                                <span v-if="game.ranked" class="text-warning">
-                                    {{ $t('ranked') }}
-                                </span>
-                                <span v-else class="text-success">
-                                    {{ $t('friendly') }}
-                                </span>
-                            </td>
+            <div class="archive-results pb-3" :class="{ 'results-loading': gamesLoading }" :aria-busy="gamesLoading">
+                <p v-if="null !== totalResults">{{ $t('n_games_found', { count: totalResults }) }}</p>
+                <p v-else>…</p>
 
-                            <td>
-                                <AppPseudo v-if="game.gameToPlayers[0]" :player="game.gameToPlayers[0].player" classes="text-danger" />
-                                <span v-else>-</span>
-                            </td>
+                <div class="card">
+                    <div class="card-header d-flex align-items-center gap-2">
+                        <AppPaginationButtons :page="searchGamesParameters.paginationPage ?? 0" :totalPages @previous="goPagePrevious" @next="goPageNext" />
+                    </div>
 
-                            <td>
-                                <AppPseudo v-if="game.gameToPlayers[1]" :player="game.gameToPlayers[1].player" classes="text-primary" />
-                                <span v-else>-</span>
-                            </td>
+                    <div v-if="gamesHistory && gamesHistory.length > 0" class="table-responsive">
+                        <table class="table text-nowrap mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col"></th>
+                                    <th scope="col">{{ $t('game.winner') }}</th>
+                                    <th scope="col">{{ $t('game.loser') }}</th>
+                                    <th scope="col">{{ $t('game.issue') }}</th>
+                                    <th scope="col">{{ $t('game.size') }}</th>
+                                    <th scope="col">{{ $t('game.moves_count') }}</th>
+                                    <th scope="col">{{ $t('game.time_control') }}</th>
+                                    <th scope="col">{{ $t('game.rules') }}</th>
+                                    <th scope="col"></th>
+                                    <th scope="col">{{ $t('game.finished') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="game in gamesHistory"
+                                    :key="game.publicId"
+                                >
+                                    <td class="ps-0">
+                                        <router-link
+                                            :to="{ name: 'online-game', params: { gameId: game.publicId } }"
+                                            class="btn btn-sm btn-link"
+                                        >Open</router-link>
+                                    </td>
 
-                            <td v-if="'canceled' === game.state">{{ $t('game_state.canceled') }}</td>
-                            <td v-else>
-                                <span v-if="null !== game.winner">
-                                    <AppPseudo :player="getStrictWinnerPlayer(game)" :classes="0 === game.winner ? 'text-danger' : 'text-primary'" />
-                                    {{ ' ' }}
-                                    <small>+ {{ game.outcome ? $t('outcome.' + game.outcome) : '??' }}</small>
-                                </span>
-                                <span v-else>-</span>
-                            </td>
+                                    <td><AppGameTypeIcon :gameType="getGameType(game)" /></td>
 
-                            <td>{{ game.boardsize }}</td>
+                                    <template v-if="'ended' === game.state && null !== game.winner">
+                                        <td><AppPseudo :player="getStrictWinnerPlayer(game)" /></td>
+                                        <td><AppPseudo :player="getStrictLoserPlayer(game)" /></td>
+                                        <td>{{ game.outcome ? $t('game_outcome.' + game.outcome) : '-' }}</td>
+                                    </template>
+                                    <template v-else>
+                                        <td colspan="2">
+                                            <AppPseudo v-if="game.gameToPlayers[0]" :player="game.gameToPlayers[0].player" />
+                                            <template v-if="game.gameToPlayers[1]">
+                                                <span class="text-body-secondary mx-2">-</span>
+                                                <AppPseudo :player="game.gameToPlayers[1].player" />
+                                            </template>
+                                        </td>
+                                        <td>{{ 'canceled' === game.state ? $t('game_state.canceled') : '-' }}</td>
+                                    </template>
 
-                            <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
+                                    <td>{{ game.boardsize }}x{{ game.boardsize }}</td>
 
-                            <td><AppGameRulesSummary :gameOptions="game" :host="game.host" /></td>
+                                    <td>{{ game.moves.length }}</td>
 
-                            <td>{{
-                                game.endedAt ? format(game.endedAt, 'd MMMM yyyy p') : '-'
-                            }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                                    <td><AppTimeControlLabel :timeControlBoardsize="game" /></td>
 
-            <div v-if="gamesHistory && gamesHistory.length > 0" class="card-footer d-flex align-items-center gap-2">
-                <button @click="goPagePrevious" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) < 1 }">{{ $t('previous') }}</button>
-                <span>{{ $t('page_page_of_max', { page: (searchGamesParameters.paginationPage ?? 0) + 1, max: totalPages }) }}</span>
-                <button @click="goPageNext" class="btn btn-sm btn-outline-primary" :class="{ disabled: (searchGamesParameters.paginationPage ?? 0) + 1 >= totalPages }">{{ $t('next') }}</button>
+                                    <td><AppGameRulesSummary :gameOptions="game" :host="game.host" /></td>
+
+                                    <td><AppGameListIcons :game /></td>
+
+                                    <td>{{ game.endedAt ? formatEndedAt(game.endedAt) : '-' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div v-if="gamesHistory && gamesHistory.length > 0" class="card-footer d-flex align-items-center gap-2">
+                        <AppPaginationButtons :page="searchGamesParameters.paginationPage ?? 0" :totalPages @previous="goPagePrevious" @next="goPageNext" />
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <style lang="stylus" scoped>
+.archive-results
+    transition opacity .15s
+
+    &.results-loading
+        opacity .5
+
+// Small screens: chart, filters, then games.
+// Larger screens: filters in a full height left column.
+.archive-layout
+    display grid
+    grid-template-columns minmax(0, 1fr)
+    grid-template-areas "header" "filters" "results"
+
+    .archive-header
+        grid-area header
+
+    .filters-column
+        grid-area filters
+
+    .archive-results
+        grid-area results
+
+@media (min-width: 768px)
+    .archive-layout
+        grid-template-columns 15rem minmax(0, 1fr)
+        grid-template-rows auto 1fr
+        grid-template-areas "filters header" "filters results"
+        column-gap 1.5rem
+
+        .filters-column
+            border-right var(--bs-border-width) solid var(--bs-border-color)
+            padding-right 1rem
+            min-height 100vh
+
+@media (min-width: 1400px)
+    .archive-layout
+        grid-template-columns 17rem minmax(0, 1fr)
+
 .chart-container
     height 250px
     position relative

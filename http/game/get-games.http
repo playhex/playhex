@@ -9,3 +9,19 @@ GET /api/games
     &fromEndedAt=2024-01-01T00:00:00
     &paginationPageSize=20
     &paginationPage=0
+
+###
+
+# Same, with new filters:
+# ranked and friendly games between humans, board size 11 to 14, 10 moves or more, won by resign or time.
+
+GET /api/games
+    ?states[]=ended
+    &gameTypes[]=ranked
+    &gameTypes[]=friendly
+    &minBoardsize=11
+    &maxBoardsize=14
+    &minMovesCount=10
+    &outcomes[]=resign
+    &outcomes[]=time
+    &endedAtSort=desc

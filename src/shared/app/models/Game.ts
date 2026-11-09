@@ -290,6 +290,20 @@ export default class Game implements TimeControlBoardsize, GameOptions
     @Column({ type: 'text', nullable: true })
     adminComments: null | string;
 
+    /**
+     * Not persisted, only set when searching games:
+     * whether a player posted at least one chat message in this game.
+     */
+    @Expose()
+    hasChat?: boolean;
+
+    /**
+     * Not persisted, only set when searching games:
+     * whether this game has a completed analyze.
+     */
+    @Expose()
+    hasAnalyze?: boolean;
+
     @AfterLoad()
     sortPlayersPosition()
     {
