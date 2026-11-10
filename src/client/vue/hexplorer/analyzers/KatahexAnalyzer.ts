@@ -1,8 +1,8 @@
-import { coordsToMove, HexMove } from '@playhex/move-notation';
 import { analysisCacheKey, type AnalysisEngine, type AnalysisInput, type AnalysisOutput } from '../../../../shared/app/hexplorer.js';
 import { LocalStorageCache } from '../services/cachedAnalysis.js';
 import { AnalyzerInterface } from './AnalyzerInterface.js';
 import { apiPostHexplorerAnalyzePosition } from '../../../apiClient.js';
+import { bestMoveFromPolicy } from '../../../../shared/app/hexplorerLive.js';
 
 /**
  * Analyze positions with Katahex on server.
@@ -31,38 +31,6 @@ export class KatahexAnalyzer implements AnalyzerInterface
         return await this.cache.getItem(cacheKey, () => this.fetchPositionAnalyze(input));
     }
 
-    /**
-     * The empty cell with the highest policy, or null if there is no policy.
-     */
-    private recommendedMoveFromPolicy(policy: undefined | number[][], black: string[], white: string[]): null | HexMove
-    {
-        if (!policy) {
-            return null;
-        }
-
-        const occupied = new Set<string>([...black, ...white]);
-
-        let bestMove: null | HexMove = null;
-        let bestPolicy = -Infinity;
-
-        for (let row = 0; row < policy.length; ++row) {
-            for (let col = 0; col < policy[row].length; ++col) {
-                const move = coordsToMove({ row, col });
-
-                if (occupied.has(move)) {
-                    continue;
-                }
-
-                if (policy[row][col] > bestPolicy) {
-                    bestPolicy = policy[row][col];
-                    bestMove = move;
-                }
-            }
-        }
-
-        return bestMove;
-    }
-
     getName(): string
     {
         return this.name;
@@ -77,7 +45,7 @@ export class KatahexAnalyzer implements AnalyzerInterface
     {
         const result = await apiPostHexplorerAnalyzePosition(input);
 
-        result.recommendedMove = this.recommendedMoveFromPolicy(result.policy, input.black, input.white);
+        result.recommendedMove = bestMoveFromPolicy(result.policy, [...input.black, ...input.white]);
 
         return result;
     }

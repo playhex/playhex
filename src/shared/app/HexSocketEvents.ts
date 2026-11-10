@@ -6,6 +6,7 @@ import { OnlinePlayerPage } from './OnlinePlayerPage.js';
 import { ChatMessage, GameAnalyze, Game, Player, Rating } from './models/index.js';
 import type { ChannelChatMessage, OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
 import { PlayerOnlineStatus, WebsocketActionError } from './Types.js';
+import type { HexplorerLiveCursor, HexplorerLiveSession, HexplorerLiveSnapshot, HexplorerMatch, HexplorerMatchCreateInput } from './hexplorerLive.js';
 
 export type HexClientToServerEvents = {
     /**
@@ -79,6 +80,54 @@ export type HexClientToServerEvents = {
      * A player send a chat message in a channel
      */
     sendChannelChat: (channel: string, content: string, answer: (error?: WebsocketActionError) => void) => void;
+
+    /**
+     * Host creates a Hexplorer live session, to stream analysis or play a match from a position.
+     * Ends previous session of this host, if any.
+     *
+     * @param studyPublicId Study the session is hosted from, authored by host. Session has same publicId, so its link never changes.
+     */
+    hexplorerLiveCreate: (studyPublicId: string, answer: (result: { publicId: string } | WebsocketActionError) => void) => void;
+
+    /**
+     * Host starts or stops streaming its analysis.
+     */
+    hexplorerLiveSetStreaming: (publicId: string, streaming: boolean, answer: (error?: WebsocketActionError) => void) => void;
+
+    /**
+     * Host sends its whole analysis. Ignored when not streaming.
+     */
+    hexplorerLiveSnapshot: (publicId: string, snapshot: HexplorerLiveSnapshot) => void;
+
+    /**
+     * Host cursor moved over the board.
+     */
+    hexplorerLiveCursor: (publicId: string, cursor: HexplorerLiveCursor) => void;
+
+    /**
+     * Host ends the session: stream and match. Its link can be used again by restarting a session from same study.
+     */
+    hexplorerLiveEnd: (publicId: string) => void;
+
+    /**
+     * Host starts a match from a position. Replaces previous match if ended.
+     */
+    hexplorerMatchCreate: (publicId: string, input: HexplorerMatchCreateInput, answer: (error?: WebsocketActionError) => void) => void;
+
+    /**
+     * A player takes the free seat of the match.
+     */
+    hexplorerMatchJoin: (publicId: string, answer: (error?: WebsocketActionError) => void) => void;
+
+    /**
+     * A match player plays a move.
+     */
+    hexplorerMatchMove: (publicId: string, move: HexMove, answer: (error?: WebsocketActionError) => void) => void;
+
+    /**
+     * A match player resigns, or host cancels a match not yet started.
+     */
+    hexplorerMatchResign: (publicId: string, answer: (error?: WebsocketActionError) => void) => void;
 };
 
 export type HexServerToClientEvents = {
@@ -329,4 +378,30 @@ export type HexServerToClientEvents = {
      * A message has been posted in a channel I subscribed for.
      */
     channelChatMessagePosted: (channel: string, channelChatMessage: ChannelChatMessage) => void;
+
+    /**
+     * Sent when joining a Hexplorer live room, and when session changed (streaming, match, ended).
+     * Null if session does not exist (anymore).
+     */
+    hexplorerLiveUpdate: (publicId: string, session: null | HexplorerLiveSession) => void;
+
+    /**
+     * Streamed analysis changed.
+     */
+    hexplorerLiveSnapshot: (publicId: string, snapshot: HexplorerLiveSnapshot) => void;
+
+    /**
+     * Streamer cursor moved.
+     */
+    hexplorerLiveCursor: (publicId: string, cursor: HexplorerLiveCursor) => void;
+
+    /**
+     * Match created, joined, move played, or ended.
+     */
+    hexplorerMatchUpdate: (publicId: string, match: HexplorerMatch) => void;
+
+    /**
+     * I have been invited to play a match from a Hexplorer position.
+     */
+    hexplorerMatchInvitation: (publicId: string, host: Player) => void;
 };

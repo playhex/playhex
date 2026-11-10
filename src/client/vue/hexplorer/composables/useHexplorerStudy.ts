@@ -19,8 +19,13 @@ const getRoutePublicId = (publicId: string | string[] | undefined): null | strin
  *
  * @param state Analysis being edited
  * @param restoreState Replaces analysis being edited
+ * @param keepsChangesOnLeave Whether changes are kept elsewhere when leaving page, so no need to confirm
  */
-export const useHexplorerStudy = (state: Ref<HexplorerState>, restoreState: (data: unknown) => Promise<void>) => {
+export const useHexplorerStudy = (
+    state: Ref<HexplorerState>,
+    restoreState: (data: unknown) => Promise<void>,
+    keepsChangesOnLeave: () => boolean = () => false,
+) => {
     const route = useRoute();
     const router = useRouter();
     const { loggedInPlayer } = storeToRefs(useAuthStore());
@@ -89,7 +94,7 @@ export const useHexplorerStudy = (state: Ref<HexplorerState>, restoreState: (dat
     // To go away from study without asking again
     let skipLeaveConfirmation = false;
 
-    onBeforeRouteLeave(() => skipLeaveConfirmation || confirmDiscardChanges());
+    onBeforeRouteLeave(() => skipLeaveConfirmation || keepsChangesOnLeave() || confirmDiscardChanges());
 
     onBeforeRouteUpdate((to, from) => to.params.publicId === from.params.publicId
         || skipLeaveConfirmation

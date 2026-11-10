@@ -6,3 +6,8 @@ export { createHexplorerState, type HexplorerState } from '../../../shared/app/h
  * Allows to pass a position with setup stones, which url hash cannot hold.
  */
 export const HEXPLORER_ANALYSIS_STATE_KEY = 'hexplorerAnalysis';
+
+/**
+ * History state key to open Hexplorer on a given tab, e.g "play".
+ */
+export const HEXPLORER_TAB_STATE_KEY = 'hexplorerTab';

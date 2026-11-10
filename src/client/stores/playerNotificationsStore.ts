@@ -6,6 +6,8 @@ import useAuthStore from './authStore.js';
 import { GamePlayerNotifications, groupPlayerNotificationByGame, UNREAD_PLAYER_NOTIFICATIONS_LIMIT } from '../../shared/app/playerNotificationUtils.js';
 import useSocketStore from './socketStore.js';
 import { notifier } from '../services/notifications/notifier.js';
+import useToastsStore from './toastsStore.js';
+import { t } from 'i18next';
 
 /**
  * Stores player notifications: the ones in the header.
@@ -173,6 +175,18 @@ const usePlayerNotificationsStore = defineStore('playerNotificationsStore', () =
 
     socket.on('gameChallengeCreated', game => {
         notifier.emit('gameChallengeCreated', game);
+    });
+
+    socket.on('hexplorerMatchInvitation', (publicId, host) => {
+        useToastsStore().addToast(t('hexplorer_live.invitation_toast', { pseudo: host.pseudo }), {
+            level: 'success',
+            autoCloseAfter: 0,
+            actions: [{
+                label: t('hexplorer_live.invitation_open'),
+                action: { name: 'hexplorer-live', params: { publicId } },
+                classes: 'btn btn-success',
+            }],
+        });
     });
 
     return {

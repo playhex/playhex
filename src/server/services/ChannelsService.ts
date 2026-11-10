@@ -5,7 +5,9 @@ import ChannelChatMessageRepository from '../repositories/ChannelChatMessageRepo
 import { languagesCodesISO6391 } from '../../shared/app/codes.js';
 import TournamentStore from '../store/TournamentStore.js';
 import LadderRepository from '../ladder/LadderRepository.js';
+import HexplorerLiveService from '../hexplorer-live/HexplorerLiveService.js';
 import { CHANNEL_LAST_MESSAGES_COUNT, CHANNEL_OLDER_MESSAGES_PAGE_SIZE } from '../../shared/app/channelUtils.js';
+import { hexplorerLiveChannelSessionId } from '../../shared/app/hexplorerLive.js';
 
 export class ChannelNotFoundError extends Error {}
 
@@ -16,6 +18,7 @@ export class ChannelsService
         private channelChatMessageRepository: ChannelChatMessageRepository,
         private tournamentStore: TournamentStore,
         private ladderRepository: LadderRepository,
+        private hexplorerLiveService: HexplorerLiveService,
 
         @Inject('Repository<Channel>')
         private channelRepository: Repository<Channel>,
@@ -66,6 +69,13 @@ export class ChannelsService
 
     private async loadOrCreateChannelIfAllowed(channelName: string): Promise<Channel>
     {
+        // Hexplorer live chat is closed once session ended
+        const hexplorerLiveId = hexplorerLiveChannelSessionId(channelName);
+
+        if (hexplorerLiveId !== null && !this.hexplorerLiveService.sessionExists(hexplorerLiveId)) {
+            throw new ChannelNotFoundError('hexplorer_live.errors.session_not_found');
+        }
+
         let channel = await this.channelRepository.findOne({
             where: { name: channelName },
         });
@@ -112,6 +122,11 @@ export class ChannelsService
 
         if (ladder) {
             return await this.ladderRepository.findLadderBySlug(ladder[1]) !== null;
+        }
+
+        // Allow Hexplorer live session channels "hexplorer-live-[publicId]", only while session is running, see above
+        if (hexplorerLiveChannelSessionId(channelName) !== null) {
+            return true;
         }
 
         return false;

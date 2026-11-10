@@ -4,6 +4,7 @@ import { KatahexAnalyzer } from '../analyzers/KatahexAnalyzer.js';
 import { AnalyzerInterface } from '../analyzers/AnalyzerInterface.js';
 import { MCTS_PLAYOUTS } from '../../../../shared/app/mctsSettings.js';
 import type { AiAvailabilityData } from '../../../../shared/app/Types.js';
+import type { AnalysisEngine } from '../../../../shared/app/hexplorer.js';
 import { apiGetAiAvailability } from '../../../apiClient.js';
 
 /**
@@ -14,6 +15,12 @@ export const createKatahexAnalyzers = (): KatahexAnalyzer[] => [
     new KatahexAnalyzer('katahex-intuition', 'Katahex Intuition', 'analysisCache'),
     new KatahexAnalyzer('katahex-mcts', `Katahex MCTS ${MCTS_PLAYOUTS}`, 'analysisCacheMcts'),
 ];
+
+/**
+ * Displayed name of an analysis engine, same as in analyzer select.
+ */
+export const analysisEngineName = (engine: AnalysisEngine): string =>
+    createKatahexAnalyzers().find(analyzer => analyzer.engine === engine)?.getName() ?? engine;
 
 /**
  * Engines availability: an engine without online worker cannot be selected.
@@ -42,6 +49,12 @@ export const useAnalysisEngines = (analysisError: Ref<null | 'engine_unavailable
         }
     });
 
+    /**
+     * Whether an engine can be used now. True while status is not yet known.
+     */
+    const isEngineAvailable = (engine: AnalysisEngine): boolean =>
+        aiAvailability.value === null || aiAvailability.value.availableAnalysisEngines.includes(engine);
+
     const isAnalyzerAvailable = (analyzer: AnalyzerInterface): boolean => {
         if (!(analyzer instanceof KatahexAnalyzer) || aiAvailability.value === null) {
             return true;
@@ -54,5 +67,6 @@ export const useAnalysisEngines = (analysisError: Ref<null | 'engine_unavailable
         aiAvailability,
         refreshEnginesStatus,
         isAnalyzerAvailable,
+        isEngineAvailable,
     };
 };

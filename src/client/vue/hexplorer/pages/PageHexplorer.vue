@@ -6,15 +6,25 @@ import { storeToRefs } from 'pinia';
 import { useHead } from '@unhead/vue';
 import { hexplorerKey, useHexplorer } from '../composables/useHexplorer.js';
 import { hexplorerStudyKey, useHexplorerStudy } from '../composables/useHexplorerStudy.js';
-import { HEXPLORER_ANALYSIS_STATE_KEY } from '../HexplorerState.js';
+import { HEXPLORER_ANALYSIS_STATE_KEY, HEXPLORER_TAB_STATE_KEY } from '../HexplorerState.js';
+import { hexplorerLiveHostKey, useHexplorerLiveHost } from '../composables/useHexplorerLive.js';
+import { readHexplorerCopy } from '../services/hexplorerCopy.js';
+import HexplorerLiveTab from '../components/HexplorerLiveTab.vue';
+import HexplorerPlayTab from '../components/HexplorerPlayTab.vue';
+import HexplorerLiveChat from '../components/HexplorerLiveChat.vue';
+import HexplorerMatchBoard from '../components/HexplorerMatchBoard.vue';
 import {
     IconArrowBarLeft,
     IconArrowDownUp,
     IconArrowBarRight,
+    IconBroadcast,
+    IconPlayFill,
     IconChevronLeft,
     IconChevronRight,
     IconCircleFill,
     IconDiagram2,
+    IconFlag,
+    IconXLg,
     IconFolder2Open,
     IconQuestionCircle,
     IconTrash,
@@ -55,7 +65,8 @@ const {
     restoreState,
 } = hexplorer;
 
-const hexplorerStudy = useHexplorerStudy(state, restoreState);
+// Live study is kept while browsing other pages, see useHexplorerLiveHost()
+const hexplorerStudy = useHexplorerStudy(state, restoreState, () => liveHost.isLive.value);
 
 provide(hexplorerStudyKey, hexplorerStudy);
 
@@ -67,9 +78,41 @@ useHead({
 
 const gameViewElement = useTemplateRef('game-view-element');
 
+const liveHost = useHexplorerLiveHost(
+    hexplorer,
+    () => gameViewElement.value,
+    computed(() => hexplorerStudy.isAuthor.value ? hexplorerStudy.study.value?.publicId ?? null : null),
+    async () => {
+        // New analysis is saved as a study, someone else's study is forked
+        await (hexplorerStudy.study.value === null ? hexplorerStudy.save() : hexplorerStudy.fork());
+
+        return hexplorerStudy.isAuthor.value ? hexplorerStudy.study.value?.publicId ?? null : null;
+    },
+);
+
+provide(hexplorerLiveHostKey, liveHost);
+
+const {
+    match: liveMatch,
+    showMatchBoard,
+    isMyTurn: isMyMatchTurn,
+    myColor: myMatchColor,
+    streaming: liveStreaming,
+    playMatchMove,
+    resignMatch,
+    publicId: livePublicId,
+    active: liveActive,
+} = liveHost;
+
+/**
+ * Chat of live session, below both Live and Play tabs.
+ */
+const showLiveChat = computed(() => liveActive.value && (currentTab.value === 'live' || currentTab.value === 'play'));
+
 whenever(gameViewElement, async element => {
     await mount(element);
     await importAnalysisFromHistoryState();
+    await importAnalysisFromCopy();
     await hexplorerStudy.init();
     await updateAnalysis();
 }, {
@@ -89,11 +132,14 @@ const isLargeScreen = useMediaQuery('(min-width: 576px)');
 
 const sidebarOpen = ref(true);
 
-type HexplorerTab = 'file' | 'tree' | 'help';
+type HexplorerTab = 'file' | 'tree' | 'live' | 'play' | 'help';
 
 const { localSettings } = storeToRefs(usePlayerLocalSettingsStore());
 
-const currentTab = ref<HexplorerTab>(localSettings.value.hexplorerHelpDismissed ? 'tree' : 'help');
+const currentTab = ref<HexplorerTab>(history.state?.[HEXPLORER_TAB_STATE_KEY] === 'play'
+    ? 'play'
+    : localSettings.value.hexplorerHelpDismissed ? 'tree' : 'help',
+);
 
 const navPanels = computed(() => [
     {
@@ -103,6 +149,13 @@ const navPanels = computed(() => [
         badge: hasUnsavedChanges.value ? { variant: 'warning', titleKey: 'hexplorer.study_unsaved_changes' } : null,
     },
     { key: 'tree' as const, icon: IconDiagram2, labelKey: 'hexplorer.tab_tree' },
+    {
+        key: 'live' as const,
+        icon: IconBroadcast,
+        labelKey: 'hexplorer_live.tab_live',
+        badge: liveStreaming.value ? { variant: 'danger', titleKey: 'hexplorer_live.live' } : null,
+    },
+    { key: 'play' as const, icon: IconPlayFill, labelKey: 'hexplorer_live.tab_play' },
     { key: 'help' as const, icon: IconQuestionCircle, labelKey: 'hexplorer.tab_help' },
 ]);
 
@@ -136,6 +189,14 @@ onKeyDown(e => (e.ctrlKey || e.metaKey) && e.key === 's', async e => {
 
 const analysisImportError = ref<string | null>(null);
 
+// Show match panel when a match starts
+watch(showMatchBoard, show => {
+    if (show) {
+        sidebarOpen.value = true;
+        currentTab.value = 'play';
+    }
+});
+
 // Errors are displayed in file tab, also tells why study is not displayed
 watch([notFound, studyError, analysisImportError], errors => {
     if (errors.some(Boolean)) {
@@ -162,6 +223,34 @@ const importAnalysisFromHistoryState = async (): Promise<void> => {
         analysisImportError.value = e instanceof Error ? e.message : String(e);
     }
 };
+
+/**
+ * Import analysis copied from a stream, see hexplorerCopy.ts.
+ * Query parameter removed once imported.
+ */
+const importAnalysisFromCopy = async (): Promise<void> => {
+    const url = new URL(window.location.href);
+    const copyId = url.searchParams.get('import');
+
+    if (copyId === null) {
+        return;
+    }
+
+    url.searchParams.delete('import');
+    history.replaceState(history.state, '', url.toString());
+
+    const copy = readHexplorerCopy(copyId);
+
+    if (copy === null) {
+        return;
+    }
+
+    try {
+        await restoreState(copy);
+    } catch (e) {
+        analysisImportError.value = e instanceof Error ? e.message : String(e);
+    }
+};
 </script>
 
 <template>
@@ -176,9 +265,52 @@ const importAnalysisFromHistoryState = async (): Promise<void> => {
                     <div class="advantage advantage-red bg-danger"></div>
                 </div>
                 <div ref="game-view-element" class="game-view"></div>
+
+                <div v-if="showMatchBoard && liveMatch" class="match-overlay bg-body">
+                    <HexplorerMatchBoard
+                        :match="liveMatch"
+                        :canPlay="isMyMatchTurn"
+                        @move="move => playMatchMove(move)"
+                    />
+                </div>
             </div>
 
-            <div class="bottom-menu">
+            <!-- Analysis buttons have no effect on match board -->
+            <div v-if="showMatchBoard && liveMatch" class="bottom-menu">
+                <!-- Icon only on small screens -->
+                <button
+                    v-if="myMatchColor !== null && liveMatch.state === 'playing'"
+                    type="button"
+                    class="btn btn-outline-danger"
+                    @click="resignMatch()"
+                >
+                    <IconFlag />
+                    <span class="d-none d-md-inline">{{ ' ' + $t('resign') }}</span>
+                </button>
+
+                <button
+                    v-if="myMatchColor !== null && liveMatch.state === 'waiting'"
+                    type="button"
+                    class="btn btn-outline-warning"
+                    @click="resignMatch()"
+                >
+                    <IconXLg />
+                    <span class="d-none d-md-inline">{{ ' ' + $t('hexplorer_live.cancel_match') }}</span>
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    @click="showMatchBoard = false"
+                ><IconDiagram2 /> {{ $t('hexplorer_live.back_to_analysis') }}</button>
+
+                <button type="button" class="btn btn-outline-primary open-sidebar-btn" @click="sidebarOpen = !sidebarOpen">
+                    <IconArrowBarLeft v-if="!sidebarOpen" />
+                    <IconArrowBarRight v-else />
+                </button>
+            </div>
+
+            <div v-else class="bottom-menu">
                 <HexplorerSetupTools v-if="!isLargeScreen" compact />
 
                 <div class="btn-group" v-if="!state.setupMode">
@@ -241,11 +373,21 @@ const importAnalysisFromHistoryState = async (): Promise<void> => {
                 </template>
             </template>
 
-            <div class="flex-grow-1 overflow-auto p-3">
+            <div class="overflow-auto p-3" :class="showLiveChat ? 'flex-shrink-1 tab-with-chat' : 'flex-grow-1'">
                 <HexplorerFileTab v-if="currentTab === 'file'" :importError="analysisImportError" />
                 <HexplorerHelpTab v-else-if="currentTab === 'help'" @dismiss="currentTab = 'tree'" />
+                <HexplorerLiveTab v-else-if="currentTab === 'live'" />
+                <HexplorerPlayTab v-else-if="currentTab === 'play'" />
                 <HexplorerTreeTab v-else :analyzers />
             </div>
+
+            <HexplorerLiveChat
+                v-if="showLiveChat && livePublicId"
+                :key="livePublicId"
+                :publicId="livePublicId"
+                :closed="false"
+                class="live-chat border-top"
+            />
 
             <template #footer>
                 <button
@@ -276,6 +418,12 @@ const importAnalysisFromHistoryState = async (): Promise<void> => {
             display flex
             flex 1
             min-height 0
+            position relative
+
+        .match-overlay
+            position absolute
+            inset 0
+            z-index 1
 
         .left-analysis-bar
             display block
@@ -307,6 +455,14 @@ const importAnalysisFromHistoryState = async (): Promise<void> => {
         .game-view
             width calc(100% - 1rem)
             height 100%
+
+.tab-with-chat
+    flex-basis auto
+    min-height 0
+
+.live-chat
+    flex 1 1 0
+    min-height 12rem
 
 .bottom-menu
     flex-shrink 0

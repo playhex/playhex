@@ -21,7 +21,8 @@ import { sgfToString } from '../../../../shared/sgf/index.js';
 import { downloadString } from '../../../services/fileDownload.js';
 import { DragPainter } from '../DragPainter.js';
 import { AnalysisEngineUnavailableError } from '../../../../shared/app/hexplorer.js';
-import { movesToTreeNodes, parseHexplorerState } from '../../../../shared/app/hexplorerStudy.js';
+import { canSwapAfter, movesToTreeNodes, parseHexplorerState } from '../../../../shared/app/hexplorerStudy.js';
+import type { HexplorerLiveSnapshot, HexplorerMatchStartPosition } from '../../../../shared/app/hexplorerLive.js';
 import { useAnalysisEngines } from './useAnalysisEngines.js';
 
 /**
@@ -48,10 +49,20 @@ const splitStonesByColor = (boardsize: number, playerIndexAt: (move: Move) => nu
     return { black, white };
 };
 
+export type UseHexplorerOptions = {
+    /**
+     * Board can't be edited nor navigated by player, and nothing is analyzed:
+     * state is only set from outside, e.g by a streamer (see applyLiveSnapshot).
+     */
+    readonly?: boolean;
+};
+
 /**
  * @param analyzers Engines that can be selected. First one is the default.
  */
-export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) => {
+export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], options: UseHexplorerOptions = {}) => {
+    const readonly = options.readonly ?? false;
+
     /**
      * Actions made so far while in setup mode (scratch editing, not yet validated into the tree).
      * Can be undo/redo.
@@ -68,11 +79,14 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) =
     // Why last analysis of current position failed, null if it did not fail.
     const analysisError = ref<null | 'engine_unavailable' | 'failed'>(null);
 
-    const { aiAvailability, refreshEnginesStatus, isAnalyzerAvailable } = useAnalysisEngines(analysisError);
+    const { aiAvailability, refreshEnginesStatus, isAnalyzerAvailable, isEngineAvailable } = useAnalysisEngines(analysisError);
 
     // The analyzer currently used to compute winrate/policy. Can be swapped at runtime
     // (see setAnalyzer), e.g to disable analysis (NoopAnalyzer) or change engine.
-    const currentAnalyzer = shallowRef<AnalyzerInterface | null>(analyzers[0]);
+    const currentAnalyzer = shallowRef<AnalyzerInterface | null>(readonly ? null : analyzers[0]);
+
+    // Analysis currently displayed for the current position, sent to stream viewers.
+    const displayedAnalysis = shallowRef<HexplorerLiveSnapshot['analysis']>(null);
 
 
     // Branching move history. currentNodeId is the position currently displayed on the board.
@@ -207,6 +221,11 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) =
     let analysisRequestId = 0;
 
     const updateAnalysis = async (): Promise<void> => {
+        // Analysis is set by streamer, see applyLiveSnapshot()
+        if (readonly) {
+            return;
+        }
+
         policyOverlayFacade.clear();
 
         const analyzer = currentAnalyzer.value;
@@ -220,6 +239,7 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) =
         const requestId = ++analysisRequestId;
 
         analysisError.value = null;
+        displayedAnalysis.value = null;
 
         // Nothing to display for the color to move: hide the winrate bar.
         if (!analyzer || (!showWinrate && !showPolicy)) {
@@ -275,6 +295,12 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) =
         if (showWinrate && typeof result.whiteWin === 'number') {
             evalsByNodeId.value.set(nodeId, result.whiteWin);
         }
+
+        displayedAnalysis.value = {
+            color,
+            ...(showWinrate && typeof result.whiteWin === 'number' ? { whiteWin: result.whiteWin } : {}),
+            ...(showPolicy && result.policy ? { policy: result.policy } : {}),
+        };
     };
 
     /**
@@ -542,7 +568,7 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) =
      * Ignored in setup mode, it would drop stones not yet validated.
      */
     const userGoToNode = (id: number): void => {
-        if (state.value.setupMode) {
+        if (readonly || state.value.setupMode) {
             return;
         }
 
@@ -728,6 +754,10 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) =
      * remaining moves in the current evaluation line (so the tree is preserved on reload).
      */
     const syncUrlHash = (): void => {
+        if (readonly) {
+            return;
+        }
+
         const size = gameViewRef.value?.getBoardsize() ?? 11;
         const line = currentLine.value; // root → lineLeaf
         const cursorIndex = line.findIndex(node => node.id === currentNodeId.value);
@@ -796,6 +826,10 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) =
         new PlayerSettingsFacade(gameView);
 
         gameView.on('hexPointerDown', async move => {
+            if (readonly) {
+                return;
+            }
+
             if (state.value.setupMode) {
                 await dragPainter.pointerDown(currentTool.value, move);
             }
@@ -806,6 +840,10 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) =
         });
 
         gameView.on('hexClicked', async move => {
+            if (readonly) {
+                return;
+            }
+
             if (state.value.setupMode) {
                 // Drag-capable tools already handled this cell on pointerdown, and the whole
                 // drag (even a single-cell one) is committed on pointerup by endDragPainting.
@@ -991,6 +1029,119 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) =
     };
 
     /**
+     * What stream viewers see: whole state, plus what is displayed but not in it
+     * (scratch setup edits, analysis of current position).
+     */
+    const getLiveSnapshot = (): HexplorerLiveSnapshot => {
+        let scratch: HexplorerLiveSnapshot['scratch'] = null;
+
+        if (state.value.setupMode) {
+            const { black, white } = getBoardStones(gameView);
+
+            scratch = {
+                stones: [
+                    ...black.map(move => ({ move, color: 0 as const })),
+                    ...white.map(move => ({ move, color: 1 as const })),
+                ],
+                marks: marksLayer.getAll(),
+            };
+        }
+
+        return {
+            state: state.value,
+            scratch,
+            analysis: displayedAnalysis.value,
+        };
+    };
+
+    /**
+     * Displays what a streamer sent. Used in readonly mode.
+     */
+    const applyLiveSnapshot = async (snapshot: HexplorerLiveSnapshot): Promise<void> => {
+        if (snapshot.state.boardsize !== gameView.getBoardsize()) {
+            await rebuildBoard(snapshot.state.boardsize);
+        }
+
+        state.value = snapshot.state;
+        tree.reload();
+
+        if (!tree.nodes.value.some(node => node.id === state.value.currentNodeId)) {
+            state.value.currentNodeId = ROOT_ID;
+        }
+
+        goToNode(state.value.currentNodeId);
+
+        if (snapshot.scratch !== null) {
+            clearBoard();
+            marksLayer.clear();
+            applySetupStones(snapshot.scratch.stones);
+
+            for (const mark of snapshot.scratch.marks) {
+                if (mark.type === 'select') {
+                    marksLayer.setSelected(mark.move, true);
+                } else {
+                    marksLayer.setMark(mark.move, mark.type, mark.text);
+                }
+            }
+        }
+
+        const { analysis } = snapshot;
+
+        whiteWin.value = analysis?.whiteWin;
+        policyOverlayFacade.clear();
+
+        if (analysis?.policy) {
+            policyOverlayFacade.setShowNumbers(state.value.policyShowNumbers);
+            policyOverlayFacade.setShowBestMark(state.value.policyShowBestMark);
+            policyOverlayFacade.apply(analysis.policy, analysis.color);
+        }
+    };
+
+    /**
+     * Position currently on board, to start a match from it.
+     * Null in setup mode: position must be validated first.
+     */
+    const getMatchStartPosition = (): null | HexplorerMatchStartPosition => {
+        if (state.value.setupMode) {
+            return null;
+        }
+
+        const { black, white } = getBoardStones(gameView);
+        const getNode = (id: number) => tree.nodes.value.find(node => node.id === id);
+
+        return {
+            boardsize: gameView.getBoardsize(),
+            stones: [
+                ...black.map(move => ({ move, color: 0 as const })),
+                ...white.map(move => ({ move, color: 1 as const })),
+            ],
+            nextPlayer: state.value.currentPlayer,
+            swapAllowed: canSwapAfter(tree.getNode(currentNodeId.value), getNode),
+        };
+    };
+
+    /**
+     * Adds moves of a match played from a node as a variation, and shows its last position.
+     * Does nothing if start node has been deleted meanwhile.
+     */
+    const addMatchVariation = (startNodeId: number, moves: HexMove[]): void => {
+        if (!tree.nodes.value.some(node => node.id === startNodeId)) {
+            return;
+        }
+
+        let parentId = startNodeId;
+
+        for (const move of moves) {
+            parentId = (tree.findChildByMove(parentId, move) ?? tree.addMove(parentId, move)).id;
+        }
+
+        if (!state.value.setupMode) {
+            disableAutoPlay();
+            goToNode(parentId);
+        }
+    };
+
+    /**
      * Shortcuts are bound on the window, so they must not steal keys from a field
      * being typed in (mark label, player names, board size): there, arrows move the
      * caret and ctrl+Z undoes the text, not the board.
@@ -1073,6 +1224,13 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[]) =
         currentAnalyzer,
         setAnalyzer,
         isAnalyzerAvailable,
+        isEngineAvailable,
+        refreshEnginesStatus,
+        readonly,
+        getLiveSnapshot,
+        applyLiveSnapshot,
+        getMatchStartPosition,
+        addMatchVariation,
     };
 };
 

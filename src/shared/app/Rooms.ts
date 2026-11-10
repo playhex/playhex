@@ -81,4 +81,9 @@ export default class Rooms
      * Used to display counts next to lobby section titles.
      */
     static readonly playingGamesCount = 'playing-games-count';
+
+    /**
+     * Hexplorer live session: streamed analysis, cursor and match updates.
+     */
+    static readonly hexplorerLive = (publicId: string) => `hexplorer-live/${publicId}`;
 }

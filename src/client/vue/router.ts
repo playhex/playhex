@@ -108,6 +108,15 @@ const routes: RouteRecordRaw[] = [
         ],
     },
     {
+        name: 'hexplorer-live',
+        path: '/hexplorer/live/:publicId',
+        component: () => import('./hexplorer/pages/PageHexplorerLive.vue'),
+        props: true,
+        meta: {
+            displayFooter: false,
+        },
+    },
+    {
         name: 'hexplorer',
         path: '/hexplorer/:publicId?',
         component: () => import('./hexplorer/pages/PageHexplorer.vue'),

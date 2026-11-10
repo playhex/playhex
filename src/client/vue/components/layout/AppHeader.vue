@@ -6,6 +6,7 @@ import { IconHexagonFill, IconHexagon, IconRocketTakeOff, IconDownload, IconCrow
 import AppPlayerMenu from './AppPlayerMenu.vue';
 import { computed } from 'vue';
 import AppPlayerNotifications from '../../player-notifications/AppPlayerNotifications.vue';
+import AppHexplorerLiveIndicator from '../../hexplorer/components/AppHexplorerLiveIndicator.vue';
 import { useTutorialControls } from '../../composables/tutorialControls.js';
 import { getTutorialChapterSteps } from '../../../../shared/app/tutorial/tutorialSteps.js';
 import { useServerVersionChecker } from '../../composables/useServerVersionChecker.js';
@@ -318,6 +319,9 @@ const {
                     <IconDownload />
                     {{ $t('update') }}
                 </button>
+
+                <!-- Hexplorer live session still running -->
+                <AppHexplorerLiveIndicator />
 
                 <!-- My turn notif -->
                 <span class="my-turn-notif">

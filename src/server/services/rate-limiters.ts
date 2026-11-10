@@ -110,6 +110,15 @@ const analyzePositionMctsLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit Hexplorer live sessions and matches creation, by player.
+ */
+const hexplorerLiveCreateLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.hexplorer_live_create',
+    points: 20,
+    duration: 600,
+});
+
+/**
  * Limit javascript errors reported from player devices, by ip.
  */
 const clientErrorReportLimiter = new RateLimiterMemory({
@@ -274,6 +283,10 @@ const consume = async (limiter: RateLimiterMemory, key: string, pointsToConsume 
 
         throw new RateLimiterServerError(String(e));
     }
+};
+
+export const rateLimiterConsumeHexplorerLiveCreate = async (playerPublicId: string) => {
+    await consume(hexplorerLiveCreateLimiter, playerPublicId);
 };
 
 export const rateLimiterConsumeChatMessage = async (playerPublicId: string) => {

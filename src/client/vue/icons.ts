@@ -27,6 +27,7 @@ export { default as IconBookmarks } from '~icons/bi/bookmarks';
 export { default as IconBoxArrowRight } from '~icons/bi/box-arrow-right';
 export { default as IconBoxArrowUpRight } from '~icons/bi/box-arrow-up-right';
 export { default as IconBrightnessHighFill } from '~icons/bi/brightness-high-fill';
+export { default as IconBroadcast } from '~icons/bi/broadcast';
 export { default as IconCalendar } from '~icons/bi/calendar';
 export { default as IconCalendarEvent } from '~icons/bi/calendar-event';
 export { default as IconCaretDownFill } from '~icons/bi/caret-down-fill';
