@@ -102,32 +102,37 @@ export default class ExternalGameRepository
             : {}
         ;
 
-        const [results, count] = await this.externalGameRepository.findAndCount({
-            select: {
-                id: true,
-                publicId: true,
-                externalId: true,
-                boardsize: true,
-                player0Name: true,
-                player1Name: true,
-                player0ExternalId: true,
-                player1ExternalId: true,
-                player0Rating: true,
-                player1Rating: true,
-                winner: true,
-                outcome: true,
-                startedAt: true,
-                endedAt: true,
-                source: true,
-                sourceUrl: true,
-                event: true,
-                createdAt: true,
-            },
-            where,
-            order: { createdAt: 'desc', id: 'desc' },
-            take: pageSize,
-            skip: page * pageSize,
-        });
+        // Not findAndCount: with "select", it counts COUNT(DISTINCT <all selected columns>),
+        // and MySQL ignores rows having a NULL in any of them (e.g unrated games)
+        const [results, count] = await Promise.all([
+            this.externalGameRepository.find({
+                select: {
+                    id: true,
+                    publicId: true,
+                    externalId: true,
+                    boardsize: true,
+                    player0Name: true,
+                    player1Name: true,
+                    player0ExternalId: true,
+                    player1ExternalId: true,
+                    player0Rating: true,
+                    player1Rating: true,
+                    winner: true,
+                    outcome: true,
+                    startedAt: true,
+                    endedAt: true,
+                    source: true,
+                    sourceUrl: true,
+                    event: true,
+                    createdAt: true,
+                },
+                where,
+                order: { createdAt: 'desc', id: 'desc' },
+                take: pageSize,
+                skip: page * pageSize,
+            }),
+            this.externalGameRepository.count({ where }),
+        ]);
 
         return { results, count };
     }
