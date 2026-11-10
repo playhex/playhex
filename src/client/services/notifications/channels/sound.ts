@@ -3,11 +3,10 @@ import { notifier } from '../notifier.js';
 import { playAudio } from '../../../../shared/app/audioPlayer.js';
 import { getLoserPlayer, isBotGame } from '../../../../shared/app/gameUtils.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
-import { halloweenSound } from '../../halloween.js';
 
 function playAudioIfNotMuted(filename: string): void {
     if (usePlayerLocalSettingsStore().localSettings.muteAudio) return;
-    playAudio(halloweenSound(filename));
+    playAudio(filename);
 }
 
 notifier.on('gameStart', (game) => {
