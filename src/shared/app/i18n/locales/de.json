@@ -35,7 +35,11 @@
         "title_waiting": "Suche Gegner: gehosted von",
         "title": "Spiel",
         "info": "Info",
-        "duration": "Spieldauer"
+        "duration": "Spieldauer",
+        "winner": "Gewinner",
+        "loser": "Verlierer",
+        "issue": "Ergebnis",
+        "moves_count": "Züge"
     },
     "game_rules": {
         "normal": "Standard",
@@ -60,7 +64,8 @@
             "notifications": "Benachrichtigungen",
             "ai_workers": "KI-Worker",
             "connected_applications": "Verbundene Anwendungen",
-            "technical_info": "Technische Infos"
+            "technical_info": "Technische Infos",
+            "security": "Sicherheit"
         },
         "audio": "Audio",
         "moderation": "Moderation"
@@ -248,7 +253,7 @@
     "game_created_by_player_time_ago": "Spiel erstellt von {player}, {timeAgo}.",
     "project_under_development": "Projekt in Entwicklung",
     "already_have_account_login_instead_link_label": "anmelden",
-    "account_created_on": "Konto erstellt am {{date}}",
+    "account_created_on": "Auf PlayHex seit {{date}}",
     "game_has_been_canceled": "Spiel wurde abgebrochen.",
     "game_analysis": {
         "how_it_works": "Wie es funktioniert",
@@ -314,7 +319,9 @@
     "handicap": {
         "title": "Handicap",
         "none": "ohne Handicap",
-        "handicap_for_player": "{{n}} für {{player}}"
+        "handicap_for_player": "{{n}} für {{player}}",
+        "opponent": "Gegner",
+        "ai": "KI"
     },
     "explore": "Erkunden",
     "friendly": "Freundschaftsspiel",
@@ -1783,5 +1790,19 @@
             }
         },
         "check_device_code": "Stelle sicher, dass dieser Code mit dem auf deinem Gerät angezeigten übereinstimmt:"
+    },
+    "pronouns": {
+        "title": "Pronomen",
+        "he/him": "er/ihm",
+        "she/her": "sie/ihr",
+        "they/them": "sie/ihnen",
+        "unspecified": "Pronomen nicht angegeben"
+    },
+    "player_popover": {
+        "on_playhex_since": "Auf PlayHex für {{duration}}"
+    },
+    "closed_game": "Geschlossenes Spiel",
+    "closed_game_invite": {
+        "share": "Teilen"
     }
 }
