@@ -1,0 +1,5 @@
+# How many players use some features (pronouns, country flags, avatars, linked accounts, game imports, Hexplorer studies),
+# and last players who used it when known.
+
+GET /api/admin/feature-usage
+Authorization: Bearer {{ adminPassword }}

@@ -14,6 +14,7 @@ import { GameStaleEvaluator } from '../../../services/auto-cancel-stale-games/Ga
 import { AutoCancelStaleGames } from '../../../services/auto-cancel-stale-games/AutoCancelStaleGames.js';
 import { ROLE_ADMIN } from '../../../services/roles.js';
 import { TournamentError } from '../../../tournaments/TournamentError.js';
+import FeatureUsageRepository from '../../../repositories/FeatureUsageRepository.js';
 
 class CreateAiVsAiInput
 {
@@ -41,6 +42,7 @@ export default class AdminController
         private pushNotificationSender: PushNotificationSender,
         private gameStaleEvaluator: GameStaleEvaluator,
         private autoCancelStaleGames: AutoCancelStaleGames,
+        private featureUsageRepository: FeatureUsageRepository,
     ) {}
 
     /**
@@ -63,6 +65,16 @@ export default class AdminController
             forwardedFor: req.headers['x-forwarded-for'],
             trustProxy: process.env.TRUST_PROXY ?? null,
         };
+    }
+
+    /**
+     * How many players use some features (pronouns, linked accounts, avatars...),
+     * and last players who used it when known.
+     */
+    @Get('/api/admin/feature-usage')
+    async getFeatureUsage()
+    {
+        return await this.featureUsageRepository.getFeatureUsage();
     }
 
     @Post('/api/admin/persist-games')
