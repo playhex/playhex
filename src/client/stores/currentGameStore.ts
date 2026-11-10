@@ -19,6 +19,7 @@ import { HexMove, isSpecialHexMove, Move } from '@playhex/move-notation';
 import { useChatInputStore } from './chatInputStore.js';
 import usePlayerLocalSettingsStore from './playerLocalSettingsStore.js';
 import { playAudio } from '../../shared/app/audioPlayer.js';
+import { halloweenSound } from '../services/halloween.js';
 import Premove from '../../shared/app/models/Premove.js';
 import { canPassAgain } from '../../shared/app/passUtils.js';
 import { checkHandicapMove, getHandicapStatus, getPresetDemerHandicap, HandicapStatus, isForcedHandicapPass, isGameInCancelWindow } from '../../shared/app/handicap.js';
@@ -806,10 +807,10 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
     const playSoundForMove = (move: HexMove): void => {
         if (localSettings.value.muteAudio) return;
-        playAudio(move === 'pass'
+        playAudio(halloweenSound(move === 'pass'
             ? '/sounds/lisp/Check.ogg'
             : '/sounds/lisp/Move.ogg',
-        );
+        ));
     };
 
     const sendMove = async (move: HexMove): Promise<void> => {

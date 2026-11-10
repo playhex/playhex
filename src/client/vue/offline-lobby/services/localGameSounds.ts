@@ -2,10 +2,11 @@ import { EngineGame } from '../../../../shared/game-engine/index.js';
 import { TimestampedMove } from '../../../../shared/game-engine/Types.js';
 import { playAudio } from '../../../../shared/app/audioPlayer.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
+import { halloweenSound } from '../../../services/halloween.js';
 
 export const playLocalGameSound = (filename: string): void => {
     if (usePlayerLocalSettingsStore().localSettings.muteAudio) return;
-    playAudio(filename);
+    playAudio(halloweenSound(filename));
 };
 
 /**
