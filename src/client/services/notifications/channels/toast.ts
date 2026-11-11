@@ -3,7 +3,7 @@ import useToastsStore from '../../../../client/stores/toastsStore.js';
 import { apiPostCancel } from '../../../apiClient.js';
 import { getCurrentPlayer, getOtherPlayer, isBotGame } from '../../../../shared/app/gameUtils.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
-import { getOpponent, iAmInGame, isMe, viewingGame } from '../../context-utils.js';
+import { getOpponent, iAmInGame, isMe, viewingGame, viewingMyGameAgainstPlayer } from '../../context-utils.js';
 import { notifier } from '../notifier.js';
 import { getPresetDemerHandicap, isForcedHandicapPass } from '../../../../shared/app/handicap.js';
 import { t } from 'i18next';
@@ -41,7 +41,8 @@ notifier.on('gameStart', game => {
         {
             level: 'success',
             autoCloseAfter: 0,
-            closable: true,
+            // Force player to go to the game, unless already busy playing against someone else
+            closable: viewingMyGameAgainstPlayer(),
             icon: IconPersonFillExclamation,
             actions: [
                 { label: t('go_to_the_game'), action: {

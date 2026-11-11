@@ -1,6 +1,7 @@
 import { Game, Player } from '../../shared/app/models/index.js';
-import { getOtherPlayer, getPlayerIndex, hasPlayer, isPlayerTurn } from '../../shared/app/gameUtils.js';
+import { getOtherPlayer, getPlayerIndex, hasPlayer, isBotGame, isPlayerTurn } from '../../shared/app/gameUtils.js';
 import useAuthStore from '../stores/authStore.js';
+import useCurrentGameStore from '../stores/currentGameStore.js';
 import router from '../vue/router.js';
 
 export const hasFocus = () => document.hasFocus();
@@ -64,4 +65,23 @@ export const viewingGame = (game: Game): boolean => {
     const { name, params } = router.currentRoute.value;
 
     return name === 'online-game' && params.gameId === game.publicId;
+};
+
+/**
+ * Player is currently on a game page, playing against another human player.
+ */
+export const viewingMyGameAgainstPlayer = (): boolean => {
+    const { name, params } = router.currentRoute.value;
+
+    if (name !== 'online-game') {
+        return false;
+    }
+
+    const { game } = useCurrentGameStore();
+
+    return game !== null
+        && game.publicId === params.gameId
+        && !isBotGame(game)
+        && iAmInGame(game)
+    ;
 };
