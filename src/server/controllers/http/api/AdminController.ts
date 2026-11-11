@@ -2,7 +2,7 @@ import { Service } from 'typedi';
 import { IsNumber, IsString, Max, Min } from 'class-validator';
 import GameStore from '../../../store/GameStore.js';
 import PlayerRepository from '../../../repositories/PlayerRepository.js';
-import { Authorized, Body, Delete, Get, HttpError, JsonController, NotFoundError, Param, Patch, Post, Req } from 'routing-controllers';
+import { Authorized, BadRequestError, Body, Delete, Get, HttpError, JsonController, NotFoundError, Param, Patch, Post, QueryParam, Req } from 'routing-controllers';
 import type { Request } from 'express';
 import { Player, Tournament, GameOptions } from '../../../../shared/app/models/index.js';
 import { RANKED_BOARDSIZE_MAX, RANKED_BOARDSIZE_MIN } from '../../../../shared/app/ratingUtils.js';
@@ -15,6 +15,7 @@ import { AutoCancelStaleGames } from '../../../services/auto-cancel-stale-games/
 import { ROLE_ADMIN } from '../../../services/roles.js';
 import { TournamentError } from '../../../tournaments/TournamentError.js';
 import FeatureUsageRepository from '../../../repositories/FeatureUsageRepository.js';
+import LiveLobbyHistoryRepository from '../../../repositories/LiveLobbyHistoryRepository.js';
 
 class CreateAiVsAiInput
 {
@@ -43,6 +44,7 @@ export default class AdminController
         private gameStaleEvaluator: GameStaleEvaluator,
         private autoCancelStaleGames: AutoCancelStaleGames,
         private featureUsageRepository: FeatureUsageRepository,
+        private liveLobbyHistoryRepository: LiveLobbyHistoryRepository,
     ) {}
 
     /**
@@ -75,6 +77,23 @@ export default class AdminController
     async getFeatureUsage()
     {
         return await this.featureUsageRepository.getFeatureUsage();
+    }
+
+    /**
+     * Live games that have been waiting for an opponent in lobby,
+     * with when they appeared and left the lobby, and whether they have been accepted or canceled.
+     */
+    @Get('/api/admin/live-lobby-history')
+    async getLiveLobbyHistory(
+        @QueryParam('since', { required: true }) since: string,
+    ) {
+        const sinceDate = new Date(since);
+
+        if (isNaN(sinceDate.getTime())) {
+            throw new BadRequestError('Invalid "since" date');
+        }
+
+        return await this.liveLobbyHistoryRepository.getLiveLobbyHistory(sinceDate);
     }
 
     @Post('/api/admin/persist-games')

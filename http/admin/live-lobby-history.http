@@ -1,0 +1,6 @@
+# Live games (initial time < 1 day) waiting for an opponent in lobby (no tournament, ladder or rematch),
+# that left lobby after "since" date: accepted, or canceled before anyone joined.
+# Returns games as [createdAt, timestamp when left lobby, 1 if accepted else 0, moves count].
+
+GET /api/admin/live-lobby-history?since=2026-10-01
+Authorization: Bearer {{ adminPassword }}
