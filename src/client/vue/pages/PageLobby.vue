@@ -34,7 +34,6 @@ import AppRhombusAutoOrientation from '../components/AppRhombusAutoOrientation.v
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppChannel from '../components/AppChannel.vue';
 import AppTutorialCard from '../components/AppTutorialCard.vue';
-import AppSurveyCard from '../components/AppSurveyCard.vue';
 import AppPlayhexChillCard from '../components/AppPlayhexChillCard.vue';
 import { getPlayerLocales } from '../../../shared/app/i18n/index.js';
 
@@ -419,8 +418,6 @@ for (const locale of getPlayerLocales()) {
                 />
 
                 <AppChannel :channels />
-
-                <AppSurveyCard />
 
                 <AppPlayhexChillCard />
 
