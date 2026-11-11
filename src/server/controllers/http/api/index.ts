@@ -7,6 +7,7 @@ import PlayerNotificationController from './PlayerNotificationController.js';
 import AuthController from './AuthController.js';
 import AccountController from './AccountController.js';
 import OnlinePlayersController from './OnlinePlayersController.js';
+import LobbyWaitStatsController from './LobbyWaitStatsController.js';
 import PlayerFavoriteTimeControlController from './PlayerFavoriteTimeControlController.js';
 import PlayerSettingsController from './PlayerSettingsController.js';
 import AdminController from './AdminController.js';
@@ -96,6 +97,7 @@ export const registerApi = (app: Express) => {
         },
         controllers: [
             OnlinePlayersController,
+            LobbyWaitStatsController,
             GameController,
             GameConditionalMovesController,
             GameChatSubscriptionController,

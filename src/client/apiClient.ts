@@ -2173,3 +2173,20 @@ export const apiRevokeOAuthConnectedApplication = async (clientId: string): Prom
 
     await checkResponse(response);
 };
+
+/**
+ * Typical (p60) time for a live lobby game to be joined, for each UTC hour of day.
+ * Response is cached 24h by browser (Cache-Control).
+ */
+export const apiGetLobbyWaitStats = async (): Promise<{ typicalJoinMsByUtcHour: (null | number)[] }> => {
+    const response = await fetch('/api/lobby-wait-stats', {
+        method: 'get',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return await response.json() as { typicalJoinMsByUtcHour: (null | number)[] };
+};

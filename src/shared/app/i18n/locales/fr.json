@@ -841,6 +841,7 @@
     },
     "game_has_been_canceled": "La partie a été annulée.",
     "waiting_for_an_opponent": "En attente d'un adversaire…",
+    "host_waiting_typical_join_time": "En général, une partie est rejointe en ~{{duration}} à cette heure.",
     "confirm_overlay": {
         "confirmation": "Confirmation",
         "are_you_sure?": "Êtes-vous sûr(e) ?",
