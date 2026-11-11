@@ -23,7 +23,7 @@ const parseStrict = (str: string): number => {
  * Here are different timings:
  *
  * 1v1              live                    correspondence
- * created          30s host offline        x
+ * created          5s host offline         x
  * started - empty  1 day inactive          2 weeks inactive
  * started - move   x                       x
  *
@@ -61,6 +61,6 @@ export const timings = {
      * Prevent keeping offline live game on lobby.
      * Requires listening players online/offline events.
      */
-    createdOrEmptyLiveGameHostLeft: parseStrict('30 seconds'),
+    createdOrEmptyLiveGameHostLeft: parseStrict('5 seconds'),
 
 };
