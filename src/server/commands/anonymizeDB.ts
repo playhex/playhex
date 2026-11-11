@@ -17,10 +17,21 @@ hexProgram
             [await hashPassword('test')],
         );
 
-        console.log('Remove all push notifications');
+        console.log('Remove account private data');
+        await AppDataSource.query('truncate player_account_discord');
+        await AppDataSource.query('truncate player_account_email');
+        await AppDataSource.query('truncate player_ai_worker_key');
+        await AppDataSource.query('truncate player_cheat');
+        await AppDataSource.query('truncate player_push_subscription');
+        await AppDataSource.query('truncate player_ip');
+
+        console.log('Remove conditional moves of still playing games');
         await AppDataSource.query(
-            'truncate player_push_subscription',
+            'delete cm from conditional_moves cm join game g on cm.gameId = g.id where g.state != "ended"',
         );
+
+        console.log('Remove survey answers');
+        await AppDataSource.query('truncate survey_answer');
 
         console.log('done');
     })
