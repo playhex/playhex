@@ -594,7 +594,7 @@ const {
 
                             <p v-else-if="cannotJoinReasonKey" class="text-center mb-0">{{ $t(cannotJoinReasonKey, { pseudo: cannotJoinOpponentPseudo }) }}</p>
 
-                            <AppHostWaitingHints v-if="cannotJoinReasonType === 'cannot_join_reason.is_host' && isPublicLiveLobbyGame(game)" />
+                            <AppHostWaitingHints v-if="cannotJoinReasonType === 'cannot_join_reason.is_host' && isPublicLiveLobbyGame(game)" :createdAt="game.createdAt" />
 
                             <button
                                 v-if="canDeclineChallenge"

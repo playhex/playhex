@@ -1,3 +1,0 @@
-# Typical (p60) time for a live lobby game to be joined, for each UTC hour of day, shown to waiting hosts.
-
-GET /api/lobby-wait-stats

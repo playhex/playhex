@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { computeTypicalJoinMsByUtcHour, computeTypicalJoinTime } from '../../services/lobbyWaitStats.js';
+import { computeJoinChances, computeJoinChancesByUtcHour, kaplanMeier } from '../../services/lobbyWaitStats.js';
 import { type LiveLobbyHistoryGame } from '../../repositories/LiveLobbyHistoryRepository.js';
 
 const at = (hour: number, minute = 0): number => Date.UTC(2026, 10, 1, hour, minute);
@@ -8,50 +8,77 @@ const at = (hour: number, minute = 0): number => Date.UTC(2026, 10, 1, hour, min
 const joined = (hour: number, waitSeconds: number): LiveLobbyHistoryGame => [at(hour), at(hour) + waitSeconds * 1000, 1, 20];
 const canceled = (hour: number, waitSeconds: number): LiveLobbyHistoryGame => [at(hour), at(hour) + waitSeconds * 1000, 0, 0];
 
+const times = <T>(n: number, f: () => T): T[] => Array.from({ length: n }, f);
+
 describe('lobbyWaitStats', () => {
-    it('returns null when not enough joined games', () => {
-        const games = Array.from({ length: 9 }, () => joined(14, 30));
+    describe('kaplanMeier', () => {
+        it('removes canceled hosts from those still waiting, instead of counting them as not joined', () => {
+            // A joined at 30s, B canceled at 10s, C canceled at 5min
+            const survival = kaplanMeier([[30000, 1], [10000, 0], [300000, 0]]);
 
-        assert.strictEqual(computeTypicalJoinTime(games, 14), null);
+            assert.strictEqual(survival(0), 1);
+            assert.strictEqual(survival(29999), 1);
+            assert.strictEqual(survival(30000), 0.5);
+            assert.strictEqual(survival(600000), 0.5);
+        });
+
+        it('considers canceled host as still waiting when joined at same time', () => {
+            const survival = kaplanMeier([[10000, 1], [10000, 0], [20000, 1]]);
+
+            // 1 joined out of 3 at 10s, then 1 out of 1 at 20s
+            assert.strictEqual(survival(10000), 1 - 1 / 3);
+            assert.strictEqual(survival(20000), 0);
+        });
     });
 
-    it('returns p60 of joined games, ignoring canceled ones', () => {
-        const games = [
-            ...Array.from({ length: 6 }, () => joined(14, 10)),
-            ...Array.from({ length: 4 }, () => joined(14, 60)),
-            ...Array.from({ length: 20 }, () => canceled(14, 5)),
-        ];
+    describe('computeJoinChances', () => {
+        it('returns null when not enough games', () => {
+            const games = times(49, () => joined(14, 30));
 
-        // sorted index 5.4: between 10s and 60s
-        assert.deepStrictEqual(computeTypicalJoinTime(games, 14), { joinMs: 30000, sampleSize: 10 });
+            assert.deepStrictEqual(computeJoinChances(games, 14), { firstMinute: null, nextTenMinutes: null });
+        });
+
+        it('returns chances to be joined in first minute, then in next 10 minutes', () => {
+            const games = [
+                ...times(20, () => joined(14, 30)),
+                ...times(20, () => canceled(14, 30)), // removed before first minute
+                ...times(15, () => joined(14, 5 * 60)),
+                ...times(25, () => canceled(14, 30 * 60)), // still waiting after 11 minutes
+            ];
+
+            // 20 joined out of 80 still waiting at 30s, then 15 out of 40 still waiting after 1min
+            assert.deepStrictEqual(computeJoinChances(games, 14), { firstMinute: 25, nextTenMinutes: 38 });
+        });
+
+        it('returns null for next minutes when not enough hosts still waiting', () => {
+            const games = [
+                ...times(40, () => joined(14, 30)),
+                ...times(19, () => canceled(14, 30 * 60)),
+            ];
+
+            assert.deepStrictEqual(computeJoinChances(games, 14), { firstMinute: 68, nextTenMinutes: null });
+        });
+
+        it('only considers games created around given hour, wrapping around midnight', () => {
+            const games = [
+                ...times(25, () => joined(23, 10)),
+                ...times(25, () => joined(1, 10)),
+                ...times(50, () => canceled(12, 300)),
+            ];
+
+            assert.strictEqual(computeJoinChances(games, 0).firstMinute, 100);
+            assert.strictEqual(computeJoinChances(games, 2).firstMinute, null);
+            assert.strictEqual(computeJoinChances(games, 12).firstMinute, 0);
+        });
     });
 
-    it('returns p60 on exact rank', () => {
-        // 11 games, index 6 is exact
-        const games = Array.from({ length: 11 }, (_, i) => joined(14, (i + 1) * 10));
-
-        assert.strictEqual(computeTypicalJoinTime(games, 14)?.joinMs, 70000);
-    });
-
-    it('only considers games created around given hour, wrapping around midnight', () => {
-        const games = [
-            ...Array.from({ length: 5 }, () => joined(23, 10)),
-            ...Array.from({ length: 5 }, () => joined(1, 10)),
-            ...Array.from({ length: 10 }, () => joined(12, 300)),
-        ];
-
-        assert.strictEqual(computeTypicalJoinTime(games, 0)?.joinMs, 10000);
-        assert.strictEqual(computeTypicalJoinTime(games, 2), null);
-    });
-
-    it('computes stats for each hour of day', () => {
-        const games = Array.from({ length: 10 }, () => joined(12, 45));
-        const byHour = computeTypicalJoinMsByUtcHour(games);
+    it('computes chances for each hour of day', () => {
+        const games = times(50, () => joined(12, 45));
+        const byHour = computeJoinChancesByUtcHour(games);
 
         assert.strictEqual(byHour.length, 24);
-        assert.strictEqual(byHour[11], 45000);
-        assert.strictEqual(byHour[12], 45000);
-        assert.strictEqual(byHour[13], 45000);
-        assert.strictEqual(byHour[14], null);
+        assert.strictEqual(byHour[11].firstMinute, 100);
+        assert.strictEqual(byHour[13].firstMinute, 100);
+        assert.strictEqual(byHour[14].firstMinute, null);
     });
 });

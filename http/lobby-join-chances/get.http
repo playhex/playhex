@@ -1,0 +1,3 @@
+# Chances for a live lobby game to be joined in first minute, then in next 10 minutes, for each UTC hour of day, shown to waiting hosts.
+
+GET /api/lobby-join-chances

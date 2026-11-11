@@ -2175,11 +2175,17 @@ export const apiRevokeOAuthConnectedApplication = async (clientId: string): Prom
 };
 
 /**
- * Typical (p60) time for a live lobby game to be joined, for each UTC hour of day.
+ * Percent chances for a live lobby game to be joined, for each UTC hour of day:
+ * within first minute, and within next 10 minutes when still not joined after first minute.
  * Response is cached 7 days by browser (Cache-Control).
  */
-export const apiGetLobbyWaitStats = async (): Promise<{ typicalJoinMsByUtcHour: (null | number)[] }> => {
-    const response = await fetch('/api/lobby-wait-stats', {
+export type LobbyJoinChances = {
+    firstMinute: null | number;
+    nextTenMinutes: null | number;
+};
+
+export const apiGetLobbyJoinChances = async (): Promise<{ joinChancesByUtcHour: LobbyJoinChances[] }> => {
+    const response = await fetch('/api/lobby-join-chances', {
         method: 'get',
         headers: {
             'Accept': 'application/json',
@@ -2188,5 +2194,5 @@ export const apiGetLobbyWaitStats = async (): Promise<{ typicalJoinMsByUtcHour: 
 
     await checkResponse(response);
 
-    return await response.json() as { typicalJoinMsByUtcHour: (null | number)[] };
+    return await response.json() as { joinChancesByUtcHour: LobbyJoinChances[] };
 };

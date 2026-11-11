@@ -1,55 +1,84 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import i18next from 'i18next';
 import useOnlinePlayersStore from '../../stores/onlinePlayersStore.js';
 import Rooms from '../../../shared/app/Rooms.js';
 import { useSocketRoom } from '../composables/useSocketRoom.js';
-import { apiGetLobbyWaitStats } from '../../apiClient.js';
+import { apiGetLobbyJoinChances, type LobbyJoinChances } from '../../apiClient.js';
 import { IconCircleFill, IconHourglass } from '../icons.js';
 
 /*
  * Shown to a host waiting for an opponent to join his live game,
- * to let him know someone will probably join soon, and avoid canceling too early.
+ * to let him know his chances to be joined, and avoid canceling too early.
  */
+
+const props = defineProps<{
+    /**
+     * When the game has been created, to know how long host has been waiting.
+     */
+    createdAt: Date;
+}>();
+
+const FIRST_MINUTE_MS = 60 * 1000;
 
 useSocketRoom(Rooms.onlinePlayersCount);
 
 const { activePlayersCount } = storeToRefs(useOnlinePlayersStore());
 
-const typicalJoinMsByUtcHour = ref<null | (null | number)[]>(null);
+const joinChancesByUtcHour = ref<null | LobbyJoinChances[]>(null);
+
+/*
+ * Chances depend on when game has been created,
+ * and switch to "next minutes" chances once first minute passed.
+ */
+const firstMinutePassed = ref(Date.now() - props.createdAt.getTime() >= FIRST_MINUTE_MS);
+let firstMinuteTimeout: null | ReturnType<typeof setTimeout> = null;
 
 onMounted(async () => {
+    if (!firstMinutePassed.value) {
+        firstMinuteTimeout = setTimeout(
+            () => firstMinutePassed.value = true,
+            FIRST_MINUTE_MS - (Date.now() - props.createdAt.getTime()),
+        );
+    }
+
     try {
-        typicalJoinMsByUtcHour.value = (await apiGetLobbyWaitStats()).typicalJoinMsByUtcHour;
+        joinChancesByUtcHour.value = (await apiGetLobbyJoinChances()).joinChancesByUtcHour;
     } catch {
         // Hints are optional, display nothing
     }
 });
 
-const typicalJoinMs = computed((): null | number => typicalJoinMsByUtcHour.value?.[new Date().getUTCHours()] ?? null);
+onUnmounted(() => {
+    if (firstMinuteTimeout !== null) {
+        clearTimeout(firstMinuteTimeout);
+    }
+});
 
-/**
- * "25 s" or "2 min", rounded, since it is only an estimation.
- */
-const formatApproxDuration = (ms: number): string => {
-    const seconds = ms / 1000;
+const joinChances = computed((): null | LobbyJoinChances => joinChancesByUtcHour.value?.[props.createdAt.getUTCHours()] ?? null);
 
-    if (seconds < 60) {
-        return new Intl.NumberFormat(i18next.resolvedLanguage, { style: 'unit', unit: 'second', unitDisplay: 'short' })
-            .format(Math.max(5, Math.round(seconds / 5) * 5));
+const hint = computed((): null | { key: string, percent: string } => {
+    const percent = firstMinutePassed.value
+        ? joinChances.value?.nextTenMinutes
+        : joinChances.value?.firstMinute;
+
+    if (percent === null || percent === undefined) {
+        return null;
     }
 
-    return new Intl.NumberFormat(i18next.resolvedLanguage, { style: 'unit', unit: 'minute', unitDisplay: 'short' })
-        .format(Math.round(seconds / 60));
-};
+    return {
+        key: firstMinutePassed.value ? 'host_waiting_join_chance_next_minutes' : 'host_waiting_join_chance_first_minute',
+        percent: new Intl.NumberFormat(i18next.resolvedLanguage, { style: 'percent' }).format(percent / 100),
+    };
+});
 </script>
 
 <template>
     <div class="host-waiting-hints small text-center">
-        <p v-if="null !== typicalJoinMs" class="mb-1">
+        <p v-if="null !== hint" class="mb-1">
             <IconHourglass />
-            {{ ' ' + $t('host_waiting_typical_join_time', { duration: formatApproxDuration(typicalJoinMs) }) }}
+            {{ ' ' + $t(hint.key, { percent: hint.percent }) }}
         </p>
         <p v-if="null !== activePlayersCount" class="mb-0">
             <IconCircleFill class="text-success active-players-icon" />
