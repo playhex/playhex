@@ -16,7 +16,7 @@ export function pwaRouter(): Router {
             name: seo.title,
             description: seo.description,
             lang: 'en',
-            theme_color: '#DC3545',
+            theme_color: '#212529',
             background_color: '#212529',
             display: 'standalone',
             display_override: ['window-controls-overlay', 'standalone', 'minimal-ui'],

@@ -8,6 +8,14 @@ const LOCAL_SETTINGS_KEY = 'hex-local-settings';
 export type DarkOrLight = 'dark' | 'light';
 export type SelectedTheme = DarkOrLight | 'auto';
 
+/**
+ * Bootstrap body background, used for theme-color meta (PWA/TWA status and navigation bars)
+ */
+const THEME_COLORS: Record<DarkOrLight, string> = {
+    dark: '#212529',
+    light: '#ffffff',
+};
+
 export class LocalSettings
 {
     /**
@@ -163,6 +171,11 @@ const usePlayerLocalSettingsStore = defineStore('playerLocalSettingsStore', () =
     watchEffect(() => {
         localStorage?.setItem('selectedTheme', localSettings.value.selectedTheme);
         document.documentElement.setAttribute('data-bs-theme', displayedTheme());
+
+        // Color PWA/TWA system bars with page background, overriding media-based meta tags from page.ejs
+        document.querySelectorAll('meta[name="theme-color"]').forEach(meta => {
+            meta.setAttribute('content', THEME_COLORS[displayedTheme()]);
+        });
     });
 
     return {

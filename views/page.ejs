@@ -6,7 +6,8 @@
     <title><%= locals.socialMeta ? socialMeta.title : seo.title %></title>
 
     <link rel="manifest" href="/pwa-manifest.json" />
-    <meta name="theme-color" content="#DC3545"/>
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#212529" media="(prefers-color-scheme: dark)">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1">
 
     <%- include('partials/seo-tags.ejs') %>
