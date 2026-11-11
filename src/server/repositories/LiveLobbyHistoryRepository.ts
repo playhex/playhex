@@ -32,6 +32,10 @@ export default class LiveLobbyHistoryRepository
      *
      * Rematches are excluded: before july 2026 they had no opponentPublicId,
      * but were actually only joined by the previous opponent.
+     *
+     * `endedAt >= since` is redundant with the coalesce condition
+     * (ended and canceled games always have endedAt, after they left lobby),
+     * but allows to use endedAt indexes instead of scanning all games.
      */
     async getLiveLobbyHistory(since: Date): Promise<LiveLobbyHistory>
     {
@@ -54,9 +58,10 @@ export default class LiveLobbyHistoryRepository
             and g.rematchedFromId is null
             and g.state in ('ended', 'canceled')
             and cast(json_extract(g.timeControlType, '$.options.initialTime') as unsigned) < 86400000
+            and g.endedAt >= ?
             and coalesce(g.startedAt, g.endedAt) >= ?
             order by g.createdAt
-        `, [since]);
+        `, [since, since]);
 
         const games: LiveLobbyHistoryGame[] = [];
 

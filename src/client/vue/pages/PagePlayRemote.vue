@@ -4,6 +4,7 @@ import 'bootstrap/js/dist/dropdown.js';
 import useLobbyStore from '../../stores/lobbyStore.js';
 import { ref, computed, watch } from 'vue';
 import AppClosedGameInvite from '../components/AppClosedGameInvite.vue';
+import AppHostWaitingHints from '../components/AppHostWaitingHints.vue';
 import AppBoard from '../components/AppBoard.vue';
 import ConfirmationOverlay from '../components/overlay/ConfirmationOverlay.vue';
 import { defineOverlay } from '@overlastic/vue';
@@ -21,7 +22,7 @@ import { Game } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { tournamentMatchFullTitle } from '../../../shared/app/tournamentUtils.js';
 import { apiPostRematch, getPlayer } from '../../apiClient.js';
-import { canJoin, isChallengeGame, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame, isBotGame, canShowHexworldLink, canShowHexplorerLink } from '../../../shared/app/gameUtils.js';
+import { canJoin, isChallengeGame, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame, isBotGame, canShowHexworldLink, canShowHexplorerLink, isPublicLiveLobbyGame } from '../../../shared/app/gameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
@@ -593,6 +594,8 @@ const {
 
                             <p v-else-if="cannotJoinReasonKey" class="text-center mb-0">{{ $t(cannotJoinReasonKey, { pseudo: cannotJoinOpponentPseudo }) }}</p>
 
+                            <AppHostWaitingHints v-if="cannotJoinReasonType === 'cannot_join_reason.is_host' && isPublicLiveLobbyGame(game)" />
+
                             <button
                                 v-if="canDeclineChallenge"
                                 type="button"
@@ -800,7 +803,7 @@ const {
     pointer-events none // only its content blocks the board
 
 .join-button-container
-    background rgba(0, 0, 0, 0.1)
+    background rgba(0, 0, 0, 0.3)
     padding 1em 0
     pointer-events auto
 

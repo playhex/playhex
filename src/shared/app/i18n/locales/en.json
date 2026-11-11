@@ -235,6 +235,7 @@
     },
     "game_has_been_canceled": "Game has been canceled.",
     "waiting_for_an_opponent": "Waiting for an opponent…",
+    "host_waiting_typical_join_time": "Usually, a game is joined in ~{{duration}} at this time of day.",
     "confirm_overlay": {
         "confirmation": "Confirmation",
         "are_you_sure?": "Are you sure?"
