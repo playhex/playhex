@@ -28,6 +28,7 @@ import { SimilarPlayingPositionChecker } from './services/anti-cheat/SimilarPlay
 
 type GameEvents = {
     played: () => void;
+    started: () => void;
     ended: () => void;
     canceled: () => void;
     chat: () => void;
@@ -598,6 +599,8 @@ export default class GameServer extends TypedEmitter<GameEvents>
         this.logger.info('Game Started.', { startedAt: this.game.startedAt });
 
         notifier.emit('gameStart', this.game);
+
+        this.emit('started');
 
         await this.autoSave.save();
 

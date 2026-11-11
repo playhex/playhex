@@ -11,7 +11,7 @@ import { getMyIndex, getOpponent } from '../../services/context-utils.js';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import AppPseudo from '../components/AppPseudo.vue';
-import { canJoin, getStrictWinnerPlayer, getStrictLoserPlayer, isBotGame, isChallengeTargetOf, isGuestBlockedFromRegisteredOnlyGame } from '../../../shared/app/gameUtils.js';
+import { canJoin, getStrictWinnerPlayer, getStrictLoserPlayer, isBotGame, isChallengeTargetOf, isGuestBlockedFromRegisteredOnlyGame, isPublicLiveLobbyGame } from '../../../shared/app/gameUtils.js';
 import { isUncommonBoardsize } from '../../../shared/app/gameOptionsUtils.js';
 import { Game, Tournament } from '../../../shared/app/models/index.js';
 import { formatDistanceToNowStrict } from 'date-fns';
@@ -22,7 +22,7 @@ import { apiGetActiveTournaments, apiPostCancel } from '../../apiClient.js';
 import useToastsStore from '../../stores/toastsStore.js';
 import AppFeaturedTournamentCard from '../tournaments/components/AppFeaturedTournamentCard.vue';
 import AppCijmTournamentCard2026 from '../components/AppCijmTournamentCard2026.vue';
-import { IconCalendar, IconCircleFill, IconEye, IconLightningChargeFill, IconSearch, IconTablerSwords, IconTrophyFill, IconX } from '../icons.js';
+import { IconCalendar, IconCircleFill, IconEye, IconInfoCircleFill, IconLightningChargeFill, IconSearch, IconTablerSwords, IconTrophyFill, IconX } from '../icons.js';
 import AppLobbyFeaturesLiveGames from '../components/AppLobbyFeaturesLiveGames.vue';
 import AppLobbyFeaturesCorrespondenceGames from '../components/AppLobbyFeaturesCorrespondenceGames.vue';
 import usePlayingGamesCountStore from '../../stores/playingGamesCountStore.js';
@@ -52,6 +52,25 @@ const { clearSoftRemovedGames } = lobbyStore;
 const { currentLobby, currentLobbyGames, endedGames, waitingGamesCount } = storeToRefs(lobbyStore);
 const { live: livePlayingCount, correspondence: correspondencePlayingCount } = storeToRefs(usePlayingGamesCountStore());
 const authStore = useAuthStore();
+
+/**
+ * My live games waiting in lobby.
+ * When there is more than one, explain that others will be canceled once one is accepted.
+ */
+const myWaitingLobbyGamesCount = computed<number>(() => {
+    const myPublicId = authStore.loggedInPlayer?.publicId;
+
+    if (!myPublicId) {
+        return 0;
+    }
+
+    return Object.values(lobbyStore.games).filter(game =>
+        !lobbyStore.isSoftRemoved(game)
+        && game.state === 'created'
+        && game.host?.publicId === myPublicId
+        && isPublicLiveLobbyGame(game),
+    ).length;
+});
 
 const {
     createGuestJoiningCorrepondenceWarningOverlay,
@@ -300,6 +319,11 @@ for (const locale of getPlayerLocales()) {
                         </div>
                         <div v-else class="card-body waiting-games-list">
                             <div class="card-text text-secondary"><i>{{ $t(currentLobby === 'live' ? 'lobby.no_open_live_games' : 'lobby.no_open_correspondence_games') }}</i></div>
+                        </div>
+                        <div v-if="currentLobby === 'live' && myWaitingLobbyGamesCount > 1" class="card-footer small">
+                            <IconInfoCircleFill class="text-info me-1" />
+                            <strong>{{ $t('lobby.multiple_waiting_games') }}</strong>
+                            {{ ' ' + $t('lobby.others_canceled_once_one_accepted') }}
                         </div>
                     </div>
                 </section>

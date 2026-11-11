@@ -20,7 +20,9 @@
         "open_live_games": "Join a live game",
         "open_correspondence_games": "Join a correspondence game",
         "no_open_live_games": "No open live games for now",
-        "no_open_correspondence_games": "No open correspondence games for now"
+        "no_open_correspondence_games": "No open correspondence games for now",
+        "multiple_waiting_games": "Multiple waiting games:",
+        "others_canceled_once_one_accepted": "Once one of your waiting games is accepted, the others are canceled."
     },
     "game": {
         "title": "Game",

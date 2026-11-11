@@ -20,7 +20,9 @@
         "open_live_games": "Rejoindre une partie en direct",
         "open_correspondence_games": "Rejoindre une partie par correspondance",
         "no_open_live_games": "Pas de parties en direct en attente pour l'instant",
-        "no_open_correspondence_games": "Pas de parties par correspondance en attente pour l'instant"
+        "no_open_correspondence_games": "Pas de parties par correspondance en attente pour l'instant",
+        "multiple_waiting_games": "Plusieurs parties en attente :",
+        "others_canceled_once_one_accepted": "Dès qu'une de vos parties en attente est acceptée, les autres sont annulées."
     },
     "game": {
         "title": "Partie",

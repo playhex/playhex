@@ -55,6 +55,11 @@ export const cancelGameReasons = [
     'host_left',
 
     /**
+     * Host started another lobby game while this one was waiting
+     */
+    'host_playing',
+
+    /**
      * Stale because game started but first move not played
      */
     'inactive',

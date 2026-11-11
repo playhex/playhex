@@ -2,7 +2,7 @@ import { Game, GameOptions, GameToPlayer, Player, Rating } from './models/index.
 import { TimestampedMove, Outcome } from '../game-engine/Types.js';
 import { PlayerIndex } from '../game-engine/index.js';
 import SearchGamesParameters, { type GameType } from './SearchGamesParameters.js';
-import { isCorrespondence, TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
+import { isCorrespondence, isLive, TimeControlCadencyName, timeControlToCadencyName } from './timeControlUtils.js';
 import { GameData } from '../game-engine/normalization.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
 import { createTimeControl } from '../time-control/createTimeControl.js';
@@ -201,6 +201,20 @@ export const isChallengeGame = (game: GameOptions): game is GameOptions & { oppo
  */
 export const isWaitingClosedGame = (game: Game): boolean => {
     return game.closed && game.state === 'created';
+};
+
+/**
+ * Whether this game is a public live game from lobby, open to anyone.
+ * Once one of them is accepted and started, other waiting ones of same players are canceled.
+ */
+export const isPublicLiveLobbyGame = (game: Game): boolean => {
+    return isLive(game)
+        && !isBotGame(game)
+        && !isChallengeGame(game)
+        && !game.closed
+        && !game.tournamentMatch
+        && !game.ladderChallenge
+    ;
 };
 
 /**

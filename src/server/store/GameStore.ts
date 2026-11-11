@@ -16,7 +16,7 @@ import { AutoSave } from '../auto-save/AutoSave.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { errorToLogger, errorToString } from '../../shared/app/utils.js';
 import type { HexMove } from '@playhex/move-notation';
-import { getOtherPlayer, isBotGame, isChallengeGame, isChallengeTargetOf, isWaitingClosedGame } from '../../shared/app/gameUtils.js';
+import { getOtherPlayer, isBotGame, isChallengeGame, isChallengeTargetOf, isPublicLiveLobbyGame, isWaitingClosedGame } from '../../shared/app/gameUtils.js';
 import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 import { rateLimiterConsumeChatMessage } from '../services/rate-limiters.js';
@@ -170,6 +170,8 @@ export default class GameStore
 
         this.persistAfterDelayOfInactivity(gameServer);
 
+        gameServer.on('started', () => this.cancelOtherLobbyGamesOfPlayers(gameServer));
+
         gameServer.on('ended', () => {
             this.onGameEnded(gameServer).catch(e => {
                 logger.error('onGameEnded returned an error in ended event', errorToLogger(e));
@@ -181,6 +183,44 @@ export default class GameStore
                 logger.error('onGameCanceled returned an error in cancelede event', errorToLogger(e));
             });
         });
+    }
+
+    /**
+     * When a public live game from lobby is accepted and starts,
+     * cancel other public live games still waiting in lobby hosted by one of its players:
+     * they are now busy playing, an opponent should not be able to join them.
+     */
+    private cancelOtherLobbyGamesOfPlayers(startedGameServer: GameServer): void
+    {
+        const startedGame = startedGameServer.getGame();
+
+        if (!isPublicLiveLobbyGame(startedGame)) {
+            return;
+        }
+
+        const playersPublicIds = new Set(startedGame.gameToPlayers.map(({ player }) => player.publicId));
+
+        for (const publicId in this.activeGames) {
+            const gameServer = this.activeGames[publicId];
+            const game = gameServer.getGame();
+
+            if (
+                game.publicId === startedGame.publicId
+                || game.state !== 'created'
+                || game.host === null
+                || !playersPublicIds.has(game.host.publicId)
+                || !isPublicLiveLobbyGame(game)
+            ) {
+                continue;
+            }
+
+            logger.info('Cancel waiting lobby game because its host started another lobby game', {
+                gamePublicId: game.publicId,
+                startedGamePublicId: startedGame.publicId,
+            });
+
+            gameServer.systemCancel('host_playing');
+        }
     }
 
     /**
