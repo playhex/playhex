@@ -1,6 +1,6 @@
 import { Inject, Service } from 'typedi';
 import { IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
-import { ExternalGameImportJob, HexplorerStudy, Player, PlayerAccountDiscord, PlayerLittleGolemAccount } from '../../shared/app/models/index.js';
+import { ExternalGameImportJob, HexplorerStudy, MatchmakingEvent, Player, PlayerAccountDiscord, PlayerLittleGolemAccount } from '../../shared/app/models/index.js';
 
 const LAST_PLAYERS_LIMIT = 5;
 
@@ -23,6 +23,12 @@ export type FeatureUsage = {
     avatars: { count: number, lastPlayers: FeatureUsageLastPlayer[] };
     externalGameImports: { count: number, players: number, lastPlayers: FeatureUsageLastPlayer[] };
     hexplorerStudies: { count: number, players: number, lastPlayers: FeatureUsageLastPlayer[] };
+
+    /**
+     * count: games played through matchmaking
+     * players: distinct players who entered queue
+     */
+    matchmaking: { count: number, players: number, lastPlayers: FeatureUsageLastPlayer[] };
 };
 
 @Service()
@@ -43,6 +49,9 @@ export default class FeatureUsageRepository
 
         @Inject('Repository<HexplorerStudy>')
         private hexplorerStudyRepository: Repository<HexplorerStudy>,
+
+        @Inject('Repository<MatchmakingEvent>')
+        private matchmakingEventRepository: Repository<MatchmakingEvent>,
     ) {}
 
     async getFeatureUsage(): Promise<FeatureUsage>
@@ -62,6 +71,9 @@ export default class FeatureUsageRepository
             hexplorerStudies,
             hexplorerStudiesPlayers,
             hexplorerStudiesLastPlayers,
+            matchmakingGames,
+            matchmakingPlayers,
+            matchmakingLastPlayers,
         ] = await Promise.all([
             this.playerRepository.countBy({ pronouns: Not(IsNull()) }),
             this.playerLittleGolemAccountRepository.count(),
@@ -81,6 +93,9 @@ export default class FeatureUsageRepository
             this.hexplorerStudyRepository.count(),
             this.countDistinct(this.hexplorerStudyRepository.createQueryBuilder('e'), 'e.authorId'),
             this.lastPlayers(this.hexplorerStudyRepository.createQueryBuilder('e'), 'e.createdAt', 'author'),
+            this.matchmakingEventRepository.countBy({ type: 'match' }),
+            this.countDistinct(this.matchmakingEventRepository.createQueryBuilder('e').where('e.type = \'enter\''), 'e.playerId'),
+            this.lastPlayers(this.matchmakingEventRepository.createQueryBuilder('e').where('e.type = \'enter\''), 'e.createdAt'),
         ]);
 
         return {
@@ -91,6 +106,7 @@ export default class FeatureUsageRepository
             avatars: { count: avatars, lastPlayers: avatarsLastPlayers },
             externalGameImports: { count: externalGameImports, players: externalGameImportsPlayers, lastPlayers: externalGameImportsLastPlayers },
             hexplorerStudies: { count: hexplorerStudies, players: hexplorerStudiesPlayers, lastPlayers: hexplorerStudiesLastPlayers },
+            matchmaking: { count: matchmakingGames, players: matchmakingPlayers, lastPlayers: matchmakingLastPlayers },
         };
     }
 

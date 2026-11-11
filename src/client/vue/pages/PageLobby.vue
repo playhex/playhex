@@ -6,6 +6,7 @@ import useAuthStore from '../../stores/authStore.js';
 import AppGameThumbnail from '../components/AppGameThumbnail.vue';
 import AppChrono from '../components/AppChrono.vue';
 import AppCreateGameButtons from '../components/AppCreateGameButtons.vue';
+import AppMatchmaking from '../components/AppMatchmaking.vue';
 import AppTimeControlLabel from '../components/AppTimeControlLabel.vue';
 import { getMyIndex, getOpponent } from '../../services/context-utils.js';
 import { useHead } from '@unhead/vue';
@@ -227,6 +228,9 @@ for (const locale of getPlayerLocales()) {
                         </template>
                     </div>
                 </section>
+
+                <!-- Matchmaking -->
+                <AppMatchmaking />
 
                 <!-- Create game -->
                 <h2>{{ $t('new_game') }}</h2>

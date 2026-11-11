@@ -10,7 +10,7 @@ import { defineOverlay } from '@overlastic/vue';
 import { Ref, watchEffect } from 'vue';
 import useAuthStore from '../../stores/authStore.js';
 import { useRoute, useRouter } from 'vue-router';
-import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit } from '../icons.js';
+import { IconFlag, IconXLg, IconCheck, IconArrowBarLeft, IconRepeat, IconArrowCounterclockwise, IconRewind, IconList, IconArrowDownUp, IconSignpostSplit, IconTrophy } from '../icons.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import { storeToRefs } from 'pinia';
 import { t } from 'i18next';
@@ -21,7 +21,7 @@ import { Game } from '../../../shared/app/models/index.js';
 import { pseudoString } from '../../../shared/app/pseudoUtils.js';
 import { tournamentMatchFullTitle } from '../../../shared/app/tournamentUtils.js';
 import { apiPostRematch, getPlayer } from '../../apiClient.js';
-import { canJoin, isChallengeGame, getPlayers, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame, isBotGame, canShowHexworldLink, canShowHexplorerLink } from '../../../shared/app/gameUtils.js';
+import { canJoin, isChallengeGame, getPlayers, getOtherPlayer, shouldShowConditionalMoves, isGuestBlockedFromRegisteredOnlyGame, isBotGame, canShowHexworldLink, canShowHexplorerLink } from '../../../shared/app/gameUtils.js';
 import { useGuestJoiningCorrespondenceWarning } from '../composables/guestJoiningCorrespondenceWarning.js';
 import useCurrentGameStore from '../../stores/currentGameStore.js';
 import { useGameViewOrientation } from '../composables/useGameViewOrientation.js';
@@ -30,6 +30,8 @@ import AppHexplorerLink from '../hexplorer/components/AppHexplorerLink.vue';
 import { computeTimeControlAtMoveIndex } from '../../../shared/app/gameUtils.js';
 import { type GameTimeData } from '../../../shared/time-control/TimeControl.js';
 import useToastsStore from '../../stores/toastsStore.js';
+import useMatchmakingStore from '../../stores/matchmakingStore.js';
+import { isLive } from '../../../shared/app/timeControlUtils.js';
 
 const head = injectHead();
 
@@ -425,6 +427,33 @@ const createOrAcceptRematch = async (): Promise<void> => {
 };
 
 /*
+ * Play again with matchmaking, avoiding same opponent if another player is waiting
+ */
+const matchmakingStore = useMatchmakingStore();
+const { searching: matchmakingSearching, entering: matchmakingEntering } = storeToRefs(matchmakingStore);
+
+const canPlayAgainMatchmaking = computed<boolean>(() => {
+    if (!game.value || loggedInPlayer.value === null || localPlayerIndex.value === null) {
+        return false;
+    }
+
+    return game.value.state === 'ended'
+        && game.value.opponentType === 'player'
+        && isLive(game.value)
+    ;
+});
+
+const playAgainMatchmaking = async (): Promise<void> => {
+    if (!game.value || loggedInPlayer.value === null) {
+        return;
+    }
+
+    const opponent = getOtherPlayer(game.value, loggedInPlayer.value);
+
+    await matchmakingStore.enter(opponent?.publicId ?? null, game.value.publicId);
+};
+
+/*
  * Sidebar
  */
 const showSidebar = (open = true): void => {
@@ -663,6 +692,19 @@ const {
                         >
                             <IconArrowCounterclockwise />
                             <span class="hide-sm">{{ ' ' + $t('undo.undo_move') }}</span>
+                        </button>
+
+                        <!-- Play again with matchmaking -->
+                        <button
+                            v-if="canPlayAgainMatchmaking"
+                            type="button"
+                            class="btn btn-outline-warning"
+                            :disabled="matchmakingSearching || matchmakingEntering"
+                            @click="playAgainMatchmaking()"
+                        >
+                            <span v-if="matchmakingSearching" class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                            <IconTrophy v-else />
+                            <span class="hide-sm">{{ ' ' + (matchmakingSearching ? $t('matchmaking.searching') : $t('matchmaking.play_again')) }}</span>
                         </button>
 
                         <!-- Rematch -->

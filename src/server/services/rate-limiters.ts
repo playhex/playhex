@@ -119,6 +119,15 @@ const hexplorerLiveCreateLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit matchmaking enter/update preferences, by player.
+ */
+const matchmakingEnterLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.matchmaking_enter',
+    points: 60,
+    duration: 600,
+});
+
+/**
  * Limit javascript errors reported from player devices, by ip.
  */
 const clientErrorReportLimiter = new RateLimiterMemory({
@@ -287,6 +296,10 @@ const consume = async (limiter: RateLimiterMemory, key: string, pointsToConsume 
 
 export const rateLimiterConsumeHexplorerLiveCreate = async (playerPublicId: string) => {
     await consume(hexplorerLiveCreateLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumeMatchmakingEnter = async (playerPublicId: string) => {
+    await consume(matchmakingEnterLimiter, playerPublicId);
 };
 
 export const rateLimiterConsumeChatMessage = async (playerPublicId: string) => {

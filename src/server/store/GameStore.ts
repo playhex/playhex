@@ -521,6 +521,8 @@ export default class GameStore
 
             this.listenGameServer(gameServer);
 
+            notifier.emit('gameCreated', game);
+
             if (!(createOptions.persist ?? true)) {
                 return gameServer;
             }

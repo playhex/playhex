@@ -1,7 +1,8 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
-import { ArrayMaxSize, IsArray, IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateBy, ValidateIf } from 'class-validator';
+import { isValidMatchmakingPreferences, type MatchmakingPreferences } from '../matchmaking/matchmakingRules.js';
 import { allShadingPatterns, type ShadingPatternType } from '@playhex/shading-patterns';
 
 export enum MoveSettings {
@@ -157,4 +158,21 @@ export default class PlayerSettings
     @MaxLength(32, { each: true })
     @Column({ type: 'json', nullable: true })
     tutorialCompletedSteps?: null | string[];
+
+    /**
+     * Last matchmaking preferences (accepted/preferred boardsizes).
+     * null means default preferences.
+     * No default value: a patch without this field must not reset preferences.
+     */
+    @Expose()
+    @IsOptional()
+    @ValidateBy({
+        name: 'isMatchmakingPreferences',
+        validator: {
+            validate: (value: unknown) => isValidMatchmakingPreferences(value),
+            defaultMessage: () => 'Invalid matchmaking preferences, at least one boardsize must be accepted',
+        },
+    })
+    @Column({ type: 'json', nullable: true })
+    matchmakingPreferences?: null | MatchmakingPreferences;
 }

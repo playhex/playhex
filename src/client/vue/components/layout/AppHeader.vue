@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import useMyGamesStore from '../../../stores/myGamesStore.js';
+import useMatchmakingStore from '../../../stores/matchmakingStore.js';
 import { useRouter } from 'vue-router';
 import { IconHexagonFill, IconHexagon, IconRocketTakeOff, IconDownload, IconCrown } from '../../icons.js';
 import AppPlayerMenu from './AppPlayerMenu.vue';
@@ -91,6 +92,40 @@ const toolsRouteNames = ['hexplorer', 'swap-maps', 'offline-lobby', 'statistics'
 const isToolsRoute = computed<boolean>(() => routeName.value !== null
     && (toolsRouteNames.includes(routeName.value) || routeName.value.startsWith('tutorial')),
 );
+
+/*
+ * Matchmaking: searching button, goes to lobby matchmaking section
+ */
+const { searching: matchmakingSearching } = storeToRefs(useMatchmakingStore());
+
+const goToMatchmaking = async (): Promise<void> => {
+    if (router.currentRoute.value.name !== 'home') {
+        await router.push({ name: 'home' });
+    }
+
+    // Lobby page may be lazy loaded, wait for section to be rendered
+    const deadline = Date.now() + 3000;
+
+    const tryScroll = (): void => {
+        const section = document.getElementById('matchmaking');
+
+        if (section === null) {
+            if (Date.now() < deadline) {
+                requestAnimationFrame(tryScroll);
+            }
+
+            return;
+        }
+
+        const { top, bottom } = section.getBoundingClientRect();
+
+        if (top < 0 || bottom > window.innerHeight) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
+    tryScroll();
+};
 
 /*
  * Tutorial
@@ -296,6 +331,19 @@ const {
             </div>
 
             <div class="d-flex align-items-center">
+                <!-- Matchmaking searching -->
+                <button
+                    v-if="matchmakingSearching"
+                    type="button"
+                    class="btn btn-sm btn-warning me-2"
+                    :title="$t('matchmaking.searching')"
+                    :aria-label="$t('matchmaking.searching')"
+                    @click="goToMatchmaking()"
+                >
+                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                    <span class="d-none d-sm-inline">&nbsp;{{ $t('matchmaking.searching') }}</span>
+                </button>
+
                 <!-- Tutorial -->
                 <router-link
                     v-if="shouldDisplayLink"

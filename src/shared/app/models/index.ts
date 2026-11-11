@@ -25,6 +25,7 @@ import LadderChallenge from './LadderChallenge.js';
 import LadderEvent from './LadderEvent.js';
 import LadderPlayer from './LadderPlayer.js';
 import LadderReign from './LadderReign.js';
+import MatchmakingEvent from './MatchmakingEvent.js';
 import ModerationSetting from './ModerationSetting.js';
 import OAuthClient from './OAuthClient.js';
 import OAuthPayload from './OAuthPayload.js';
@@ -93,6 +94,7 @@ export {
     LadderEvent,
     LadderPlayer,
     LadderReign,
+    MatchmakingEvent,
     ModerationSetting,
     MoveSettings,
     OAuthClient,
@@ -164,6 +166,7 @@ export const entities = {
     LadderEvent,
     LadderPlayer,
     LadderReign,
+    MatchmakingEvent,
     ModerationSetting,
     OAuthClient,
     OAuthPayload,

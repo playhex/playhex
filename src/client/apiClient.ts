@@ -28,6 +28,7 @@ import type SearchHexplorerStudiesParameters from '../shared/app/SearchHexplorer
 import type { PuzzleInput } from '../shared/app/puzzles/puzzleTree.js';
 import type { PuzzleCheckInput, PuzzleCheckState, PuzzleSolvePositionInput, PuzzleSolvePositionOutput } from '../shared/app/puzzles/puzzleCheck.js';
 import type { PuzzleGenerateInput, PuzzleGenerateState } from '../shared/app/puzzles/puzzleGenerate.js';
+import type { MatchmakingPreferences, MatchmakingStatus } from '../shared/app/matchmaking/matchmakingRules.js';
 import type { PuzzleCollectionInput } from '../shared/app/puzzles/puzzleCollection.js';
 import type { Move } from '@playhex/move-notation';
 import type { PuzzleMonitorUncoveredLineCount } from '../shared/app/puzzles/puzzleMonitor.js';
@@ -2172,4 +2173,57 @@ export const apiRevokeOAuthConnectedApplication = async (clientId: string): Prom
     });
 
     await checkResponse(response);
+};
+
+/*
+ * Matchmaking
+ */
+export const apiPostMatchmaking = async (preferences: MatchmakingPreferences, avoidPlayerPublicId: null | string = null): Promise<null | MatchmakingStatus> => {
+    const response = await fetch('/api/matchmaking', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ preferences, avoidPlayerPublicId }),
+    });
+
+    await checkResponse(response);
+
+    return (await response.json()).status;
+};
+
+export const apiDeleteMatchmaking = async (): Promise<void> => {
+    const response = await fetch('/api/matchmaking', {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+};
+
+export const apiGetMatchmakingStatus = async (): Promise<null | MatchmakingStatus> => {
+    const response = await fetch('/api/matchmaking/me', {
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return (await response.json()).status;
+};
+
+export const apiGetMatchmakingStats = async (playerPublicId: string): Promise<{ gamesCount: number, streak: number }> => {
+    const response = await fetch(`/api/matchmaking/stats/${playerPublicId}`, {
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return await response.json();
 };

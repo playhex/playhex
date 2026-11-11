@@ -6,6 +6,7 @@ import { OnlinePlayerPage } from './OnlinePlayerPage.js';
 import { ChatMessage, GameAnalyze, Game, Player, Rating } from './models/index.js';
 import type { ChannelChatMessage, OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
 import { PlayerOnlineStatus, WebsocketActionError } from './Types.js';
+import type { MatchmakingStatus } from './matchmaking/matchmakingRules.js';
 import type { HexplorerLiveCursor, HexplorerLiveSession, HexplorerLiveSnapshot, HexplorerMatch, HexplorerMatchCreateInput } from './hexplorerLive.js';
 
 export type HexClientToServerEvents = {
@@ -131,6 +132,17 @@ export type HexClientToServerEvents = {
 };
 
 export type HexServerToClientEvents = {
+    /**
+     * Matchmaking: my search state changed (entered, preferences updated, left).
+     * null when I am no longer searching.
+     */
+    matchmakingStatus: (status: null | MatchmakingStatus) => void;
+
+    /**
+     * Matchmaking: I have been matched, game created or joined, I should go on it.
+     */
+    matchmakingMatched: (gamePublicId: string) => void;
+
     /**
      * A game has been created.
      */

@@ -43,6 +43,7 @@ import SurveyAnswerController from './SurveyAnswerController.js';
 import HexGameImporterController from './HexGameImporterController.js';
 import LadderController from '../../../ladder/LadderController.js';
 import AdminLadderController from '../../../ladder/AdminLadderController.js';
+import MatchmakingController from '../../../matchmaking/MatchmakingController.js';
 import HexplorerStudyController from './HexplorerStudyController.js';
 import PuzzleController from '../../../puzzles/PuzzleController.js';
 import PuzzleCollectionController from '../../../puzzles/PuzzleCollectionController.js';
@@ -107,6 +108,7 @@ export const registerApi = (app: Express) => {
             TournamentBanController,
             TournamentSeriesController,
             LadderController,
+            MatchmakingController,
             HexplorerStudyController,
             PuzzleController,
             PuzzleCollectionController,

@@ -2260,5 +2260,37 @@
         "day": "Day",
         "week": "Week",
         "month": "Month"
+    },
+    "matchmaking": {
+        "title": "Matchmaking",
+        "play": "Play",
+        "searching": "Searching…",
+        "cancel": "Cancel",
+        "how_it_works": "How it works",
+        "ranked": "Ranked",
+        "boardsizes": "Board sizes",
+        "legend_yes": "I accept",
+        "legend_heart": "I prefer",
+        "legend_no": "I refuse",
+        "at_least_one_boardsize": "Accept at least one board size",
+        "choice_yes": "{{size}}×{{size}}: accepted. Click to prefer.",
+        "choice_heart": "{{size}}×{{size}}: preferred. Click to refuse.",
+        "choice_no": "{{size}}×{{size}}: refused. Click to accept.",
+        "rush_hour_now": "Rush hour, until {{end}}",
+        "rush_hour_next": "Rush hour: {{start}}–{{end}}, starts {{distance}}",
+        "games_count_one": "{{count}} game",
+        "games_count_other": "{{count}} games",
+        "streak_one": "{{count}} day streak",
+        "streak_other": "{{count}} days streak",
+        "play_again": "Play again (matchmaking)",
+        "matched_toast": "Opponent found, your game has started!",
+        "matched_toast_open": "Play",
+        "info": {
+            "paint": "Click a board size to change your choice. Keep pressed and slide to apply it to other sizes.",
+            "boardsize_pick": "The board size is picked among sizes accepted by both players, preferred ones first.",
+            "stay_online": "You can browse the site while searching, but the search stops if you go offline.",
+            "rush_hour": "Rush hour: most players are online, games are found faster.",
+            "streak": "Days in a row: consecutive days with at least one matchmaking game."
+        }
     }
 }

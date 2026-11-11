@@ -3,6 +3,11 @@ import { ChatMessage, Game, LadderChallenge, Player, PlayerModerationAction, Tou
 import { TimestampedMove } from '../../../shared/game-engine/Types.js';
 
 type NotifiableEvents = {
+    /**
+     * A game has been created, by a player in lobby, or by system (ladder, tournament, matchmaking...).
+     */
+    gameCreated: (game: Game) => void;
+
     gameStart: (game: Game) => void;
 
     /**

@@ -2329,5 +2329,37 @@
         "day": "Jour",
         "week": "Semaine",
         "month": "Mois"
+    },
+    "matchmaking": {
+        "title": "Matchmaking",
+        "play": "Jouer",
+        "searching": "Recherche…",
+        "cancel": "Annuler",
+        "how_it_works": "Fonctionnement",
+        "ranked": "Classée",
+        "boardsizes": "Tailles de plateau",
+        "legend_yes": "J'accepte",
+        "legend_heart": "Je préfère",
+        "legend_no": "Je refuse",
+        "at_least_one_boardsize": "Accepte au moins une taille de plateau",
+        "choice_yes": "{{size}}×{{size}} : accepté. Cliquer pour préférer.",
+        "choice_heart": "{{size}}×{{size}} : préféré. Cliquer pour refuser.",
+        "choice_no": "{{size}}×{{size}} : refusé. Cliquer pour accepter.",
+        "rush_hour_now": "Heure de pointe, jusqu'à {{end}}",
+        "rush_hour_next": "Heure de pointe : {{start}}–{{end}}, commence {{distance}}",
+        "games_count_one": "{{count}} partie",
+        "games_count_other": "{{count}} parties",
+        "streak_one": "série de {{count}} jour",
+        "streak_other": "série de {{count}} jours",
+        "play_again": "Rejouer (matchmaking)",
+        "matched_toast": "Adversaire trouvé, ta partie a commencé !",
+        "matched_toast_open": "Jouer",
+        "info": {
+            "paint": "Clique sur une taille pour changer ton choix. Reste appuyé et glisse pour l'appliquer aux autres tailles.",
+            "boardsize_pick": "La taille est choisie parmi celles acceptées par les deux joueurs, en priorité celles préférées.",
+            "stay_online": "Tu peux naviguer sur le site pendant la recherche, mais elle s'arrête si tu te déconnectes.",
+            "rush_hour": "Heure de pointe : la plupart des joueurs sont en ligne, les parties se trouvent plus vite.",
+            "streak": "Jours d'affilée : jours consécutifs avec au moins une partie en matchmaking."
+        }
     }
 }

@@ -69,6 +69,7 @@ export { default as IconGithub } from '~icons/bi/github';
 export { default as IconGraphUp } from '~icons/bi/graph-up';
 export { default as IconGrid3x3GapFill } from '~icons/bi/grid-3x3-gap-fill';
 export { default as IconGlobe } from '~icons/bi/globe';
+export { default as IconHeartFill } from '~icons/bi/heart-fill';
 export { default as IconHexagon } from '~icons/bi/hexagon';
 export { default as IconHexagonFill } from '~icons/bi/hexagon-fill';
 export { default as IconHourglass } from '~icons/bi/hourglass';
