@@ -106,7 +106,8 @@ defineProps({
 
             <component :is="is" :class="classes" class="nick">
                 <span v-if="player.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>
-                <span>{{ player.pseudo }}</span>
+                <span v-if="player.isDonor"><span class="donor-initial">{{ [...player.pseudo][0] }}</span>{{ [...player.pseudo].slice(1).join('') }}</span>
+                <span v-else>{{ player.pseudo }}</span>
             </component>
         </span>
 

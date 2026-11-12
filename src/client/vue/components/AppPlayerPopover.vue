@@ -110,6 +110,7 @@ onMounted(async () => {
     <div
         ref="popover"
         class="player-popover card shadow p-2 text-body"
+        :class="{ 'player-popover-donor': player.isDonor }"
         role="dialog"
         :aria-label="player.pseudo"
         @click.stop
@@ -125,7 +126,7 @@ onMounted(async () => {
                         class="fw-bold text-body text-decoration-none popover-pseudo"
                         @click="emit('close')"
                     >
-                        <span v-if="player.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span>{{ player.pseudo }}
+                        <span v-if="player.isGuest" class="fst-italic">{{ $t('guest') }}&nbsp;</span><template v-if="player.isDonor"><span class="donor-initial">{{ [...player.pseudo][0] }}</span>{{ [...player.pseudo].slice(1).join('') }}</template><template v-else>{{ player.pseudo }}</template>
                     </RouterLink>
                     <strong v-else class="popover-pseudo">{{ player.pseudo }}</strong>
                 </div>
@@ -160,6 +161,15 @@ onMounted(async () => {
     width max-content
     max-width calc(100vw - 16px)
     font-size 1rem
+
+// Donor: flat golden background with a static, sharp-edged diagonal glint
+.player-popover-donor
+    border-color rgba(192, 138, 16, .45)
+    background linear-gradient(115deg, transparent 62%, rgba(255, 255, 255, .5) 62%, rgba(255, 255, 255, .5) 68%, transparent 68%), #faefcd
+
+[data-bs-theme=dark] .player-popover-donor
+    border-color rgba(217, 180, 74, .35)
+    background linear-gradient(115deg, transparent 62%, rgba(255, 230, 160, .06) 62%, rgba(255, 230, 160, .06) 68%, transparent 68%), #332a16
 
 .popover-avatar
     display inline-flex

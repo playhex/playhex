@@ -79,7 +79,7 @@ export default class PlayerController
             .leftJoin('game.gameToPlayers', 'gameToPlayers')
             .addSelect(['gameToPlayers.gameId', 'gameToPlayers.playerId', 'gameToPlayers.order'])
             .leftJoin('gameToPlayers.player', 'gameToPlayerPlayer')
-            .addSelect(['gameToPlayerPlayer.id', 'gameToPlayerPlayer.publicId', 'gameToPlayerPlayer.pseudo', 'gameToPlayerPlayer.slug', 'gameToPlayerPlayer.isGuest', 'gameToPlayerPlayer.isBot'])
+            .addSelect(['gameToPlayerPlayer.id', 'gameToPlayerPlayer.publicId', 'gameToPlayerPlayer.pseudo', 'gameToPlayerPlayer.slug', 'gameToPlayerPlayer.isGuest', 'gameToPlayerPlayer.isBot', 'gameToPlayerPlayer.isDonor'])
             .orderBy('playerNotification.createdAt', 'DESC')
             .addOrderBy('playerNotification.id', 'DESC')
         ;

@@ -96,6 +96,7 @@ const offlinePlayer: Player = {
     pseudo: t('player'),
     isGuest: false,
     pronouns: null,
+    isDonor: false,
     createdAt: new Date(),
     slug: '',
 };
@@ -195,6 +196,7 @@ const initGameFromGameOptions = (gameOptions: OfflineAIGameOptions) => {
             isBot: true,
             isGuest: false,
             pronouns: null,
+            isDonor: false,
             pseudo: localAI.label,
             slug: '',
             publicId: localAI.name,

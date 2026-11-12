@@ -45,6 +45,14 @@ export default class Player
     isBot: boolean;
 
     /**
+     * Player donated to PlayHex. Set manually (Liberapay has no API).
+     * Shows a golden player popover and a "winning path" under nickname.
+     */
+    @Column({ default: false })
+    @Expose({ groups: [GROUP_DEFAULT, 'rating', 'playerNotification', 'lobby', 'puzzle', 'player_moderation_action', 'channel'] })
+    isDonor: boolean = false;
+
+    /**
      * Used for link to profile page, SGF file name
      */
     @Column({ length: 34, unique: true })
