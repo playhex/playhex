@@ -32,10 +32,14 @@ describe('lobbyWaitStats', () => {
     });
 
     describe('computeJoinChances', () => {
-        it('returns null when not enough games', () => {
-            const games = times(49, () => joined(14, 30));
+        it('returns null when no games', () => {
+            assert.deepStrictEqual(computeJoinChances([], 14), { firstMinute: null, nextTenMinutes: null });
+        });
 
-            assert.deepStrictEqual(computeJoinChances(games, 14), { firstMinute: null, nextTenMinutes: null });
+        it('returns chances even with few games', () => {
+            const games = [joined(14, 30), canceled(14, 30 * 60)];
+
+            assert.deepStrictEqual(computeJoinChances(games, 14), { firstMinute: 50, nextTenMinutes: 0 });
         });
 
         it('returns chances to be joined in first minute, then in next 10 minutes', () => {
@@ -50,30 +54,27 @@ describe('lobbyWaitStats', () => {
             assert.deepStrictEqual(computeJoinChances(games, 14), { firstMinute: 25, nextTenMinutes: 38 });
         });
 
-        it('returns null for next minutes when not enough hosts still waiting', () => {
-            const games = [
-                ...times(40, () => joined(14, 30)),
-                ...times(19, () => canceled(14, 30 * 60)),
-            ];
+        it('returns null for next minutes when all hosts joined in first minute', () => {
+            const games = times(10, () => joined(14, 30));
 
-            assert.deepStrictEqual(computeJoinChances(games, 14), { firstMinute: 68, nextTenMinutes: null });
+            assert.deepStrictEqual(computeJoinChances(games, 14), { firstMinute: 100, nextTenMinutes: null });
         });
 
         it('only considers games created around given hour, wrapping around midnight', () => {
             const games = [
-                ...times(25, () => joined(23, 10)),
-                ...times(25, () => joined(1, 10)),
-                ...times(50, () => canceled(12, 300)),
+                joined(23, 10),
+                joined(1, 10),
+                canceled(12, 300),
             ];
 
             assert.strictEqual(computeJoinChances(games, 0).firstMinute, 100);
-            assert.strictEqual(computeJoinChances(games, 2).firstMinute, null);
+            assert.strictEqual(computeJoinChances(games, 3).firstMinute, null);
             assert.strictEqual(computeJoinChances(games, 12).firstMinute, 0);
         });
     });
 
     it('computes chances for each hour of day', () => {
-        const games = times(50, () => joined(12, 45));
+        const games = [joined(12, 45)];
         const byHour = computeJoinChancesByUtcHour(games);
 
         assert.strictEqual(byHour.length, 24);

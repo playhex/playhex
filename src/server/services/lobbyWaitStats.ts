@@ -5,17 +5,6 @@ import { type LiveLobbyHistoryGame } from '../repositories/LiveLobbyHistoryRepos
  */
 const HOUR_WINDOW = 1;
 
-/**
- * Below this number of games, chance to be joined in first minute is not relevant enough to be displayed.
- */
-const MIN_GAMES = 50;
-
-/**
- * Below this number of hosts still waiting at the end of the next minutes,
- * chance to be joined in these next minutes is not relevant enough to be displayed.
- */
-const MIN_STILL_WAITING = 20;
-
 const FIRST_MINUTE_MS = 60 * 1000;
 const NEXT_MINUTES_MS = 10 * 60 * 1000;
 
@@ -94,7 +83,8 @@ export const kaplanMeier = (waits: [number, 0 | 1][]): (t: number) => number => 
 
 /**
  * Chances to be joined for a game created around `hour` (UTC hour of day).
- * Each value is null when not enough data.
+ * Always returned, even when based on few games, values are then only less precise.
+ * Null only when no data at all.
  */
 export const computeJoinChances = (games: LiveLobbyHistoryGame[], hour: number): JoinChances => {
     const waits: [number, 0 | 1][] = [];
@@ -107,18 +97,17 @@ export const computeJoinChances = (games: LiveLobbyHistoryGame[], hour: number):
         waits.push([Math.max(0, closedAt - createdAt), accepted]);
     }
 
-    if (waits.length < MIN_GAMES) {
+    if (waits.length === 0) {
         return { firstMinute: null, nextTenMinutes: null };
     }
 
     const survival = kaplanMeier(waits);
     const afterFirstMinute = survival(FIRST_MINUTE_MS);
     const afterNextMinutes = survival(FIRST_MINUTE_MS + NEXT_MINUTES_MS);
-    const stillWaiting = waits.filter(([wait]) => wait > FIRST_MINUTE_MS + NEXT_MINUTES_MS).length;
 
     return {
         firstMinute: Math.round(100 * (1 - afterFirstMinute)),
-        nextTenMinutes: stillWaiting >= MIN_STILL_WAITING && afterFirstMinute > 0
+        nextTenMinutes: afterFirstMinute > 0
             ? Math.round(100 * (1 - afterNextMinutes / afterFirstMinute))
             : null,
     };

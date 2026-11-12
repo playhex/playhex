@@ -4,6 +4,7 @@ import { useHead, useSeoMeta } from '@unhead/vue';
 import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
 import AppRhombus from '../components/AppRhombus.vue';
+import { apiGetLobbyJoinChances, type LobbyJoinChances } from '../../apiClient.js';
 import {
     IconAlarmFill,
     IconAspectRatio,
@@ -365,6 +366,46 @@ const heatmapCellStyle = (count: number): Record<string, string> => {
     return { backgroundColor: `rgba(var(--bs-primary-rgb), ${alpha})` };
 };
 
+/*
+ * Chances for a live lobby game to be joined, depending on hour of day.
+ */
+const lobbyJoinChancesByUtcHour = ref<null | LobbyJoinChances[]>(null);
+
+void (async () => {
+    try {
+        lobbyJoinChancesByUtcHour.value = (await apiGetLobbyJoinChances()).joinChancesByUtcHour;
+    } catch {
+        // Optional section, not displayed
+    }
+})();
+
+type LobbyJoinChancesRow = 'firstMinute' | 'nextTenMinutes';
+
+/**
+ * Percents by local hour (index 0 to 23), shifted from UTC hours.
+ */
+const localizedLobbyJoinChances = (row: LobbyJoinChancesRow): (null | number)[] => {
+    const byUtcHour = lobbyJoinChancesByUtcHour.value;
+
+    return Array.from({ length: 24 }, (_, localHour) => byUtcHour?.[((localHour - timezoneOffsetHours) % 24 + 24) % 24]?.[row] ?? null);
+};
+
+/**
+ * Greener for hours where it is easier to get joined, relative to other hours of the same row.
+ */
+const lobbyJoinChanceCellStyle = (row: LobbyJoinChancesRow, percent: null | number): Record<string, string> => {
+    if (percent === null) {
+        return {};
+    }
+
+    const percents = localizedLobbyJoinChances(row).filter((p): p is number => p !== null);
+    const min = Math.min(...percents);
+    const max = Math.max(...percents);
+    const alpha = max === min ? 0.4 : 0.08 + 0.72 * (percent - min) / (max - min);
+
+    return { backgroundColor: `rgba(var(--bs-success-rgb), ${alpha})` };
+};
+
 const sortedRatingBuckets = computed<[string, number][]>(() => {
     if (!commonStats.value || typeof commonStats.value === 'string') {
         return [];
@@ -634,6 +675,33 @@ const ratingBarHeight = (count: number): string => {
             </div>
             <div class="form-text mb-4">{{ $t('statistics.activity_note', { offset: timezoneOffsetLabel }) }}</div>
 
+            <template v-if="null !== lobbyJoinChancesByUtcHour">
+                <h2 class="h4"><IconHourglass class="me-2" />{{ $t('statistics.lobby_join_chances') }}</h2>
+
+                <div class="table-responsive">
+                    <table class="table table-sm heatmap-table join-chances-table mb-1">
+                        <thead>
+                            <tr>
+                                <th class="day-col"></th>
+                                <th v-for="hour in 24" :key="hour" class="text-center small text-secondary fw-normal">{{ (hour - 1) + 'h' }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="row in (['firstMinute', 'nextTenMinutes'] as const)" :key="row">
+                                <th class="day-col small text-secondary fw-normal text-nowrap">{{ row === 'firstMinute' ? $t('statistics.lobby_join_chances_first_minute') : $t('statistics.lobby_join_chances_next_minutes') }}</th>
+                                <td
+                                    v-for="(percent, hour) in localizedLobbyJoinChances(row)"
+                                    :key="hour"
+                                    class="heatmap-cell text-center"
+                                    :style="lobbyJoinChanceCellStyle(row, percent)"
+                                >{{ percent ?? '' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-text mb-4">{{ $t('statistics.lobby_join_chances_note', { offset: timezoneOffsetLabel }) }}</div>
+            </template>
+
             <h2 class="h4 mt-4"><IconStarFill class="me-2" />{{ $t('statistics.most_played_boardsizes') }}</h2>
 
             <div class="table-responsive">
@@ -847,6 +915,20 @@ const ratingBarHeight = (count: number): string => {
     td.heatmap-cell
         height 1.2em
         background-color var(--bs-secondary-bg)
+
+.join-chances-table
+    .day-col
+        width 7.5em
+
+    tbody .day-col
+        padding 1px 0.5em
+
+    thead th
+        font-size 0.7em
+
+    td.heatmap-cell
+        font-size 0.7em
+        vertical-align middle
 
 .rating-chart
     height 8em
