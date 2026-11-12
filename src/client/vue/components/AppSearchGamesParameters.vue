@@ -4,7 +4,7 @@ import SearchGamesParameters, { gameStates, gameTypes, GameType, gameTypeTransla
 import { MAX_BOARDSIZE, MIN_BOARDSIZE } from '../../../shared/app/boardsizeLimits.js';
 import { Player } from '../../../shared/app/models/index.js';
 import { getPlayer } from '../../apiClient.js';
-import { IconX } from '../icons.js';
+import { IconChatRightText, IconGraphUp, IconX } from '../icons.js';
 import AppRangeSlider from './AppRangeSlider.vue';
 import AppGameTypeIcon from './AppGameTypeIcon.vue';
 import AppPlayerSelectMultiple from '../tournaments/components/AppPlayerSelectMultiple.vue';
@@ -51,6 +51,20 @@ const selectedOutcomes = computed({
         ? undefined
         : value,
 });
+
+/*
+ * Content filters: checked means only games with this content, unchecked means no filter.
+ */
+const contentFilterKeys = ['hasChat', 'hasAnalyze', 'hasMalkovich'] as const satisfies (keyof SearchGamesParameters)[];
+
+const contentFilter = (key: typeof contentFilterKeys[number]) => computed<boolean>({
+    get: () => searchGamesParameters.value[key] === true,
+    set: value => searchGamesParameters.value[key] = value ? true : undefined,
+});
+
+const hasChat = contentFilter('hasChat');
+const hasAnalyze = contentFilter('hasAnalyze');
+const hasMalkovich = contentFilter('hasMalkovich');
 
 /*
  * Sliders: full range means no filter.
@@ -171,6 +185,7 @@ const filterKeys = [
     'maxBoardsize',
     'minMovesCount',
     'maxMovesCount',
+    ...contentFilterKeys,
     'fromEndedAt',
     'toEndedAt',
     'endedAtSort',
@@ -222,6 +237,7 @@ const collapsedFilterKeys = [
     'maxBoardsize',
     'minMovesCount',
     'maxMovesCount',
+    ...contentFilterKeys,
     'states',
 ] as const satisfies (typeof filterKeys[number])[];
 
@@ -278,6 +294,22 @@ const collapsedActiveFiltersCount = computed<number>(() => collapsedFilterKeys.f
                     :formatValue="formatMovesCount"
                 />
             </div>
+
+            <fieldset class="mb-3 filter-checks">
+                <legend class="small mb-1">{{ $t('game_content_filter') }}</legend>
+                <div class="form-check">
+                    <input type="checkbox" v-model="hasChat" class="form-check-input" id="content-has-chat" autocomplete="off">
+                    <label class="form-check-label" for="content-has-chat"><IconChatRightText class="me-1" /> {{ $t('has_chat_messages') }}</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" v-model="hasAnalyze" class="form-check-input" id="content-has-analyze" autocomplete="off">
+                    <label class="form-check-label" for="content-has-analyze"><IconGraphUp class="me-1" /> {{ $t('has_analyze') }}</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" v-model="hasMalkovich" class="form-check-input" id="content-has-malkovich" autocomplete="off">
+                    <label class="form-check-label" for="content-has-malkovich">{{ $t('has_malkovich_messages') }}</label>
+                </div>
+            </fieldset>
         </div>
 
         <div class="mb-3">

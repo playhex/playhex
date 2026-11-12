@@ -7,6 +7,20 @@ import type { StatsGrouping } from '../../shared/app/GamesStatsParameters.js';
 import type { AnalyzeGameRequest } from '../ai-jobs/gameAnalyze.js';
 
 /**
+ * Player chat message visible to everyone, as shown by chat icon in games list.
+ * Same as isChatMessageVisibleToEveryone(), do not reveal hidden messages exist.
+ * Expects aliases "chatMessage" and "game".
+ */
+const CHAT_MESSAGE_VISIBLE_TO_EVERYONE_SQL = '(chatMessage.playerId is not null and (chatMessage.visibility = \'public\' or (chatMessage.visibility = \'malkovich\' and game.state in (\'ended\', \'canceled\'))))';
+
+/**
+ * Hint for EXISTS filters subqueries, else MySQL turns them into a semijoin driven by the subquery table,
+ * scanning it entirely then sorting, instead of following game indexes and stop at pagination limit (10s vs 50ms).
+ * Ignored as a comment by other databases.
+ */
+const NO_SEMIJOIN = '/*+ NO_SEMIJOIN() */ 1';
+
+/**
  * Relations to load in order to recreate an Game in memory.
  */
 const relations: FindOptionsRelations<Game> = {
@@ -323,6 +337,48 @@ export default class GameRepository
             ;
         }
 
+        if (params.hasChat) {
+            const chatMessage = queryBuilder
+                .subQuery()
+                .select(NO_SEMIJOIN)
+                .from(ChatMessage, 'chatMessage')
+                .where('chatMessage.gameId = game.id')
+                .andWhere(CHAT_MESSAGE_VISIBLE_TO_EVERYONE_SQL)
+            ;
+
+            queryBuilder.andWhere(`EXISTS ${chatMessage.getQuery()}`);
+        }
+
+        if (params.hasAnalyze) {
+            const gameAnalyze = queryBuilder
+                .subQuery()
+                .select(NO_SEMIJOIN)
+                .from(GameAnalyze, 'gameAnalyze')
+                .where('gameAnalyze.gameId = game.id')
+                .andWhere('gameAnalyze.analyze is not null')
+            ;
+
+            queryBuilder.andWhere(`EXISTS ${gameAnalyze.getQuery()}`);
+        }
+
+        if (params.hasMalkovich) {
+            // No NO_SEMIJOIN hint here: malkovich messages are rare, so scanning them first is faster
+            const malkovichMessage = queryBuilder
+                .subQuery()
+                .select('1')
+                .from(ChatMessage, 'chatMessage')
+                .where('chatMessage.gameId = game.id')
+                .andWhere('chatMessage.playerId is not null')
+                .andWhere('chatMessage.visibility = \'malkovich\'')
+            ;
+
+            queryBuilder
+                // Do not reveal hidden malkovich messages exist in games not yet over
+                .andWhere('game.state in (\'ended\', \'canceled\')')
+                .andWhere(`EXISTS ${malkovichMessage.getQuery()}`)
+            ;
+        }
+
         if (undefined !== params.fromEndedAt) {
             queryBuilder
                 .andWhere('game.endedAt >= :fromEndedAt')
@@ -395,9 +451,7 @@ export default class GameRepository
                 .innerJoin('chatMessage.game', 'game')
                 .select('distinct chatMessage.gameId', 'gameId')
                 .where('chatMessage.gameId in (:gameIds)', { gameIds })
-                .andWhere('chatMessage.playerId is not null')
-                // Same as isChatMessageVisibleToEveryone(), do not reveal hidden messages exist
-                .andWhere('(chatMessage.visibility = \'public\' or (chatMessage.visibility = \'malkovich\' and game.state in (\'ended\', \'canceled\')))')
+                .andWhere(CHAT_MESSAGE_VISIBLE_TO_EVERYONE_SQL)
                 .getRawMany(),
 
             this.gameRepository.manager

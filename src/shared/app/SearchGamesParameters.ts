@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsDate, IsIn, IsInt, IsNumber, IsOptional, IsUUID, Max, Min, Validate, ValidateNested } from 'class-validator';
 import { GameState } from './Types.js';
 import type { Outcome } from '../game-engine/Types.js';
@@ -48,6 +48,14 @@ export const searchableOutcomes: Outcome[] = [
  * Moves count slider goes up to this value, which means "this value or more".
  */
 export const MOVES_COUNT_SLIDER_MAX = 30;
+
+/**
+ * Filters only enabled or not set. Query string and url hash give strings,
+ * and implicit conversion would convert 'false' to true.
+ */
+const trueOrUndefined = ({ obj, key }: { obj: Record<string, unknown>, key: string }): true | undefined =>
+    obj[key] === true || obj[key] === 'true' ? true : undefined
+;
 
 /**
  * Contains filters parameters to search in archived games.
@@ -120,6 +128,30 @@ export default class SearchGamesParameters
     @Validate(() => PlayerCriteria, { each: true })
     @Type(() => PlayerCriteria)
     players?: PlayerCriteria[];
+
+    /**
+     * Only games having chat messages visible to everyone (same as chat icon in games list).
+     */
+    @IsOptional()
+    @IsBoolean()
+    @Transform(trueOrUndefined)
+    hasChat?: true;
+
+    /**
+     * Only games having an AI analysis.
+     */
+    @IsOptional()
+    @IsBoolean()
+    @Transform(trueOrUndefined)
+    hasAnalyze?: true;
+
+    /**
+     * Only ended or canceled games having malkovich messages.
+     */
+    @IsOptional()
+    @IsBoolean()
+    @Transform(trueOrUndefined)
+    hasMalkovich?: true;
 
     @IsOptional()
     @IsIn(['asc', 'desc'])

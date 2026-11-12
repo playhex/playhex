@@ -2253,6 +2253,8 @@
     },
     "has_chat_messages": "Has chat messages",
     "has_analyze": "Has an AI analysis",
+    "has_malkovich_messages": "Has malkovich logs",
+    "game_content_filter": "Content",
     "filters": "Filters",
     "reset_filters": "Reset filters",
     "reset_dates": "Reset dates",

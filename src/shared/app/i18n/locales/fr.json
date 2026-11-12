@@ -2321,6 +2321,8 @@
     },
     "has_chat_messages": "Contient des messages",
     "has_analyze": "Analysée par l'IA",
+    "has_malkovich_messages": "Contient des logs malkovich",
+    "game_content_filter": "Contenu",
     "filters": "Filtres",
     "reset_filters": "Réinitialiser les filtres",
     "reset_dates": "Réinitialiser les dates",
