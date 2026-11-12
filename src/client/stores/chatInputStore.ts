@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
+import type { ChatMessageVisibility } from '../../shared/app/chatMessageVisibility.js';
 
 /**
  * Provide refs for chatInput, one per game.
@@ -25,8 +26,22 @@ export const useChatInputStore = defineStore('chatInputStore', () => {
         return refs[gameId];
     };
 
+    /**
+     * Visibility of message to send (public, private, malkovich), one per game.
+     */
+    const visibilityRefs: { [gameId: string]: Ref<ChatMessageVisibility> } = {};
+
+    const getChatMessageVisibility = (gameId: string): Ref<ChatMessageVisibility> => {
+        if (!visibilityRefs[gameId]) {
+            visibilityRefs[gameId] = ref('public');
+        }
+
+        return visibilityRefs[gameId];
+    };
+
     return {
         getChatInput,
+        getChatMessageVisibility,
     };
 
 });

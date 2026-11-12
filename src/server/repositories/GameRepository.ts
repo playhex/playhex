@@ -392,9 +392,12 @@ export default class GameRepository
         const [chatRows, analyzeRows]: [{ gameId: number }[], { gameId: number }[]] = await Promise.all([
             this.gameRepository.manager
                 .createQueryBuilder(ChatMessage, 'chatMessage')
+                .innerJoin('chatMessage.game', 'game')
                 .select('distinct chatMessage.gameId', 'gameId')
                 .where('chatMessage.gameId in (:gameIds)', { gameIds })
                 .andWhere('chatMessage.playerId is not null')
+                // Same as isChatMessageVisibleToEveryone(), do not reveal hidden messages exist
+                .andWhere('(chatMessage.visibility = \'public\' or (chatMessage.visibility = \'malkovich\' and game.state in (\'ended\', \'canceled\')))')
                 .getRawMany(),
 
             this.gameRepository.manager
@@ -490,6 +493,7 @@ export default class GameRepository
             .from(ChatMessage, 'chatMessage')
             .where('chatMessage.gameId = game.id')
             .andWhere('chatMessage.playerId IS NOT NULL')
+            .andWhere('chatMessage.visibility != \'private\'') // game is ended, malkovich are revealed
             .limit(1)
             .offset(1)
         ;

@@ -18,7 +18,13 @@ export default class ChatWebsocketController implements WebsocketControllerInter
 
     onConnection(socket: HexSocket): void
     {
-        socket.on('sendChat', async (gameId, content, answer) => {
+        socket.on('sendChat', async (gameId, content, ...args) => {
+            // visibility is omitted for public messages, and by clients loaded before visibility was added
+            const [visibility, answer] = args.length === 1
+                ? ['public' as const, args[0]]
+                : args
+            ;
+
             const player = getSocketPlayerAllowedToWrite(socket);
 
             if (player === null) {
@@ -30,6 +36,7 @@ export default class ChatWebsocketController implements WebsocketControllerInter
 
             chatMessage.player = player;
             chatMessage.content = content;
+            chatMessage.visibility = visibility;
             chatMessage.createdAt = new Date();
 
             try {
@@ -38,7 +45,8 @@ export default class ChatWebsocketController implements WebsocketControllerInter
                 });
             } catch (e) {
                 logger.error('Validation failed', { validationError: e });
-                return e.message;
+                answer({ reason: 'server_error' });
+                return;
             }
 
             try {

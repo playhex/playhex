@@ -9,7 +9,7 @@ import type { ByoYomiPlayerTimeData } from '../../time-control/time-controls/Byo
 import ChatMessage from './ChatMessage.js';
 import GameToPlayer from './GameToPlayer.js';
 import { Expose, GROUP_DEFAULT } from '../class-transformer-custom.js';
-import { Transform, Type } from 'class-transformer';
+import { Transform, TransformationType, Type } from 'class-transformer';
 import Rating from './Rating.js';
 import TournamentMatch from './TournamentMatch.js';
 import LadderChallenge from './LadderChallenge.js';
@@ -21,6 +21,7 @@ import { type Outcome } from '../../game-engine/Types.js';
 import type { HexMove } from '@playhex/move-notation';
 import { deserializeMoves, serializeMoves } from '../movesSerializer.js';
 import { normalizeHandicapOptions } from '../handicap.js';
+import { isChatMessageVisibleToEveryone } from '../chatMessageVisibility.js';
 
 @Entity()
 @Index(keysOf<Game>()('state', 'opponentType', 'ranked')) // To fetch ended 1v1 games, and sort by ranked/friendly in archive page
@@ -161,9 +162,17 @@ export default class Game implements TimeControlBoardsize, GameOptions
     @Expose({ groups: [GROUP_DEFAULT, 'lobby'] })
     explorationAllowed: boolean;
 
+    /**
+     * Contains private and malkovich messages in memory.
+     * They are filtered out when serialized: they must not be sent to other people than their author.
+     */
     @OneToMany(() => ChatMessage, chatMessage => chatMessage.game, { cascade: true })
     @Expose()
     @Type(() => ChatMessage)
+    @Transform(({ value, obj, type }) => type === TransformationType.PLAIN_TO_CLASS || !Array.isArray(value)
+        ? value
+        : value.filter((chatMessage: ChatMessage) => isChatMessageVisibleToEveryone(chatMessage, obj)),
+    )
     chatMessages: Relation<ChatMessage>[];
 
     @Column({ type: 'text', transformer: {

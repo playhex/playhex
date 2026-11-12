@@ -7,6 +7,8 @@ import { GameData } from '../game-engine/normalization.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
 import { createTimeControl } from '../time-control/createTimeControl.js';
 import { canUndoWithHandicap, getPresetDemerHandicap } from './handicap.js';
+import { isChatMessageVisibleToEveryone } from './chatMessageVisibility.js';
+import { insertChatMessage } from './chatUtils.js';
 
 export const hasPlayer = (game: Game, player: Player): boolean => {
     if (game.host !== null && game.host.publicId === player.publicId) {
@@ -239,6 +241,8 @@ export const is1v1Game = (game: Game): boolean => {
  * Update local game data from Game received data
  */
 export const updateGame = (local: Game, server: Game): void => {
+    const previousChatMessages = local.chatMessages ?? [];
+
     Object.assign(local, server);
 
     if (typeof server.gameToPlayers !== 'undefined') {
@@ -255,6 +259,13 @@ export const updateGame = (local: Game, server: Game): void => {
 
     if (typeof server.chatMessages !== 'undefined') {
         local.chatMessages = [...server.chatMessages];
+
+        // Server never sends my own hidden chat messages in game, keep them
+        for (const chatMessage of previousChatMessages) {
+            if (!isChatMessageVisibleToEveryone(chatMessage, local)) {
+                insertChatMessage(local.chatMessages, chatMessage);
+            }
+        }
     }
 
     if (typeof server.moves !== 'undefined') {

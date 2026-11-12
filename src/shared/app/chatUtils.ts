@@ -27,6 +27,24 @@ export const canChatMessageBePostedInGame = (chatMessage: ChatMessage, game: Gam
     return canPlayerChatInGame(chatMessage.player, game);
 };
 
+/**
+ * Insert a chat message at its place, by date, in a list sorted by date.
+ * Messages can be older than the last one, i.e revealed malkovich messages, or my own hidden messages.
+ *
+ * @returns Whether the message has been appended at the end.
+ */
+export const insertChatMessage = <T extends { createdAt: Date }>(chatMessages: T[], chatMessage: T): boolean => {
+    let i = chatMessages.length;
+
+    while (i > 0 && chatMessages[i - 1].createdAt > chatMessage.createdAt) {
+        --i;
+    }
+
+    chatMessages.splice(i, 0, chatMessage);
+
+    return i === chatMessages.length - 1;
+};
+
 export const sanitizeMessage = (str: string): string => {
     return str.replace(/[<>&]/g, matched => {
         switch (matched) {

@@ -1,6 +1,7 @@
 import { isSameDay } from 'date-fns';
 import { SGF, SGFColor, sgfToString } from '../sgf/index.js';
 import { Game, ChatMessage } from './models/index.js';
+import { isChatMessageVisibleToEveryone } from './chatMessageVisibility.js';
 import { pseudoString } from './pseudoUtils.js';
 import { guessDemerHandicapFromGame } from './demerHandicap.js';
 import { isRatingConfident } from './ratingUtils.js';
@@ -38,7 +39,8 @@ const getMovesChatMessages = (game: Game): ChatMessage[][] => {
         return [];
     }
 
-    const { chatMessages } = game;
+    // Author may have their own private and not yet revealed malkovich messages
+    const chatMessages = game.chatMessages.filter(chatMessage => isChatMessageVisibleToEveryone(chatMessage, game));
     const movesChatMessages: ChatMessage[][] = Array(moveTimestamps.length).fill(null).map(() => []);
     let i = 0;
 

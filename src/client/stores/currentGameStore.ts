@@ -24,6 +24,9 @@ import { canPassAgain } from '../../shared/app/passUtils.js';
 import { checkHandicapMove, getHandicapStatus, getPresetDemerHandicap, HandicapStatus, isForcedHandicapPass, isGameInCancelWindow } from '../../shared/app/handicap.js';
 import { PlayerSettingsFacade } from '../services/board-view-facades/PlayerSettingsFacade.js';
 import { RichChat } from '../../shared/app/rich-chat.js';
+import type { ChatMessageVisibility } from '../../shared/app/chatMessageVisibility.js';
+import { insertChatMessage } from '../../shared/app/chatUtils.js';
+import type { WebsocketActionError } from '../../shared/app/Types.js';
 import ChatMessage from '../../shared/app/models/ChatMessage.js';
 import { GameTimeData } from '../../shared/time-control/TimeControl.js';
 import useServerDateStore from './serverDateStore.js';
@@ -202,7 +205,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             return socket.on(name, listener);
         };
 
-        on('gameUpdate', (publicId, gameData) => {
+        on('gameUpdate', (publicId, gameData, myHiddenChatMessages = []) => {
             // ignore if not my game, or already initialized
             if (publicId !== gamePublicId || game.value !== null) {
                 return;
@@ -212,6 +215,10 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             if (gameData === null) {
                 void router.push({ name: 'home' });
                 return;
+            }
+
+            for (const chatMessage of myHiddenChatMessages) {
+                insertChatMessage(gameData.chatMessages, chatMessage);
             }
 
             onFirstUpdate(gameData);
@@ -452,8 +459,12 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 return;
             }
 
-            game.value.chatMessages.push(chatMessage);
-            richChat.value?.postChatMessage(chatMessage);
+            if (insertChatMessage(game.value.chatMessages, chatMessage)) {
+                richChat.value?.postChatMessage(chatMessage);
+            } else {
+                // Older message, i.e revealed malkovich: rebuild rich chat to show it at its place
+                richChat.value = new RichChat(game.value);
+            }
 
             /*
              * myGamesStore already emits this event for games I play in,
@@ -1047,24 +1058,33 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         }
     });
 
-    const sendChatMessage = async (content: string): Promise<void> => {
+    const sendChatMessage = async (content: string, visibility: ChatMessageVisibility = 'public'): Promise<void> => {
         return await new Promise((resolve, reject) => {
             if (!game.value) {
                 throw new Error('no game');
             }
 
-            socket.emit('sendChat', game.value.publicId, content, error => {
+            const answer = (error?: WebsocketActionError): void => {
                 if (error) {
                     useSocketStore().handleMessageError(error, 'could not post message, server error');
                     reject(new Error(error.reason));
                     return;
                 }
 
-                // Posting in a game chat subscribes me to it, server side
-                useGameChatSubscriptionsStore().markSubscribedAfterPost(game.value!);
+                // Posting in a game chat subscribes me to it, server side, except for private messages
+                if (visibility !== 'private') {
+                    useGameChatSubscriptionsStore().markSubscribedAfterPost(game.value!);
+                }
 
                 resolve();
-            });
+            };
+
+            // Public is the default, do not send it
+            if (visibility === 'public') {
+                socket.emit('sendChat', game.value.publicId, content, answer);
+            } else {
+                socket.emit('sendChat', game.value.publicId, content, visibility, answer);
+            }
         });
     };
 

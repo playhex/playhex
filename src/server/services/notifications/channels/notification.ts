@@ -6,6 +6,7 @@ import { playerGender } from '../../../../shared/app/playerPronouns.js';
 import { createPlayerNotification } from '../../../../shared/app/models/PlayerNotification.js';
 import { getLoserPlayer, getOtherPlayer, getPlayers, getWinnerPlayer, hasPlayer } from '../../../../shared/app/gameUtils.js';
 import logger from '../../../services/logger.js';
+import { isChatMessageVisibleToEveryone } from '../../../../shared/app/chatMessageVisibility.js';
 import OnlinePlayersService from '../../../services/OnlinePlayersService.js';
 import { PlayerNotificationsService } from '../../../services/PlayerNotificationsService.js';
 import GameRepository from '../../../repositories/GameRepository.js';
@@ -45,6 +46,11 @@ notifier.on('chatMessage', async (game, chatMessage) => {
 
     // No notification for moderated chat messages
     if (chatMessage.deletedByModeration) {
+        return;
+    }
+
+    // No notification for private or not yet revealed malkovich messages
+    if (!isChatMessageVisibleToEveryone(chatMessage, game)) {
         return;
     }
 

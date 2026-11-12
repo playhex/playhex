@@ -11,6 +11,8 @@ import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
 import AppTimeControlLabel from './AppTimeControlLabel.vue';
 import { canPlayerChatInGame, blockEnterOnMobile, formatMessagePostedHour } from '../../../shared/app/chatUtils.js';
+import { type ChatMessageVisibility, chatMessageVisibilities, isChatMessageVisibleToEveryone } from '../../../shared/app/chatMessageVisibility.js';
+import { onClickOutside } from '@vueuse/core';
 import { DurationUnit, format, formatDistanceToNow, formatDuration, formatRelative, intervalToDuration, intlFormat, isSameDay, isToday, isYesterday } from 'date-fns';
 import { timeControlToCadencyName } from '../../../shared/app/timeControlUtils.js';
 import useAnalyzeStore from '../../stores/analyzeStore.js';
@@ -130,6 +132,34 @@ const playerColor = (player: Player): string => {
 };
 
 const chatInput = useChatInputStore().getChatInput(game.value.publicId);
+const chatMessageVisibility = useChatInputStore().getChatMessageVisibility(game.value.publicId);
+
+/*
+ * Chat message visibility menu.
+ * Handled here instead of with bootstrap dropdown,
+ * to always close when clicking outside (i.e on the board canvas) or choosing.
+ */
+const visibilityMenuOpen = ref(false);
+const visibilityToggleElement = ref<HTMLElement>();
+const visibilityMenuElement = ref<HTMLElement>();
+
+onClickOutside(visibilityMenuElement, () => visibilityMenuOpen.value = false, { ignore: [visibilityToggleElement] });
+
+const closeVisibilityMenu = (): void => {
+    visibilityMenuOpen.value = false;
+    visibilityToggleElement.value?.focus();
+};
+
+const chooseChatMessageVisibility = (visibility: ChatMessageVisibility): void => {
+    chatMessageVisibility.value = visibility;
+    visibilityMenuOpen.value = false;
+    chatInputElement.value?.focus();
+};
+
+const chatInputPlaceholderKey = computed((): string => chatMessageVisibility.value === 'public'
+    ? 'chat_message_placeholder'
+    : `chat_message_placeholder_${chatMessageVisibility.value}`,
+);
 const chatMessagesElement = ref<HTMLElement>();
 const chatInputElement = ref<HTMLElement>();
 
@@ -174,7 +204,7 @@ const sendChat = async () => {
     chatInput.value = '';
 
     try {
-        await sendChatMessage(message);
+        await sendChatMessage(message, chatMessageVisibility.value);
     } catch (e) {
         chatInput.value = message;
     }
@@ -894,7 +924,7 @@ watch(gameUIMode, () => {
 
                                 <span class="content text-body-secondary fst-italic text-center" v-if="message.contentTranslationKey">{{ $t(message.contentTranslationKey, message.translationParameters ?? {}) }}</span>
                                 <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
-                                <span class="content" v-else v-html="renderMessage(message.content)"></span>
+                                <span class="content" :class="[`chat-message-${message.visibility ?? 'public'}`, { 'fst-italic': !isChatMessageVisibleToEveryone(message, game) }]" v-else v-html="renderMessage(message.content)"></span>
                             </template>
 
                             <template v-else-if="message.type === 'move'">
@@ -930,10 +960,48 @@ watch(gameUIMode, () => {
                             ref="chatInputElement"
                             class="form-control bg-body-tertiary"
                             aria-describedby="message-submit"
-                            :placeholder="isChatInputEnabled ? $t('chat_message_placeholder') : ''"
+                            :class="`chat-message-${chatMessageVisibility}`"
+                            :placeholder="isChatInputEnabled ? $t(chatInputPlaceholderKey) : ''"
                             maxlength="1000"
                             :disabled="!isChatInputEnabled"
                         />
+                        <div class="chat-message-visibility-wrapper">
+                            <button
+                                ref="visibilityToggleElement"
+                                type="button"
+                                class="btn bg-body-secondary dropdown-toggle chat-message-visibility"
+                                :class="`chat-message-${chatMessageVisibility}`"
+                                aria-haspopup="menu"
+                                :aria-expanded="visibilityMenuOpen"
+                                :aria-label="`${$t('chat_message_visibility')}: ${$t(`chat_message_visibility_${chatMessageVisibility}`)}`"
+                                :title="$t(`chat_message_visibility_${chatMessageVisibility}`)"
+                                :disabled="!isChatInputEnabled"
+                                @click="visibilityMenuOpen = !visibilityMenuOpen"
+                                @keydown.esc="visibilityMenuOpen = false"
+                            ></button>
+                            <ul
+                                v-if="visibilityMenuOpen"
+                                ref="visibilityMenuElement"
+                                class="dropdown-menu show chat-message-visibility-menu"
+                                role="menu"
+                                :aria-label="$t('chat_message_visibility')"
+                                @keydown.esc="closeVisibilityMenu()"
+                            >
+                                <li v-for="visibility in chatMessageVisibilities" :key="visibility" role="none">
+                                    <button
+                                        type="button"
+                                        role="menuitemradio"
+                                        class="dropdown-item"
+                                        :class="`chat-message-${visibility}`"
+                                        :aria-checked="chatMessageVisibility === visibility"
+                                        @click="chooseChatMessageVisibility(visibility)"
+                                    >
+                                        <IconCheck class="visibility-check" :class="{ invisible: chatMessageVisibility !== visibility }" aria-hidden="true" />
+                                        {{ $t(`chat_message_visibility_${visibility}`) }}
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
                         <AppSpectatorCount />
                         <button
                             class="btn chat-message-submit"
@@ -1054,6 +1122,37 @@ watch(gameUIMode, () => {
 
         .chat-message-submit
             min-width 4em
+
+        .chat-message-visibility-wrapper
+            position relative
+            display flex
+
+        .chat-message-visibility
+            min-width 3em
+
+        // Open above chat input, aligned right of the toggle
+        .chat-message-visibility-menu
+            position absolute
+            bottom 100%
+            right 0
+            top auto
+
+    .visibility-check
+        margin-right 0.25em
+
+// Vivid colors, distinct from each other and from default text, in both themes
+.chat-message-private
+    color #0b5ed7 !important
+
+.chat-message-malkovich
+    color #c2410c !important
+
+[data-bs-theme=dark]
+    .chat-message-private
+        color #74b0ff !important
+
+    .chat-message-malkovich
+        color #ff922b !important
 
 .nav-game-sidebar
     .nav-link

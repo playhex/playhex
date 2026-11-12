@@ -4,9 +4,12 @@ import { PlayerIndex } from '../game-engine/index.js';
 import { GameTimeData } from '../time-control/TimeControl.js';
 import { OnlinePlayerPage } from './OnlinePlayerPage.js';
 import { ChatMessage, GameAnalyze, Game, Player, Rating } from './models/index.js';
+import type { ChatMessageVisibility } from './chatMessageVisibility.js';
 import type { ChannelChatMessage, OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
 import { PlayerOnlineStatus, WebsocketActionError } from './Types.js';
 import type { HexplorerLiveCursor, HexplorerLiveSession, HexplorerLiveSnapshot, HexplorerMatch, HexplorerMatchCreateInput } from './hexplorerLive.js';
+
+type SendChatAnswer = (error?: WebsocketActionError) => void;
 
 export type HexClientToServerEvents = {
     /**
@@ -47,9 +50,14 @@ export type HexClientToServerEvents = {
     cancelPremove: (gameId: string, answer: (result: true | string) => void) => void;
 
     /**
-     * A player send a chat message on a game
+     * A player send a chat message on a game.
+     * visibility is omitted for public messages (also by clients loaded before visibility was added).
      */
-    sendChat: (gameId: string, content: string, answer: (error?: WebsocketActionError) => void) => void;
+    sendChat: (
+        gameId: string,
+        content: string,
+        ...args: [answer: SendChatAnswer] | [visibility: Exclude<ChatMessageVisibility, 'public'>, answer: SendChatAnswer]
+    ) => void;
 
     /**
      * I am active.
@@ -345,8 +353,11 @@ export type HexServerToClientEvents = {
      * game can be null e.g when a player enters a room of a game that doesn't exists,
      * so we should show a message like "game not found" or redirect player.
      * Happens in dev, when I restart server, game no longer in memory
+     *
+     * myHiddenChatMessages: my own chat messages not visible to everyone (private, not yet revealed malkovich),
+     * not included in game.chatMessages, so I still see them after a page reload.
      */
-    gameUpdate: (gameId: string, game: Game | null) => void;
+    gameUpdate: (gameId: string, game: Game | null, myHiddenChatMessages?: ChatMessage[]) => void;
 
     /** State for the `Rooms.playerGames` room. */
     playerGamesUpdate: (myGames: Game[]) => void;

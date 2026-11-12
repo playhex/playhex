@@ -7,6 +7,7 @@ import { instanceToInstance } from '../../../shared/app/class-transformer-custom
 import { Outcome, TimestampedMove } from '../../../shared/game-engine/Types.js';
 import { AbstractTimeControl } from '../../../shared/time-control/TimeControl.js';
 import { HexMove } from '@playhex/move-notation';
+import { isChatMessageVisibleToEveryone } from '../../../shared/app/chatMessageVisibility.js';
 
 /**
  * Socket io instance.
@@ -143,10 +144,43 @@ export class GameEventsEmitter
             return;
         }
 
+        // Private and not yet revealed malkovich messages are only sent to their author
+        if (!isChatMessageVisibleToEveryone(chatMessage, game)) {
+            if (chatMessage.player !== null) {
+                io().to(Rooms.player(chatMessage.player.publicId)).emit('chat', game.publicId, instanceToInstance(chatMessage));
+            }
+
+            return;
+        }
+
         io().to([
             Rooms.game(game.publicId),
             ...gamePlayersRooms(game),
         ]).emit('chat', game.publicId, instanceToInstance(chatMessage));
+    }
+
+    /**
+     * Game is now over: send malkovich messages to everyone,
+     * except to their author who already have them.
+     */
+    private emitRevealedMalkovichMessages(game: Game): void
+    {
+        const rooms = [
+            Rooms.game(game.publicId),
+            ...gamePlayersRooms(game),
+        ];
+
+        for (const chatMessage of game.chatMessages) {
+            if (chatMessage.visibility !== 'malkovich' || chatMessage.deletedByModeration || chatMessage.player === null) {
+                continue;
+            }
+
+            io()
+                .to(rooms)
+                .except(Rooms.player(chatMessage.player.publicId))
+                .emit('chat', game.publicId, instanceToInstance(chatMessage))
+            ;
+        }
     }
 
     emitAskUndo(game: Game, byPlayerIndex: number): void
@@ -209,6 +243,8 @@ export class GameEventsEmitter
         io().to([
             ...startedGameLobbyRooms(game),
         ]).emit('lobbyGameEnded', instanceToInstance(game));
+
+        this.emitRevealedMalkovichMessages(game);
     }
 
     emitGameCanceled(game: Game, canceledAt: { date: Date }): void
@@ -219,6 +255,8 @@ export class GameEventsEmitter
             ...gamePlayersRooms(game),
             Rooms.thumbnailGame(game.publicId),
         ]).emit('gameCanceled', game.publicId, canceledAt);
+
+        this.emitRevealedMalkovichMessages(game);
     }
 
     emitRatingsUpdated(game: Game, newRatings: Rating[]): void

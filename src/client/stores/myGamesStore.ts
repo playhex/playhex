@@ -10,6 +10,7 @@ import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js'
 import { addMove, cancelGame, cloneGame, endGame, handleTimeControlUpdate, hasPlayer, isBotGame, isChallengeTargetOf } from '../../shared/app/gameUtils.js';
 import { iAmInGame } from '../services/context-utils.js';
 import { notifier } from '../services/notifications/notifier.js';
+import { insertChatMessage } from '../../shared/app/chatUtils.js';
 
 export type CurrentGame = {
     publicId: string;
@@ -193,7 +194,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
             return;
         }
 
-        myGames.value[gameId].game.chatMessages.push(chatMessage);
+        insertChatMessage(myGames.value[gameId].game.chatMessages, chatMessage);
 
         notifier.emit('chatMessage', myGames.value[gameId].game, chatMessage);
     });

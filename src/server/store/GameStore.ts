@@ -930,6 +930,12 @@ export default class GameStore
             return;
         }
 
+        // Private message: nobody else will ever see it to answer.
+        // Malkovich authors are subscribed: others can answer once revealed.
+        if (chatMessage.visibility === 'private') {
+            return;
+        }
+
         try {
             await Container.get(GameChatNotificationService).autoSubscribeAuthor(game, chatMessage.player);
         } catch (e) {
