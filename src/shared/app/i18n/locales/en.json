@@ -735,6 +735,7 @@
     "discussion_not_followed": "Not following",
     "discussion_followed": "Following",
     "unread_messages": "unread messages",
+    "chat_new_messages": "New",
     "send_chat_message": "Send",
     "spectators": "Spectators",
     "n_characters_one": "{{count}} character",

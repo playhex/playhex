@@ -120,6 +120,16 @@ export default class GameRepository
         await this.gameRepository.update({ publicId }, { ranked });
     }
 
+    async findIdByPublicId(publicId: string): Promise<null | number>
+    {
+        const game = await this.gameRepository.findOne({
+            select: { id: true },
+            where: { publicId },
+        });
+
+        return game?.id ?? null;
+    }
+
     async findUnique(publicId: string): Promise<null | Game>
     {
         return await this.gameRepository.findOne({

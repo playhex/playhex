@@ -12,6 +12,7 @@ import { apiGetPlayerIsCurrentlyChatRestricted } from '../../../apiClient.js';
 import { blockEnterOnMobile, formatMessagePostedHour, makeLinksClickable, sanitizeMessage } from '../../../../shared/app/chatUtils.js';
 import { hexplorerLiveChannelName } from '../../../../shared/app/hexplorerLive.js';
 import AppPseudo from '../../components/AppPseudo.vue';
+import AppChatNewMessagesLine from '../../components/AppChatNewMessagesLine.vue';
 import { IconChatDots, IconSendFill } from '../../icons.js';
 
 const props = defineProps<{
@@ -23,7 +24,7 @@ const props = defineProps<{
     closed: boolean;
 }>();
 
-const { messages, postMessage, hasOlderMessages, loadingOlderMessages, loadOlderMessages } = useChannel(hexplorerLiveChannelName(props.publicId));
+const { messages, postMessage, hasOlderMessages, loadingOlderMessages, loadOlderMessages, firstUnseenMessage, inputFocused } = useChannel(hexplorerLiveChannelName(props.publicId));
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 
@@ -79,16 +80,19 @@ const sendChat = async (): Promise<void> => {
                     >{{ $t('load_older_messages') }}</button>
                 </div>
 
-                <div v-for="message in messages" :key="message.publicId" class="chat-message">
-                    <small class="time text-secondary">{{ formatMessagePostedHour(message.createdAt) }}</small>
-                    <span>&nbsp;</span>
-                    <span class="player" v-if="message.player"><AppPseudo :player="message.player" /></span>
-                    <span v-if="message.player">&nbsp;</span>
+                <template v-for="message in messages" :key="message.publicId">
+                    <AppChatNewMessagesLine v-if="message.publicId === firstUnseenMessage?.publicId" />
+                    <div class="chat-message">
+                        <small class="time text-secondary">{{ formatMessagePostedHour(message.createdAt) }}</small>
+                        <span>&nbsp;</span>
+                        <span class="player" v-if="message.player"><AppPseudo :player="message.player" /></span>
+                        <span v-if="message.player">&nbsp;</span>
 
-                    <span class="content text-body-secondary fst-italic" v-if="message.contentTranslationKey">{{ $t(message.contentTranslationKey, message.translationParameters ?? {}) }}</span>
-                    <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
-                    <span class="content" v-else v-html="renderMessage(message.content)"></span>
-                </div>
+                        <span class="content text-body-secondary fst-italic" v-if="message.contentTranslationKey">{{ $t(message.contentTranslationKey, message.translationParameters ?? {}) }}</span>
+                        <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
+                        <span class="content" v-else v-html="renderMessage(message.content)"></span>
+                    </div>
+                </template>
 
                 <p v-if="!messages.length" class="chat-empty"><IconChatDots /></p>
             </div>
@@ -99,6 +103,8 @@ const sendChat = async (): Promise<void> => {
                 <input
                     v-model="chatInput"
                     @keydown="blockEnterOnMobile"
+                    @focus="inputFocused = true"
+                    @blur="inputFocused = false"
                     class="form-control bg-body-tertiary"
                     :placeholder="isChatInputEnabled ? $t('chat_message_placeholder') : ''"
                     maxlength="1000"

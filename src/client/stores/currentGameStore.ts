@@ -14,7 +14,7 @@ import { useRouter } from 'vue-router';
 import Player from '../../shared/app/models/Player.js';
 import { MoveSettings } from '../../shared/app/models/PlayerSettings.js';
 import { timeControlToCadencyName } from '../../shared/app/timeControlUtils.js';
-import { apiGetConditionalMoves, apiPatchConditionalMoves, apiPostAnswerCancel, apiPostAnswerUndo, apiPostAskCancel, apiPostAskUndo, apiPostCancel, apiPostResign } from '../apiClient.js';
+import { apiGetConditionalMoves, apiPatchConditionalMoves, apiPostAnswerCancel, apiPostAnswerUndo, apiPostAskCancel, apiPostAskUndo, apiPostCancel, apiPostResign, apiGetGameChatSeen, apiPutGameChatSeen } from '../apiClient.js';
 import { HexMove, isSpecialHexMove, Move } from '@playhex/move-notation';
 import { useChatInputStore } from './chatInputStore.js';
 import usePlayerLocalSettingsStore from './playerLocalSettingsStore.js';
@@ -37,6 +37,7 @@ import GameFinishedOverlay from '../vue/components/overlay/GameFinishedOverlay.v
 import type ExternalGame from '../../shared/app/models/ExternalGame.js';
 import { externalGameToGame } from '../../shared/app/externalGameUtils.js';
 import useGameChatSubscriptionsStore from './gameChatSubscriptionsStore.js';
+import { useChatSeen } from '../vue/composables/useChatSeen.js';
 
 /**
  * Current remote game I am focused on.
@@ -58,6 +59,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const { socket } = socketStore;
 
     const currentGamePublicId = ref<null | string>(null);
+
+    /**
+     * Whether current game is an external game (played outside PlayHex), not a PlayHex game.
+     */
+    const isExternalGame = ref(false);
 
     const game = ref<null | Game>(null);
     const spectators = ref<Player[]>([]);
@@ -163,6 +169,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
      */
     const useExternalGame = (externalGame: ExternalGame) => {
         currentGamePublicId.value = externalGame.publicId;
+        isExternalGame.value = true;
 
         const loadedGame = externalGameToGame(externalGame);
 
@@ -193,6 +200,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             engineGame.value = null;
             game.value = null;
             currentGamePublicId.value = null;
+            isExternalGame.value = false;
         });
     };
 
@@ -473,11 +481,6 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
              */
             if (loggedInPlayer.value === null || !hasPlayer(game.value, loggedInPlayer.value)) {
                 notifier.emit('chatMessage', game.value, chatMessage);
-            }
-
-            // Do not show the unread messages badge on a chat muted on this device
-            if (!isReadingChatMessages.value && !usePlayerLocalSettingsStore().isGameChatMuted(game.value.publicId)) {
-                ++unreadMessages.value;
             }
         });
 
@@ -1031,31 +1034,36 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const richChat = ref<null | RichChat>(null);
 
     /**
-     * Number of unread messages.
-     * Front side only (if we refresh, we lose the unread message),
-     * should be stored server side.
+     * Until when I have seen this game chat, stored server side.
      */
-    const unreadMessages = ref(0);
+    const {
+        firstUnseenMessage: firstUnseenChatMessage,
+        unseenCount,
+        inputFocused: chatInputFocused,
+    } = useChatSeen({
+        messages: () => game.value?.chatMessages ?? [],
+        chatKey: () => isExternalGame.value ? null : game.value?.publicId ?? null,
+        fetchSeenAt: apiGetGameChatSeen,
+        putSeenAt: apiPutGameChatSeen,
+    });
 
     /**
-     * Whether chat is open.
-     * Must be set to true so unreadMessages won't increment,
-     * and prevent showing (1) when we are already reading chat.
+     * Number of unread messages, for the badge.
+     * Do not show the unread messages badge on a chat muted on this device.
      */
-    const isReadingChatMessages = ref(false);
+    const unreadMessages = computed((): number => {
+        if (!game.value || usePlayerLocalSettingsStore().isGameChatMuted(game.value.publicId)) {
+            return 0;
+        }
+
+        return unseenCount.value;
+    });
 
     watch(game, () => {
         richChat.value = game.value
             ? new RichChat(game.value)
             : null
         ;
-    });
-
-    // Clear unreadMessages when player opens chat
-    watch(isReadingChatMessages, () => {
-        if (isReadingChatMessages.value) {
-            unreadMessages.value = 0;
-        }
     });
 
     const sendChatMessage = async (content: string, visibility: ChatMessageVisibility = 'public'): Promise<void> => {
@@ -1469,7 +1477,8 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         canResign,
         richChat,
         unreadMessages,
-        isReadingChatMessages,
+        firstUnseenChatMessage,
+        chatInputFocused,
         canCancel,
         canDeclineChallenge,
         canRematch,

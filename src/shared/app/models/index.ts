@@ -2,6 +2,7 @@ import AIConfig from './AIConfig.js';
 import BannedIp from './BannedIp.js';
 import Channel from './Channel.js';
 import ChannelChatMessage from './ChannelChatMessage.js';
+import ChannelChatSeen from './ChannelChatSeen.js';
 import ChatMessage from './ChatMessage.js';
 import ClientErrorReport from './ClientErrorReport.js';
 import ConditionalMoves from './ConditionalMoves.js';
@@ -10,6 +11,7 @@ import ExternalGameAnalyze from './ExternalGameAnalyze.js';
 import ExternalGameImportJob from './ExternalGameImportJob.js';
 import GameAnalyze from './GameAnalyze.js';
 import Game from './Game.js';
+import GameChatSeen from './GameChatSeen.js';
 import GameChatSubscription from './GameChatSubscription.js';
 import GameOptions from './GameOptions.js';
 import {
@@ -73,6 +75,7 @@ export {
     BannedIp,
     Channel,
     ChannelChatMessage,
+    ChannelChatSeen,
     ChatMessage,
     ClientErrorReport,
     ConditionalMoves,
@@ -80,6 +83,7 @@ export {
     ExternalGameAnalyze,
     ExternalGameImportJob,
     GameAnalyze,
+    GameChatSeen,
     GameChatSubscription,
     GameOptions,
     GameOptionsTimeControl,
@@ -144,6 +148,7 @@ export const entities = {
     BannedIp,
     Channel,
     ChannelChatMessage,
+    ChannelChatSeen,
     ChatMessage,
     ClientErrorReport,
     ConditionalMoves,
@@ -151,6 +156,7 @@ export const entities = {
     ExternalGameAnalyze,
     ExternalGameImportJob,
     GameAnalyze,
+    GameChatSeen,
     GameChatSubscription,
     GameOptions,
     GameOptionsTimeControl,

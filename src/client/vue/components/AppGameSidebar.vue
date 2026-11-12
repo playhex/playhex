@@ -6,6 +6,7 @@ import { storeToRefs } from 'pinia';
 import useAuthStore from '../../stores/authStore.js';
 import usePlayerLocalSettingsStore from '../../stores/playerLocalSettingsStore.js';
 import AppPseudo from './AppPseudo.vue';
+import AppChatNewMessagesLine from './AppChatNewMessagesLine.vue';
 import { ChatMessage, Game, Player } from '../../../shared/app/models/index.js';
 import AppGameAnalyze from './AppGameAnalyze.vue';
 import AppGameRulesSummary from './AppGameRulesSummary.vue';
@@ -65,6 +66,8 @@ const {
     playingGameFacade,
     playerSettingsFacade,
     richChat,
+    firstUnseenChatMessage,
+    chatInputFocused,
 } = storeToRefs(useCurrentGameStore());
 
 const {
@@ -220,6 +223,13 @@ watch(chatInput, () => {
 });
 
 const { coordsClick: chatClick } = useCoordsMarks(gameView);
+
+/**
+ * Whether to display the "new" line above this message.
+ */
+const isFirstUnseenChatMessage = (message: unknown): boolean => isChatMessage(message)
+    && message.publicId === firstUnseenChatMessage.value?.publicId
+;
 
 
 /**
@@ -910,37 +920,38 @@ watch(gameUIMode, () => {
 
                 <div v-else class="chat-messages" ref="chatMessagesElement" @click="chatClick">
                     <div class="container-fluid">
-                        <div
-                            v-for="message, key in richChat?.getRichChatMessages()"
-                            :key
-                            class="chat-message"
-                            :class="isChatMessage(message) ? '' : `chat-header chat-header-${message.type}`"
-                        >
-                            <template v-if="isChatMessage(message)">
-                                <small class="time text-secondary">{{ formatMessagePostedHour(message.createdAt) }}</small>
-                                <span>&nbsp;</span>
-                                <span class="player" v-if="message.player"><AppPseudo :player="message.player" :classes="playerColor(message.player)" /></span>
-                                <span v-if="message.player">&nbsp;</span>
+                        <template v-for="message, key in richChat?.getRichChatMessages()" :key>
+                            <AppChatNewMessagesLine v-if="isFirstUnseenChatMessage(message)" />
+                            <div
+                                class="chat-message"
+                                :class="isChatMessage(message) ? '' : `chat-header chat-header-${message.type}`"
+                            >
+                                <template v-if="isChatMessage(message)">
+                                    <small class="time text-secondary">{{ formatMessagePostedHour(message.createdAt) }}</small>
+                                    <span>&nbsp;</span>
+                                    <span class="player" v-if="message.player"><AppPseudo :player="message.player" :classes="playerColor(message.player)" /></span>
+                                    <span v-if="message.player">&nbsp;</span>
 
-                                <span class="content text-body-secondary fst-italic text-center" v-if="message.contentTranslationKey">{{ $t(message.contentTranslationKey, message.translationParameters ?? {}) }}</span>
-                                <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
-                                <span class="content" :class="[`chat-message-${message.visibility ?? 'public'}`, { 'fst-italic': !isChatMessageVisibleToEveryone(message, game) }]" v-else v-html="renderMessage(message.content)"></span>
-                            </template>
+                                    <span class="content text-body-secondary fst-italic text-center" v-if="message.contentTranslationKey">{{ $t(message.contentTranslationKey, message.translationParameters ?? {}) }}</span>
+                                    <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized for XSS, see renderMessage() -->
+                                    <span class="content" :class="[`chat-message-${message.visibility ?? 'public'}`, { 'fst-italic': !isChatMessageVisibleToEveryone(message, game) }]" v-else v-html="renderMessage(message.content)"></span>
+                                </template>
 
-                            <template v-else-if="message.type === 'move'">
-                                <span class="line"></span>
-                                <button class="btn btn-link btn-sm header-move text-secondary p-0" @click="enableSimulationMode().goToMainPosition(message.moveNumber)">{{ $t('move_number', { n: message.moveNumber }) }}</button>
-                                <span class="line"></span>
-                            </template>
-                            <template v-else-if="message.type === 'game_started' || message.type === 'game_ended' || message.type === 'game_canceled'">
-                                <span class="line"></span>
-                                <small class="text-secondary">{{ $t(`chat_header.${message.type}`) }}</small>
-                                <span class="line"></span>
-                            </template>
-                            <template v-else-if="message.type === 'date'">
-                                <small class="header-date text-secondary mt-1">{{ formatChatDateHeader(message.date) }}</small>
-                            </template>
-                        </div>
+                                <template v-else-if="message.type === 'move'">
+                                    <span class="line"></span>
+                                    <button class="btn btn-link btn-sm header-move text-secondary p-0" @click="enableSimulationMode().goToMainPosition(message.moveNumber)">{{ $t('move_number', { n: message.moveNumber }) }}</button>
+                                    <span class="line"></span>
+                                </template>
+                                <template v-else-if="message.type === 'game_started' || message.type === 'game_ended' || message.type === 'game_canceled'">
+                                    <span class="line"></span>
+                                    <small class="text-secondary">{{ $t(`chat_header.${message.type}`) }}</small>
+                                    <span class="line"></span>
+                                </template>
+                                <template v-else-if="message.type === 'date'">
+                                    <small class="header-date text-secondary mt-1">{{ formatChatDateHeader(message.date) }}</small>
+                                </template>
+                            </div>
+                        </template>
                         <p v-if="!richChat?.getRichChatMessages().length" class="chat-empty"><IconChatDots /></p>
                     </div>
                 </div>
@@ -962,6 +973,8 @@ watch(gameUIMode, () => {
                         <input
                             v-model="chatInput"
                             @keydown="blockEnterOnMobile"
+                            @focus="chatInputFocused = true"
+                            @blur="chatInputFocused = false"
                             ref="chatInputElement"
                             class="form-control bg-body-tertiary"
                             aria-describedby="message-submit"

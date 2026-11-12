@@ -754,6 +754,38 @@ export const apiDeleteGameChatSubscription = async (gamePublicId: string): Promi
     await checkResponse(response);
 };
 
+const apiGetChatSeen = async (url: string): Promise<null | Date> => {
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    const { seenAt } = await response.json() as { seenAt: null | string };
+
+    return seenAt === null ? null : new Date(seenAt);
+};
+
+const apiPutChatSeen = async (url: string, seenAt: Date): Promise<void> => {
+    const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ seenAt }),
+    });
+
+    await checkResponse(response);
+};
+
+export const apiGetGameChatSeen = (gamePublicId: string) => apiGetChatSeen(`/api/games/${gamePublicId}/chat-seen`);
+export const apiPutGameChatSeen = (gamePublicId: string, seenAt: Date) => apiPutChatSeen(`/api/games/${gamePublicId}/chat-seen`, seenAt);
+export const apiGetChannelChatSeen = (channelName: string) => apiGetChatSeen(`/api/channels/${channelName}/chat-seen`);
+export const apiPutChannelChatSeen = (channelName: string, seenAt: Date) => apiPutChatSeen(`/api/channels/${channelName}/chat-seen`, seenAt);
+
 export const apiGetAiConfigs = async (): Promise<WithRequired<AIConfig, 'player'>[]> => {
     const response = await fetch(`/api/ai-configs`, {
         method: 'GET',

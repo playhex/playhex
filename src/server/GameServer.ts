@@ -49,9 +49,8 @@ type GameEvents = {
  *
  * Persisting is done on repository.
  *
- * Most of games should be played only in memory,
- * and persisted only on game finished.
- * Unless server restart, a player become temporarly inactive, or correspondace game.
+ * Games are persisted once created (so they have a gameId),
+ * then state is saved again on game finished, after some inactivity, or before server restart.
  */
 export default class GameServer extends TypedEmitter<GameEvents>
 {

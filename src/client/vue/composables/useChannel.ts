@@ -3,13 +3,19 @@ import useSocketStore from '../../stores/socketStore.js';
 import Rooms from '../../../shared/app/Rooms.js';
 import type ChannelChatMessage from '../../../shared/app/models/ChannelChatMessage.js';
 import { CHANNEL_LAST_MESSAGES_COUNT, CHANNEL_OLDER_MESSAGES_PAGE_SIZE } from '../../../shared/app/channelUtils.js';
-import { apiGetChannelMessagesBefore } from '../../apiClient.js';
+import { apiGetChannelChatSeen, apiGetChannelMessagesBefore, apiPutChannelChatSeen } from '../../apiClient.js';
+import { useChatSeen } from './useChatSeen.js';
 
 export const useChannel = (channelName: string) => {
     const socketStore = useSocketStore();
     const { socket, joinRoom, leaveRoom } = socketStore;
 
     const messages = ref<ChannelChatMessage[]>([]);
+
+    /**
+     * Whether last messages have been received at least once.
+     */
+    const messagesLoaded = ref(false);
 
     /**
      * Whether there may be older messages to load
@@ -25,6 +31,7 @@ export const useChannel = (channelName: string) => {
     const onChannelChatMessageUpdate = (channel: string, channelChatMessages: ChannelChatMessage[], channelSlowMode: null | number) => {
         if (channel !== channelName) return;
         messages.value = channelChatMessages;
+        messagesLoaded.value = true;
         slowMode.value = channelSlowMode;
         hasOlderMessages.value = channelChatMessages.length >= CHANNEL_LAST_MESSAGES_COUNT;
     };
@@ -71,6 +78,16 @@ export const useChannel = (channelName: string) => {
         }
     };
 
+    /**
+     * Until when I have seen this channel, stored server side.
+     */
+    const { firstUnseenMessage, inputFocused } = useChatSeen({
+        messages: () => messages.value,
+        chatKey: () => messagesLoaded.value ? channelName : null,
+        fetchSeenAt: apiGetChannelChatSeen,
+        putSeenAt: apiPutChannelChatSeen,
+    });
+
     onBeforeUnmount(() => {
         leaveRoom(Rooms.channel(channelName));
         socket.off('channelChatMessageUpdate', onChannelChatMessageUpdate);
@@ -84,5 +101,7 @@ export const useChannel = (channelName: string) => {
         loadOlderMessages,
         slowMode,
         postMessage,
+        firstUnseenMessage,
+        inputFocused,
     };
 };

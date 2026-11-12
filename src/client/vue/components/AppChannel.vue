@@ -9,6 +9,7 @@ import { useStickToBottom } from '../composables/useStickToBottom.js';
 import useAuthStore from '../../stores/authStore.js';
 import { sanitizeMessage, makeLinksClickable, blockEnterOnMobile } from '../../../shared/app/chatUtils.js';
 import AppPseudo from './AppPseudo.vue';
+import AppChatNewMessagesLine from './AppChatNewMessagesLine.vue';
 import { apiGetPlayerIsCurrentlyChatRestricted } from '../../apiClient.js';
 
 const props = defineProps({
@@ -32,6 +33,12 @@ const postMessage = (content: string) => channelComposables[activeChannel.value]
 const hasOlderMessages = computed(() => channelComposables[activeChannel.value].hasOlderMessages.value);
 const loadingOlderMessages = computed(() => channelComposables[activeChannel.value].loadingOlderMessages.value);
 const slowMode = computed(() => channelComposables[activeChannel.value].slowMode.value);
+const firstUnseenMessagePublicId = computed(() => channelComposables[activeChannel.value].firstUnseenMessage.value?.publicId ?? null);
+const setInputFocused = (focused: boolean) => {
+    for (const [name, ch] of Object.entries(channelComposables)) {
+        ch.inputFocused.value = focused && name === activeChannel.value;
+    }
+};
 
 // One input string kept per channel so switching tabs doesn't discard typed text.
 const chatInputs = ref<Record<string, string>>(Object.fromEntries(channelNames.map(name => [name, ''])));
@@ -151,19 +158,18 @@ const sendMessage = async () => {
                     @click="loadOlderMessages"
                 >{{ $t('load_older_messages') }}</button>
             </div>
-            <div
-                v-for="message in messages"
-                :key="message.publicId"
-                class="channel-message"
-            >
-                <small class="time text-secondary">{{ formatMessageDate(message.createdAt) }}</small>
-                <span v-if="message.player" class="player">
-                    <AppPseudo :player="message.player" />
-                </span>
-                <span class="content text-body-secondary fst-italic" v-if="message.contentTranslationKey">{{ $t(message.contentTranslationKey, message.translationParameters ?? {}) }}</span>
-                <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized, see renderMessage() -->
-                <span class="content" v-else v-html="renderMessage(message.content)" />
-            </div>
+            <template v-for="message in messages" :key="message.publicId">
+                <AppChatNewMessagesLine v-if="message.publicId === firstUnseenMessagePublicId" />
+                <div class="channel-message">
+                    <small class="time text-secondary">{{ formatMessageDate(message.createdAt) }}</small>
+                    <span v-if="message.player" class="player">
+                        <AppPseudo :player="message.player" />
+                    </span>
+                    <span class="content text-body-secondary fst-italic" v-if="message.contentTranslationKey">{{ $t(message.contentTranslationKey, message.translationParameters ?? {}) }}</span>
+                    <!-- eslint-disable-next-line vue/no-v-html message.content is sanitized, see renderMessage() -->
+                    <span class="content" v-else v-html="renderMessage(message.content)" />
+                </div>
+            </template>
             <p v-if="!messages.length" class="text-secondary mb-0">{{ $t('chat') }}</p>
         </div>
 
@@ -173,6 +179,8 @@ const sendMessage = async () => {
                     :value="chatInput"
                     @input="chatInput = ($event.target as HTMLInputElement).value"
                     @keydown="blockEnterOnMobile"
+                    @focus="setInputFocused(true)"
+                    @blur="setInputFocused(false)"
                     class="form-control bg-body-tertiary"
                     :placeholder="inputPlaceholder"
                     maxlength="1000"

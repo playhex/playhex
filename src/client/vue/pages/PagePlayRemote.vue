@@ -62,7 +62,6 @@ const {
     shouldEnablePass,
     handicapStatus,
     unreadMessages,
-    isReadingChatMessages,
 } = storeToRefs(useCurrentGameStore());
 
 const {
@@ -431,20 +430,6 @@ const createOrAcceptRematch = async (): Promise<void> => {
 const showSidebar = (open = true): void => {
     localSettings.openSidebar = open;
 };
-
-const isSidebarCurrentlyOpen = computed<boolean>(() => {
-    if (undefined !== localSettings.openSidebar) {
-        return localSettings.openSidebar;
-    }
-
-    return window.screen.width >= 576;
-});
-
-watch(isSidebarCurrentlyOpen, () => {
-    isReadingChatMessages.value = isSidebarCurrentlyOpen.value;
-}, {
-    immediate: true,
-});
 
 /*
  * Pass
