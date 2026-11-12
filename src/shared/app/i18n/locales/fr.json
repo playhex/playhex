@@ -1803,7 +1803,7 @@
         "activity_note": "Comptabilise le moment où les coups sont joués (pas le début ou la fin des parties). Les horaires sont affichés dans votre fuseau horaire local (UTC{{offset}}).",
         "lobby_join_chances": "Chances qu'une partie live soit rejointe",
         "lobby_join_chances_first_minute": "< 1 min",
-        "lobby_join_chances_next_minutes": "10 min suivantes",
+        "lobby_join_chances_next_minutes": "+10 min",
         "lobby_join_chances_note": "Pourcentage des parties live créées dans le lobby qui trouvent un adversaire dans la première minute, puis dans les 10 minutes suivantes quand personne n'a rejoint après la première minute. Estimé sur les 8 dernières semaines, comme si les hôtes attendaient au lieu d'annuler. Les horaires sont affichés dans votre fuseau horaire local (UTC{{offset}}).",
         "opening_moves": "Coups d'ouverture les plus joués",
         "opening_moves_note": "Pour les plateaux {{boardsize}}, la taille la plus jouée.",

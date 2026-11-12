@@ -831,7 +831,7 @@ const ratingBarHeight = (count: number): string => {
                     <thead>
                         <tr>
                             <th class="day-col"></th>
-                            <th v-for="hour in 24" :key="hour" class="text-center small text-secondary fw-normal">{{ hour - 1 }}</th>
+                            <th v-for="hour in 24" :key="hour" class="text-center text-secondary fw-normal">{{ (hour - 1) + 'h' }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -862,7 +862,7 @@ const ratingBarHeight = (count: number): string => {
                                 <th
                                     v-for="hour in 24"
                                     :key="hour"
-                                    class="text-center small text-secondary fw-normal"
+                                    class="text-center text-secondary fw-normal"
                                     :class="{ 'now-col-top': hour - 1 === nowLocalIndex.hour }"
                                 >{{ (hour - 1) + 'h' }}</th>
                             </tr>
@@ -1064,8 +1064,15 @@ const ratingBarHeight = (count: number): string => {
         border none
         padding 1px
 
+    // Same first column width in all heatmap tables so that hour columns are aligned
     .day-col
-        width 3em
+        width 4.5em
+
+    tbody .day-col
+        padding 1px 0.5em 1px 1px
+
+    thead th
+        font-size 0.7em
 
     td.heatmap-cell
         height 1.2em
@@ -1085,15 +1092,6 @@ const ratingBarHeight = (count: number): string => {
         box-shadow inset 2px 0 0 var(--bs-emphasis-color), inset -2px -2px 0 var(--bs-emphasis-color)
 
 .join-chances-table
-    .day-col
-        width 7.5em
-
-    tbody .day-col
-        padding 1px 0.5em
-
-    thead th
-        font-size 0.7em
-
     td.heatmap-cell
         font-size 0.7em
         vertical-align middle

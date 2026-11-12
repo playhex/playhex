@@ -1811,7 +1811,7 @@
         "activity_note": "Counts when moves are played (not when games start or end). Times are shown in your local timezone (UTC{{offset}}).",
         "lobby_join_chances": "Chances to get a live game joined",
         "lobby_join_chances_first_minute": "< 1 min",
-        "lobby_join_chances_next_minutes": "next 10 min",
+        "lobby_join_chances_next_minutes": "+10 min",
         "lobby_join_chances_note": "Percent of live games created in lobby that get an opponent within the first minute, then within the next 10 minutes when nobody joined after the first minute. Estimated over the last 8 weeks, as if hosts waited instead of canceling. Times are shown in your local timezone (UTC{{offset}}).",
         "opening_moves": "Most common opening moves",
         "opening_moves_note": "For {{boardsize}} boards, the most played size.",
