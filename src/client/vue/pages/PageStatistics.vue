@@ -328,6 +328,17 @@ const timezoneOffsetHours = Math.round(-new Date().getTimezoneOffset() / 60);
 
 const timezoneOffsetLabel = (timezoneOffsetHours >= 0 ? '+' : '') + timezoneOffsetHours;
 
+/**
+ * Current day of week (0 = sunday) and hour, in the same shifted local time as tables below,
+ * to highlight current moment.
+ */
+const nowLocalIndex = (() => {
+    const now = new Date();
+    const shiftedIndex = (((now.getUTCDay() * 24 + now.getUTCHours() + timezoneOffsetHours) % 168) + 168) % 168;
+
+    return { day: Math.floor(shiftedIndex / 24), hour: shiftedIndex % 24 };
+})();
+
 const dayLabel = (dayOfWeek: number): string => format(new Date(2023, 0, 1 + dayOfWeek), 'EEE');
 
 const localizedHeatmap = computed<null | number[][]>(() => {
@@ -666,6 +677,7 @@ const ratingBarHeight = (count: number): string => {
                                 v-for="hour in 24"
                                 :key="hour"
                                 class="heatmap-cell"
+                                :class="{ 'heatmap-now': day - 1 === nowLocalIndex.day && hour - 1 === nowLocalIndex.hour }"
                                 :style="heatmapCellStyle(localizedHeatmap?.[day - 1]?.[hour - 1] ?? 0)"
                                 :title="String(localizedHeatmap?.[day - 1]?.[hour - 1] ?? 0)"
                             ></td>
@@ -683,16 +695,22 @@ const ratingBarHeight = (count: number): string => {
                         <thead>
                             <tr>
                                 <th class="day-col"></th>
-                                <th v-for="hour in 24" :key="hour" class="text-center small text-secondary fw-normal">{{ (hour - 1) + 'h' }}</th>
+                                <th
+                                    v-for="hour in 24"
+                                    :key="hour"
+                                    class="text-center small text-secondary fw-normal"
+                                    :class="{ 'now-col-top': hour - 1 === nowLocalIndex.hour }"
+                                >{{ (hour - 1) + 'h' }}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="row in (['firstMinute', 'nextTenMinutes'] as const)" :key="row">
+                            <tr v-for="(row, rowIndex) in (['firstMinute', 'nextTenMinutes'] as const)" :key="row">
                                 <th class="day-col small text-secondary fw-normal text-nowrap">{{ row === 'firstMinute' ? $t('statistics.lobby_join_chances_first_minute') : $t('statistics.lobby_join_chances_next_minutes') }}</th>
                                 <td
                                     v-for="(percent, hour) in localizedLobbyJoinChances(row)"
                                     :key="hour"
                                     class="heatmap-cell text-center"
+                                    :class="{ 'now-col': hour === nowLocalIndex.hour, 'now-col-bottom': hour === nowLocalIndex.hour && rowIndex === 1 }"
                                     :style="lobbyJoinChanceCellStyle(row, percent)"
                                 >{{ percent ?? '' }}</td>
                             </tr>
@@ -915,6 +933,19 @@ const ratingBarHeight = (count: number): string => {
     td.heatmap-cell
         height 1.2em
         background-color var(--bs-secondary-bg)
+
+    td.heatmap-now
+        box-shadow inset 0 0 0 2px var(--bs-emphasis-color)
+
+    // Outline around current hour column, header included
+    .now-col-top
+        box-shadow inset 2px 2px 0 var(--bs-emphasis-color), inset -2px 0 0 var(--bs-emphasis-color)
+
+    .now-col
+        box-shadow inset 2px 0 0 var(--bs-emphasis-color), inset -2px 0 0 var(--bs-emphasis-color)
+
+    .now-col-bottom
+        box-shadow inset 2px 0 0 var(--bs-emphasis-color), inset -2px -2px 0 var(--bs-emphasis-color)
 
 .join-chances-table
     .day-col
