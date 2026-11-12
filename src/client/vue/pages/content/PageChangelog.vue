@@ -33,4 +33,10 @@ void (async () => {
 
 :deep(h3)
     font-size 1.25em !important
+
+:deep(h4)
+    font-size 1.125em !important
+
+:deep(h5), :deep(h6)
+    font-size 1em !important
 </style>
