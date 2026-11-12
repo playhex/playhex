@@ -4,9 +4,10 @@ import { useHead, useSeoMeta } from '@unhead/vue';
 import { format } from 'date-fns';
 import i18next, { t } from 'i18next';
 import AppRhombus from '../components/AppRhombus.vue';
+import { Chart, Tooltip, Legend, BarElement, LineElement, PointElement, CategoryScale, LinearScale, type ChartData, type ChartOptions } from 'chart.js';
+import { Bar } from 'vue-chartjs';
 import { apiGetLobbyJoinChances, type LobbyJoinChances } from '../../apiClient.js';
 import {
-    IconAlarmFill,
     IconAspectRatio,
     IconClockHistory,
     IconEmojiDizzyFill,
@@ -20,7 +21,6 @@ import {
     IconPeople,
     IconPeopleFill,
     IconPersonFill,
-    IconPersonFillExclamation,
     IconRobot,
     IconSignpostSplit,
     IconStarFill,
@@ -278,23 +278,208 @@ const sortedBoardsizeEntries = <T, >(counts: Record<string, T>): [string, T][] =
     return Object.entries(counts).sort((a, b) => +a[0] - +b[0]);
 };
 
-const mostPlayedBoardsizes = computed<{ main: [string, number][], restCount: number }>(() => {
+/**
+ * Board sizes having at least 1% of games, most played first.
+ */
+const mostPlayedBoardsizes = computed<[string, number][]>(() => {
     if (!displayedStats.value) {
-        return { main: [], restCount: 0 };
+        return [];
     }
 
     const total = sumOfCounts(displayedStats.value.boardsizeCounts);
-    const entries = sortedEntries(displayedStats.value.boardsizeCounts);
-    const main = entries.filter(([, count]) => percent(count, total) >= 1);
-    const restCount = entries
-        .filter(([, count]) => percent(count, total) < 1)
-        .reduce((sum, [, count]) => sum + count, 0)
-    ;
 
-    return { main, restCount };
+    return sortedEntries(displayedStats.value.boardsizeCounts)
+        .filter(([, count]) => percent(count, total) >= 1)
+    ;
 });
 
 const boardsizeLabel = (boardsize: string | number): string => `${boardsize}x${boardsize}`;
+
+/*
+ * Board sizes chart: games count as bars, game length as lines on a second axis.
+ */
+Chart.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Tooltip, Legend);
+
+const mostPlayedBoardsizesChartData = computed<ChartData<'bar', number[], string>>(() => ({
+    labels: mostPlayedBoardsizes.value.map(([boardsize]) => boardsizeLabel(boardsize)),
+    datasets: [
+        {
+            label: t('statistics.games_column'),
+            data: mostPlayedBoardsizes.value.map(([, count]) => count),
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        },
+    ],
+}));
+
+const gamesCountTooltipLabel = (label: undefined | string, count: number, total?: number): string => {
+    if (!displayedStats.value) {
+        return '';
+    }
+
+    return `${label}: ${formatCount(count)} (${formatPercent(count, total ?? sumOfCounts(displayedStats.value.boardsizeCounts))})`;
+};
+
+/**
+ * Bar labels in page text color and size, more readable than chart.js default small grey.
+ */
+const categoryAxisTicks = () => {
+    const bodyStyle = getComputedStyle(document.body);
+
+    return {
+        ticks: {
+            color: bodyStyle.color,
+            font: { size: parseFloat(bodyStyle.fontSize) },
+        },
+    };
+};
+
+/**
+ * Only outcomes that happened, in this order.
+ */
+const displayedOutcomes = computed<[string, number][]>(() => {
+    if (!displayedStats.value) {
+        return [];
+    }
+
+    const { outcomeCounts } = displayedStats.value;
+
+    return (['path', 'resign', 'time', 'forfeit'] as const)
+        .filter(outcome => outcomeCounts[outcome])
+        .map(outcome => [outcome, outcomeCounts[outcome]])
+    ;
+});
+
+const outcomesChartData = computed<ChartData<'bar', number[], string>>(() => ({
+    labels: displayedOutcomes.value.map(([outcome]) => t(`outcome.${outcome}`)),
+    datasets: [
+        {
+            label: t('statistics.games_column'),
+            data: displayedOutcomes.value.map(([, count]) => count),
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        },
+    ],
+}));
+
+const outcomesChartOptions = computed<ChartOptions<'bar'>>(() => ({
+    maintainAspectRatio: false,
+    scales: {
+        x: categoryAxisTicks(),
+        y: {
+            beginAtZero: true,
+            title: { display: true, text: t('statistics.games_column') },
+        },
+    },
+    plugins: {
+        legend: { display: false },
+        tooltip: {
+            callbacks: {
+                label: item => gamesCountTooltipLabel(item.dataset.label, item.raw as number, displayedStats.value?.count),
+            },
+        },
+    },
+}));
+
+const mostPlayedBoardsizesChartOptions = computed<ChartOptions<'bar'>>(() => ({
+    maintainAspectRatio: false,
+    scales: {
+        x: categoryAxisTicks(),
+        y: {
+            beginAtZero: true,
+            title: { display: true, text: t('statistics.games_column') },
+        },
+    },
+    plugins: {
+        legend: { display: false },
+        tooltip: {
+            callbacks: {
+                label: item => gamesCountTooltipLabel(item.dataset.label, item.raw as number),
+            },
+        },
+    },
+}));
+
+const boardsizesChartData = computed<null | ChartData<'bar' | 'line', (null | number)[], string>>(() => {
+    if (!displayedStats.value) {
+        return null;
+    }
+
+    const { boardsizeCounts, movesCountByBoardsize } = displayedStats.value;
+    const entries = sortedBoardsizeEntries(boardsizeCounts);
+
+    return {
+        labels: entries.map(([boardsize]) => boardsizeLabel(boardsize)),
+        datasets: [
+            {
+                type: 'line',
+                label: t('statistics.median_moves'),
+                data: entries.map(([boardsize]) => movesCountByBoardsize[boardsize]?.median ?? null),
+                yAxisID: 'moves',
+                borderColor: 'rgb(255, 159, 64)',
+                backgroundColor: 'rgb(255, 159, 64)',
+                pointRadius: 2,
+                spanGaps: true,
+            },
+            {
+                type: 'line',
+                label: t('statistics.avg_moves'),
+                data: entries.map(([boardsize]) => {
+                    const avg = movesCountByBoardsize[boardsize]?.avg;
+
+                    return avg === undefined ? null : Math.round(avg * 10) / 10;
+                }),
+                yAxisID: 'moves',
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderDash: [4, 4],
+                pointRadius: 2,
+                spanGaps: true,
+            },
+            {
+                type: 'bar',
+                label: t('statistics.games_column'),
+                data: entries.map(([, count]) => count),
+                yAxisID: 'games',
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+            },
+        ],
+    };
+});
+
+const boardsizesChartOptions = computed<ChartOptions<'bar' | 'line'>>(() => ({
+    maintainAspectRatio: false,
+    interaction: {
+        mode: 'index',
+        intersect: false,
+    },
+    scales: {
+        games: {
+            type: 'linear',
+            position: 'left',
+            beginAtZero: true,
+            title: { display: true, text: t('statistics.games_column') },
+        },
+        moves: {
+            type: 'linear',
+            position: 'right',
+            beginAtZero: true,
+            grid: { drawOnChartArea: false },
+            title: { display: true, text: t('moves') },
+        },
+    },
+    plugins: {
+        tooltip: {
+            callbacks: {
+                label: item => {
+                    if (item.dataset.yAxisID !== 'games') {
+                        return `${item.dataset.label}: ${item.formattedValue}`;
+                    }
+
+                    return gamesCountTooltipLabel(item.dataset.label, item.raw as number);
+                },
+            },
+        },
+    },
+}));
 
 const shadingPatternLabel = (pattern: string): string => {
     return t(`shading_patterns.types.${pattern}`, { defaultValue: pattern });
@@ -586,27 +771,6 @@ const ratingBarHeight = (count: number): string => {
                 </div>
             </div>
 
-            <h2 class="h4"><IconTrophyFill class="me-2" />{{ $t('statistics.outcome_breakdown') }}</h2>
-
-            <ul class="list-group list-group-flush mb-4">
-                <li v-if="displayedStats.outcomeCounts.path" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span><IconSignpostSplit class="me-2 text-secondary" />{{ $t('outcome.path') }}</span>
-                    <span class="badge text-bg-secondary rounded-pill">{{ displayedStats.outcomeCounts.path }} ({{ formatPercent(displayedStats.outcomeCounts.path, displayedStats.count) }})</span>
-                </li>
-                <li v-if="displayedStats.outcomeCounts.resign" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span><IconFlag class="me-2 text-secondary" />{{ $t('outcome.resign') }}</span>
-                    <span class="badge text-bg-secondary rounded-pill">{{ displayedStats.outcomeCounts.resign }} ({{ formatPercent(displayedStats.outcomeCounts.resign, displayedStats.count) }})</span>
-                </li>
-                <li v-if="displayedStats.outcomeCounts.time" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span><IconAlarmFill class="me-2 text-secondary" />{{ $t('outcome.time') }}</span>
-                    <span class="badge text-bg-secondary rounded-pill">{{ displayedStats.outcomeCounts.time }} ({{ formatPercent(displayedStats.outcomeCounts.time, displayedStats.count) }})</span>
-                </li>
-                <li v-if="displayedStats.outcomeCounts.forfeit" class="list-group-item d-flex justify-content-between align-items-center">
-                    <span><IconPersonFillExclamation class="me-2 text-secondary" />{{ $t('outcome.forfeit') }}</span>
-                    <span class="badge text-bg-secondary rounded-pill">{{ displayedStats.outcomeCounts.forfeit }} ({{ formatPercent(displayedStats.outcomeCounts.forfeit, displayedStats.count) }})</span>
-                </li>
-            </ul>
-
             <h2 v-if="displayedMonthlyActivePlayers.length > 0" class="h4"><IconPeopleFill class="me-2" />{{ $t('statistics.monthly_active_players') }}</h2>
 
             <div v-if="displayedMonthlyActivePlayers.length > 0" class="row g-3 mb-4">
@@ -720,55 +884,28 @@ const ratingBarHeight = (count: number): string => {
                 <div class="form-text mb-4">{{ $t('statistics.lobby_join_chances_note', { offset: timezoneOffsetLabel }) }}</div>
             </template>
 
-            <h2 class="h4 mt-4"><IconStarFill class="me-2" />{{ $t('statistics.most_played_boardsizes') }}</h2>
-
-            <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>{{ $t('statistics.boardsize') }}</th>
-                            <th class="text-end">{{ $t('statistics.games_column') }}</th>
-                            <th class="text-end">%</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="[boardsize, count] in mostPlayedBoardsizes.main" :key="boardsize">
-                            <td>{{ boardsizeLabel(boardsize) }}</td>
-                            <td class="text-end">{{ count }}</td>
-                            <td class="text-end">{{ formatPercent(count, sumOfCounts(displayedStats.boardsizeCounts)) }}</td>
-                        </tr>
-                        <tr v-if="mostPlayedBoardsizes.restCount > 0">
-                            <td class="text-secondary">{{ $t('statistics.other_boardsizes') }}</td>
-                            <td class="text-end text-secondary">{{ mostPlayedBoardsizes.restCount }}</td>
-                            <td class="text-end text-secondary">{{ formatPercent(mostPlayedBoardsizes.restCount, sumOfCounts(displayedStats.boardsizeCounts)) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                <div class="col">
+                    <h2 class="h4"><IconTrophyFill class="me-2" />{{ $t('statistics.outcome_breakdown') }}</h2>
+                    <div class="boardsizes-chart">
+                        <Bar :data="outcomesChartData" :options="outcomesChartOptions" />
+                    </div>
+                </div>
+                <div class="col">
+                    <h2 class="h4"><IconStarFill class="me-2" />{{ $t('statistics.most_played_boardsizes') }}</h2>
+                    <div class="boardsizes-chart">
+                        <Bar :data="mostPlayedBoardsizesChartData" :options="mostPlayedBoardsizesChartOptions" />
+                    </div>
+                </div>
             </div>
 
             <h2 class="h4 mt-4"><IconAspectRatio class="me-2" />{{ $t('statistics.boardsizes_and_game_length') }}</h2>
 
-            <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>{{ $t('statistics.boardsize') }}</th>
-                            <th class="text-end">{{ $t('statistics.games_column') }}</th>
-                            <th class="text-end">%</th>
-                            <th class="text-end">{{ $t('statistics.avg_moves') }}</th>
-                            <th class="text-end">{{ $t('statistics.median_moves') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="[boardsize, count] in sortedBoardsizeEntries(displayedStats.boardsizeCounts)" :key="boardsize">
-                            <td>{{ boardsizeLabel(boardsize) }}</td>
-                            <td class="text-end">{{ count }}</td>
-                            <td class="text-end">{{ formatPercent(count, sumOfCounts(displayedStats.boardsizeCounts)) }}</td>
-                            <td class="text-end">{{ displayedStats.movesCountByBoardsize[boardsize]?.avg.toFixed(1) ?? '–' }}</td>
-                            <td class="text-end">{{ displayedStats.movesCountByBoardsize[boardsize]?.median ?? '–' }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div v-if="boardsizesChartData" class="boardsizes-chart">
+                <Bar
+                    :data="(boardsizesChartData as unknown as ChartData<'bar'>)"
+                    :options="(boardsizesChartOptions as ChartOptions<'bar'>)"
+                />
             </div>
         </div>
 
@@ -963,6 +1100,10 @@ const ratingBarHeight = (count: number): string => {
 
 .rating-chart
     height 8em
+
+.boardsizes-chart
+    position relative
+    height 16em
 
 .rating-col
     width 1.6em
