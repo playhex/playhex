@@ -29,6 +29,9 @@ import { getTimestampedMoves } from './gameUtils.js';
 export type ChatHeader =
     { type: 'date', date: Date }
     | { type: 'move', moveNumber: number }
+    | { type: 'game_started' }
+    | { type: 'game_ended' }
+    | { type: 'game_canceled' }
 ;
 
 export type RichChatMessage = ChatMessage | ChatHeader;
@@ -43,7 +46,9 @@ export class RichChat
         game: Game,
     ) {
         this.generators = [
+            new GameStartedHeader(game),
             new MoveNumberHeader(game),
+            new GameEndedHeader(game),
             new DateHeader(game),
         ];
 
@@ -135,6 +140,48 @@ class MoveNumberHeader extends AbstractChatHeaderGenerator
 
         return [
             { type: 'move', moveNumber: currentMoveNumber },
+        ];
+    }
+}
+
+/**
+ * Add header when game started, before first message posted after game start.
+ */
+class GameStartedHeader extends AbstractChatHeaderGenerator
+{
+    private yielded = false;
+
+    yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
+    {
+        if (this.yielded || this.game.startedAt === null || chatMessage.createdAt < this.game.startedAt) {
+            return [];
+        }
+
+        this.yielded = true;
+
+        return [
+            { type: 'game_started' },
+        ];
+    }
+}
+
+/**
+ * Add header when game ended or has been canceled, before first message posted after game end.
+ */
+class GameEndedHeader extends AbstractChatHeaderGenerator
+{
+    private yielded = false;
+
+    yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
+    {
+        if (this.yielded || this.game.endedAt === null || chatMessage.createdAt < this.game.endedAt) {
+            return [];
+        }
+
+        this.yielded = true;
+
+        return [
+            { type: this.game.state === 'canceled' ? 'game_canceled' : 'game_ended' },
         ];
     }
 }

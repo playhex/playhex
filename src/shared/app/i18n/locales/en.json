@@ -233,6 +233,11 @@
     "game_finished_overlay": {
         "title": "Game finished"
     },
+    "chat_header": {
+        "game_started": "Game started",
+        "game_ended": "Game ended",
+        "game_canceled": "Game canceled"
+    },
     "game_has_been_canceled": "Game has been canceled.",
     "waiting_for_an_opponent": "Waiting for an opponent…",
     "host_waiting_join_chance_first_minute": "At this time of day, {{percent}} of games are joined within the first minute.",

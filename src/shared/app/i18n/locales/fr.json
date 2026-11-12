@@ -845,6 +845,11 @@
     "game_finished_overlay": {
         "title": "Partie terminée"
     },
+    "chat_header": {
+        "game_started": "Partie commencée",
+        "game_ended": "Partie terminée",
+        "game_canceled": "Partie annulée"
+    },
     "game_has_been_canceled": "La partie a été annulée.",
     "waiting_for_an_opponent": "En attente d'un adversaire…",
     "host_waiting_join_chance_first_minute": "À cette heure-ci, {{percent}} des parties sont rejointes dans la première minute.",

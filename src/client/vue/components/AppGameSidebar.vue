@@ -932,6 +932,11 @@ watch(gameUIMode, () => {
                                 <button class="btn btn-link btn-sm header-move text-secondary p-0" @click="enableSimulationMode().goToMainPosition(message.moveNumber)">{{ $t('move_number', { n: message.moveNumber }) }}</button>
                                 <span class="line"></span>
                             </template>
+                            <template v-else-if="message.type === 'game_started' || message.type === 'game_ended' || message.type === 'game_canceled'">
+                                <span class="line"></span>
+                                <small class="text-secondary">{{ $t(`chat_header.${message.type}`) }}</small>
+                                <span class="line"></span>
+                            </template>
                             <template v-else-if="message.type === 'date'">
                                 <small class="header-date text-secondary mt-1">{{ formatChatDateHeader(message.date) }}</small>
                             </template>
@@ -1209,7 +1214,7 @@ watch(gameUIMode, () => {
             margin-inline-start 1em
 
 .chat-messages
-    .chat-header-move
+    .chat-header-move, .chat-header-game_started, .chat-header-game_ended, .chat-header-game_canceled
         text-align center
         display flex
         gap 1em

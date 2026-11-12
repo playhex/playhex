@@ -110,4 +110,66 @@ describe('Rich Chat', () => {
         assert.strictEqual(richChat[3], message2);
     });
 
+
+    const createMessage = (createdAt: string, content: string): ChatMessage => {
+        const message = new ChatMessage();
+        message.content = content;
+        message.createdAt = new Date(createdAt);
+        return message;
+    };
+
+    it('yield game started and game ended headers', () => {
+        const game = createGame();
+
+        game.startedAt = new Date('2024-08-24T12:00:00Z');
+        game.moves = [coordsToMove({ row: 0, col: 0 })];
+        game.moveTimestamps = [new Date('2024-08-24T12:01:00Z')];
+        game.state = 'ended';
+        game.endedAt = new Date('2024-08-24T12:01:00Z');
+
+        const message0 = createMessage('2024-08-24T11:59:00Z', 'Before start');
+        const message1 = createMessage('2024-08-24T12:00:30Z', 'During game');
+        const message2 = createMessage('2024-08-24T12:02:00Z', 'GG');
+        const message3 = createMessage('2024-08-24T12:03:00Z', 'Thanks');
+
+        game.chatMessages = [message0, message1, message2, message3];
+
+        const richChat = new RichChat(game)
+            .getRichChatMessages()
+            .filter(item => item instanceof ChatMessage || item.type !== 'date')
+        ;
+
+        assert.deepStrictEqual(richChat, [
+            message0,
+            { type: 'game_started' },
+            message1,
+            { type: 'move', moveNumber: 1 },
+            { type: 'game_ended' },
+            message2,
+            message3,
+        ]);
+    });
+
+    it('yield game canceled header', () => {
+        const game = createGame();
+
+        game.startedAt = new Date('2024-08-24T12:00:00Z');
+        game.state = 'canceled';
+        game.endedAt = new Date('2024-08-24T12:01:00Z');
+
+        const message0 = createMessage('2024-08-24T12:02:00Z', 'Bye');
+
+        game.chatMessages = [message0];
+
+        const richChat = new RichChat(game)
+            .getRichChatMessages()
+            .filter(item => item instanceof ChatMessage || item.type !== 'date')
+        ;
+
+        assert.deepStrictEqual(richChat, [
+            { type: 'game_started' },
+            { type: 'game_canceled' },
+            message0,
+        ]);
+    });
 });
