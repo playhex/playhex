@@ -1,3 +1,41 @@
+## November 12, 2026
+*New on PlayHex, since last week*
+
+As you may have seen, I've shown a quick one-line survey for a few days, to ask you what you miss the most on PlayHex. I've been surprised on how relevant and serious your feedback was. Here is what has been done from your feedback. It also gave Hexplorer quite an overhaul!
+
+### From one-line survey answers
+Here are all things done directly from your answers to the survey:
+
+- 📡 **[Hexplorer](/hexplorer) streaming**: stream your analysis with a link, anyone can watch your cursor and chat with you. You can now give a class, or study a position together!
+- ♟️ **Play from a position** against a bot or a player, you can click "Play from this position", it opens Hexplorer, you can go to the position you want or edit it, then play it: either against katahex, or against someone.
+- **Save and share your Hexplorer studies**, and sidebar reorganized like the puzzle editor
+- 🔒 **Invite a friend** not yet on PlayHex: create a closed game, not visible in the lobby, and share it with a link or a QR code
+- 🗣️ **Pronouns**: set your pronouns in your profile page. They are shown on your profile, and used to adapt translations
+- **[Games archive](/games-archive)** reworked, with more filters and columns, and games grouped by day, week or month. Same for the games list on player profile pages
+- 📏 Rated games now allowed **up to board size 23** (was 19)
+- Phone app system bars now follow the light/dark theme instead of being red
+
+#### Other survey answers
+About the **matchmaking**, for sure it's also my main goal, it gives direction to the other features I add. Implementing it is not a problem, I already have a working proof of concept. The problem is number of players, I'm afraid to add the matchmaking too early, and it becomes an unused feature because players get used to never being matched. But I may try things like showing it only once a day, during the most active 2h.
+
+About **clock lag compensation**, like compensate player ping right? It can't be done because I need to trust the player data, like anyone can cheat by faking a big ping. So maybe I can only add it for friendly games, with someone you trust. But then, it seems too complicated, instead, if you have ping issue, you can just add 1 or 2 more seconds increment.
+
+About **analysis while playing**, not sure I understand, it can be done already with Hexplorer. I won't allow it for games against someone. Maybe against someone while training? If yes, I can try to allow it in Hexplorer "Play".
+
+I liked showing a temporary one-question survey, I think about adding other similar survey sometimes, with other questions.
+
+### Added
+- ⏳ When waiting for an opponent, see **how long you will typically wait**, and your chances to be joined in the next minute or next 10 minutes
+- 🎯 **Handicap**: give extra stones to the weaker player when creating a game
+- 🤫 **Private and Malkovich messages** in game chat: write notes only visible to you, or messages revealed to everyone once the game is over
+- 👤 Clicking a nickname now opens a **popover** with player info and a button to challenge them
+
+### Changed
+- Accepting a game now cancels the other games you created
+- Simpler Play vs AI overlay for newcomers, only show Easy / Medium / Hard, and tells you if you already beat them, like a roadmap. Then you can unfold other stronger AIs.
+- [Statistics page](/statistics): reworked stats on activity, and changed moves per sizes long table into a chart.
+- Tutorial: Reorganize it into chapters, so the first chapter contains only the 2 rules.
+
 ## November 3, 2026
 *New on PlayHex, since 2 weeks*
 
