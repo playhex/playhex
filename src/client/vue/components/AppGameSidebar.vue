@@ -587,7 +587,7 @@ watch(gameUIMode, () => {
         -->
         <div class="sidebar-block block-game-options" v-if="isTab('main', 'info')">
             <router-link
-                v-for="tournamentMatch in game.tournamentMatch ? [game.tournamentMatch!] : []"
+                v-for="tournamentMatch in game.tournamentMatch?.tournament ? [game.tournamentMatch!] : []"
                 :to="{ name: 'tournament', params: { slug: tournamentMatch.tournament.slug }, hash: '#match-' + tournamentMatchKey(tournamentMatch) }"
                 class="btn btn-warning btn-block btn-tournament"
             >
