@@ -28,12 +28,26 @@ export const canChatMessageBePostedInGame = (chatMessage: ChatMessage, game: Gam
 };
 
 /**
+ * Whether this chat message is already in the list, compared by publicId.
+ */
+export const hasChatMessage = <T extends { publicId?: string }>(chatMessages: T[], chatMessage: T): boolean => {
+    return chatMessage.publicId !== undefined
+        && chatMessages.some(({ publicId }) => publicId === chatMessage.publicId)
+    ;
+};
+
+/**
  * Insert a chat message at its place, by date, in a list sorted by date.
  * Messages can be older than the last one, i.e revealed malkovich messages, or my own hidden messages.
+ * Does nothing if message is already in the list (same publicId).
  *
  * @returns Whether the message has been appended at the end.
  */
-export const insertChatMessage = <T extends { createdAt: Date }>(chatMessages: T[], chatMessage: T): boolean => {
+export const insertChatMessage = <T extends { createdAt: Date, publicId?: string }>(chatMessages: T[], chatMessage: T): boolean => {
+    if (hasChatMessage(chatMessages, chatMessage)) {
+        return false;
+    }
+
     let i = chatMessages.length;
 
     while (i > 0 && chatMessages[i - 1].createdAt > chatMessage.createdAt) {

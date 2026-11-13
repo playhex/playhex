@@ -10,7 +10,7 @@ import { timeValueToMilliseconds } from '../../shared/time-control/TimeValue.js'
 import { addMove, cancelGame, cloneGame, endGame, handleTimeControlUpdate, hasPlayer, isBotGame, isChallengeTargetOf } from '../../shared/app/gameUtils.js';
 import { iAmInGame } from '../services/context-utils.js';
 import { notifier } from '../services/notifications/notifier.js';
-import { insertChatMessage } from '../../shared/app/chatUtils.js';
+import { hasChatMessage, insertChatMessage } from '../../shared/app/chatUtils.js';
 
 export type CurrentGame = {
     publicId: string;
@@ -190,7 +190,7 @@ const useMyGamesStore = defineStore('myGamesStore', () => {
     });
 
     socket.on('chat', (gameId, chatMessage) => {
-        if (!myGames.value[gameId]) {
+        if (!myGames.value[gameId] || hasChatMessage(myGames.value[gameId].game.chatMessages, chatMessage)) {
             return;
         }
 

@@ -87,14 +87,22 @@ const useSocketStore = defineStore('socketStore', () => {
 
     const authStore = useAuthStore();
 
+    /**
+     * Leave my player room, joined again after each reconnection while subscribed.
+     */
+    let unsubscribePlayerRoom: null | (() => void) = null;
+
     watch(() => authStore.loggedInPlayer, player => {
+        unsubscribePlayerRoom?.();
+        unsubscribePlayerRoom = null;
+
         if (player === null) {
             socket.disconnect();
             return;
         }
 
         reconnectSocket();
-        void joinRoom(Rooms.player(player.publicId));
+        unsubscribePlayerRoom = subscribeRoom(Rooms.player(player.publicId));
     });
 
     socket.on('connect', () => {

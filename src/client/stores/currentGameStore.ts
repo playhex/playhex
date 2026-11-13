@@ -25,7 +25,7 @@ import { checkHandicapMove, getHandicapStatus, getPresetDemerHandicap, HandicapS
 import { PlayerSettingsFacade } from '../services/board-view-facades/PlayerSettingsFacade.js';
 import { RichChat } from '../../shared/app/rich-chat.js';
 import type { ChatMessageVisibility } from '../../shared/app/chatMessageVisibility.js';
-import { insertChatMessage } from '../../shared/app/chatUtils.js';
+import { hasChatMessage, insertChatMessage } from '../../shared/app/chatUtils.js';
 import type { WebsocketActionError } from '../../shared/app/Types.js';
 import ChatMessage from '../../shared/app/models/ChatMessage.js';
 import { GameTimeData } from '../../shared/time-control/TimeControl.js';
@@ -464,6 +464,11 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         on('chat', (gameId: string, chatMessage: ChatMessage) => {
             if (gameId !== gamePublicId || !game.value) {
+                return;
+            }
+
+            // Already received, i.e my own revealed malkovich message
+            if (hasChatMessage(game.value.chatMessages, chatMessage)) {
                 return;
             }
 

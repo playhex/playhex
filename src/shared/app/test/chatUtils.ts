@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { getChatMessageSortDate, ignoreInvalidChatMessageMoveNumber, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage, shortenHexwikiLink } from '../chatUtils.js';
+import { getChatMessageSortDate, ignoreInvalidChatMessageMoveNumber, insertChatMessage, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage, shortenHexwikiLink } from '../chatUtils.js';
 import { ChatMessage } from '../models/index.js';
 
 describe('chatMessageUtils', () => {
@@ -224,6 +224,27 @@ describe('chatMessageUtils', () => {
                 ignoreInvalidChatMessageMoveNumber(chatMessage, 5);
                 assert.strictEqual(chatMessage.moveNumber, null, `${visibility} ${moveNumber}`);
             }
+        });
+    });
+
+    describe('insertChatMessage', () => {
+        it('does not insert a message already in the list', () => {
+            const message = (content: string, minute: number): ChatMessage => {
+                const chatMessage = new ChatMessage();
+                chatMessage.content = content;
+                chatMessage.createdAt = new Date(`2024-08-24T12:0${minute}:00Z`);
+                return chatMessage;
+            };
+
+            const a = message('a', 1);
+            const b = message('b', 2);
+            const chatMessages: ChatMessage[] = [];
+
+            assert.strictEqual(insertChatMessage(chatMessages, a), true);
+            assert.strictEqual(insertChatMessage(chatMessages, b), true);
+            assert.strictEqual(insertChatMessage(chatMessages, a), false, 'same message received again');
+            assert.strictEqual(insertChatMessage(chatMessages, { ...b }), false, 'same publicId, other instance');
+            assert.deepStrictEqual(chatMessages.map(m => m.content), ['a', 'b']);
         });
     });
 });
