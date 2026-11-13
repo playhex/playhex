@@ -172,14 +172,7 @@ const updateOrientationLandscape = (orientation: number): void => {
 const clickLogout = async (): Promise<void> => {
     closeMenu();
 
-    const newPlayer = await useAuthStore().logout();
-
-    void router.push({
-        name: 'player',
-        params: {
-            slug: newPlayer.slug,
-        },
-    });
+    await useAuthStore().logout();
 };
 </script>
 
