@@ -3,6 +3,8 @@ import { initI18n } from '../shared/app/i18n/index.js';
 import 'bootstrap/js/src/collapse.js';
 import 'bootstrap/js/src/offcanvas.js';
 import './base.styl';
+import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
+import twemojiCountryFlagsUrl from 'country-flag-emoji-polyfill/dist/TwemojiCountryFlags.woff2?no-inline';
 
 import { createPinia } from 'pinia';
 import { createApp } from 'vue';
@@ -19,6 +21,9 @@ import './services/registerServiceWorker.js';
 import './services/playerActivity.js';
 import { preloadAssets } from './services/preload-assets.js';
 import './services/notifications/index.js';
+
+// Windows does not render flag emojis. Only on systems that lack them, declares a flags-only font (not downloaded otherwise).
+polyfillCountryFlagEmojis('Twemoji Country Flags', twemojiCountryFlagsUrl);
 
 const pinia = createPinia();
 

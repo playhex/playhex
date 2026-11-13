@@ -1,3 +1,8 @@
+// Flags-only font declared by polyfillCountryFlagEmojis() on systems that lack flag emojis (Windows).
+// Ignored elsewhere. "html body" to win over Bootstrap CSS, which is loaded later at runtime.
+html body
+    font-family "Twemoji Country Flags", var(--bs-body-font-family)
+
 /**
  * Top and down menus.
  */

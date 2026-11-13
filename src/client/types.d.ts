@@ -2,6 +2,10 @@
 
 declare module '*.styl';
 declare module '*.css';
+declare module '*?no-inline' {
+    const url: string;
+    export default url;
+}
 
 // Globals injected by Vite's define
 declare const BASE_URL: string | undefined;

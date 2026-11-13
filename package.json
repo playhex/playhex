@@ -68,6 +68,7 @@
     "content-range": "^2.0.2",
     "copy-to-clipboard": "^4.0.2",
     "cors": "^2.8.6",
+    "country-flag-emoji-polyfill": "^0.1.10",
     "csv-parse": "^7.0.3",
     "date-fns": "^4.4.0",
     "davies-hex-ai": "^1.2.7",
