@@ -206,6 +206,16 @@ export const isWaitingClosedGame = (game: Game): boolean => {
 };
 
 /**
+ * Whether given player is the host of this game.
+ */
+export const isHostOf = (game: Game, player: null | Player): boolean => {
+    return player !== null
+        && game.host !== null
+        && game.host.publicId === player.publicId
+    ;
+};
+
+/**
  * Whether this game is a public live game from lobby, open to anyone.
  * Once one of them is accepted and started, other waiting ones of same players are canceled.
  */

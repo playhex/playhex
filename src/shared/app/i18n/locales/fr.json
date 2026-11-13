@@ -1173,7 +1173,7 @@
     "opponent_must_be_registered": "Joueurs avec compte uniquement",
     "opponent_must_be_registered_help": "Les invités ne peuvent pas rejoindre cette partie. Seuls les joueurs avec un compte sont acceptés.",
     "closed_game": "Partie fermée",
-    "closed_game_help": "Cette partie n'apparaît pas dans le lobby. Seules les personnes ayant le lien peuvent la rejoindre, même si elles ne sont pas encore sur PlayHex.",
+    "closed_game_help": "Cette partie n'apparaît pas dans le lobby des autres joueurs. Seules les personnes ayant le lien peuvent la rejoindre, même si elles ne sont pas encore sur PlayHex.",
     "closed_game_invite": {
         "link_label": "Lien à envoyer à un(e) ami(e)",
         "share": "Partager"

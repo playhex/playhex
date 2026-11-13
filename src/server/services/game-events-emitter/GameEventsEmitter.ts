@@ -35,17 +35,14 @@ const gamePlayersRooms = (game: Game): string[] => {
  * Rooms for game lobby, or bot lobby.
  * Challenge games are reserved for a specific opponent and must never appear in a public lobby:
  * only the host and the challenged opponent should see it there.
- * Closed games are not sent at all: their id is what allows to join.
+ * Closed games are sent only to their players (the host, while waiting): their id is what allows to join,
+ * but host should still find it back in lobby.
  *
  * Can be empty: do not emit in this case, io().to([]) would broadcast to all sockets.
  */
 const lobbyRooms = (game: Game): string[] => {
-    if (isChallengeGame(game)) {
+    if (isChallengeGame(game) || isWaitingClosedGame(game)) {
         return gamePlayersRooms(game);
-    }
-
-    if (isWaitingClosedGame(game)) {
-        return [];
     }
 
     return startedGameLobbyRooms(game);

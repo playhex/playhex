@@ -93,6 +93,24 @@ describe('Closed games', () => {
 
             assert.deepStrictEqual(gameStore.getWaiting1v1GamesData(), [publicGame]);
         });
+
+        it('contains my waiting closed game, so I can find back its link', () => {
+            const publicGame = createWaitingGame();
+            const myClosedGame = createWaitingGame({ closed: true });
+
+            const gameStore = createGameStoreWithActiveGames([publicGame, myClosedGame]);
+
+            assert.deepStrictEqual(gameStore.getWaiting1v1GamesData(myClosedGame.host), [publicGame, myClosedGame]);
+        });
+
+        it('does not contain waiting closed game of another player', () => {
+            const publicGame = createWaitingGame();
+            const othersClosedGame = createWaitingGame({ closed: true });
+
+            const gameStore = createGameStoreWithActiveGames([publicGame, othersClosedGame]);
+
+            assert.deepStrictEqual(gameStore.getWaiting1v1GamesData(createPlayer()), [publicGame]);
+        });
     });
 
     describe('lobbyGameCreated event', () => {
@@ -104,8 +122,10 @@ describe('Closed games', () => {
             return emitted.lobbyGameCreated;
         };
 
-        it('is not emitted for closed games, not even to all sockets', () => {
-            assert.strictEqual(emitGameCreated(createWaitingGame({ closed: true })), undefined);
+        it('is emitted only to host for closed games, never to lobby nor to all sockets', () => {
+            const game = createWaitingGame({ closed: true });
+
+            assert.deepStrictEqual(emitGameCreated(game), [[Rooms.playerGames(game.host!.publicId)]]);
         });
 
         it('is emitted to lobby for public games', () => {

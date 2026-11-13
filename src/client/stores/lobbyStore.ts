@@ -3,7 +3,7 @@ import { Game } from '../../shared/app/models/index.js';
 import { getGame, getGames } from '../../client/apiClient.js';
 import useSocketStore from './socketStore.js';
 import { computed, ref } from 'vue';
-import { cancelGame, hasPlayer, isBotGame, isChallengeGame, isChallengeTargetOf, matchSearchParams, updateGame } from '../../shared/app/gameUtils.js';
+import { cancelGame, hasPlayer, isBotGame, isChallengeGame, isChallengeTargetOf, isHostOf, isWaitingClosedGame, matchSearchParams, updateGame } from '../../shared/app/gameUtils.js';
 import SearchGamesParameters from '../../shared/app/SearchGamesParameters.js';
 import { isCorrespondence, isLive, TimeControlCadency } from '../../shared/app/timeControlUtils.js';
 import useAuthStore from './authStore.js';
@@ -184,6 +184,11 @@ const useLobbyStore = defineStore('lobbyStore', () => {
                 if (!isRelevantToMe) {
                     return;
                 }
+            }
+
+            // Closed games are listed only to their host, so they can find back the link to share
+            if (isWaitingClosedGame(game) && !isHostOf(game, authStore.loggedInPlayer)) {
+                return;
             }
 
             games.value[game.publicId] = game;

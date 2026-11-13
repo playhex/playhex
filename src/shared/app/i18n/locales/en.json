@@ -143,7 +143,7 @@
     "opponent_must_be_registered": "Registered players only",
     "opponent_must_be_registered_help": "Guests cannot join this game. Only players with an account are allowed.",
     "closed_game": "Closed game",
-    "closed_game_help": "This game does not appear in the lobby. Only people with the link can join, even if they are not on PlayHex yet.",
+    "closed_game_help": "This game does not appear in the lobby of other players. Only people with the link can join, even if they are not on PlayHex yet.",
     "closed_game_invite": {
         "link_label": "Link to send to a friend",
         "share": "Share"

@@ -22,7 +22,7 @@ import { apiGetActiveTournaments, apiPostCancel } from '../../apiClient.js';
 import useToastsStore from '../../stores/toastsStore.js';
 import AppFeaturedTournamentCard from '../tournaments/components/AppFeaturedTournamentCard.vue';
 import AppCijmTournamentCard2026 from '../components/AppCijmTournamentCard2026.vue';
-import { IconCalendar, IconCircleFill, IconEye, IconInfoCircleFill, IconLightningChargeFill, IconSearch, IconTablerSwords, IconTrophyFill, IconX } from '../icons.js';
+import { IconCalendar, IconCircleFill, IconEye, IconInfoCircleFill, IconLightningChargeFill, IconLockFill, IconSearch, IconTablerSwords, IconTrophyFill, IconX } from '../icons.js';
 import AppLobbyFeaturesLiveGames from '../components/AppLobbyFeaturesLiveGames.vue';
 import AppLobbyFeaturesCorrespondenceGames from '../components/AppLobbyFeaturesCorrespondenceGames.vue';
 import usePlayingGamesCountStore from '../../stores/playingGamesCountStore.js';
@@ -301,6 +301,7 @@ for (const locale of getPlayerLocales()) {
                                                 :disabled="Boolean(game.softRemoved) || isGuestBlockedFromRegisteredOnlyGame(game, authStore.loggedInPlayer)"
                                             >{{ $t('lobby_join') }}</button></span>
                                             <span v-if="game.ranked" class="text-warning ms-2"><IconTrophyFill /> {{ $t('ranked') }}</span>
+                                            <span v-if="game.closed" class="text-body-secondary ms-2" :title="$t('closed_game_help')"><IconLockFill /> {{ $t('closed_game') }}</span>
                                         </td>
                                         <td>
                                             <AppPseudo v-if="game.host" :player="game.host" flag onlineStatus rating />

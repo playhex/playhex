@@ -33,7 +33,8 @@ export default class LobbyWebsocketController implements WebsocketControllerInte
             return;
         }
 
-        const games = this.gameStore.getWaiting1v1GamesData();
+        // Also returns closed games hosted by this player, so they find back the link to share
+        const games = this.gameStore.getWaiting1v1GamesData(socket.data.player);
         socket.emit('lobbyUpdate', games.map(game => instanceToInstance(game, { groups: ['lobby'] })));
     }
 }

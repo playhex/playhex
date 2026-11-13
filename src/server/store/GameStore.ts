@@ -16,7 +16,7 @@ import { AutoSave } from '../auto-save/AutoSave.js';
 import { notifier } from '../services/notifications/notifier.js';
 import { errorToLogger, errorToString } from '../../shared/app/utils.js';
 import type { HexMove } from '@playhex/move-notation';
-import { getOtherPlayer, isBotGame, isChallengeGame, isChallengeTargetOf, isPublicLiveLobbyGame, isWaitingClosedGame } from '../../shared/app/gameUtils.js';
+import { getOtherPlayer, isBotGame, isChallengeGame, isChallengeTargetOf, isHostOf, isPublicLiveLobbyGame, isWaitingClosedGame } from '../../shared/app/gameUtils.js';
 import { GameEventsEmitter } from '../services/game-events-emitter/GameEventsEmitter.js';
 import PlayerModerationActionRepository from '../repositories/PlayerModerationActionRepository.js';
 import { rateLimiterConsumeChatMessage } from '../services/rate-limiters.js';
@@ -350,11 +350,21 @@ export default class GameStore
         ;
     }
 
-    getWaiting1v1GamesData(): Game[]
+    /**
+     * Games waiting for an opponent, to list in lobby.
+     * Closed games are hidden, except to their host, given player,
+     * so they can find back the game and its link to share.
+     */
+    getWaiting1v1GamesData(player: null | Player = null): Game[]
     {
         return Object.values(this.activeGames)
-            .filter(gameServer => gameServer.getGame().state === 'created' && !isBotGame(gameServer.getGame()) && !isChallengeGame(gameServer.getGame()) && !isWaitingClosedGame(gameServer.getGame()))
             .map(gameServer => gameServer.getGame())
+            .filter(game =>
+                game.state === 'created'
+                && !isBotGame(game)
+                && !isChallengeGame(game)
+                && (!isWaitingClosedGame(game) || isHostOf(game, player)),
+            )
         ;
     }
 
