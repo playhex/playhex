@@ -1,6 +1,7 @@
 import assert from 'assert';
 import { describe, it } from 'mocha';
-import { makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage, shortenHexwikiLink } from '../chatUtils.js';
+import { getChatMessageSortDate, ignoreInvalidChatMessageMoveNumber, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage, shortenHexwikiLink } from '../chatUtils.js';
+import { ChatMessage } from '../models/index.js';
 
 describe('chatMessageUtils', () => {
     describe('makesCoordsInteractive', () => {
@@ -176,6 +177,53 @@ describe('chatMessageUtils', () => {
             assert.strictEqual(shortenHexwikiLink('https://www.hexwiki.net'), null);
             assert.strictEqual(shortenHexwikiLink('https://www.hexwiki.net/index.php/'), null);
             assert.strictEqual(shortenHexwikiLink('https://trmph.com/hexwiki/Intermediate_strategy_guide.html'), null);
+        });
+    });
+
+    describe('getChatMessageSortDate', () => {
+        const moveTimestamps = [
+            new Date('2024-08-24T12:01:00Z'),
+            new Date('2024-08-24T12:02:00Z'),
+            new Date('2024-08-24T12:03:00Z'),
+        ];
+        const createdAt = new Date('2024-08-24T12:05:00Z');
+
+        it('returns post date when not attached to a move', () => {
+            assert.strictEqual(getChatMessageSortDate({ createdAt, moveNumber: null }, moveTimestamps), createdAt);
+            assert.strictEqual(getChatMessageSortDate({ createdAt }, moveTimestamps), createdAt);
+        });
+
+        it('returns just before next move when attached to a move', () => {
+            assert.deepStrictEqual(getChatMessageSortDate({ createdAt, moveNumber: 1 }, moveTimestamps), new Date('2024-08-24T12:01:59.999Z'));
+            assert.deepStrictEqual(getChatMessageSortDate({ createdAt, moveNumber: 2 }, moveTimestamps), new Date('2024-08-24T12:02:59.999Z'));
+        });
+
+        it('returns post date when attached to last move, or to a move not played anymore', () => {
+            assert.strictEqual(getChatMessageSortDate({ createdAt, moveNumber: 3 }, moveTimestamps), createdAt);
+            assert.strictEqual(getChatMessageSortDate({ createdAt, moveNumber: 4 }, moveTimestamps), createdAt);
+        });
+    });
+
+    describe('ignoreInvalidChatMessageMoveNumber', () => {
+        const createMessage = (visibility: ChatMessage['visibility'], moveNumber: null | number): ChatMessage => {
+            const chatMessage = new ChatMessage();
+            chatMessage.visibility = visibility;
+            chatMessage.moveNumber = moveNumber;
+            return chatMessage;
+        };
+
+        it('keeps move number of an earlier move', () => {
+            const chatMessage = createMessage('malkovich', 2);
+            ignoreInvalidChatMessageMoveNumber(chatMessage, 5);
+            assert.strictEqual(chatMessage.moveNumber, 2);
+        });
+
+        it('removes move number when no move played since, or invalid, or public', () => {
+            for (const [visibility, moveNumber] of [['private', 5], ['private', 6], ['private', 0], ['public', 2]] as const) {
+                const chatMessage = createMessage(visibility, moveNumber);
+                ignoreInvalidChatMessageMoveNumber(chatMessage, 5);
+                assert.strictEqual(chatMessage.moveNumber, null, `${visibility} ${moveNumber}`);
+            }
         });
     });
 });

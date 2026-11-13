@@ -172,4 +172,93 @@ describe('Rich Chat', () => {
             message0,
         ]);
     });
+
+    describe('messages attached to a move', () => {
+        const createGameWithMoves = () => {
+            const game = createGame();
+
+            game.startedAt = new Date('2024-08-24T12:00:00Z');
+            game.moves = [
+                coordsToMove({ row: 0, col: 0 }),
+                coordsToMove({ row: 0, col: 1 }),
+                coordsToMove({ row: 0, col: 2 }),
+            ];
+            game.moveTimestamps = [
+                new Date('2024-08-24T12:01:00Z'),
+                new Date('2024-08-24T12:02:00Z'),
+                new Date('2024-08-24T12:03:00Z'),
+            ];
+
+            return game;
+        };
+
+        const createAttachedMessage = (createdAt: string, content: string, moveNumber: number): ChatMessage => {
+            const message = createMessage(createdAt, content);
+            message.visibility = 'malkovich';
+            message.moveNumber = moveNumber;
+            return message;
+        };
+
+        it('shows message under its move, even if posted after next move', () => {
+            const game = createGameWithMoves();
+
+            const message0 = createMessage('2024-08-24T12:01:30Z', 'Hi');
+            const message1 = createAttachedMessage('2024-08-24T12:03:30Z', 'About move 1', 1);
+            const message2 = createMessage('2024-08-24T12:03:40Z', 'After move 3');
+
+            game.chatMessages = [message0, message1, message2];
+
+            const richChat = new RichChat(game)
+                .getRichChatMessages()
+                .filter(item => item instanceof ChatMessage || item.type === 'move')
+            ;
+
+            assert.deepStrictEqual(richChat, [
+                { type: 'move', moveNumber: 1 },
+                message0,
+                message1,
+                { type: 'move', moveNumber: 3 },
+                message2,
+            ]);
+        });
+
+        it('places by date a message attached to last move, or to an undone move', () => {
+            const game = createGameWithMoves();
+
+            const message0 = createAttachedMessage('2024-08-24T12:03:30Z', 'About last move', 3);
+            const message1 = createAttachedMessage('2024-08-24T12:03:40Z', 'About undone move', 5);
+
+            game.chatMessages = [message0, message1];
+
+            const richChat = new RichChat(game)
+                .getRichChatMessages()
+                .filter(item => item instanceof ChatMessage || item.type === 'move')
+            ;
+
+            assert.deepStrictEqual(richChat, [
+                { type: 'move', moveNumber: 3 },
+                message0,
+                message1,
+            ]);
+        });
+
+        it('does not yield a date header for a message attached to a move of the day before', () => {
+            const game = createGameWithMoves();
+
+            const message0 = createMessage('2024-08-24T12:01:30Z', 'Hi');
+            const message1 = createAttachedMessage('2024-08-25T10:00:00Z', 'About move 1, the day after', 1);
+            const message2 = createMessage('2024-08-24T12:02:30Z', 'Same day');
+
+            game.chatMessages = [message0, message1, message2];
+
+            const dateHeaders = new RichChat(game)
+                .getRichChatMessages()
+                .filter(item => !(item instanceof ChatMessage) && item.type === 'date')
+            ;
+
+            assert.deepStrictEqual(dateHeaders, [
+                { type: 'date', date: new Date('2024-08-24T12:01:30Z') },
+            ]);
+        });
+    });
 });

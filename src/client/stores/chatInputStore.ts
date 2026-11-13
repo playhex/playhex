@@ -39,9 +39,38 @@ export const useChatInputStore = defineStore('chatInputStore', () => {
         return visibilityRefs[gameId];
     };
 
+    /**
+     * Number of moves played when I started typing the message, one per game.
+     * Used to attach the message to this move, even if opponent plays while I am typing.
+     */
+    const frozenMoveNumberRefs: { [gameId: string]: Ref<null | number> } = {};
+
+    const getFrozenMoveNumber = (gameId: string): Ref<null | number> => {
+        if (!frozenMoveNumberRefs[gameId]) {
+            frozenMoveNumberRefs[gameId] = ref(null);
+        }
+
+        return frozenMoveNumberRefs[gameId];
+    };
+
+    /**
+     * Whether message should be attached to its move, or placed by date. One per game.
+     */
+    const attachToMoveRefs: { [gameId: string]: Ref<boolean> } = {};
+
+    const getAttachToMove = (gameId: string): Ref<boolean> => {
+        if (!attachToMoveRefs[gameId]) {
+            attachToMoveRefs[gameId] = ref(true);
+        }
+
+        return attachToMoveRefs[gameId];
+    };
+
     return {
         getChatInput,
         getChatMessageVisibility,
+        getFrozenMoveNumber,
+        getAttachToMove,
     };
 
 });

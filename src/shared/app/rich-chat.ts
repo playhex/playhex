@@ -1,6 +1,7 @@
 import { isSameDay } from 'date-fns';
 import { ChatMessage, Game } from './models/index.js';
 import { getTimestampedMoves } from './gameUtils.js';
+import { getChatMessageSortDate, sortGameChatMessages } from './chatUtils.js';
 
 /*
  * Take a game chat messages, and adds between chat messages:
@@ -52,7 +53,7 @@ export class RichChat
             new DateHeader(game),
         ];
 
-        for (const chatMessage of game.chatMessages) {
+        for (const chatMessage of sortGameChatMessages(game.chatMessages, game.moveTimestamps)) {
             this.postChatMessage(chatMessage);
         }
     }
@@ -62,6 +63,10 @@ export class RichChat
         return this.richChatMessages;
     }
 
+    /**
+     * Append a chat message, must be the latest one by getChatMessageSortDate(),
+     * else a new RichChat should be created.
+     */
     postChatMessage(chatMessage: ChatMessage): void
     {
         for (const generator of this.generators) {
@@ -84,6 +89,14 @@ abstract class AbstractChatHeaderGenerator
     {}
 
     /**
+     * Date used to place the message: its post date, or before next move if attached to a move.
+     */
+    protected getSortDate(chatMessage: ChatMessage): Date
+    {
+        return getChatMessageSortDate(chatMessage, this.game.moveTimestamps);
+    }
+
+    /**
      * Called on every chat message.
      * Should returns rich chat features to show before provided chatMessage, or empty list if none.
      */
@@ -101,6 +114,11 @@ class DateHeader extends AbstractChatHeaderGenerator
 
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
+        // Message attached to an earlier move: posted later, do not show its date between older messages
+        if (this.getSortDate(chatMessage).getTime() !== chatMessage.createdAt.getTime()) {
+            return [];
+        }
+
         if (this.currentDate !== null && isSameDay(this.currentDate, chatMessage.createdAt)) {
             return [];
         }
@@ -127,7 +145,7 @@ class MoveNumberHeader extends AbstractChatHeaderGenerator
 
         while (
             timestampedMoves.length > currentMoveNumber
-            && chatMessage.createdAt >= timestampedMoves[currentMoveNumber].playedAt
+            && this.getSortDate(chatMessage) >= timestampedMoves[currentMoveNumber].playedAt
         ) {
             ++currentMoveNumber;
         }
@@ -153,7 +171,7 @@ class GameStartedHeader extends AbstractChatHeaderGenerator
 
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
-        if (this.yielded || this.game.startedAt === null || chatMessage.createdAt < this.game.startedAt) {
+        if (this.yielded || this.game.startedAt === null || this.getSortDate(chatMessage) < this.game.startedAt) {
             return [];
         }
 
@@ -174,7 +192,7 @@ class GameEndedHeader extends AbstractChatHeaderGenerator
 
     yieldChatHeaders(chatMessage: ChatMessage): ChatHeader[]
     {
-        if (this.yielded || this.game.endedAt === null || chatMessage.createdAt < this.game.endedAt) {
+        if (this.yielded || this.game.endedAt === null || this.getSortDate(chatMessage) < this.game.endedAt) {
             return [];
         }
 

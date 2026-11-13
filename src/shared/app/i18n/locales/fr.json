@@ -617,6 +617,7 @@
     "see_progression_on_challonge": "Voir la progression sur Challonge",
     "chat_message_placeholder": "Message…",
     "chat_message_visibility": "Visibilité du message",
+    "chat_attach_to_move_toggle": "Afficher ce message sous le coup {{n}}",
     "chat_message_visibility_public": "Public",
     "chat_message_visibility_private": "Notes personnelles",
     "chat_message_visibility_malkovich": "Malkovich",

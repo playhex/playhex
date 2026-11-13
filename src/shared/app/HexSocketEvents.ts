@@ -9,7 +9,10 @@ import type { ChannelChatMessage, OnlinePlayers, PlayerNotification, Premove } f
 import { PlayerOnlineStatus, WebsocketActionError } from './Types.js';
 import type { HexplorerLiveCursor, HexplorerLiveSession, HexplorerLiveSnapshot, HexplorerMatch, HexplorerMatchCreateInput } from './hexplorerLive.js';
 
-type SendChatAnswer = (error?: WebsocketActionError) => void;
+/**
+ * Answers error, or posted chat message publicId.
+ */
+type SendChatAnswer = (error?: WebsocketActionError, chatMessagePublicId?: string) => void;
 
 export type HexClientToServerEvents = {
     /**
@@ -52,11 +55,15 @@ export type HexClientToServerEvents = {
     /**
      * A player send a chat message on a game.
      * visibility is omitted for public messages (also by clients loaded before visibility was added).
+     * moveNumber, to attach a malkovich or private message to a move, is omitted when null.
      */
     sendChat: (
         gameId: string,
         content: string,
-        ...args: [answer: SendChatAnswer] | [visibility: Exclude<ChatMessageVisibility, 'public'>, answer: SendChatAnswer]
+        ...args:
+            [answer: SendChatAnswer]
+            | [visibility: Exclude<ChatMessageVisibility, 'public'>, answer: SendChatAnswer]
+            | [visibility: Exclude<ChatMessageVisibility, 'public'>, moveNumber: number, answer: SendChatAnswer]
     ) => void;
 
     /**

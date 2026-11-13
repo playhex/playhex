@@ -18,7 +18,7 @@ export default abstract class AbstractChatMessage
     id?: number;
 
     @ColumnUUID({ unique: true })
-    @Expose({ groups: ['moderation', 'channel'] })
+    @Expose({ groups: [GROUP_DEFAULT, 'moderation', 'channel'] })
     publicId: string = uuidv4();
 
     @Column({ nullable: true })

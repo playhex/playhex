@@ -20,9 +20,12 @@ export default class ChatWebsocketController implements WebsocketControllerInter
     {
         socket.on('sendChat', async (gameId, content, ...args) => {
             // visibility is omitted for public messages, and by clients loaded before visibility was added
-            const [visibility, answer] = args.length === 1
-                ? ['public' as const, args[0]]
-                : args
+            // moveNumber is omitted when message is not attached to a move
+            const [visibility, moveNumber, answer] = args.length === 1
+                ? ['public' as const, null, args[0]]
+                : args.length === 2
+                    ? [args[0], null, args[1]]
+                    : args
             ;
 
             const player = getSocketPlayerAllowedToWrite(socket);
@@ -37,6 +40,7 @@ export default class ChatWebsocketController implements WebsocketControllerInter
             chatMessage.player = player;
             chatMessage.content = content;
             chatMessage.visibility = visibility;
+            chatMessage.moveNumber = moveNumber;
             chatMessage.createdAt = new Date();
 
             try {
@@ -70,7 +74,7 @@ export default class ChatWebsocketController implements WebsocketControllerInter
                 return;
             }
 
-            answer();
+            answer(undefined, chatMessage.publicId);
         });
     }
 }

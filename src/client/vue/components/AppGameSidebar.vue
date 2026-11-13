@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { playerGender } from '../../../shared/app/playerPronouns.js';
-import { PropType, computed, onMounted, onUnmounted, ref, toRefs, watch, watchEffect } from 'vue';
+import { PropType, computed, nextTick, onMounted, onUnmounted, ref, shallowRef, toRefs, watch, watchEffect } from 'vue';
 import { IconAlphabet, IconChatDots, IconMeditation, IconMailbox, IconMailboxFlag, IconMuteOff, IconMuteOn, IconSendFill, IconArrowBarRight, IconShareFill, IconCheck, IconDownload, IconInfoCircle, IconGear, IconTrophyFill, IconPeopleFill, IconInfoLg, IconHouse, IconLightningChargeFill, IconAlarmFill, IconCalendar, IconSignpostSplit, Icon123, IconCrown } from '../icons.js';
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../stores/authStore.js';
@@ -68,6 +68,7 @@ const {
     richChat,
     firstUnseenChatMessage,
     chatInputFocused,
+    simulationMainCursor,
 } = storeToRefs(useCurrentGameStore());
 
 const {
@@ -136,6 +137,55 @@ const playerColor = (player: Player): string => {
 
 const chatInput = useChatInputStore().getChatInput(game.value.publicId);
 const chatMessageVisibility = useChatInputStore().getChatMessageVisibility(game.value.publicId);
+const frozenMoveNumber = useChatInputStore().getFrozenMoveNumber(game.value.publicId);
+const attachToMove = useChatInputStore().getAttachToMove(game.value.publicId);
+
+/*
+ * Attach malkovich and private messages to the move they are about:
+ * the move shown in simulation mode, or else the last move when I started typing,
+ * so that the message is not shown under opponent move played while I was typing.
+ */
+watch(chatInput, (input, oldInput) => {
+    if (input === '') {
+        frozenMoveNumber.value = null;
+        attachToMove.value = true;
+        return;
+    }
+
+    if (oldInput === '') {
+        frozenMoveNumber.value = game.value.moveTimestamps.length;
+    }
+}, { flush: 'sync' });
+
+const targetMoveNumber = computed((): null | number => {
+    if (chatMessageVisibility.value === 'public') {
+        return null;
+    }
+
+    const moveNumber = simulationMainCursor.value ?? frozenMoveNumber.value;
+
+    return moveNumber !== null && moveNumber > 0
+        ? moveNumber
+        : null
+    ;
+});
+
+/**
+ * Show toggle only when message would not be placed under the last move anyway.
+ */
+const showAttachToMoveToggle = computed((): boolean => targetMoveNumber.value !== null
+    && targetMoveNumber.value !== game.value.moveTimestamps.length,
+);
+
+/**
+ * Last message I sent attached to an earlier move, to scroll to it.
+ */
+const lastAttachedMessage = shallowRef<null | ChatMessage>(null);
+
+const toggleAttachToMove = (): void => {
+    attachToMove.value = !attachToMove.value;
+    chatInputElement.value?.focus();
+};
 
 /*
  * Chat message visibility menu.
@@ -204,12 +254,31 @@ const sendChat = async () => {
     }
 
     const message = chatInput.value;
+    const frozen = frozenMoveNumber.value;
+    const attach = attachToMove.value;
+    // Always send move, even if it is the last one: opponent may play while sending.
+    // Server ignores it if no move has been played since.
+    const moveNumber = attach ? targetMoveNumber.value : null;
+    const scrollToMessage = showAttachToMoveToggle.value && attach;
     chatInput.value = '';
+    let chatMessagePublicId: null | string;
 
     try {
-        await sendChatMessage(message, chatMessageVisibility.value);
+        chatMessagePublicId = await sendChatMessage(message, chatMessageVisibility.value, moveNumber);
     } catch (e) {
         chatInput.value = message;
+        frozenMoveNumber.value = frozen;
+        attachToMove.value = attach;
+        return;
+    }
+
+    // Message is inserted above, under its move, so it would not be seen: scroll to it.
+    // Message is already received here, server broadcasts it before answering.
+    if (scrollToMessage) {
+        lastAttachedMessage.value = game.value.chatMessages.find(chatMessage => chatMessage.publicId === chatMessagePublicId) ?? null;
+
+        await nextTick();
+        chatMessagesElement.value?.querySelector('.chat-message-attached-last')?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
 };
 
@@ -924,7 +993,7 @@ watch(gameUIMode, () => {
                             <AppChatNewMessagesLine v-if="isFirstUnseenChatMessage(message)" />
                             <div
                                 class="chat-message"
-                                :class="isChatMessage(message) ? '' : `chat-header chat-header-${message.type}`"
+                                :class="isChatMessage(message) ? { 'chat-message-attached-last': message === lastAttachedMessage } : `chat-header chat-header-${message.type}`"
                             >
                                 <template v-if="isChatMessage(message)">
                                     <small class="time text-secondary">{{ formatMessagePostedHour(message.createdAt) }}</small>
@@ -970,6 +1039,15 @@ watch(gameUIMode, () => {
                     </div>
 
                     <div class="input-group">
+                        <button
+                            v-if="showAttachToMoveToggle"
+                            type="button"
+                            class="btn bg-body-secondary chat-attach-to-move"
+                            :class="[attachToMove ? `chat-message-${chatMessageVisibility}` : 'text-secondary opacity-50']"
+                            :aria-pressed="attachToMove"
+                            :title="$t('chat_attach_to_move_toggle', { n: targetMoveNumber })"
+                            @click="toggleAttachToMove()"
+                        >↳ {{ $t('move_number', { n: targetMoveNumber }) }}</button>
                         <input
                             v-model="chatInput"
                             @keydown="blockEnterOnMobile"
@@ -1133,6 +1211,9 @@ watch(gameUIMode, () => {
     .chat-input
         flex 0 1 auto
         margin-top auto
+
+        .chat-attach-to-move
+            white-space nowrap
 
         input, button
             border-radius 0

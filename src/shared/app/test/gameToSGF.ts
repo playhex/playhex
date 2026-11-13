@@ -1,7 +1,9 @@
 import assert from 'assert';
 import { Game } from '../models/index.js';
 import { plainToInstance } from '../class-transformer-custom.js';
-import { gameToSGF } from '../gameToSGF.js';
+import { gameToSGF, getMovesChatMessages } from '../gameToSGF.js';
+import { createGame } from '../models/Game.js';
+import { ChatMessage as ChatMessageModel } from '../models/index.js';
 
 describe('gameToSGF', () => {
     it('generates SGF from an Game instance', () => {
@@ -264,5 +266,36 @@ describe('gameToSGF', () => {
             gameToSGF(game),
             '(;FF[4]CA[UTF-8]AP[PlayHex:0.0.0]SO[PlayHex.org]PC[https://playhex.org/games/99efbf69-a506-4438-9c39-f3daeaf55d37]GM[11]SZ[11]PB[Davies 7]PW[Aaaa]DT[2025-08-21]HA[0]RE[B+Resign]TM[10]OT[3x5 byo-yomi];B[j2]BL[10]OB[3];W[h7]WL[6]OW[3];B[f8]BL[7]OB[3];W[e4]WL[2]OW[3];B[g6]BL[4]OB[3];W[d7]WL[5]OW[1];B[g5]BL[1]OB[3];W[i3]WL[5]OW[1];B[h3]BL[5]OB[2];W[i4]WL[5]OW[1];B[e10]BL[5]OB[2])',
         );
+    });
+
+    it('puts chat messages attached to a move on this move', () => {
+        const game = createGame();
+
+        game.state = 'ended';
+        game.moveTimestamps = [
+            new Date('2024-08-27T20:00:00.000Z'),
+            new Date('2024-08-27T20:00:10.000Z'),
+            new Date('2024-08-27T20:00:20.000Z'),
+        ];
+
+        const createMessage = (createdAt: string, moveNumber: null | number): ChatMessageModel => {
+            const chatMessage = new ChatMessageModel();
+            chatMessage.createdAt = new Date(createdAt);
+            chatMessage.visibility = 'malkovich';
+            chatMessage.moveNumber = moveNumber;
+            return chatMessage;
+        };
+
+        const byDate = createMessage('2024-08-27T20:00:15.000Z', null);
+        const attached = createMessage('2024-08-27T20:00:30.000Z', 1);
+        const last = createMessage('2024-08-27T20:00:40.000Z', null);
+
+        game.chatMessages = [byDate, attached, last];
+
+        assert.deepStrictEqual(getMovesChatMessages(game), [
+            [attached],
+            [byDate],
+            [last],
+        ]);
     });
 });

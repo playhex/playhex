@@ -10,6 +10,7 @@ import { createTimeControl } from '../time-control/createTimeControl.js';
 import { PlayerIndex } from '../time-control/TimeControl.js';
 import { ByoYomiTimeControl } from '../time-control/time-controls/ByoYomiTimeControl.js';
 import { getTimestampedMoves } from './gameUtils.js';
+import { getChatMessageSortDate } from './chatUtils.js';
 
 export const baseSGF: SGF = {
     FF: 4,
@@ -24,9 +25,10 @@ export const baseSGF: SGF = {
  * Used to get chat messages posted on a given move.
  *
  * Chat messages posted before first move are on first move.
- * Then, all messages are on the move they are posted when given move was last played move.
+ * Then, all messages are on the move they are posted when given move was last played move,
+ * or on the move they are attached to (moveNumber).
  */
-const getMovesChatMessages = (game: Game): ChatMessage[][] => {
+export const getMovesChatMessages = (game: Game): ChatMessage[][] => {
     if (!game) {
         return [];
     }
@@ -42,11 +44,14 @@ const getMovesChatMessages = (game: Game): ChatMessage[][] => {
     // Author may have their own private and not yet revealed malkovich messages
     const chatMessages = game.chatMessages.filter(chatMessage => isChatMessageVisibleToEveryone(chatMessage, game));
     const movesChatMessages: ChatMessage[][] = Array(moveTimestamps.length).fill(null).map(() => []);
-    let i = 0;
 
+    // Messages are ordered by createdAt, so messages attached to a move stay after the ones placed by date on this move
     for (const chatMessage of chatMessages) {
-        while (i + 1 < moveTimestamps.length && chatMessage.createdAt > moveTimestamps[i + 1]) {
-            ++i;
+        const sortDate = getChatMessageSortDate(chatMessage, moveTimestamps);
+        let i = moveTimestamps.length - 1;
+
+        while (i > 0 && sortDate <= moveTimestamps[i]) {
+            --i;
         }
 
         movesChatMessages[i].push(chatMessage);

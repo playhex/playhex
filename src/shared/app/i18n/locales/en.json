@@ -722,6 +722,7 @@
     "system": "System",
     "chat_message_placeholder": "Message…",
     "chat_message_visibility": "Message visibility",
+    "chat_attach_to_move_toggle": "Show this message under move {{n}}",
     "chat_message_visibility_public": "Public",
     "chat_message_visibility_private": "Personal notes",
     "chat_message_visibility_malkovich": "Malkovich",

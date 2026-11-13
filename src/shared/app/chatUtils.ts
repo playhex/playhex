@@ -45,6 +45,57 @@ export const insertChatMessage = <T extends { createdAt: Date }>(chatMessages: T
     return i === chatMessages.length - 1;
 };
 
+/**
+ * Message can only be attached to a move when not public.
+ * Client always sends the move the message is about, even if it is the last one,
+ * in case opponent plays while message is being sent.
+ * So keep it only if it is an earlier move than the last played one, else place message by date.
+ */
+export const ignoreInvalidChatMessageMoveNumber = (chatMessage: ChatMessage, movesCount: number): void => {
+    if (chatMessage.moveNumber === null) {
+        return;
+    }
+
+    if (
+        chatMessage.visibility === 'public'
+        || chatMessage.moveNumber < 1
+        || chatMessage.moveNumber >= movesCount
+    ) {
+        chatMessage.moveNumber = null;
+    }
+};
+
+/**
+ * Date used to place a game chat message among moves.
+ * Messages attached to a move (moveNumber) are placed just before the next move,
+ * so they are shown under this move header, and in this move SGF node.
+ * Messages attached to the last move, or to a move not played anymore (undo), are placed by date.
+ */
+export const getChatMessageSortDate = (
+    chatMessage: { createdAt: Date, moveNumber?: null | number },
+    moveTimestamps: Date[],
+): Date => {
+    const { moveNumber } = chatMessage;
+
+    if (typeof moveNumber !== 'number' || moveNumber < 1 || moveNumber >= moveTimestamps.length) {
+        return chatMessage.createdAt;
+    }
+
+    return new Date(moveTimestamps[moveNumber].getTime() - 1);
+};
+
+/**
+ * Game chat messages, sorted by getChatMessageSortDate().
+ * Returns a new array, stable sort.
+ */
+export const sortGameChatMessages = <T extends { createdAt: Date, moveNumber?: null | number }>(chatMessages: T[], moveTimestamps: Date[]): T[] => {
+    return chatMessages
+        .map(chatMessage => ({ chatMessage, sortDate: getChatMessageSortDate(chatMessage, moveTimestamps).getTime() }))
+        .sort((a, b) => a.sortDate - b.sortDate)
+        .map(({ chatMessage }) => chatMessage)
+    ;
+};
+
 export const sanitizeMessage = (str: string): string => {
     return str.replace(/[<>&]/g, matched => {
         switch (matched) {

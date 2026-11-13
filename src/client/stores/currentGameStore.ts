@@ -467,10 +467,10 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                 return;
             }
 
-            if (insertChatMessage(game.value.chatMessages, chatMessage)) {
+            if (insertChatMessage(game.value.chatMessages, chatMessage) && chatMessage.moveNumber === null) {
                 richChat.value?.postChatMessage(chatMessage);
             } else {
-                // Older message, i.e revealed malkovich: rebuild rich chat to show it at its place
+                // Older message, i.e revealed malkovich, or attached to an earlier move: rebuild rich chat to show it at its place
                 richChat.value = new RichChat(game.value);
             }
 
@@ -1066,13 +1066,19 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         ;
     });
 
-    const sendChatMessage = async (content: string, visibility: ChatMessageVisibility = 'public'): Promise<void> => {
+    /**
+     * @param moveNumber Move the message is about, only for malkovich and private messages.
+     *                   Server ignores it if it is the last played move.
+     *
+     * @returns Posted chat message publicId, or null if not answered by server (older server version)
+     */
+    const sendChatMessage = async (content: string, visibility: ChatMessageVisibility = 'public', moveNumber: null | number = null): Promise<null | string> => {
         return await new Promise((resolve, reject) => {
             if (!game.value) {
                 throw new Error('no game');
             }
 
-            const answer = (error?: WebsocketActionError): void => {
+            const answer = (error?: WebsocketActionError, chatMessagePublicId?: string): void => {
                 if (error) {
                     useSocketStore().handleMessageError(error, 'could not post message, server error');
                     reject(new Error(error.reason));
@@ -1084,12 +1090,14 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
                     useGameChatSubscriptionsStore().markSubscribedAfterPost(game.value!);
                 }
 
-                resolve();
+                resolve(chatMessagePublicId ?? null);
             };
 
             // Public is the default, do not send it
             if (visibility === 'public') {
                 socket.emit('sendChat', game.value.publicId, content, answer);
+            } else if (moveNumber !== null) {
+                socket.emit('sendChat', game.value.publicId, content, visibility, moveNumber, answer);
             } else {
                 socket.emit('sendChat', game.value.publicId, content, visibility, answer);
             }
@@ -1258,6 +1266,22 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
 
         return simulatePlayingGameFacade.value;
     };
+
+    /**
+     * Main line position shown in simulation mode, or null if not in simulation mode.
+     * Reactive, unlike simulatePlayingGameFacade.getMainCursor().
+     */
+    const simulationMainCursor = ref<null | number>(null);
+
+    const onSimulationMainCursorChanged = (index: number): void => {
+        simulationMainCursor.value = index;
+    };
+
+    watch(simulatePlayingGameFacade, (facade, oldFacade) => {
+        oldFacade?.off('mainCursorChanged', onSimulationMainCursorChanged);
+        facade?.on('mainCursorChanged', onSimulationMainCursorChanged);
+        simulationMainCursor.value = facade?.getMainCursor() ?? null;
+    });
 
     const disableSimulationMode = (): void => {
         if (!simulatePlayingGameFacade.value) {
@@ -1486,6 +1510,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         conditionalMovesEditor,
         conditionalMovesState,
         simulatePlayingGameFacade,
+        simulationMainCursor,
 
         useGame,
         useExternalGame,

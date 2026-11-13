@@ -1,7 +1,7 @@
 import { Container, Inject, Service } from 'typedi';
 import GameServer from '../GameServer.js';
 import { Player, ChatMessage, Game, GameOptions, Rating, Premove } from '../../shared/app/models/index.js';
-import { canChatMessageBePostedInGame } from '../../shared/app/chatUtils.js';
+import { canChatMessageBePostedInGame, ignoreInvalidChatMessageMoveNumber } from '../../shared/app/chatUtils.js';
 import GameRepository from '../repositories/GameRepository.js';
 import logger from '../services/logger.js';
 import { FindAIError, findAIOpponent } from '../services/AIManager.js';
@@ -893,6 +893,7 @@ export default class GameStore
                 return error;
             }
 
+            ignoreInvalidChatMessageMoveNumber(chatMessage, gameServer.getEngineGame()?.getMovesHistory().length ?? gameServer.getGame().moveTimestamps.length);
             gameServer.postChatMessage(chatMessage);
 
             await this.autoSubscribeChatMessageAuthor(gameServer.getGame(), chatMessage);
@@ -913,6 +914,7 @@ export default class GameStore
             return error;
         }
 
+        ignoreInvalidChatMessageMoveNumber(chatMessage, game.moveTimestamps.length);
         chatMessage.game = game;
 
         // Game is in database, insert chat message into database
