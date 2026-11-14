@@ -298,6 +298,9 @@ const routes: RouteRecordRaw[] = [
                 name: 'changelog',
                 path: 'changelog',
                 component: () => import('./pages/content/PageChangelog.vue'),
+                meta: {
+                    noContentContainer: true,
+                },
             },
         ],
     },

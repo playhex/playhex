@@ -30,8 +30,8 @@ export const simulateTargetPseudoClassHandler = () => {
         return;
     }
 
-    const targetedHashId = decodeURIComponent(hash);
-    const element = document.querySelector(targetedHashId);
+    // getElementById instead of querySelector, because ids like "2026-11-12" are not valid css selectors
+    const element = document.getElementById(decodeURIComponent(hash).substring(1));
 
     if (!element) {
         return;

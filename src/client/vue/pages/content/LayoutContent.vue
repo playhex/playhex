@@ -14,7 +14,8 @@
             </nav>
         </div>
         <div class="col-12 col-sm-8 col-md-9 col-lg-6">
-            <div class="container my-3">
+            <router-view v-if="$route.meta.noContentContainer" />
+            <div v-else class="container my-3">
                 <router-view />
             </div>
         </div>
