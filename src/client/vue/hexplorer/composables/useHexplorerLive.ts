@@ -175,4 +175,10 @@ export const useHexplorerLiveHost = (
     };
 };
 
+/**
+ * Chat channel of the live session shown on the page, if any.
+ * Ctrl+click on a tree node pastes its mention in this chat input.
+ */
+export const hexplorerLiveChatChannelKey: InjectionKey<Ref<null | string>> = Symbol('hexplorerLiveChatChannel');
+
 export const hexplorerLiveHostKey: InjectionKey<ReturnType<typeof useHexplorerLiveHost>> = Symbol('hexplorerLiveHost');

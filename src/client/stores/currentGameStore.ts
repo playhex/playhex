@@ -1118,13 +1118,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
             throw new Error('Cannot past coords in chat, no game');
         }
 
-        const chatInput = useChatInputStore().getChatInput(game.value.publicId);
-
-        if (chatInput.value.length > 0 && !chatInput.value.match(/\s$/)) {
-            chatInput.value += ' ';
-        }
-
-        chatInput.value += move + ' ';
+        useChatInputStore().appendToChatInput(game.value.publicId, move);
     };
 
     /*

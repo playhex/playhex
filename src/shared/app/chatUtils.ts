@@ -234,9 +234,21 @@ export const relCoordsTranslate = (str: string, boardsize: number): string => {
 };
 
 /**
+ * Replaces matches of pattern in a sanitized message,
+ * but not inside links, urls, or already interactive spans.
+ * Pattern must not contain capturing groups, replacer receives the whole match.
+ */
+export const replaceOutsideLinks = (str: string, pattern: RegExp, replacer: (match: string) => string): string => {
+    const regex = new RegExp(`(<a\\s.*?<\\/a>|<span\\s.*?<\\/span>|https?:\\/\\/\\S+)|${pattern.source}`, 'gi');
+
+    return str.replace(regex, (match, skipped?: string) => skipped ?? replacer(match));
+};
+
+/**
  * Parse coords in chat to wrap them in <span class="coords">
  * and allow to highlight them and make them interactive.
- * Do not match coords inside url or inside links (to not break hexworld links for example).
+ * Do not match coords inside url or inside links (to not break hexworld links for example),
+ * nor inside already interactive spans (i.e node mentions "12.e5" in Hexplorer chat).
  *
  * Example:
  *      "I would play d4 first"
@@ -247,28 +259,21 @@ export const relCoordsTranslate = (str: string, boardsize: number): string => {
  * Should take boardsize a input to make sure not to match outside hexes.
  */
 export const makesCoordsInteractive = (str: string, boardsize: number): string => {
-    const regex = boardsize > 26
-        ? /(<a\s.*?<\/a>|https?:\/\/\S+)|\b([a-z]{1,2}\d{1,3})\b/gi
-        : /(<a\s.*?<\/a>|https?:\/\/\S+)|\b([a-z][1-2]?\d)\b/gi
+    const pattern = boardsize > 26
+        ? /\b[a-z]{1,2}\d{1,3}\b/
+        : /\b[a-z][1-2]?\d\b/
     ;
 
-    return str.replace(
-        regex,
-        (_, url: string, move: Move) => {
-            if (url) {
-                return url;
-            }
+    return replaceOutsideLinks(str, pattern, move => {
+        const { row, col } = parseMove(move.toLowerCase() as Move);
 
-            const { row, col } = parseMove(move.toLowerCase() as Move);
+        // do not match coords outside board (and do not match u2 in "hi, u2")
+        if (row >= boardsize || col >= boardsize) {
+            return move;
+        }
 
-            // do not match coords outside board (and do not match u2 in "hi, u2")
-            if (row >= boardsize || col >= boardsize) {
-                return move;
-            }
-
-            return '<span class="coords">' + move + '</span>';
-        },
-    );
+        return '<span class="coords">' + move + '</span>';
+    });
 };
 
 export const formatMessagePostedHour = (date: Date): string => `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;

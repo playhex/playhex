@@ -27,6 +27,19 @@ export const useChatInputStore = defineStore('chatInputStore', () => {
     };
 
     /**
+     * Append text (coords, node mention...) to chat input, space separated.
+     */
+    const appendToChatInput = (gameId: string, text: string): void => {
+        const chatInput = getChatInput(gameId);
+
+        if (chatInput.value.length > 0 && !/\s$/.test(chatInput.value)) {
+            chatInput.value += ' ';
+        }
+
+        chatInput.value += text + ' ';
+    };
+
+    /**
      * Visibility of message to send (public, private, malkovich), one per game.
      */
     const visibilityRefs: { [gameId: string]: Ref<ChatMessageVisibility> } = {};
@@ -68,6 +81,7 @@ export const useChatInputStore = defineStore('chatInputStore', () => {
 
     return {
         getChatInput,
+        appendToChatInput,
         getChatMessageVisibility,
         getFrozenMoveNumber,
         getAttachToMove,

@@ -61,6 +61,12 @@ describe('chatMessageUtils', () => {
             );
 
             assert.strictEqual(
+                makesCoordsInteractive(`<span class="coords" data-node-mention="12.e5">12.e5</span> or e5`, 14),
+                `<span class="coords" data-node-mention="12.e5">12.e5</span> or <span class="coords">e5</span>`,
+                `should not match inside already interactive spans`,
+            );
+
+            assert.strictEqual(
                 makesCoordsInteractive(`PLAY D4!`, 14),
                 `PLAY <span class="coords">D4</span>!`,
                 `should work with uppercase`,

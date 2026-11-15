@@ -4,6 +4,9 @@
  * (reusing the same hexagon look as AppConditionalMoveButton), connected
  * by straight (not diagonal) lines: a single line down for a single
  * child, a horizontal bar + verticals when branching.
+ *
+ * Every depth level takes exactly --tree-col width (hexagon + stem),
+ * so nodes are aligned in columns, see HexplorerMoveTreePanel.
  */
 import { computed } from 'vue';
 import { GameTree } from '../GameTree.js';
@@ -18,7 +21,21 @@ const props = defineProps<{
 
 const emit = defineEmits<{
     select: [id: number];
+
+    /**
+     * Ctrl+click: mention this node in chat
+     */
+    mention: [id: number];
 }>();
+
+const onClick = (e: MouseEvent): void => {
+    if (e.ctrlKey || e.metaKey) {
+        emit('mention', props.nodeId);
+        return;
+    }
+
+    emit('select', props.nodeId);
+};
 
 const node = computed(() => props.tree.getNode(props.nodeId));
 
@@ -59,7 +76,8 @@ const playerIndex = computed<0 | 1>(() => {
             type="button"
             class="tree-node-button"
             :class="{ 'tree-node-current': nodeId === currentNodeId }"
-            @click="emit('select', nodeId)"
+            :data-node-id="nodeId"
+            @click="onClick"
         >
             <AppConditionalMoveButton :label :playerIndex :class="{ 'setup-node': isSetup }" />
             <IconPencilSquare v-if="isSetup" class="setup-icon" />
@@ -79,6 +97,7 @@ const playerIndex = computed<0 | 1>(() => {
                 :nodeId="node.children[0]"
                 :currentNodeId
                 @select="id => emit('select', id)"
+                @mention="id => emit('mention', id)"
             />
         </template>
 
@@ -92,6 +111,7 @@ const playerIndex = computed<0 | 1>(() => {
                         :nodeId="childId"
                         :currentNodeId
                         @select="id => emit('select', id)"
+                        @mention="id => emit('mention', id)"
                     />
                 </div>
             </div>
@@ -121,7 +141,7 @@ const playerIndex = computed<0 | 1>(() => {
 
     :deep(div.hexagons)
         height 1.5rem
-        width 1.7rem
+        width var(--tree-hex-width, 1.7rem)
 
         &::before
             font-size 1.7rem
@@ -154,7 +174,7 @@ const playerIndex = computed<0 | 1>(() => {
 
 .tree-stem
     height 2px
-    width 0.3rem
+    width calc(var(--tree-col, 2rem) - var(--tree-hex-width, 1.7rem))
     background var(--bs-border-color)
 
 .tree-children
@@ -190,6 +210,6 @@ const playerIndex = computed<0 | 1>(() => {
         left 0
         top 50%
         height 2px
-        width 0.3rem
+        width calc(var(--tree-col, 2rem) - var(--tree-hex-width, 1.7rem))
         background var(--bs-border-color)
 </style>

@@ -616,6 +616,17 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
     };
 
     /**
+     * Node to briefly show in the tree (scroll to it and flash it),
+     * i.e when clicking on a node mentioned in chat.
+     */
+    const highlightRequest = shallowRef<null | { id: number }>(null);
+
+    // new object each time, so that highlighting same node again triggers watchers
+    const highlightNode = (id: number): void => {
+        highlightRequest.value = { id };
+    };
+
+    /**
      * Goes to the board position at the given ply index in evalHistory
      * (i.e position of a bar clicked in the evaluation graph).
      * Also stops auto-play, like any manual navigation.
@@ -1321,6 +1332,8 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
         goToEvalIndex,
         goToNode,
         userGoToNode,
+        highlightRequest,
+        highlightNode,
         goToParent,
         goToFirstChild,
         pass,

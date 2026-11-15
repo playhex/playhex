@@ -7,7 +7,7 @@ import { inject } from 'vue';
 import { hexplorerKey } from '../composables/useHexplorer.js';
 import { HEXPLORER_COMMENT_MAX_LENGTH } from '../../../../shared/app/hexplorerStudy.js';
 import EvaluationGraph from './EvaluationGraph.vue';
-import MoveTree from './MoveTree.vue';
+import HexplorerMoveTreePanel from './HexplorerMoveTreePanel.vue';
 import HexplorerSetupTools from './HexplorerSetupTools.vue';
 import HexplorerPlayerNameInput from './HexplorerPlayerNameInput.vue';
 import {
@@ -17,8 +17,6 @@ import {
 } from '../../icons.js';
 
 const {
-    tree,
-    currentNodeId,
     aiEnabled,
     evalHistory,
     evalCursorIndex,
@@ -50,14 +48,7 @@ const {
         <h6 class="d-flex align-items-center gap-2 mb-2">
             <IconDiagram2 /> {{ $t('hexplorer.move_history') }}
         </h6>
-        <div class="move-tree-wrapper bg-body mb-2">
-            <MoveTree
-                :tree
-                :nodeId="0"
-                :currentNodeId
-                @select="userGoToNode"
-            />
-        </div>
+        <HexplorerMoveTreePanel class="mb-2" @select="userGoToNode" />
 
         <HexplorerSetupTools />
 
@@ -74,13 +65,3 @@ const {
         ></textarea>
     </div>
 </template>
-
-<style lang="stylus" scoped>
-.move-tree-wrapper
-    max-height 50vh
-    min-height 5rem
-    overflow auto
-    border 1px solid var(--bs-border-color)
-    border-radius var(--bs-border-radius)
-    padding 0.5rem
-</style>

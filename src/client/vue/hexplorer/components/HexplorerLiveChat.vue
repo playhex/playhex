@@ -3,14 +3,20 @@
  * Chat of a Hexplorer live session, looking like game chat.
  * Messages are stored in channel "hexplorer-live-<publicId>".
  */
-import { computed, ref, watch, watchEffect } from 'vue';
+import { computed, inject, onBeforeUnmount, ref, watch, watchEffect } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useChannel } from '../../composables/useChannel.js';
 import { useStickToBottom } from '../../composables/useStickToBottom.js';
 import useAuthStore from '../../../stores/authStore.js';
 import { apiGetPlayerIsCurrentlyChatRestricted } from '../../../apiClient.js';
-import { blockEnterOnMobile, formatMessagePostedHour, makeLinksClickable, sanitizeMessage } from '../../../../shared/app/chatUtils.js';
+import type { GameView } from '@playhex/pixi-board';
+import type { Move } from '@playhex/move-notation';
+import { blockEnterOnMobile, formatMessagePostedHour, makeLinksClickable, makesCoordsInteractive, relCoordsTranslate, sanitizeMessage } from '../../../../shared/app/chatUtils.js';
+import { useCoordsMarks } from '../../composables/useCoordsMarks.js';
 import { hexplorerLiveChannelName } from '../../../../shared/app/hexplorerLive.js';
+import { useChatInputStore } from '../../../stores/chatInputStore.js';
+import { hexplorerKey } from '../composables/useHexplorer.js';
+import { makeNodeMentionsInteractive, resolveNodeMention } from '../nodeMention.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppChatNewMessagesLine from '../../components/AppChatNewMessagesLine.vue';
 import { IconChatDots, IconSendFill } from '../../icons.js';
@@ -41,14 +47,91 @@ watchEffect(async () => {
 
 const isChatInputEnabled = computed(() => loggedInPlayer.value !== null && !isChatBlocked.value && !props.closed);
 
-const chatInput = ref('');
+// From store, so that ctrl+click on a tree node can paste its mention here
+const chatInputStore = useChatInputStore();
+const chatChannel = hexplorerLiveChannelName(props.publicId);
+const chatInput = chatInputStore.getChatInput(chatChannel);
+const chatInputElement = ref<HTMLInputElement>();
 const messagesElement = ref<HTMLElement>();
+
+// Keep focus when pasting coords or a node mention, but not when input is cleared after sending (would reopen keyboard on mobile)
+watch(chatInput, input => {
+    if (input !== '') {
+        chatInputElement.value?.focus();
+    }
+});
 
 const { contentChanged } = useStickToBottom(messagesElement);
 
 watch(messages, () => contentChanged(), { deep: true });
 
-const renderMessage = (content: string): string => makeLinksClickable(sanitizeMessage(content));
+const { tree, currentNodeId, readonly, userGoToNode, highlightNode, gameView, state } = inject(hexplorerKey)!;
+
+/**
+ * Like game chat (see renderMessageWithCoords()), plus node mentions ("12.e5"),
+ * made interactive before coords so that "e5" is not matched inside them.
+ */
+const renderMessage = (content: string): string => {
+    const { boardsize } = state.value;
+    let str = sanitizeMessage(content);
+
+    str = makeLinksClickable(str);
+    str = relCoordsTranslate(str, boardsize);
+    str = makeNodeMentionsInteractive(str);
+    str = makesCoordsInteractive(str, boardsize);
+
+    return str;
+};
+
+const { coordsClick } = useCoordsMarks(gameView);
+
+/*
+ * Ctrl+click on board to paste coords in chat, like in game.
+ * Board is rebuilt when boardsize changes, so listen each new one.
+ */
+const pasteCoords = (move: Move): void => {
+    if (!isChatInputEnabled.value) {
+        return;
+    }
+
+    chatInputStore.appendToChatInput(chatChannel, move);
+};
+
+watch(gameView, (current: GameView, previous?: GameView) => {
+    previous?.off('hexClickedSecondary', pasteCoords);
+    current?.on('hexClickedSecondary', pasteCoords);
+}, { immediate: true });
+
+onBeforeUnmount(() => gameView.value?.off('hexClickedSecondary', pasteCoords));
+
+/**
+ * Click on coords: show them on board.
+ * Click on a node mention ("12.e5"): select this node, or only show it in tree when I cannot navigate.
+ */
+const messagesClick = (e: MouseEvent): void => {
+    const { target } = e;
+
+    if (!(target instanceof HTMLElement)) {
+        return;
+    }
+
+    if (!target.dataset.nodeMention) {
+        coordsClick(e);
+        return;
+    }
+
+    const nodeId = resolveNodeMention(tree, target.dataset.nodeMention, currentNodeId.value);
+
+    if (nodeId === null) {
+        return;
+    }
+
+    if (!readonly.value) {
+        userGoToNode(nodeId);
+    }
+
+    highlightNode(nodeId);
+};
 
 const sendChat = async (): Promise<void> => {
     const content = chatInput.value.trim();
@@ -69,7 +152,7 @@ const sendChat = async (): Promise<void> => {
 
 <template>
     <div class="hexplorer-live-chat bg-body">
-        <div class="chat-messages" ref="messagesElement">
+        <div class="chat-messages" ref="messagesElement" @click="messagesClick">
             <div class="container-fluid">
                 <div v-if="hasOlderMessages" class="text-center">
                     <button
@@ -102,6 +185,7 @@ const sendChat = async (): Promise<void> => {
             <div class="input-group">
                 <input
                     v-model="chatInput"
+                    ref="chatInputElement"
                     @keydown="blockEnterOnMobile"
                     @focus="inputFocused = true"
                     @blur="inputFocused = false"

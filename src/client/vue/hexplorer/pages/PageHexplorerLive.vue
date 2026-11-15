@@ -10,12 +10,13 @@ import { useMediaQuery, whenever } from '@vueuse/core';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import { hexplorerKey, useHexplorer } from '../composables/useHexplorer.js';
+import { hexplorerLiveChatChannelKey } from '../composables/useHexplorerLive.js';
 import { useHexplorerLiveSession, type HexplorerLiveSessionHandlers } from '../composables/hexplorerLiveSession.js';
 import { useHexplorerLiveSync } from '../composables/useHexplorerLiveSync.js';
 import { NoopAnalyzer } from '../analyzers/NoopAnalyzer.js';
 import { storeHexplorerCopy } from '../services/hexplorerCopy.js';
 import { hexplorerLiveChannelName } from '../../../../shared/app/hexplorerLive.js';
-import MoveTree from '../components/MoveTree.vue';
+import HexplorerMoveTreePanel from '../components/HexplorerMoveTreePanel.vue';
 import HexplorerMatchBoard from '../components/HexplorerMatchBoard.vue';
 import HexplorerMatchPanel from '../components/HexplorerMatchPanel.vue';
 import HexplorerLiveChat from '../components/HexplorerLiveChat.vue';
@@ -41,7 +42,7 @@ const hexplorer = useHexplorer('', [new NoopAnalyzer()], { readonly: () => !edit
 
 provide(hexplorerKey, hexplorer);
 
-const { tree, currentNodeId, currentComment, whiteWin, analysisLoading, state, mount, bindKeys } = hexplorer;
+const { currentComment, whiteWin, analysisLoading, state, mount, bindKeys } = hexplorer;
 
 bindKeys();
 
@@ -87,6 +88,8 @@ const leave = (): Promise<boolean> => action(answer => socket.emit('hexplorerLiv
 const isLargeScreen = useMediaQuery('(min-width: 576px)');
 
 const ended = computed(() => session.value === null);
+
+provide(hexplorerLiveChatChannelKey, computed(() => ended.value ? null : hexplorerLiveChannelName(props.publicId)));
 const streaming = computed(() => session.value?.streaming ?? false);
 
 /**
@@ -235,9 +238,7 @@ const openCopy = (): void => {
                         <template v-else>
                             <p v-if="currentComment" class="comment border rounded p-2 mb-2 small">{{ currentComment }}</p>
 
-                            <div class="tree-container border rounded bg-body p-2">
-                                <MoveTree :tree :nodeId="0" :currentNodeId />
-                            </div>
+                            <HexplorerMoveTreePanel />
                         </template>
 
                         <button type="button" class="btn btn-outline-primary btn-sm mt-2" @click="openCopy()">
@@ -363,8 +364,4 @@ const openCopy = (): void => {
 
 .comment
     white-space pre-wrap
-
-.tree-container
-    max-height 16rem
-    overflow auto
 </style>

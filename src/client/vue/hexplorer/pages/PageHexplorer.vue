@@ -7,7 +7,7 @@ import { useHead } from '@unhead/vue';
 import { hexplorerKey, useHexplorer } from '../composables/useHexplorer.js';
 import { hexplorerStudyKey, useHexplorerStudy } from '../composables/useHexplorerStudy.js';
 import { HEXPLORER_ANALYSIS_STATE_KEY, HEXPLORER_ANALYZE_TOGETHER_STATE_KEY, HEXPLORER_TAB_STATE_KEY, parseHexplorerAnalyzeTogether } from '../HexplorerState.js';
-import { hexplorerLiveHostKey, useHexplorerLiveHost } from '../composables/useHexplorerLive.js';
+import { hexplorerLiveChatChannelKey, hexplorerLiveHostKey, useHexplorerLiveHost } from '../composables/useHexplorerLive.js';
 import { readHexplorerCopy } from '../services/hexplorerCopy.js';
 import HexplorerLiveTab from '../components/HexplorerLiveTab.vue';
 import HexplorerPlayTab from '../components/HexplorerPlayTab.vue';
@@ -27,6 +27,7 @@ import {
 } from '../../icons.js';
 import HexplorerNavButtons from '../components/HexplorerNavButtons.vue';
 import { HEXPLORER_PLAYER_NAME_MAX_LENGTH } from '../../../../shared/app/hexplorerStudy.js';
+import { hexplorerLiveChannelName } from '../../../../shared/app/hexplorerLive.js';
 import AppResizableSidebar from '../../components/AppResizableSidebar.vue';
 import HexplorerFileTab from '../components/HexplorerFileTab.vue';
 import HexplorerHelpTab from '../components/HexplorerHelpTab.vue';
@@ -99,6 +100,8 @@ const {
  * Chat of live session, below Tree, Live and Play tabs.
  */
 const showLiveChat = computed(() => liveActive.value && ['tree', 'live', 'play'].includes(currentTab.value));
+
+provide(hexplorerLiveChatChannelKey, computed(() => showLiveChat.value && livePublicId.value ? hexplorerLiveChannelName(livePublicId.value) : null));
 
 whenever(gameViewElement, async element => {
     await mount(element);
