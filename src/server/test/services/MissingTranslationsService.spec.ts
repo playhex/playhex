@@ -15,6 +15,16 @@ const source = {
 };
 
 describe('MissingTranslationsService', () => {
+    it('reports gendered keys as missing by default, ignores them with ignoreGenderKeys', () => {
+        const gendered = { title: 'Title', title_male: 'King', title_female: 'Queen' };
+
+        assert.deepStrictEqual(service.getMissingKeys(gendered, { title: 'Titre' }, 'de'), { title_male: 'King', title_female: 'Queen' });
+        assert.deepStrictEqual(
+            new MissingTranslationsService('en', { ignoreGenderKeys: true }).getMissingKeys(gendered, { title: 'Titre' }, 'de'),
+            {},
+        );
+    });
+
     it('returns missing keys, nested', () => {
         assert.deepStrictEqual(
             service.getMissingKeys(source, { title: 'Titre', nested: { moves_one: 'x', moves_other: 'y' }, other: 'z' }, 'de'),

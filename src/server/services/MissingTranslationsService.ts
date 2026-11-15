@@ -11,6 +11,7 @@ export type TranslationObject = { [key: string]: string | TranslationObject };
 
 const PLURAL_SUFFIX = /^(.+)_(zero|one|two|few|many|other)$/;
 const ORDINAL_SUFFIX = '_ordinal';
+const GENDER_SUFFIX = /_(male|female)$/;
 
 const CATEGORIES_ORDER: Intl.LDMLPluralRule[] = ['zero', 'one', 'two', 'few', 'many', 'other'];
 
@@ -24,6 +25,12 @@ export type MissingTranslationsOptions = {
      * Weblate plural formulas only handle integers, and removes these categories.
      */
     ignoreDecimalPlurals?: boolean;
+
+    /**
+     * Do not report gendered keys (key_male, key_female) as missing.
+     * They are only needed in some languages, and only when different from the base key.
+     */
+    ignoreGenderKeys?: boolean;
 };
 
 const isObject = (value: unknown): value is TranslationObject =>
@@ -88,6 +95,10 @@ export default class MissingTranslationsService
         const pluralBases = new Set<string>();
 
         for (const key of Object.keys(source)) {
+            if (this.options.ignoreGenderKeys && GENDER_SUFFIX.test(key)) {
+                continue;
+            }
+
             const match = key.match(PLURAL_SUFFIX);
 
             if (match !== null && typeof source[`${match[1]}_other`] === 'string') {
