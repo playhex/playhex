@@ -6,9 +6,11 @@ import { onClickOutside } from '@vueuse/core';
 import { IconMailbox, IconMailboxFlag } from '../icons.js';
 import AppNotification from './AppNotification.vue';
 import AppUnreadNotificationsBadge from './AppUnreadNotificationsBadge.vue';
-import { getOpponent } from '../../services/context-utils.js';
+import { getOpponent, getMyIndex } from '../../services/context-utils.js';
 import { pseudoStringOptional } from '../../../shared/app/pseudoUtils.js';
 import usePlayerNotificationsStore from '../../stores/playerNotificationsStore.js';
+import { Game } from '../../../shared/app/models/index.js';
+import { t } from 'i18next';
 
 const playerNotificationsStore = usePlayerNotificationsStore();
 
@@ -27,6 +29,17 @@ const {
 const { acknowledge: ack, loadMoreReadNotifications } = playerNotificationsStore;
 
 const showNotifications = ref(false);
+
+const gameTitle = (game: Game): string => {
+    if (getMyIndex(game) !== null) {
+        return t('game_against_player', { player: pseudoStringOptional(getOpponent(game)) });
+    }
+
+    return t('game_player_vs_player', {
+        red: pseudoStringOptional(game.gameToPlayers[0]?.player ?? null),
+        blue: pseudoStringOptional(game.gameToPlayers[1]?.player ?? null),
+    });
+};
 
 const notificationsElement = ref<HTMLElement>();
 
@@ -104,7 +117,7 @@ onClickOutside(notificationsElement, () => {
                             }"
                         >
                             <h6 class="mb-1" :class="{ 'is-read': playerNotifications.every(n => n.isRead) }">
-                                {{ $t('game_against_player', { player: pseudoStringOptional(getOpponent(game)) }) }}
+                                {{ gameTitle(game) }}
                                 &nbsp;
                                 <span class="text-secondary small">
                                     {{ $t('game_created_short', { date: formatRelative(game.createdAt, new Date()) }) }}
