@@ -8,7 +8,9 @@
         "open_live_games": "Liity live-peliin",
         "open_correspondence_games": "Liity kirjeenvaihtopeliin",
         "no_open_live_games": "Ei avoimia live-pelejä tällä hetkellä",
-        "no_open_correspondence_games": "Ei avoimia kirjeenvaihtopeleja tällä hetkellä"
+        "no_open_correspondence_games": "Ei avoimia kirjeenvaihtopeleja tällä hetkellä",
+        "multiple_waiting_games": "Useita odottavia pelejä:",
+        "others_canceled_once_one_accepted": "Kun yksi odottavista peleistäsi hyväksytään, muut perutaan."
     },
     "game": {
         "title": "Peli",
@@ -35,13 +37,19 @@
         "playing": "Pelissä",
         "watch": "Katso",
         "title_your_turn": "Sinun vuorosi!",
-        "title_waiting": "Odotetaan vastustajaa: isäntänä"
+        "title_waiting": "Odotetaan vastustajaa: isäntänä",
+        "winner": "Voittaja",
+        "loser": "Häviäjä",
+        "issue": "Lopputulos",
+        "moves_count": "Siirrot"
     },
     "game_rules": {
         "normal": "standardi",
         "host_plays_first": "isäntä pelaa ensimmäisenä",
         "host_plays_second": "isäntä pelaa toisena",
-        "no_swap": "ei vaihtoa"
+        "no_swap": "ei vaihtoa",
+        "handicap_for_host": "tasoitus {{n}} isännälle",
+        "handicap_for_opponent": "tasoitus {{n}} vastustajalle"
     },
     "game_state": {
         "created": "Luotu",
@@ -66,7 +74,8 @@
             "notifications": "Ilmoitukset",
             "ai_workers": "AI-workerit",
             "connected_applications": "Yhdistetyt sovellukset",
-            "technical_info": "Tekniset tiedot"
+            "technical_info": "Tekniset tiedot",
+            "security": "Turvallisuus"
         },
         "audio": "Ääni",
         "moderation": "Moderointi"
@@ -117,7 +126,33 @@
     "handicap": {
         "title": "Tasoitus",
         "none": "ei mitään",
-        "handicap_for_player": "{{n}} pelaajalle {{player}}"
+        "handicap_for_player": "{{n}} pelaajalle {{player}}",
+        "you": "sinä",
+        "opponent": "vastustaja",
+        "ai": "tekoäly",
+        "increase": "Kasvata tasoitusta",
+        "decrease": "Pienennä tasoitusta",
+        "setup": {
+            "first_stone_then": "{{player}} asettaa vaihdettavan kiven, sitten vielä {{count}}, tai {{swappedCount}} vaihdon jälkeen.",
+            "first_stone_then_you": "Aseta vaihdettava kivi, sitten vielä {{count}}, tai {{swappedCount}} vaihdon jälkeen.",
+            "first_stone_for_blue": "{{player}} asettaa vaihdettavan kiven, sitten {{beneficiary}} pelaa {{count}} siirtoa.",
+            "first_stone_for_blue_you": "Aseta vaihdettava kivi, sitten {{beneficiary}} pelaa {{count}} siirtoa.",
+            "first_stone_for_blue_beneficiary": "{{player}} asettaa vaihdettavan kiven, sitten sinä pelaat {{count}} siirtoa.",
+            "swap_decision": "{{player}} päättää vaihdosta: {{beneficiary}} asettaa sitten {{swappedCount}} kiveä, tai {{count}} jos kieltäydytään.",
+            "swap_decision_you": "Napsauta kiveä vaihtaaksesi: {{beneficiary}} asettaa sitten {{swappedCount}} kiveä, tai {{count}} jos kieltäydyt.",
+            "swap_decision_beneficiary": "{{player}} päättää vaihdosta: sinä asetat sitten {{swappedCount}} kiveä, tai {{count}} jos kieltäydytään.",
+            "stones_after_swap": "Kivi vaihdettu: {{player}} asettaa {{count}} kiveä.",
+            "stones_after_swap_you": "Kivi vaihdettu: aseta {{count}} kiveä.",
+            "refuse_swap": "Älä vaihda",
+            "no_swap_one": "Vaihto pois käytöstä: {{player}} asettaa 1 kiven.",
+            "no_swap_other": "Vaihto pois käytöstä: {{player}} asettaa {{count}} kiveä.",
+            "no_swap_you_one": "Vaihto pois käytöstä: aseta 1 kivi.",
+            "no_swap_you_other": "Vaihto pois käytöstä: aseta {{count}} kiveä.",
+            "stones_one": "{{player}} asettaa vielä 1 kiven.",
+            "stones_other": "{{player}} asettaa vielä {{count}} kiveä.",
+            "stones_you_one": "Aseta vielä 1 kivi.",
+            "stones_you_other": "Aseta vielä {{count}} kiveä."
+        }
     },
     "2dots": "{{s}}:",
     "game_created_short": "luotu {{ date }}",
@@ -160,7 +195,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "Katso miten voit laskea tekoälyn siirtoja PlayHexille omalta tietokoneeltasi",
-        "engine_unavailable": "Joillakin AI-moottoreilla ei ole juuri nyt yhtään workeria verkossa, nämä tekoälyt eivät ole käytettävissä."
+        "engine_unavailable": "Joillakin AI-moottoreilla ei ole juuri nyt yhtään workeria verkossa, nämä tekoälyt eivät ole käytettävissä.",
+        "ai_not_available": "Ei juuri nyt saatavilla"
     },
     "game_analysis": {
         "game_analysis": "Tekoälyn pelitarkastelu",
@@ -230,7 +266,12 @@
     },
     "1vAI_friendly": {
         "title": "Pelaa tekoälyä vastaan",
-        "create": "Pelaa tekoälyä vastaan"
+        "create": "Pelaa tekoälyä vastaan",
+        "easy": "Helppo",
+        "medium": "Keskitaso",
+        "hard": "Vaikea",
+        "beaten": "Jo voitettu",
+        "unlock_stronger_ais": "Näytä lisää tekoälyvaihtoehtoja"
     },
     "1vAI_offline": {
         "title": "Offline-tekoäly",
@@ -705,7 +746,12 @@
         "block_at_a_distance": "Älä aseta kiveäsi aivan vastustajan kiven viereen: vierekkäisen eston voi helposti kiertää. Estä kauempaa ja jätä tilaa: sinulla on aikaa vastata sen siirtoihin.",
         "block_remember": "Muista: Hexissä hyvä siirto on sekä puolustava että hyökkäävä.",
         "ziggurat_defense_1": "Sininen tunkeutuu keskelle: punainen vastaa kivensä viereen ja muodostaa sillan reunan kanssa.",
-        "ziggurat_defense_2": "Sininen tunkeutuu ensimmäiselle riville: punainen vastaa sillalla, ja uusi kivi on yhdistetty reunaan."
+        "ziggurat_defense_2": "Sininen tunkeutuu ensimmäiselle riville: punainen vastaa sillalla, ja uusi kivi on yhdistetty reunaan.",
+        "demo_0_play": "Pelaa",
+        "chapters": {
+            "hex_rule": "I. Hexin säännöt",
+            "beginners_strategy": "II. Aloittelijan strategia"
+        }
     },
     "donate": "Lahjoita PlayHexille",
     "notifications": "Ilmoitukset",
@@ -844,7 +890,57 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Kopioi pelilaudan alla olevasta \"Virheenkorjaustiedoista\"",
         "engine_unavailable": "Tällä moottorilla ei ole juuri nyt yhtään AI-workeria verkossa, asemia ei voi analysoida.",
-        "analysis_failed": "Tätä asemaa ei voitu analysoida."
+        "analysis_failed": "Tätä asemaa ei voitu analysoida.",
+        "analyze_in_hexplorer": "Analysoi Hexplorerissa",
+        "play_from_position": "Pelaa asemasta",
+        "tab_file": "Tiedosto",
+        "tab_tree": "Puu",
+        "comment": "Kommentti",
+        "comment_placeholder": "Kommentoi tätä asemaa…",
+        "current_study": "Nykyinen tutkielma",
+        "new_study": "Uusi tutkielma",
+        "study_title": "Tutkielman otsikko",
+        "study_default_title": "Nimetön tutkielma",
+        "study_by": "Tekijä: {{author}}",
+        "study_fork": "Haarauta",
+        "study_fork_help": "Tallenna oma kopio tästä tutkielmasta muutoksineen",
+        "study_forked_from": "Haarautettu tutkielmasta",
+        "study_share": "Jaa tämä tutkielma",
+        "study_link_copied": "Linkki kopioitu",
+        "study_delete": "Poista tämä tutkielma",
+        "study_delete_confirm": "Poistetaanko tämä tutkielma? Sen linkki lakkaa toimimasta.",
+        "study_too_large": "Tämä tutkielma on liian suuri tallennettavaksi: poista joitakin haaroja tai kommentteja.",
+        "study_not_found": "Tätä tutkielmaa ei ole tai se on poistettu.",
+        "study_unsaved_changes": "Tallentamattomia muutoksia",
+        "study_save_shortcut": "Tallenna tutkielma (Ctrl+S)",
+        "study_validate_setup_first": "Lopeta asettelutila tallentaaksesi tutkielman.",
+        "study_save_to_share": "Tallenna tutkielma haarauttaaksesi tai jakaaksesi sen.",
+        "my_studies": "Omat tutkielmat",
+        "export": "Vie",
+        "study_sort": "Lajittele tutkielmat",
+        "study_sort_date_desc": "Uusimmat",
+        "study_sort_date_asc": "Vanhimmat",
+        "study_sort_title_asc": "Nimi A–Ö",
+        "study_sort_title_desc": "Nimi Ö–A",
+        "tools_history": "Historia",
+        "tools_stones": "Kivet",
+        "tools_marks": "Merkinnät",
+        "tools_label": "Tunniste",
+        "study_discard_confirm": "Sinulla on tallentamattomia muutoksia, ne menetetään. Jatketaanko?",
+        "tab_help": "Ohje",
+        "help_what_title": "Mikä on Hexplorer?",
+        "help_what": "Ilmainen Hexin analyysilauta: tutki mitä tahansa asemaa, kokeile useita muunnelmia ja katso, mitä tekoäly niistä ajattelee.",
+        "help_why_title": "Miksi käyttää sitä?",
+        "help_why": "Ymmärtääksesi pelejäsi, löytääksesi parempia siirtoja ja jakaaksesi ajatuksiasi asemasta muiden pelaajien kanssa.",
+        "help_how_title": "Näin sitä käytetään",
+        "help_how_play": "Aseta kiviä vapaasti rakentaaksesi oman aseman",
+        "help_how_import": "tai tuo Hex-peli linkistä tai tekstistä",
+        "help_how_ai": "Laudan vasemmalla puolella oleva palkki näyttää, kuka on voitolla, ja lauta näyttää tekoälyn harkitsemat siirrot.",
+        "help_how_setup": "Asettelutilassa voit lisätä laudalle merkintöjä ja muokata asemaa vapaasti",
+        "help_how_file": "Tallenna tutkielmasi (Ctrl+S), jaa se tai vie se SGF-muodossa",
+        "help_dismiss": "Selvä, älä näytä uudelleen",
+        "study_nodes_one": "{{count}} solmu",
+        "study_nodes_other": "{{count}} solmua"
     },
     "player_menu": {
         "open_menu": "Avaa pelaajavalikko",
@@ -863,7 +959,8 @@
         "reserved_for_other_player": "Tämä peli on toiselle pelaajalle varattu haaste.",
         "reserved_for_other_player_named": "Tämä peli on pelaajalle {{pseudo}} varattu haaste.",
         "other": "Et voi liittyä tähän peliin.",
-        "game_canceled": "Tämä peli on peruttu."
+        "game_canceled": "Tämä peli on peruttu.",
+        "is_host_closed": "Tämä peli on suljettu: vain pelin linkin saanut voi liittyä."
     },
     "board_mount_error": {
         "error": "Lautaa ei voitu näyttää, tapahtui virhe:",
@@ -1084,7 +1181,8 @@
         "create_game": "pelin luominen",
         "challenge_player": "pelaajan haastaminen",
         "challenge_same_target": "tämän pelaajan haastaminen uudelleen",
-        "analyze_position": "asemien analysointi"
+        "analyze_position": "asemien analysointi",
+        "create_hexplorer_study": "Hexplorer-tutkielmien luominen"
     },
     "head_to_head": "Keskinäiset",
     "never_played_together": "Et ole vielä koskaan pelannut tätä pelaajaa vastaan.",
@@ -1238,7 +1336,17 @@
             "fixed_fill_twice": "Ruudulla {{move}} on kiinteä väri kahdesti",
             "invalid_type": "Virheellinen {{property}}",
             "solver_unproven_one": "{{count}} asema ei voitu ratkaista ajoissa, tehtävä on tarkistettu vain osittain",
-            "solver_unproven_other": "{{count}} asemaa ei voitu ratkaista ajoissa, tehtävä on tarkistettu vain osittain"
+            "solver_unproven_other": "{{count}} asemaa ei voitu ratkaista ajoissa, tehtävä on tarkistettu vain osittain",
+            "generator_initial_not_winning": "Mohex-ratkaisija ei löydä tästä voittavaa siirtoa",
+            "generator_depends_on_disabled_cells": "Voitto on mahdollinen vain tehtävän ulkopuolisten ruutujen avulla: merkitse asemavaiheessa omaan reunaansa yhdistetyt kivet",
+            "generator_already_connected": "Yhteys on jo olemassa, ei mitään generoitavaa",
+            "generator_unproven": "Voittavaa siirtoa ei todistettu ajoissa, haara jätetty tyhjäksi",
+            "generator_budget_exceeded": "Puu on liian suuri, haara jätetty tyhjäksi",
+            "generator_parallel_dropped": "Tunkeutumista {{move}} vastustajan siltaan ei voitu lisätä rinnakkaisena sarjana, sen pelaaminen epäonnistuttaa tehtävän",
+            "generator_accepted_losing": "Tämä siirto hyväksytään, mutta Mohex-ratkaisija todistaa sen häviävän",
+            "generator_accepted_unproven": "Tämä siirto hyväksytään, mutta Mohex-ratkaisija ei todista sen voittavan: sitä ei jatketa",
+            "generator_failed_winning": "Tämä siirto epäonnistuu, mutta Mohex-ratkaisija todistaa sen voittavan",
+            "generator_invalid_tree": "Generoitu puu on virheellinen ({{error}})"
         },
         "editor": {
             "optional": "Valinnainen",
@@ -1403,7 +1511,24 @@
             "warnings_badge_one": "{{count}} tarkistusvaroitus",
             "warnings_badge_other": "{{count}} tarkistusvaroitusta",
             "errors_count_one": "{{count}} korjattava ongelma, katso Julkaise-välilehti",
-            "errors_count_other": "{{count}} korjattavaa ongelmaa, katso Julkaise-välilehti"
+            "errors_count_other": "{{count}} korjattavaa ongelmaa, katso Julkaise-välilehti",
+            "solver_position": "Asema Mohexille",
+            "solver_position_help": "Mohex pelaa koko laudalla: tarkista, että tehtävän ulkopuoliset ruudut on täytetty aseman mukaan ja että reunaan yhdistetyt kivet on merkitty.",
+            "check_section": "Tarkista tehtävä",
+            "generate": "Generoi puu",
+            "generate_tab": "Generointi",
+            "generate_help": "Täydentää puun valitusta solmusta säilyttäen olemassa olevat siirrot: voittavat siirrot ja kumoukset Mohexilta, tietokoneen vastaukset Katahexilta.",
+            "generate_templates": "Pysähdy mallin avulla saatuun yhteyteen, enintään",
+            "generate_templates_none": "Ei mallia: tehtävä päättyy vasta, kun yhteys on valmis.",
+            "generate_templates_help": "Tehtävä päättyy heti, kun yhteys on todistettu tällä tai pienemmällä mallilla.",
+            "generate_templates_none_option": "Ei mitään",
+            "generate_from_node": "Generoi tästä solmusta",
+            "generate_not_here": "Valitse Puu-välilehdeltä pääsarjan solmu ennen tehtävän loppua.",
+            "generate_progress": "Ratkaistaan asemia: {{done}}/{{total}}",
+            "generate_ok": "Puu generoitu.",
+            "generate_warnings": "Generoinnin varoitukset ({{count}}):",
+            "generate_stop": "Pysäytä",
+            "generate_tree_changed": "Puu muuttui generoinnin aikana, tulos ohitettiin. Generoi uudelleen."
         },
         "next_puzzle": "Seuraava tehtävä",
         "collections": {
@@ -1461,7 +1586,12 @@
         "published_ago": "Julkaistu {{date}}",
         "sort_by": "Järjestä",
         "sort_published_at": "Julkaisupäivä",
-        "sort_created_at": "Lisäyspäivä"
+        "sort_created_at": "Lisäyspäivä",
+        "field_secondary_urls": "Muut linkit",
+        "field_secondary_urls_help": "Jos video on julkaistu myös muilla alustoilla (PeerTube, Dailymotion…). Yllä oleva linkki pysyy päälinkkinä.",
+        "add_link": "Lisää linkki",
+        "remove_link": "Poista tämä linkki",
+        "watch_on": "Katso palvelussa {{platform}}"
     },
     "swap_maps": {
         "title": "Vaihtokartat",
@@ -1529,13 +1659,20 @@
         "opening_moves": "Yleisimmät avaussiirrot",
         "opening_moves_note": "Lautakoolle {{boardsize}}, pelatuin koko.",
         "rating_distribution": "Ratingin jakauma",
-        "rating_distribution_note": "Vain muut kuin bottipelaajat, joiden rating on vakiintunut (poikkeama alle {{deviation}}), lasketaan. Vieraat ovat mukana."
+        "rating_distribution_note": "Vain muut kuin bottipelaajat, joiden rating on vakiintunut (poikkeama alle {{deviation}}), lasketaan. Vieraat ovat mukana.",
+        "lobby_join_chances": "Todennäköisyys saada vastustaja livepeliin",
+        "lobby_join_chances_first_minute": "< 1 min",
+        "lobby_join_chances_next_minutes": "+10 min",
+        "lobby_join_chances_note": "Osuus aulassa luoduista livepeleistä, jotka saavat vastustajan ensimmäisen minuutin aikana, ja sitten seuraavien 10 minuutin aikana, jos kukaan ei liittynyt ensimmäisen minuutin jälkeen. Arvioitu viimeisten 8 viikon ajalta, kuin isännät olisivat odottaneet perumisen sijaan. Ajat näytetään paikallisella aikavyöhykkeelläsi (UTC{{offset}})."
     },
     "ladder": {
         "title": "Kukkulan kuningas",
+        "title_female": "Kukkulan kuningatar",
         "intro": "Yksi tikapuu, yksi valtaistuin. Haasta yläpuolellasi oleva pelaaja: jos voitat, saat hänen paikkansa. Mitä korkeammalla istut, sitä enemmän joudut puolustamaan.",
         "king": "Kukkulan kuningas",
+        "king_female": "Kukkulan kuningatar",
         "king_for": "Kuninkaana {{duration}}",
+        "king_for_female": "Kuningattarena {{duration}}",
         "no_king": "Valtaistuin on tyhjä. Liity ja valtaa se!",
         "join": "Liity Kukkulan kuninkaaseen",
         "leave": "Poistu tältä kukkulalta",
@@ -1561,6 +1698,7 @@
         "no_running_challenges": "Ei käynnissä olevia haasteita.",
         "vs": "vs",
         "nobody_to_challenge": "Ei ketään haastettavaa: sinä olet kuningas!",
+        "nobody_to_challenge_female": "Ei ketään haastettavaa: sinä olet kuningatar!",
         "live": "Live",
         "challenge_overlay": {
             "title": "Haasta {{player}}",
@@ -1604,6 +1742,7 @@
             "challenge_defended": "{{opponent}} puolusti paikkaansa pelaajaa {{player}} vastaan",
             "challenge_voided": "Peli {{player}} vs {{opponent}} on peruttu",
             "new_king": "{{player}} on uusi Kukkulan kuningas!",
+            "new_king_female": "{{player}} on uusi Kukkulan kuningatar!",
             "giant_slayer": "{{player}} on Jättiläisentappaja: syöksi vallasta pelaajan {{opponent}}!",
             "climber": "{{player}} voitti {{wins}} haastetta peräkkäin!",
             "strike": "{{player}} antoi ajan loppua pelissä (varoitus {{strikes}})",
@@ -1782,5 +1921,356 @@
     "n_messages_one": "{{ count }} viesti",
     "n_messages_other": "{{ count }} viestiä",
     "n_interested_one": "{{ count }} kiinnostunut",
-    "n_interested_other": "{{ count }} kiinnostunutta"
+    "n_interested_other": "{{ count }} kiinnostunutta",
+    "pronouns": {
+        "title": "Pronominit",
+        "explain": "Nämä pronominit ovat julkisia: ne näkyvät profiilissasi ja nimimerkkiäsi napsautettaessa. Niitä käytetään myös mukauttamaan käyttöliittymän tekstejä sinulle sekä sitä, miten sinusta puhutaan muille pelaajille.",
+        "save_error": "Pronominien tallennus epäonnistui. Yritä uudelleen.",
+        "he/him": "hän (he/him)",
+        "she/her": "hän (she/her)",
+        "they/them": "hän (they/them)",
+        "unspecified": "Pronomineja ei ole määritetty"
+    },
+    "player_popover": {
+        "on_playhex_since": "PlayHexissä {{duration}}"
+    },
+    "closed_game": "Suljettu peli",
+    "closed_game_help": "Tämä peli ei näy muiden pelaajien aulassa. Vain linkin saaneet voivat liittyä, vaikka he eivät olisi vielä PlayHexissä.",
+    "closed_game_invite": {
+        "link_label": "Linkki ystävälle lähetettäväksi",
+        "share": "Jaa"
+    },
+    "chat_header": {
+        "game_started": "Peli alkoi",
+        "game_ended": "Peli päättyi",
+        "game_canceled": "Peli peruttiin"
+    },
+    "host_waiting_join_chance_first_minute": "Tähän aikaan päivästä {{percent}} peleistä saa vastustajan ensimmäisen minuutin aikana.",
+    "host_waiting_join_chance_next_minutes": "Kukaan ei ole vielä liittynyt. Odottamalla 10 minuuttia lisää {{percent}} isännistä löytää vastustajan.",
+    "match_title_in_tournament": "{{ match }} – {{ tournament }}",
+    "chat_message_visibility": "Viestin näkyvyys",
+    "chat_attach_to_move_toggle": "Näytä tämä viesti siirron {{n}} alla",
+    "chat_message_visibility_public": "Julkinen",
+    "chat_message_visibility_private": "Henkilökohtaiset muistiinpanot",
+    "chat_message_visibility_malkovich": "Malkovich",
+    "chat_message_placeholder_private": "Henkilökohtainen muistiinpano, näkyy vain sinulle…",
+    "chat_message_placeholder_malkovich": "Malkovich, näkyy kaikille pelin päätyttyä…",
+    "chat_new_messages": "Uudet",
+    "set_password": "Aseta salasana",
+    "set_password_explain": "Tililläsi ei ole vielä salasanaa. Aseta salasana, jotta voit kirjautua myös käyttäjänimelläsi \"{{login}}\".",
+    "saved": "Tallennettu",
+    "or": "tai",
+    "log_in_with_discord": "Kirjaudu Discordilla",
+    "must_be_logged_in": "Sinun on kirjauduttava sisään",
+    "same_pseudo": "Tämä on jo käyttäjänimesi",
+    "pseudo_change_limit_reached": "Olet vaihtanut käyttäjänimeäsi liian monta kertaa viime aikoina",
+    "must_set_password_first": "Aseta ensin salasana, muuten et voisi enää kirjautua",
+    "discord_login_failed": "Kirjautuminen Discordilla epäonnistui, yritä uudelleen",
+    "discord_login_cancelled": "Kirjautuminen Discordilla peruttiin",
+    "discord_already_linked": "Tämä Discord-tili on jo yhdistetty toiseen PlayHex-tiliin",
+    "discord_account_creation_rate_limited": "Viime aikoina on luotu liian monta tiliä, yritä myöhemmin uudelleen",
+    "change_pseudo": {
+        "title": "Vaihda käyttäjänimi",
+        "new_pseudo": "Uusi käyttäjänimi",
+        "submit": "Vaihda käyttäjänimi",
+        "confirm": "Vaihdetaanko käyttäjänimeksi \"{{pseudo}}\"?",
+        "success": "Käyttäjänimesi on vaihdettu.",
+        "next_allowed_at": "Olet vaihtanut käyttäjänimeäsi liian monta kertaa viime aikoina. Voit vaihtaa sen uudelleen {{date}}.",
+        "old_pseudo_released": "Vanha käyttäjänimesi vapautuu muiden pelaajien käyttöön. Vanhan profiilisi osoitteen linkit ohjataan uuteen. Kirjaudut jatkossa uudella käyttäjänimelläsi.",
+        "remaining_one": "Voit vaihtaa käyttäjänimesi vielä {{count}} kerran 30 päivän aikana.",
+        "remaining_other": "Voit vaihtaa käyttäjänimesi vielä {{count}} kertaa 30 päivän aikana.",
+        "former_pseudo_note_one": "Profiilissasi näkyy \"aiemmin {pseudo}\" {{count}} päivän ajan.",
+        "former_pseudo_note_other": "Profiilissasi näkyy \"aiemmin {pseudo}\" {{count}} päivän ajan."
+    },
+    "formerly": "aiemmin",
+    "discord_account": {
+        "title": "Discord",
+        "private": "Vain sinä näet yhdistetyn Discord-tilisi, sitä ei näytetä profiilissasi.",
+        "explain": "Yhdistä Discord-tilisi kirjautuaksesi Discordilla.",
+        "link": "Yhdistä Discord-tilini",
+        "linked_to": "Yhdistetty Discord-tiliin {username}. Voit kirjautua Discordilla.",
+        "unlink": "Poista yhdistäminen",
+        "unlink_confirm": "Poistetaanko Discord-tilin yhdistäminen? Et voi enää kirjautua Discordilla.",
+        "set_password_to_unlink": "Poistaaksesi Discord-tilin yhdistämisen aseta ensin salasana, jotta voit edelleen kirjautua."
+    },
+    "recovery_email": {
+        "title": "Palautussähköposti",
+        "explain": "Valinnainen. Käytetään yhteydenottoon tilisi turvallisuudesta, esim. jos unohdat salasanasi.",
+        "email": "Sähköposti",
+        "private": "Sähköpostisi on yksityinen eikä sitä koskaan näytetä muille pelaajille. Jätä tyhjäksi poistaaksesi sen.",
+        "invalid": "Virheellinen sähköposti"
+    },
+    "cancel_request": {
+        "ask": "Ehdota peruutusta",
+        "player_wants_to_cancel": "{{ player }} ehdottaa pelin perumista",
+        "accept": "Hyväksy peruutus",
+        "reject": "Hylkää",
+        "request_denied": "Pelaajan {{ player }} pyyntö perua peli hylättiin.",
+        "game_canceled_by_agreement": "Peli peruttiin molempien pelaajien sopimuksesta, ehdotti {{ player }}.",
+        "confirm_overlay": {
+            "title": "Ehdotetaanko pelin perumista?",
+            "message": "Tämä lähettää pyynnön vastustajallesi, joka voi hyväksyä tai hylätä sen. Jos se hyväksytään, peli perutaan eikä sitä lasketa.",
+            "confirmLabel": "Kyllä, lähetä pyyntö",
+            "cancelLabel": "Ei, jatka pelaamista"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer livenä",
+        "tab_live": "Live",
+        "tab_play": "Pelaa",
+        "bot_unavailable": "ei saatavilla",
+        "tab_chat": "Chat",
+        "live": "Live",
+        "stream": "Lähetys",
+        "stream_description": "Jaa linkki: kuka tahansa voi seurata analyysiasi livenä, nähdä kursorisi ja keskustella.",
+        "start_stream": "Aloita lähetys",
+        "stop_stream": "Lopeta lähetys",
+        "share_link": "Jaettava linkki",
+        "copy_link": "Kopioi linkki",
+        "match": "Pelaa tästä asemasta",
+        "match_description": "Pelaa peli laudan asemasta bottia tai toista pelaajaa vastaan. Kun peli päättyy, se lisätään analyysiisi muunnelmana.",
+        "i_play": "Pelaan",
+        "opponent": "Vastustaja",
+        "opponent_player": "Pelaaja",
+        "invite_player_optional": "Kutsu pelaaja (valinnainen)",
+        "invite_player_help": "Kutsuttu saa ilmoituksen ja on ainoa, joka voi liittyä. Muuten pelata voi ensimmäinen linkin avaaja.",
+        "validate_setup_first": "Vahvista ensin asetteluasema.",
+        "start_match": "Aloita peli",
+        "back_to_analysis": "Takaisin analyysiin",
+        "back_to_match": "Takaisin peliin",
+        "waiting_for_opponent": "Odotetaan vastustajaa…",
+        "waiting_for_player": "Odotetaan pelaajaa {{pseudo}}…",
+        "you": "Sinä",
+        "your_turn": "Sinun vuorosi",
+        "swap_hint": "Napsauta kiveä vaihtaaksesi.",
+        "wins": "voittaa",
+        "wins_by_resignation": "voittaa luovutuksella",
+        "match_expired": "Peli päättyi: liian pitkään ei siirtoa.",
+        "match_canceled": "Peli peruttiin.",
+        "join_match": "Pelaa tämä peli",
+        "cancel_match": "Peru peli",
+        "hosted_by": "Isäntä:",
+        "session_ended": "Tämä istunto on päättynyt.",
+        "waiting_for_stream": "Odotetaan lähetystä…",
+        "open_copy": "Avaa kopio",
+        "open_copy_failed": "Kopion avaaminen epäonnistui.",
+        "invitation_toast": "{{pseudo}} kutsuu sinut peliin Hexplorer-asemasta.",
+        "invitation_open": "Avaa",
+        "live_elsewhere": "Lähetät jo toisesta tutkielmasta. Vain yksi live-istunto kerrallaan.",
+        "go_to_live_study": "Siirry sinne",
+        "back_to_live": "Hexplorer-lähetyksesi on yhä käynnissä: palaa siihen",
+        "errors": {
+            "session_not_found": "Tätä live-istuntoa ei enää ole.",
+            "already_live": "Lähetät jo toisessa välilehdessä. Lopeta se ensin.",
+            "not_host": "Vain isäntä voi tehdä tämän.",
+            "match_already_running": "Peli on jo käynnissä.",
+            "position_already_won": "Tämä asema on jo voitettu.",
+            "bot_unavailable": "Tämä botti ei ole juuri nyt saatavilla.",
+            "invalid_invited_player": "Tätä pelaajaa ei voi kutsua.",
+            "cannot_join": "Et voi liittyä tähän peliin.",
+            "match_not_playing": "Tätä peliä ei pelata.",
+            "not_your_turn": "Ei ole sinun vuorosi.",
+            "not_a_player": "Et pelaa tässä pelissä.",
+            "invalid_data": "Virheelliset tiedot.",
+            "illegal_move": "Tätä siirtoa ei voi pelata.",
+            "study_required": "Tallenna analyysi ensin tutkielmaksi."
+        }
+    },
+    "social_preview": {
+        "default_description": "Pelaa Hex-lautapeliä verkossa muita pelaajia tai tekoälyä vastaan. Turnauksia, tehtäviä, pelianalyysiä.",
+        "by": "tekijä: {{author}}",
+        "game": {
+            "canceled_title": "Peruttu Hex-peli",
+            "canceled_description": "Tämä Hex {{boardsize}} -peli on peruttu.",
+            "waiting_title": "Avoin Hex-peli, isäntänä {{player}}",
+            "waiting_title_anonymous": "Avoin Hex-peli",
+            "waiting_description": "Hex {{boardsize}} -peli, {{timeControl}}, odottaa vastustajaa. Liity PlayHexissä.",
+            "ranked": "rankattu",
+            "friendly": "ystävyysottelu",
+            "playing_description": "Peli käynnissä, katso livenä PlayHexissä.",
+            "outcome_path": "{{winner}} voitti yhdistämällä omat reunansa",
+            "outcome_resign": "{{winner}} voitti luovutuksella",
+            "outcome_time": "{{winner}} voitti ajalla",
+            "outcome_forfeit": "{{winner}} voitti luovutusvoitolla",
+            "winner": "{{winner}} voittaa",
+            "image_alt": "Hex-pelin {{title}} loppuasema",
+            "open_game": "Avoin peli",
+            "join": "Liity PlayHexissä",
+            "playing": "Peli käynnissä",
+            "cadency_live": "Live",
+            "cadency_correspondence": "Kirjepeli",
+            "n_moves_one": "{{count}} siirto",
+            "n_moves_other": "{{count}} siirtoa"
+        },
+        "tournament": {
+            "starts_at": "Alkaa {{date}}",
+            "running": "Turnaus käynnissä",
+            "rank_1": "1.: {{player}}",
+            "rank_2": "2.: {{player}}",
+            "rank_3": "3.: {{player}}",
+            "canceled": "Turnaus peruttu",
+            "hex_tournament": "Hex-turnaus",
+            "n_registered_one": "{{count}} pelaaja ilmoittautunut",
+            "n_registered_other": "{{count}} pelaajaa ilmoittautunut",
+            "n_participants_one": "{{count}} osallistuja",
+            "n_participants_other": "{{count}} osallistujaa"
+        },
+        "tournament_series": {
+            "next": "Seuraava: {{title}}, {{date}}",
+            "hex_tournaments": "Hex-turnaukset",
+            "n_editions_one": "{{count}} turnaus pelattu",
+            "n_editions_other": "{{count}} turnausta pelattu"
+        },
+        "puzzle": {
+            "default_title": "Hex-tehtävä",
+            "red_to_play": "Punainen siirtää ja voittaa",
+            "blue_to_play": "Sininen siirtää ja voittaa",
+            "label": "Tehtävä",
+            "hex_puzzle_by": "Hex-tehtävä, tekijä {{author}}"
+        },
+        "hexplorer_study": {
+            "default_title": "Hexplorer-tutkielma",
+            "label": "Tutkielma",
+            "hex_study_by": "Hex-tutkielma, tekijä {{author}}"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "Hex-tehtävät, tekijä {{author}}",
+            "n_puzzles_one": "{{count}} Hex-tehtävä",
+            "n_puzzles_other": "{{count}} Hex-tehtävää"
+        },
+        "player": {
+            "title": "{{player}}, Hex-pelaaja",
+            "bot": "Hex-tekoäly",
+            "rating": "Luokitus {{rating}}",
+            "member_since": "Jäsen {{date}} alkaen",
+            "on_playhex": "Pelaaja PlayHexissä",
+            "n_games_one": "{{count}} peli pelattu",
+            "n_games_other": "{{count}} peliä pelattu"
+        },
+        "ladder": {
+            "king": "Kuningas: {{player}}",
+            "king_female": "Kuningatar: {{player}}",
+            "reign_one": "Hallinnut {{duration}}, {{count}} puolustus",
+            "reign_other": "Hallinnut {{duration}}, {{count}} puolustusta",
+            "n_players_one": "{{count}} pelaaja kukkulalla",
+            "n_players_other": "{{count}} pelaajaa kukkulalla"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hex-tehtävät",
+                "description": "Ratkaise yhteisön tekemiä Hex-tehtäviä aloittelijasta asiantuntijaan ja tee omiasi."
+            },
+            "tournaments": {
+                "title": "Hex-turnaukset",
+                "description": "Osallistu Hex-turnauksiin verkossa: live- ja kirjepelit, sveitsiläinen järjestelmä ja pudotuspelit."
+            },
+            "tournament_series": {
+                "title": "Hex-turnaussarjat",
+                "description": "Toistuvat Hex-turnaukset: seuraa sarjaa tietääksesi, milloin seuraava turnaus pelataan."
+            },
+            "ladders": {
+                "title": "Kukkulan kuningas",
+                "description": "Kiipeä Hex-tikkailla: haasta yläpuolellasi olevia pelaajia, vie heidän paikkansa ja puolusta valtaistuinta."
+            },
+            "games_archive": {
+                "title": "Hex-pelien arkisto",
+                "description": "Selaa ja hae kaikkia PlayHexissä pelattuja Hex-pelejä."
+            },
+            "videos": {
+                "title": "Hex-videot",
+                "description": "Yhteisön tekemiä videoita Hexistä: opetusta, strategiaa, peliarvioita."
+            },
+            "statistics": {
+                "title": "PlayHex-tilastot",
+                "description": "Pelit, pelaajat, lautakoot ja voittoprosentit PlayHexissä."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Tutki Hex-asemia tekoälyanalyysin avulla."
+            },
+            "swap_maps": {
+                "title": "Hexin vaihtokartat",
+                "description": "Mitkä avaussiirrot kannattaa vaihtaa kullakin lautakoolla, KataHexin laskemana."
+            },
+            "guide": {
+                "title": "PlayHex-opas",
+                "description": "Näin pelaat Hexiä PlayHexissä: säännöt, tekoälyanalyysi, ehdolliset siirrot, moderointi."
+            },
+            "export_games_data": {
+                "title": "Vie PlayHexin pelidata",
+                "description": "Lataa aineisto kaikista PlayHexissä pelatuista Hex-peleistä, vapaasti uudelleenkäytettävissä."
+            },
+            "guide_ai_analysis": {
+                "title": "Tekoälyn pelianalyysi",
+                "description": "Käy Hex-pelisi läpi tekoälyn kanssa: löydä virheesi, näe parhaat siirrot ja selvitä, milloin sait tai menetit edun."
+            },
+            "guide_conditional_moves": {
+                "title": "Ehdolliset siirrot",
+                "description": "Pelaa Hex-kirjepelejä nopeammin: suunnittele vastauksesi vastustajan seuraaviin siirtoihin ja pelaa tikkaat automaattisesti."
+            },
+            "tutorial_rules": {
+                "title": "Hexin säännöt",
+                "description": "Opi Hexin 2 sääntöä muutamassa minuutissa interaktiivisen opetuksen avulla ja pelaa sitten ensimmäiset pelisi bottia vastaan."
+            },
+            "tutorial_swap": {
+                "title": "Vaihtosääntö Hexissä",
+                "description": "Vaihtosääntö pitää Hex-pelit tasapainoisina."
+            },
+            "tutorial_bridge": {
+                "title": "Silta Hexissä",
+                "description": "Silta on Hexin tärkein muoto: kaksi kiveä, jotka ovat jo yhteydessä koskematta toisiinsa. Opi, miten se toimii, ja harjoittele tehtävillä."
+            },
+            "tutorial_block": {
+                "title": "Hex-strategia aloittelijoille: estä voittaaksesi",
+                "description": "Hexissä estäminen rakentaa omaa reittiäsi: paras strategia pelin alussa."
+            },
+            "tutorial_ziggurat": {
+                "title": "Zikkurat-malli Hexissä",
+                "description": "Zikkurat on toinen Hexissä tunnettava muoto: kolmannen rivin kivi, joka on yhteydessä reunaansa. Opi, miten se toimii, ja harjoittele tehtävillä."
+            },
+            "cijm_2025": {
+                "title": "Hex-turnaus – Pariisi 2025",
+                "description": "Kaksi Hex-turnausta 14. ja 15. kesäkuuta 2025 Salon Culture & Jeux Mathématiques -tapahtumassa, Place Saint-Sulpice, Pariisi. Ilmainen, kaikki tasot."
+            },
+            "cijm_2026": {
+                "title": "Hex-turnaus – Pariisi 2026",
+                "description": "Jättimäinen Hex-turnaus sunnuntaina 24. toukokuuta 2026 Salon Culture & Jeux Mathématiques -tapahtumassa, Place Saint-Sulpice, Pariisi. Ilmainen, kaikki tasot, 8-vuotiaista alkaen."
+            }
+        },
+        "n_days_one": "{{count}} päivä",
+        "n_days_other": "{{count}} päivää",
+        "n_hours_one": "{{count}} tunti",
+        "n_hours_other": "{{count}} tuntia"
+    },
+    "game_outcome": {
+        "path": "Yhteys",
+        "resign": "Luovutus",
+        "time": "Aika",
+        "forfeit": "Luovutusvoitto"
+    },
+    "has_chat_messages": "Sisältää chat-viestejä",
+    "has_analyze": "Sisältää tekoälyanalyysin",
+    "has_malkovich_messages": "Sisältää Malkovich-merkintöjä",
+    "game_content_filter": "Sisältö",
+    "filters": "Suodattimet",
+    "reset_filters": "Nollaa suodattimet",
+    "reset_dates": "Nollaa päivämäärät",
+    "game_type": "Pelityyppi",
+    "game_state_filter": "Tila",
+    "opponent_or_players": "Pelaajat",
+    "one_or_two_players_help": "1 pelaaja: tämän pelaajan pelit. 2 pelaajaa: heidän keskinäiset pelinsä.",
+    "search_opponent": "Vastustaja",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "Kaikki suodattimet",
+    "hide_filters": "Vähemmän suodattimia",
+    "week_of": "Viikko alkaen {{date}}",
+    "chart_grouping": {
+        "label": "Ryhmittele",
+        "auto": "Automaattinen",
+        "day": "Päivä",
+        "week": "Viikko",
+        "month": "Kuukausi"
+    },
+    "n_games_found_one": "{{count}} peli löytyi.",
+    "n_games_found_other": "{{count}} peliä löytyi."
 }

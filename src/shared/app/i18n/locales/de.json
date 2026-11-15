@@ -8,7 +8,9 @@
         "open_live_games": "Einem Live-Spiel beitreten",
         "open_correspondence_games": "Einem Fernspiel beitreten",
         "no_open_live_games": "Derzeit keine offenen Live-Spiele",
-        "no_open_correspondence_games": "Derzeit keine offenen Fernspiele"
+        "no_open_correspondence_games": "Derzeit keine offenen Fernspiele",
+        "multiple_waiting_games": "Mehrere wartende Spiele:",
+        "others_canceled_once_one_accepted": "Sobald eines deiner wartenden Spiele angenommen wird, werden die anderen abgebrochen."
     },
     "game": {
         "opponent": "Gegner",
@@ -35,13 +37,19 @@
         "title_waiting": "Suche Gegner: gehosted von",
         "title": "Spiel",
         "info": "Info",
-        "duration": "Spieldauer"
+        "duration": "Spieldauer",
+        "winner": "Gewinner*in",
+        "loser": "Verlierer*in",
+        "issue": "Ergebnis",
+        "moves_count": "Züge"
     },
     "game_rules": {
         "normal": "Standard",
         "host_plays_first": "Host spielt zuerst",
         "host_plays_second": "Host spielt als Zweiter",
-        "no_swap": "Kein Tausch"
+        "no_swap": "Kein Tausch",
+        "handicap_for_host": "Handicap {{n}} für den Host",
+        "handicap_for_opponent": "Handicap {{n}} für den Gegner"
     },
     "create_game": {
         "more_options": "Mehr Optionen",
@@ -60,7 +68,8 @@
             "notifications": "Benachrichtigungen",
             "ai_workers": "KI-Worker",
             "connected_applications": "Verbundene Anwendungen",
-            "technical_info": "Technische Infos"
+            "technical_info": "Technische Infos",
+            "security": "Sicherheit"
         },
         "audio": "Audio",
         "moderation": "Moderation"
@@ -117,7 +126,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "Zeige mir, wie ich KI-Züge für PlayHex auf meinem Computer berechnen kann",
-        "engine_unavailable": "Für einige KI-Engines ist gerade kein Worker online, diese KIs sind nicht verfügbar."
+        "engine_unavailable": "Für einige KI-Engines ist gerade kein Worker online, diese KIs sind nicht verfügbar.",
+        "ai_not_available": "Gerade nicht verfügbar"
     },
     "try_again": "Erneut versuchen",
     "no": "Nein",
@@ -141,7 +151,12 @@
     },
     "1vAI_friendly": {
         "title": "Gegen KI spielen",
-        "create": "Gegen KI spielen"
+        "create": "Gegen KI spielen",
+        "easy": "Leicht",
+        "medium": "Mittel",
+        "hard": "Schwer",
+        "beaten": "Bereits besiegt",
+        "unlock_stronger_ais": "Mehr KI-Optionen anzeigen"
     },
     "1vAI_offline": {
         "title": "Offline-KI",
@@ -233,8 +248,8 @@
     },
     "i_play": {
         "title": "Ich spiele",
-        "first": "Erster",
-        "second": "Zweiter",
+        "first": "Zuerst",
+        "second": "Als Zweites",
         "random": "Zufällig"
     },
     "swap_rule": "Tauschregel",
@@ -314,7 +329,33 @@
     "handicap": {
         "title": "Handicap",
         "none": "ohne Handicap",
-        "handicap_for_player": "{{n}} für {{player}}"
+        "handicap_for_player": "{{n}} für {{player}}",
+        "you": "du",
+        "opponent": "Gegner",
+        "ai": "KI",
+        "increase": "Handicap erhöhen",
+        "decrease": "Handicap verringern",
+        "setup": {
+            "first_stone_then": "{{player}} setzt einen tauschbaren Stein, dann {{count}} weitere, oder {{swappedCount}} bei Tausch.",
+            "first_stone_then_you": "Setze einen tauschbaren Stein, dann {{count}} weitere, oder {{swappedCount}} bei Tausch.",
+            "first_stone_for_blue": "{{player}} setzt einen tauschbaren Stein, dann spielt {{beneficiary}} {{count}} Züge.",
+            "first_stone_for_blue_you": "Setze einen tauschbaren Stein, dann spielt {{beneficiary}} {{count}} Züge.",
+            "first_stone_for_blue_beneficiary": "{{player}} setzt einen tauschbaren Stein, dann spielst du {{count}} Züge.",
+            "swap_decision": "{{player}} entscheidet, ob getauscht wird: {{beneficiary}} setzt dann {{swappedCount}} Steine, oder {{count}} bei Ablehnung.",
+            "swap_decision_you": "Klicke auf den Stein, um zu tauschen: {{beneficiary}} setzt dann {{swappedCount}} Steine, oder {{count}}, wenn du ablehnst.",
+            "swap_decision_beneficiary": "{{player}} entscheidet, ob getauscht wird: Du setzt dann {{swappedCount}} Steine, oder {{count}} bei Ablehnung.",
+            "stones_after_swap": "Stein getauscht: {{player}} setzt {{count}} Steine.",
+            "stones_after_swap_you": "Stein getauscht: Setze {{count}} Steine.",
+            "refuse_swap": "Nicht tauschen",
+            "no_swap_one": "Tausch deaktiviert: {{player}} setzt 1 Stein.",
+            "no_swap_other": "Tausch deaktiviert: {{player}} setzt {{count}} Steine.",
+            "no_swap_you_one": "Tausch deaktiviert: Setze 1 Stein.",
+            "no_swap_you_other": "Tausch deaktiviert: Setze {{count}} Steine.",
+            "stones_one": "{{player}} setzt noch 1 Stein.",
+            "stones_other": "{{player}} setzt noch {{count}} Steine.",
+            "stones_you_one": "Setze noch 1 Stein.",
+            "stones_you_other": "Setze noch {{count}} Steine."
+        }
     },
     "explore": "Erkunden",
     "friendly": "Freundschaftsspiel",
@@ -676,7 +717,12 @@
         "block_at_a_distance": "Setze deinen Stein nicht direkt an den Stein deines Gegners: Eine benachbarte Blockade ist leicht zu umgehen. Blockiere weiter entfernt und lass etwas Platz: So hast du Zeit, auf seine Züge zu antworten.",
         "block_remember": "Merke: In Hex ist ein guter Zug zugleich defensiv und offensiv.",
         "ziggurat_defense_1": "Blau dringt in die Mitte ein: Rot antwortet neben seinem Stein und bildet eine Brücke mit dem Rand.",
-        "ziggurat_defense_2": "Blau dringt in die erste Reihe ein: Rot antwortet mit einer Brücke, und der neue Stein ist mit dem Rand verbunden."
+        "ziggurat_defense_2": "Blau dringt in die erste Reihe ein: Rot antwortet mit einer Brücke, und der neue Stein ist mit dem Rand verbunden.",
+        "demo_0_play": "Spielen",
+        "chapters": {
+            "hex_rule": "I. Hex-Regeln",
+            "beginners_strategy": "II. Strategie für Anfänger"
+        }
     },
     "tournament_seeding_methods": {
         "title": "Setzliste",
@@ -844,7 +890,57 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Aus \"Debugging-Informationen\" unter dem Spielbrett kopieren",
         "engine_unavailable": "Für diese Engine ist gerade kein KI-Worker online, Stellungen können nicht analysiert werden.",
-        "analysis_failed": "Diese Stellung konnte nicht analysiert werden."
+        "analysis_failed": "Diese Stellung konnte nicht analysiert werden.",
+        "analyze_in_hexplorer": "In Hexplorer analysieren",
+        "play_from_position": "Ab einer Position spielen",
+        "tab_file": "Datei",
+        "tab_tree": "Baum",
+        "comment": "Kommentar",
+        "comment_placeholder": "Diese Position kommentieren…",
+        "current_study": "Aktuelle Studie",
+        "new_study": "Neue Studie",
+        "study_title": "Titel der Studie",
+        "study_default_title": "Unbenannte Studie",
+        "study_by": "Von {{author}}",
+        "study_fork": "Fork",
+        "study_fork_help": "Eine eigene Kopie dieser Studie mit ihren Änderungen speichern",
+        "study_forked_from": "Fork von",
+        "study_share": "Diese Studie teilen",
+        "study_link_copied": "Link kopiert",
+        "study_delete": "Diese Studie löschen",
+        "study_delete_confirm": "Diese Studie löschen? Ihr Link funktioniert dann nicht mehr.",
+        "study_too_large": "Diese Studie ist zu groß zum Speichern: Entferne einige Zweige oder Kommentare.",
+        "study_not_found": "Diese Studie existiert nicht oder wurde gelöscht.",
+        "study_unsaved_changes": "Ungespeicherte Änderungen",
+        "study_save_shortcut": "Studie speichern (Strg+S)",
+        "study_validate_setup_first": "Beende den Setup-Modus, um die Studie zu speichern.",
+        "study_save_to_share": "Speichere diese Studie, um sie zu forken oder zu teilen.",
+        "my_studies": "Meine Studien",
+        "export": "Exportieren",
+        "study_sort": "Studien sortieren",
+        "study_sort_date_desc": "Neueste",
+        "study_sort_date_asc": "Älteste",
+        "study_sort_title_asc": "Name A–Z",
+        "study_sort_title_desc": "Name Z–A",
+        "tools_history": "Verlauf",
+        "tools_stones": "Steine",
+        "tools_marks": "Markierungen",
+        "tools_label": "Beschriftung",
+        "study_discard_confirm": "Du hast ungespeicherte Änderungen, sie gehen verloren. Fortfahren?",
+        "tab_help": "Hilfe",
+        "help_what_title": "Was ist Hexplorer?",
+        "help_what": "Ein kostenloses Analysebrett für Hex: Erkunde beliebige Positionen, probiere mehrere Varianten aus und sieh, was die KI davon hält.",
+        "help_why_title": "Wozu?",
+        "help_why": "Um deine Spiele zu verstehen, bessere Züge zu finden und deine Ideen zu einer Position mit anderen zu teilen.",
+        "help_how_title": "Verwendung",
+        "help_how_play": "Setze Steine frei, um eine eigene Position zu bauen",
+        "help_how_import": "oder importiere ein Hex-Spiel aus einem Link oder Text",
+        "help_how_ai": "Der Balken links vom Brett zeigt, wer gewinnt, und das Brett zeigt die Züge, die die KI in Betracht zieht.",
+        "help_how_setup": "Im Setup-Modus kannst du Markierungen auf dem Brett setzen und eine Position frei bearbeiten",
+        "help_how_file": "Speichere deine Studie (Strg+S), teile sie oder exportiere sie als SGF",
+        "help_dismiss": "Verstanden, nicht mehr anzeigen",
+        "study_nodes_one": "{{count}} Knoten",
+        "study_nodes_other": "{{count}} Knoten"
     },
     "player_menu": {
         "open_menu": "Spielermenü öffnen",
@@ -863,7 +959,8 @@
         "reserved_for_other_player": "Dieses Spiel ist eine Herausforderung, die für einen anderen Spieler reserviert ist.",
         "reserved_for_other_player_named": "Dieses Spiel ist eine Herausforderung, die für {{pseudo}} reserviert ist.",
         "other": "Du kannst diesem Spiel nicht beitreten.",
-        "game_canceled": "Dieses Spiel wurde abgesagt."
+        "game_canceled": "Dieses Spiel wurde abgesagt.",
+        "is_host_closed": "Dieses Spiel ist geschlossen: Nur wer den Link zu diesem Spiel hat, kann beitreten."
     },
     "lobby_challenges_you_badge": "Fordert dich heraus!",
     "sort_recently_played": "Zuletzt gespielt",
@@ -886,7 +983,9 @@
         "empty": "Noch keine Turnierserien.",
         "load_error": "Turnierserien konnten nicht geladen werden",
         "next": "Nächste:",
-        "last_winner": "Letzter Gewinner:",
+        "last_winner": "Zuletzt gewonnen:",
+        "last_winner_male": "Letzter Gewinner:",
+        "last_winner_female": "Letzte Gewinnerin:",
         "see_all": "Alle Serien anzeigen"
     },
     "tournament_series_page": {
@@ -1030,7 +1129,8 @@
         "challenge_player": "einen Spieler herausfordern",
         "challenge_same_target": "diesen Spieler erneut herausfordern",
         "analyze_position": "Positionen analysieren",
-        "channel_slow_mode": "langsamer Modus"
+        "channel_slow_mode": "langsamer Modus",
+        "create_hexplorer_study": "Hexplorer-Studien erstellen"
     },
     "head_to_head": "Direktvergleich",
     "never_played_together": "Du hast bisher noch nicht gegen diesen Spieler gespielt.",
@@ -1107,7 +1207,11 @@
         "opening_moves": "Häufigste Eröffnungszüge",
         "opening_moves_note": "Für Bretter der Größe {{boardsize}}, der am häufigsten gespielten Größe.",
         "rating_distribution": "Wertungsverteilung",
-        "rating_distribution_note": "Nur Nicht-Bot-Spieler mit einer stabilisierten Wertung (Abweichung unter {{deviation}}) werden gezählt. Gäste sind eingeschlossen."
+        "rating_distribution_note": "Nur Nicht-Bot-Spieler mit einer stabilisierten Wertung (Abweichung unter {{deviation}}) werden gezählt. Gäste sind eingeschlossen.",
+        "lobby_join_chances": "Chancen, dass einem Live-Spiel beigetreten wird",
+        "lobby_join_chances_first_minute": "< 1 Min.",
+        "lobby_join_chances_next_minutes": "+10 Min.",
+        "lobby_join_chances_note": "Anteil der in der Lobby erstellten Live-Spiele, die innerhalb der ersten Minute einen Gegner finden, dann innerhalb der nächsten 10 Minuten, wenn nach der ersten Minute niemand beigetreten ist. Geschätzt über die letzten 8 Wochen, als ob die Hosts gewartet hätten, statt abzubrechen. Zeiten in deiner lokalen Zeitzone (UTC{{offset}})."
     },
     "board_mount_error": {
         "error": "Das Spielbrett konnte nicht angezeigt werden, ein Fehler ist aufgetreten:",
@@ -1295,7 +1399,17 @@
             "invalid_fixed_fill": "Ungültige feste Farben der Felder außerhalb des Rätsels",
             "fixed_fill_not_disabled": "{{move}} hat eine feste Farbe, liegt aber nicht außerhalb des Rätsels",
             "fixed_fill_twice": "{{move}} hat doppelt eine feste Farbe",
-            "invalid_type": "Ungültige(r) {{property}}"
+            "invalid_type": "Ungültige(r) {{property}}",
+            "generator_initial_not_winning": "Der Mohex-Solver findet hier keinen Gewinnzug für die spielende Seite",
+            "generator_depends_on_disabled_cells": "Die spielende Seite gewinnt nur mit Hilfe von Feldern außerhalb des Puzzles: Markiere im Positionsschritt Steine, die mit ihrem Rand verbunden sind",
+            "generator_already_connected": "Hier ist bereits eine Verbindung vorhanden, nichts zu generieren",
+            "generator_unproven": "Kein Gewinnzug rechtzeitig bewiesen, Zweig bleibt leer",
+            "generator_budget_exceeded": "Baum zu groß, Zweig bleibt leer",
+            "generator_parallel_dropped": "Eindringen {{move}} in eine gegnerische Brücke konnte nicht als parallele Sequenz hinzugefügt werden, dieser Zug lässt das Puzzle scheitern",
+            "generator_accepted_losing": "Dieser Zug wird akzeptiert, aber der Mohex-Solver beweist, dass er verliert",
+            "generator_accepted_unproven": "Dieser Zug wird akzeptiert, aber der Mohex-Solver beweist nicht, dass er gewinnt: Er wird nicht fortgesetzt",
+            "generator_failed_winning": "Dieser Zug scheitert, aber der Mohex-Solver beweist, dass er gewinnt",
+            "generator_invalid_tree": "Generierter Baum ist ungültig ({{error}})"
         },
         "editor": {
             "optional": "Optional",
@@ -1460,7 +1574,24 @@
             "errors_count_other": "{{count}} Probleme zu beheben, siehe Reiter Veröffentlichen",
             "save_and_publish": "Speichern und veröffentlichen",
             "delete": "Löschen",
-            "delete_confirm": "Dieses Rätsel löschen?"
+            "delete_confirm": "Dieses Rätsel löschen?",
+            "solver_position": "Position für Mohex",
+            "solver_position_help": "Mohex spielt auf dem ganzen Brett: Prüfe, dass die Felder außerhalb des Puzzles der Position entsprechend gefüllt sind und dass mit einem Rand verbundene Steine markiert sind.",
+            "check_section": "Puzzle prüfen",
+            "generate": "Baum generieren",
+            "generate_tab": "Generierung",
+            "generate_help": "Vervollständigt den Baum ab dem ausgewählten Knoten und behält bestehende Züge: Gewinnzüge und Widerlegungen von Mohex, Antworten des Computers von Katahex.",
+            "generate_templates": "Bei einer Verbindung durch Template stoppen, bis zu",
+            "generate_templates_none": "Kein Template: Das Puzzle endet erst, wenn die Verbindung vollständig ist.",
+            "generate_templates_help": "Das Puzzle endet, sobald die Verbindung mit diesem Template oder einem kleineren bewiesen ist.",
+            "generate_templates_none_option": "Keines",
+            "generate_from_node": "Ab diesem Knoten generieren",
+            "generate_not_here": "Wähle im Tab Baum einen Knoten der Hauptsequenz vor dem Ende des Puzzles.",
+            "generate_progress": "Positionen werden gelöst: {{done}}/{{total}}",
+            "generate_ok": "Baum generiert.",
+            "generate_warnings": "Warnungen bei der Generierung ({{count}}):",
+            "generate_stop": "Stoppen",
+            "generate_tree_changed": "Der Baum hat sich während der Generierung geändert, das Ergebnis wurde verworfen. Generiere erneut."
         },
         "next_puzzle": "Nächstes Rätsel",
         "collections": {
@@ -1518,7 +1649,12 @@
         "published_ago": "Veröffentlicht {{date}}",
         "sort_by": "Sortieren nach",
         "sort_published_at": "Veröffentlichungsdatum",
-        "sort_created_at": "Hinzufügedatum"
+        "sort_created_at": "Hinzufügedatum",
+        "field_secondary_urls": "Weitere Links",
+        "field_secondary_urls_help": "Falls dieses Video auch auf anderen Plattformen veröffentlicht ist (PeerTube, Dailymotion…). Der Link oben bleibt der Hauptlink.",
+        "add_link": "Link hinzufügen",
+        "remove_link": "Diesen Link entfernen",
+        "watch_on": "Auf {{platform}} ansehen"
     },
     "swap_maps": {
         "title": "Tauschkarten",
@@ -1539,9 +1675,12 @@
     },
     "ladder": {
         "title": "King of the Hill",
+        "title_female": "Queen of the Hill",
         "intro": "Eine Rangliste, ein Thron. Fordere einen Spieler über dir heraus: Wenn du gewinnst, übernimmst du seinen Platz. Je höher du sitzt, desto mehr musst du verteidigen.",
         "king": "King of the Hill",
+        "king_female": "Queen of the Hill",
         "king_for": "König seit {{duration}}",
+        "king_for_female": "Königin seit {{duration}}",
         "no_king": "Der Thron ist leer. Tritt bei und erobere ihn!",
         "join": "King of the Hill beitreten",
         "leave": "Diesen Hügel verlassen",
@@ -1567,13 +1706,16 @@
         "no_running_challenges": "Keine laufende Herausforderung.",
         "vs": "gegen",
         "nobody_to_challenge": "Niemand zum Herausfordern: Du bist der König!",
+        "nobody_to_challenge_female": "Niemand zum Herausfordern: Du bist die Königin!",
         "live": "Live",
         "challenge_overlay": {
             "title": "{{player}} herausfordern",
             "intro": "Das Spiel beginnt sofort. Du spielst zuerst, dein Gegner darf tauschen.",
             "propose_live": "Live-Spiel vorschlagen",
             "propose_live_help": "Dein Gegner kann annehmen oder ablehnen und als Fernspiel spielen. Ohne Antwort innerhalb von 10 Minuten beginnt das Fernspiel.",
-            "defender_not_active": "{{player}} ist gerade nicht auf PlayHex aktiv, du kannst nur einem aktiven Spieler ein Live-Spiel vorschlagen.",
+            "defender_not_active": "{{player}} ist gerade nicht auf PlayHex aktiv, du kannst ein Live-Spiel nur aktiven Spielenden vorschlagen.",
+            "defender_not_active_male": "{{player}} ist gerade nicht auf PlayHex aktiv, du kannst nur einem aktiven Spieler ein Live-Spiel vorschlagen.",
+            "defender_not_active_female": "{{player}} ist gerade nicht auf PlayHex aktiv, du kannst nur einer aktiven Spielerin ein Live-Spiel vorschlagen.",
             "live_time_control": "Live-Zeitkontrolle",
             "submit": "Herausfordern"
         },
@@ -1583,7 +1725,9 @@
         "decline_live": "Als Fernspiel spielen",
         "title_name": {
             "giant_slayer": "Riesentöter",
-            "climber": "Aufsteiger"
+            "climber": "Aufsteiger*in",
+            "climber_male": "Aufsteiger",
+            "climber_female": "Aufsteigerin"
         },
         "title_help": {
             "giant_slayer": "Hat einen König entthront, der 5 Mal oder öfter verteidigt hat",
@@ -1610,7 +1754,10 @@
             "challenge_defended": "{{opponent}} hat den Platz gegen {{player}} verteidigt",
             "challenge_voided": "Das Spiel {{player}} gegen {{opponent}} wurde abgebrochen",
             "new_king": "{{player}} ist der neue King of the Hill!",
-            "giant_slayer": "{{player}} ist ein Riesentöter: hat {{opponent}} entthront!",
+            "new_king_female": "{{player}} ist die neue Queen of the Hill!",
+            "giant_slayer": "{{player}} ist Riesentöter*in: hat {{opponent}} entthront!",
+            "giant_slayer_male": "{{player}} ist ein Riesentöter: hat {{opponent}} entthront!",
+            "giant_slayer_female": "{{player}} ist eine Riesentöterin: hat {{opponent}} entthront!",
             "climber": "{{player}} hat {{wins}} Herausforderungen in Folge gewonnen!",
             "strike": "{{player}} hat in einem Spiel die Zeit überschritten (Verwarnung {{strikes}})",
             "cheat": "{{player}} wurde wegen Betrugs ans Ende verschoben, Spiel gegen {{opponent}} abgebrochen",
@@ -1627,19 +1774,39 @@
             "rejoin_too_early": "Du kannst King of the Hill noch nicht wieder beitreten.",
             "not_member": "Du bist nicht bei King of the Hill.",
             "cannot_challenge_yourself": "Du kannst dich nicht selbst herausfordern.",
-            "defender_not_member": "Dieser Spieler ist nicht bei King of the Hill.",
-            "out_of_range": "Dieser Spieler ist außerhalb deiner Reichweite.",
+            "defender_not_member": "Diese Person ist nicht bei King of the Hill.",
+            "defender_not_member_male": "Dieser Spieler ist nicht bei King of the Hill.",
+            "defender_not_member_female": "Diese Spielerin ist nicht bei King of the Hill.",
+            "out_of_range": "Diese Person ist außerhalb deiner Reichweite.",
+            "out_of_range_male": "Dieser Spieler ist außerhalb deiner Reichweite.",
+            "out_of_range_female": "Diese Spielerin ist außerhalb deiner Reichweite.",
             "invalid_boardsize": "Diese Brettgröße ist nicht erlaubt.",
             "no_outgoing_slot": "Du hast bereits so viele Herausforderungen gesendet, wie dein Platz erlaubt.",
-            "defender_incoming_full": "Dieser Spieler kann gerade keine weiteren Herausforderungen erhalten.",
-            "defender_cooling_down": "Dieser Spieler hat gerade ein Spiel beendet und kann ab {{date}} wieder herausgefordert werden.",
-            "opponent_cooldown": "Du hast kürzlich gegen diesen Spieler gespielt. Du kannst ihn ab {{date}} wieder herausfordern.",
-            "diversity_limit": "Zu viele deiner letzten Spiele waren gegen diesen Spieler.",
-            "defender_diversity_limit": "Zu viele der letzten Spiele dieses Spielers waren gegen dich.",
-            "already_playing_opponent": "Du hast bereits ein laufendes Spiel gegen diesen Spieler.",
+            "defender_incoming_full": "Diese Person kann gerade keine weiteren Herausforderungen erhalten.",
+            "defender_incoming_full_male": "Dieser Spieler kann gerade keine weiteren Herausforderungen erhalten.",
+            "defender_incoming_full_female": "Diese Spielerin kann gerade keine weiteren Herausforderungen erhalten.",
+            "defender_cooling_down": "Diese Person hat gerade ein Spiel beendet und kann ab {{date}} wieder herausgefordert werden.",
+            "defender_cooling_down_male": "Dieser Spieler hat gerade ein Spiel beendet und kann ab {{date}} wieder herausgefordert werden.",
+            "defender_cooling_down_female": "Diese Spielerin hat gerade ein Spiel beendet und kann ab {{date}} wieder herausgefordert werden.",
+            "opponent_cooldown": "Du hast kürzlich gegen diese Person gespielt. Du kannst sie ab {{date}} wieder herausfordern.",
+            "opponent_cooldown_male": "Du hast kürzlich gegen diesen Spieler gespielt. Du kannst ihn ab {{date}} wieder herausfordern.",
+            "opponent_cooldown_female": "Du hast kürzlich gegen diese Spielerin gespielt. Du kannst sie ab {{date}} wieder herausfordern.",
+            "diversity_limit": "Zu viele deiner letzten Spiele waren gegen diese Person.",
+            "diversity_limit_male": "Zu viele deiner letzten Spiele waren gegen diesen Spieler.",
+            "diversity_limit_female": "Zu viele deiner letzten Spiele waren gegen diese Spielerin.",
+            "defender_diversity_limit": "Zu viele der letzten Spiele dieser Person waren gegen dich.",
+            "defender_diversity_limit_male": "Zu viele der letzten Spiele dieses Spielers waren gegen dich.",
+            "defender_diversity_limit_female": "Zu viele der letzten Spiele dieser Spielerin waren gegen dich.",
+            "already_playing_opponent": "Du hast bereits ein laufendes Spiel gegen diese Person.",
+            "already_playing_opponent_male": "Du hast bereits ein laufendes Spiel gegen diesen Spieler.",
+            "already_playing_opponent_female": "Du hast bereits ein laufendes Spiel gegen diese Spielerin.",
             "live_time_control_not_live": "Diese Zeitkontrolle ist keine Live-Zeitkontrolle.",
-            "defender_not_active": "Dein Gegner ist gerade nicht aktiv, du kannst kein Live-Spiel vorschlagen.",
-            "challenger_not_active": "Dein Herausforderer ist nicht mehr aktiv, du kannst das Live-Spiel nicht annehmen."
+            "defender_not_active": "Dein Gegenüber ist gerade nicht aktiv, du kannst kein Live-Spiel vorschlagen.",
+            "defender_not_active_male": "Dein Gegner ist gerade nicht aktiv, du kannst kein Live-Spiel vorschlagen.",
+            "defender_not_active_female": "Deine Gegnerin ist gerade nicht aktiv, du kannst kein Live-Spiel vorschlagen.",
+            "challenger_not_active": "Wer dich herausgefordert hat, ist nicht mehr aktiv, du kannst das Live-Spiel nicht annehmen.",
+            "challenger_not_active_male": "Dein Herausforderer ist nicht mehr aktiv, du kannst das Live-Spiel nicht annehmen.",
+            "challenger_not_active_female": "Deine Herausforderin ist nicht mehr aktiv, du kannst das Live-Spiel nicht annehmen."
         },
         "not_found": "King of the Hill nicht gefunden.",
         "invalid_incoming_slots": "Ungültige Anzahl an Herausforderungen.",
@@ -1782,5 +1949,358 @@
             }
         },
         "check_device_code": "Stelle sicher, dass dieser Code mit dem auf deinem Gerät angezeigten übereinstimmt:"
-    }
+    },
+    "pronouns": {
+        "title": "Pronomen",
+        "explain": "Diese Pronomen sind öffentlich: Sie erscheinen auf deinem Profil und beim Klick auf deinen Benutzernamen. Sie werden außerdem verwendet, um die Texte der Oberfläche an dich anzupassen, und wie sie dich gegenüber anderen Spielenden bezeichnet.",
+        "save_error": "Pronomen konnten nicht gespeichert werden. Bitte versuche es erneut.",
+        "he/him": "er/ihm",
+        "she/her": "sie/ihr",
+        "they/them": "neutral",
+        "unspecified": "Keine Pronomen angegeben"
+    },
+    "player_popover": {
+        "on_playhex_since": "Seit {{duration}} auf PlayHex"
+    },
+    "closed_game": "Geschlossenes Spiel",
+    "closed_game_help": "Dieses Spiel erscheint nicht in der Lobby anderer Spielender. Nur Personen mit dem Link können beitreten, auch wenn sie noch nicht auf PlayHex sind.",
+    "closed_game_invite": {
+        "link_label": "Link zum Senden an Freunde",
+        "share": "Teilen"
+    },
+    "chat_header": {
+        "game_started": "Spiel gestartet",
+        "game_ended": "Spiel beendet",
+        "game_canceled": "Spiel abgebrochen"
+    },
+    "host_waiting_join_chance_first_minute": "Zu dieser Tageszeit wird {{percent}} der Spiele innerhalb der ersten Minute beigetreten.",
+    "host_waiting_join_chance_next_minutes": "Noch niemand ist beigetreten. Wer 10 Minuten länger wartet, findet in {{percent}} der Fälle einen Gegner.",
+    "match_title_in_tournament": "{{ match }} von {{ tournament }}",
+    "chat_message_visibility": "Sichtbarkeit der Nachricht",
+    "chat_attach_to_move_toggle": "Diese Nachricht unter Zug {{n}} anzeigen",
+    "chat_message_visibility_public": "Öffentlich",
+    "chat_message_visibility_private": "Persönliche Notizen",
+    "chat_message_visibility_malkovich": "Malkovich",
+    "chat_message_placeholder_private": "Persönliche Notiz, nur für dich sichtbar…",
+    "chat_message_placeholder_malkovich": "Malkovich, für alle sichtbar, sobald das Spiel vorbei ist…",
+    "chat_new_messages": "Neu",
+    "set_password": "Passwort festlegen",
+    "set_password_explain": "Dein Konto hat noch kein Passwort. Lege ein Passwort fest, um dich auch mit deinem Benutzernamen „{{login}}“ anzumelden.",
+    "saved": "Gespeichert",
+    "or": "oder",
+    "log_in_with_discord": "Mit Discord anmelden",
+    "must_be_logged_in": "Du musst angemeldet sein",
+    "same_pseudo": "Das ist bereits dein Benutzername",
+    "pseudo_change_limit_reached": "Du hast deinen Benutzernamen in letzter Zeit zu oft geändert",
+    "must_set_password_first": "Lege zuerst ein Passwort fest, sonst könntest du dich nicht mehr anmelden",
+    "discord_login_failed": "Anmeldung mit Discord fehlgeschlagen, bitte versuche es erneut",
+    "discord_login_cancelled": "Anmeldung mit Discord wurde abgebrochen",
+    "discord_already_linked": "Dieses Discord-Konto ist bereits mit einem anderen PlayHex-Konto verknüpft",
+    "discord_account_creation_rate_limited": "In letzter Zeit wurden zu viele Konten erstellt, bitte versuche es später erneut",
+    "change_pseudo": {
+        "title": "Benutzernamen ändern",
+        "new_pseudo": "Neuer Benutzername",
+        "submit": "Benutzernamen ändern",
+        "confirm": "Benutzernamen in „{{pseudo}}“ ändern?",
+        "success": "Dein Benutzername wurde geändert.",
+        "next_allowed_at": "Du hast deinen Benutzernamen in letzter Zeit zu oft geändert. Du kannst ihn am {{date}} wieder ändern.",
+        "old_pseudo_released": "Dein alter Benutzername wird für andere verfügbar. Links zu deiner alten Profil-URL werden auf die neue weitergeleitet. Du meldest dich dann mit deinem neuen Benutzernamen an.",
+        "remaining_one": "Du kannst deinen Benutzernamen innerhalb von 30 Tagen noch {{count}} Mal ändern.",
+        "remaining_other": "Du kannst deinen Benutzernamen innerhalb von 30 Tagen noch {{count}} Mal ändern.",
+        "former_pseudo_note_one": "Dein Profil zeigt {{count}} Tag lang „früher {pseudo}“ an.",
+        "former_pseudo_note_other": "Dein Profil zeigt {{count}} Tage lang „früher {pseudo}“ an."
+    },
+    "formerly": "früher",
+    "discord_account": {
+        "title": "Discord",
+        "private": "Nur du siehst dein verknüpftes Discord-Konto, es wird nicht auf deinem Profil angezeigt.",
+        "explain": "Verknüpfe dein Discord-Konto, um dich mit Discord anzumelden.",
+        "link": "Mein Discord-Konto verknüpfen",
+        "linked_to": "Verknüpft mit dem Discord-Konto {username}. Du kannst dich mit Discord anmelden.",
+        "unlink": "Verknüpfung aufheben",
+        "unlink_confirm": "Verknüpfung mit deinem Discord-Konto aufheben? Du kannst dich dann nicht mehr mit Discord anmelden.",
+        "set_password_to_unlink": "Lege zuerst ein Passwort fest, um die Verknüpfung mit Discord aufzuheben, damit du dich weiterhin anmelden kannst."
+    },
+    "recovery_email": {
+        "title": "Wiederherstellungs-E-Mail",
+        "explain": "Optional. Wird verwendet, um dich bezüglich der Sicherheit deines Kontos zu kontaktieren, z. B. wenn du dein Passwort verlierst.",
+        "email": "E-Mail",
+        "private": "Deine E-Mail ist privat und wird anderen nie angezeigt. Leer lassen, um sie zu entfernen.",
+        "invalid": "Ungültige E-Mail"
+    },
+    "cancel_request": {
+        "ask": "Abbruch vorschlagen",
+        "player_wants_to_cancel": "{{ player }} schlägt vor, das Spiel abzubrechen",
+        "accept": "Abbruch annehmen",
+        "reject": "Ablehnen",
+        "request_denied": "Die Anfrage von {{ player }}, das Spiel abzubrechen, wurde abgelehnt.",
+        "game_canceled_by_agreement": "Spiel im Einvernehmen beider Seiten abgebrochen, vorgeschlagen von {{ player }}.",
+        "confirm_overlay": {
+            "title": "Abbruch des Spiels vorschlagen?",
+            "message": "Dies sendet eine Anfrage an deinen Gegner, die angenommen oder abgelehnt werden kann. Bei Annahme wird das Spiel abgebrochen und nicht gewertet.",
+            "confirmLabel": "Ja, Anfrage senden",
+            "cancelLabel": "Nein, weiterspielen"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer live",
+        "tab_live": "Live",
+        "tab_play": "Spielen",
+        "bot_unavailable": "nicht verfügbar",
+        "tab_chat": "Chat",
+        "live": "Live",
+        "stream": "Stream",
+        "stream_description": "Teile einen Link: Alle können deine Analyse live verfolgen, deinen Cursor sehen und chatten.",
+        "start_stream": "Stream starten",
+        "stop_stream": "Stream beenden",
+        "share_link": "Link zum Teilen",
+        "copy_link": "Link kopieren",
+        "match": "Ab dieser Position spielen",
+        "match_description": "Spiele eine Partie ab der Position auf dem Brett, gegen einen Bot oder eine andere Person. Danach wird die Partie als Variante zu deiner Analyse hinzugefügt.",
+        "i_play": "Ich spiele",
+        "opponent": "Gegner",
+        "opponent_player": "Eine Person",
+        "invite_player_optional": "Jemanden einladen (optional)",
+        "invite_player_help": "Eingeladene Personen erhalten eine Benachrichtigung und können als Einzige beitreten. Ansonsten kann die erste Person spielen, die den Link öffnet.",
+        "validate_setup_first": "Bestätige zuerst die Setup-Position.",
+        "start_match": "Partie starten",
+        "back_to_analysis": "Zurück zur Analyse",
+        "back_to_match": "Zurück zur Partie",
+        "waiting_for_opponent": "Warte auf einen Gegner…",
+        "waiting_for_player": "Warte auf {{pseudo}}…",
+        "you": "Du",
+        "your_turn": "Du bist dran",
+        "swap_hint": "Klicke auf den Stein, um zu tauschen.",
+        "wins": "gewinnt",
+        "wins_by_resignation": "gewinnt durch Aufgabe",
+        "match_expired": "Partie beendet: zu lange kein Zug.",
+        "match_canceled": "Partie abgebrochen.",
+        "join_match": "Diese Partie spielen",
+        "cancel_match": "Partie abbrechen",
+        "hosted_by": "Veranstaltet von",
+        "session_ended": "Diese Sitzung ist beendet.",
+        "waiting_for_stream": "Warte auf den Stream…",
+        "open_copy": "Kopie öffnen",
+        "open_copy_failed": "Kopie konnte nicht geöffnet werden.",
+        "invitation_toast": "{{pseudo}} lädt dich zu einer Partie ab einer Hexplorer-Position ein.",
+        "invitation_open": "Öffnen",
+        "live_elsewhere": "Du bist bereits mit einer anderen Studie live. Nur eine Live-Sitzung gleichzeitig.",
+        "go_to_live_study": "Dorthin wechseln",
+        "back_to_live": "Dein Hexplorer-Stream läuft noch: zurück zum Stream",
+        "errors": {
+            "session_not_found": "Diese Live-Sitzung existiert nicht mehr.",
+            "already_live": "Du bist bereits in einem anderen Tab live. Beende das zuerst.",
+            "not_host": "Nur der Host kann das tun.",
+            "match_already_running": "Es läuft bereits eine Partie.",
+            "position_already_won": "Diese Position ist bereits gewonnen.",
+            "bot_unavailable": "Dieser Bot ist gerade nicht verfügbar.",
+            "invalid_invited_player": "Diese Person kann nicht eingeladen werden.",
+            "cannot_join": "Du kannst dieser Partie nicht beitreten.",
+            "match_not_playing": "Diese Partie wird nicht gespielt.",
+            "not_your_turn": "Du bist nicht am Zug.",
+            "not_a_player": "Du spielst in dieser Partie nicht mit.",
+            "invalid_data": "Ungültige Daten.",
+            "illegal_move": "Dieser Zug kann nicht gespielt werden.",
+            "study_required": "Speichere die Analyse zuerst als Studie."
+        }
+    },
+    "social_preview": {
+        "default_description": "Spiele das Brettspiel Hex online, gegen andere oder gegen die KI. Turniere, Puzzles, Spielanalyse.",
+        "by": "von {{author}}",
+        "game": {
+            "canceled_title": "Abgebrochenes Hex-Spiel",
+            "canceled_description": "Dieses Hex-Spiel {{boardsize}} wurde abgebrochen.",
+            "waiting_title": "Offenes Hex-Spiel von {{player}}",
+            "waiting_title_anonymous": "Offenes Hex-Spiel",
+            "waiting_description": "Hex-Spiel {{boardsize}}, {{timeControl}}, wartet auf einen Gegner. Tritt auf PlayHex bei.",
+            "ranked": "gewertet",
+            "friendly": "freundschaftlich",
+            "playing_description": "Spiel läuft, sieh es live auf PlayHex.",
+            "outcome_path": "{{winner}} hat durch Verbinden der eigenen Seiten gewonnen",
+            "outcome_resign": "{{winner}} hat durch Aufgabe gewonnen",
+            "outcome_time": "{{winner}} hat auf Zeit gewonnen",
+            "outcome_forfeit": "{{winner}} hat kampflos gewonnen",
+            "winner": "{{winner}} gewinnt",
+            "image_alt": "Endposition des Hex-Spiels {{title}}",
+            "open_game": "Offenes Spiel",
+            "join": "Tritt auf PlayHex bei",
+            "playing": "Spiel läuft",
+            "cadency_live": "Live",
+            "cadency_correspondence": "Fernspiel",
+            "n_moves_one": "{{count}} Zug",
+            "n_moves_other": "{{count}} Züge"
+        },
+        "tournament": {
+            "starts_at": "Beginnt {{date}}",
+            "running": "Turnier läuft",
+            "rank_1": "1.: {{player}}",
+            "rank_2": "2.: {{player}}",
+            "rank_3": "3.: {{player}}",
+            "canceled": "Turnier abgesagt",
+            "hex_tournament": "Hex-Turnier",
+            "n_registered_one": "{{count}} Anmeldung",
+            "n_registered_other": "{{count}} Anmeldungen",
+            "n_participants_one": "{{count}} Teilnahme",
+            "n_participants_other": "{{count}} Teilnehmende"
+        },
+        "tournament_series": {
+            "next": "Nächstes: {{title}}, {{date}}",
+            "hex_tournaments": "Hex-Turniere",
+            "n_editions_one": "{{count}} Ausgabe gespielt",
+            "n_editions_other": "{{count}} Ausgaben gespielt"
+        },
+        "puzzle": {
+            "default_title": "Hex-Puzzle",
+            "red_to_play": "Rot am Zug gewinnt",
+            "blue_to_play": "Blau am Zug gewinnt",
+            "label": "Puzzle",
+            "hex_puzzle_by": "Hex-Puzzle von {{author}}"
+        },
+        "hexplorer_study": {
+            "default_title": "Hexplorer-Studie",
+            "label": "Studie",
+            "hex_study_by": "Hex-Studie von {{author}}"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "Hex-Puzzles von {{author}}",
+            "n_puzzles_one": "{{count}} Hex-Puzzle",
+            "n_puzzles_other": "{{count}} Hex-Puzzles"
+        },
+        "player": {
+            "title": "{{player}}, Hex-Spieler*in",
+            "title_male": "{{player}}, Hex-Spieler",
+            "title_female": "{{player}}, Hex-Spielerin",
+            "bot": "Hex-KI",
+            "rating": "Wertung {{rating}}",
+            "member_since": "Mitglied seit {{date}}",
+            "on_playhex": "Auf PlayHex aktiv",
+            "n_games_one": "{{count}} Spiel gespielt",
+            "n_games_other": "{{count}} Spiele gespielt"
+        },
+        "ladder": {
+            "king": "König: {{player}}",
+            "king_female": "Königin: {{player}}",
+            "reign_one": "Regiert seit {{duration}}, {{count}} Verteidigung",
+            "reign_other": "Regiert seit {{duration}}, {{count}} Verteidigungen",
+            "n_players_one": "{{count}} Person auf dem Hügel",
+            "n_players_other": "{{count}} Personen auf dem Hügel"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hex-Puzzles",
+                "description": "Löse Hex-Puzzles der Community, von Anfänger bis Experte, und erstelle deine eigenen."
+            },
+            "tournaments": {
+                "title": "Hex-Turniere",
+                "description": "Nimm an Online-Hex-Turnieren teil: live und als Fernspiel, im Schweizer System und im K.-o.-System."
+            },
+            "tournament_series": {
+                "title": "Hex-Turnierserien",
+                "description": "Wiederkehrende Hex-Turniere: Folge einer Serie, um zu wissen, wann die nächste Ausgabe gespielt wird."
+            },
+            "ladders": {
+                "title": "King of the Hill",
+                "description": "Erklimme die Hex-Rangliste: Fordere Spielende über dir heraus, übernimm ihren Platz und verteidige den Thron."
+            },
+            "games_archive": {
+                "title": "Hex-Spielarchiv",
+                "description": "Durchsuche alle auf PlayHex gespielten Hex-Spiele."
+            },
+            "videos": {
+                "title": "Hex-Videos",
+                "description": "Videos über Hex von der Community: Tutorials, Strategie, Spielbesprechungen."
+            },
+            "statistics": {
+                "title": "PlayHex-Statistiken",
+                "description": "Spiele, Spielende, Brettgrößen und Gewinnraten auf PlayHex."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Erkunde Hex-Positionen mit KI-Analyse."
+            },
+            "swap_maps": {
+                "title": "Hex-Swap-Karten",
+                "description": "Welche Eröffnungszüge getauscht werden sollten, für jede Brettgröße, berechnet von KataHex."
+            },
+            "guide": {
+                "title": "PlayHex-Leitfaden",
+                "description": "Wie man Hex auf PlayHex spielt: Regeln, KI-Analyse, bedingte Züge, Moderation."
+            },
+            "export_games_data": {
+                "title": "PlayHex-Spieldaten exportieren",
+                "description": "Lade einen Datensatz aller auf PlayHex gespielten Hex-Spiele herunter, frei wiederverwendbar."
+            },
+            "guide_ai_analysis": {
+                "title": "KI-Spielanalyse",
+                "description": "Überprüfe deine Hex-Spiele mit KI: Finde deine Patzer, sieh die besten Züge und erkenne, wann du den Vorteil gewonnen oder verloren hast."
+            },
+            "guide_conditional_moves": {
+                "title": "Bedingte Züge",
+                "description": "Spiele Hex-Fernspiele schneller: Plane deine Antworten auf die nächsten Züge deines Gegners und spiele Leitern automatisch."
+            },
+            "tutorial_rules": {
+                "title": "Hex-Regeln",
+                "description": "Lerne die 2 Regeln von Hex in wenigen Minuten mit einem interaktiven Tutorial und spiele dann deine ersten Spiele gegen einen Bot."
+            },
+            "tutorial_swap": {
+                "title": "Die Tauschregel in Hex",
+                "description": "Die Tauschregel hält Hex-Spiele ausgeglichen."
+            },
+            "tutorial_bridge": {
+                "title": "Die Brücke in Hex",
+                "description": "Die Brücke ist die wichtigste Form in Hex: zwei Steine, die bereits verbunden sind, ohne sich zu berühren. Lerne, wie sie funktioniert, und übe mit Puzzles."
+            },
+            "tutorial_block": {
+                "title": "Hex-Strategie für Anfänger: Blockieren, um zu gewinnen",
+                "description": "In Hex baut Blockieren deinen eigenen Weg: die beste Strategie zu Beginn des Spiels."
+            },
+            "tutorial_ziggurat": {
+                "title": "Das Zikkurat-Template in Hex",
+                "description": "Die Zikkurat ist die zweite Form, die man in Hex kennen sollte: ein Stein in der dritten Reihe, der mit seinem Rand verbunden ist. Lerne, wie sie funktioniert, und übe mit Puzzles."
+            },
+            "cijm_2025": {
+                "title": "Hex-Turnier – Paris 2025",
+                "description": "Zwei Hex-Turniere am 14. und 15. Juni 2025 auf dem Salon Culture & Jeux Mathématiques, Place Saint-Sulpice, Paris. Kostenlos, alle Niveaus."
+            },
+            "cijm_2026": {
+                "title": "Hex-Turnier – Paris 2026",
+                "description": "Riesen-Hex-Turnier am Sonntag, 24. Mai 2026, auf dem Salon Culture & Jeux Mathématiques, Place Saint-Sulpice, Paris. Kostenlos, alle Niveaus, ab 8 Jahren."
+            }
+        },
+        "n_days_one": "{{count}} Tag",
+        "n_days_other": "{{count}} Tage",
+        "n_hours_one": "{{count}} Stunde",
+        "n_hours_other": "{{count}} Stunden"
+    },
+    "game_outcome": {
+        "path": "Verbindung",
+        "resign": "Aufgabe",
+        "time": "Zeit",
+        "forfeit": "Kampflos"
+    },
+    "has_chat_messages": "Mit Chatnachrichten",
+    "has_analyze": "Mit KI-Analyse",
+    "has_malkovich_messages": "Mit Malkovich-Notizen",
+    "game_content_filter": "Inhalt",
+    "filters": "Filter",
+    "reset_filters": "Filter zurücksetzen",
+    "reset_dates": "Daten zurücksetzen",
+    "game_type": "Spieltyp",
+    "game_state_filter": "Status",
+    "opponent_or_players": "Spielende",
+    "one_or_two_players_help": "1 Person: Spiele dieser Person. 2 Personen: Spiele zwischen ihnen.",
+    "search_opponent": "Gegner",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "Alle Filter",
+    "hide_filters": "Weniger Filter",
+    "week_of": "Woche vom {{date}}",
+    "chart_grouping": {
+        "label": "Gruppieren nach",
+        "auto": "Auto",
+        "day": "Tag",
+        "week": "Woche",
+        "month": "Monat"
+    },
+    "n_games_found_one": "{{count}} Spiel gefunden.",
+    "n_games_found_other": "{{count}} Spiele gefunden."
 }

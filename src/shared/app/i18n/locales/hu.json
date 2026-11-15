@@ -8,7 +8,9 @@
         "open_live_games": "Csatlakozás élő játékhoz",
         "open_correspondence_games": "Csatlakozás levelezős játékhoz",
         "no_open_live_games": "Jelenleg nincs nyitott élő játék",
-        "no_open_correspondence_games": "Jelenleg nincs nyitott levelezős játék"
+        "no_open_correspondence_games": "Jelenleg nincs nyitott levelezős játék",
+        "multiple_waiting_games": "Több várakozó játszma:",
+        "others_canceled_once_one_accepted": "Amint valamelyik várakozó játszmádat elfogadják, a többi törlődik."
     },
     "game": {
         "title": "Játék",
@@ -35,13 +37,19 @@
         "playing": "Folyamatban",
         "watch": "Nézés",
         "title_your_turn": "Te jössz!",
-        "title_waiting": "Ellenfélre vár: házigazda"
+        "title_waiting": "Ellenfélre vár: házigazda",
+        "winner": "Győztes",
+        "loser": "Vesztes",
+        "issue": "Eredmény",
+        "moves_count": "Lépések"
     },
     "game_rules": {
         "normal": "szabványos",
         "host_plays_first": "házigazda kezd",
         "host_plays_second": "házigazda lép másodikként",
-        "no_swap": "csere nélkül"
+        "no_swap": "csere nélkül",
+        "handicap_for_host": "{{n}} előny a házigazdának",
+        "handicap_for_opponent": "{{n}} előny az ellenfélnek"
     },
     "game_state": {
         "created": "Létrehozva",
@@ -66,7 +74,8 @@
             "notifications": "Értesítések",
             "ai_workers": "AI workerek",
             "connected_applications": "Csatlakoztatott alkalmazások",
-            "technical_info": "Technikai információk"
+            "technical_info": "Technikai információk",
+            "security": "Biztonság"
         },
         "audio": "Hang",
         "moderation": "Moderálás"
@@ -120,7 +129,33 @@
     "handicap": {
         "title": "Hendikep",
         "none": "nincs",
-        "handicap_for_player": "{{n}} {{player}} részére"
+        "handicap_for_player": "{{n}} {{player}} részére",
+        "you": "te",
+        "opponent": "ellenfél",
+        "ai": "MI",
+        "increase": "Előny növelése",
+        "decrease": "Előny csökkentése",
+        "setup": {
+            "first_stone_then": "{{player}} lerak egy cserélhető követ, majd még {{count}} követ, vagy csere esetén {{swappedCount}} követ.",
+            "first_stone_then_you": "Rakj le egy cserélhető követ, majd még {{count}} követ, vagy csere esetén {{swappedCount}} követ.",
+            "first_stone_for_blue": "{{player}} lerak egy cserélhető követ, majd {{beneficiary}} {{count}} lépést tesz.",
+            "first_stone_for_blue_you": "Rakj le egy cserélhető követ, majd {{beneficiary}} {{count}} lépést tesz.",
+            "first_stone_for_blue_beneficiary": "{{player}} lerak egy cserélhető követ, majd te teszel {{count}} lépést.",
+            "swap_decision": "{{player}} dönt a cseréről: {{beneficiary}} ezután {{swappedCount}} követ rak le, vagy elutasítás esetén {{count}} követ.",
+            "swap_decision_you": "Kattints a kőre a cseréhez: {{beneficiary}} ezután {{swappedCount}} követ rak le, vagy ha elutasítod, {{count}} követ.",
+            "swap_decision_beneficiary": "{{player}} dönt a cseréről: ezután te {{swappedCount}} követ raksz le, vagy elutasítás esetén {{count}} követ.",
+            "stones_after_swap": "Kő kicserélve: {{player}} {{count}} követ rak le.",
+            "stones_after_swap_you": "Kő kicserélve: rakj le {{count}} követ.",
+            "refuse_swap": "Nincs csere",
+            "no_swap_one": "Csere kikapcsolva: {{player}} 1 követ rak le.",
+            "no_swap_other": "Csere kikapcsolva: {{player}} {{count}} követ rak le.",
+            "no_swap_you_one": "Csere kikapcsolva: rakj le 1 követ.",
+            "no_swap_you_other": "Csere kikapcsolva: rakj le {{count}} követ.",
+            "stones_one": "{{player}} még 1 követ rak le.",
+            "stones_other": "{{player}} még {{count}} követ rak le.",
+            "stones_you_one": "Rakj le még 1 követ.",
+            "stones_you_other": "Rakj le még {{count}} követ."
+        }
     },
     "2dots": "{{s}}:",
     "game_created_short": "létrehozva {{ date }}",
@@ -163,7 +198,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "Tudd meg, hogyan számolhatsz AI lépéseket a PlayHex számára a saját számítógépeden",
-        "engine_unavailable": "Néhány AI motornak jelenleg nincs online workere, ezek az AI-k nem érhetők el."
+        "engine_unavailable": "Néhány AI motornak jelenleg nincs online workere, ezek az AI-k nem érhetők el.",
+        "ai_not_available": "Jelenleg nem elérhető"
     },
     "game_analysis": {
         "game_analysis": "AI játékelemzés",
@@ -234,7 +270,12 @@
     },
     "1vAI_friendly": {
         "title": "Játék AI ellen",
-        "create": "Játék AI ellen"
+        "create": "Játék AI ellen",
+        "easy": "Könnyű",
+        "medium": "Közepes",
+        "hard": "Nehéz",
+        "beaten": "Már legyőzve",
+        "unlock_stronger_ais": "Több MI-lehetőség megjelenítése"
     },
     "1vAI_offline": {
         "title": "Offline AI",
@@ -711,7 +752,12 @@
         "block_at_a_distance": "Ne tedd a kövedet közvetlenül az ellenfél köve mellé: egy szomszédos blokkot könnyű megkerülni. Blokkolj messzebbről, hagyj némi helyet: lesz időd válaszolni a lépéseire.",
         "block_remember": "Ne feledd: a Hexben egy jó lépés egyszerre védekező és támadó.",
         "ziggurat_defense_1": "A kék középre hatol: a piros a köve mellé válaszol, és hidat alkot a széllel.",
-        "ziggurat_defense_2": "A kék az első sorba hatol: a piros egy híddal válaszol, és az új kő össze van kötve a széllel."
+        "ziggurat_defense_2": "A kék az első sorba hatol: a piros egy híddal válaszol, és az új kő össze van kötve a széllel.",
+        "demo_0_play": "Játék",
+        "chapters": {
+            "hex_rule": "I. A Hex szabályai",
+            "beginners_strategy": "II. Stratégia kezdőknek"
+        }
     },
     "donate": "Adományozz a PlayHexnek",
     "enable_notifications_overlay": {
@@ -844,7 +890,57 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Másold ki a „Debugging information” részből a tábla alatt",
         "engine_unavailable": "Ehhez a motorhoz jelenleg nincs online AI worker, az állások nem elemezhetők.",
-        "analysis_failed": "Ezt az állást nem sikerült elemezni."
+        "analysis_failed": "Ezt az állást nem sikerült elemezni.",
+        "analyze_in_hexplorer": "Elemzés a Hexplorerben",
+        "play_from_position": "Játék egy pozícióból",
+        "tab_file": "Fájl",
+        "tab_tree": "Fa",
+        "comment": "Megjegyzés",
+        "comment_placeholder": "Írj megjegyzést ehhez a pozícióhoz…",
+        "current_study": "Jelenlegi tanulmány",
+        "new_study": "Új tanulmány",
+        "study_title": "Tanulmány címe",
+        "study_default_title": "Névtelen tanulmány",
+        "study_by": "Szerző: {{author}}",
+        "study_fork": "Elágaztatás",
+        "study_fork_help": "Saját másolat mentése erről a tanulmányról, a módosításokkal",
+        "study_forked_from": "Elágaztatva innen:",
+        "study_share": "Tanulmány megosztása",
+        "study_link_copied": "Link másolva",
+        "study_delete": "Tanulmány törlése",
+        "study_delete_confirm": "Törlöd ezt a tanulmányt? A linkje nem fog többé működni.",
+        "study_too_large": "Ez a tanulmány túl nagy a mentéshez: távolíts el néhány ágat vagy megjegyzést.",
+        "study_not_found": "Ez a tanulmány nem létezik, vagy törölték.",
+        "study_unsaved_changes": "Nem mentett módosítások",
+        "study_save_shortcut": "Tanulmány mentése (Ctrl+S)",
+        "study_validate_setup_first": "A tanulmány mentéséhez lépj ki a felállítási módból.",
+        "study_save_to_share": "Mentsd el a tanulmányt az elágaztatáshoz vagy megosztáshoz.",
+        "my_studies": "Tanulmányaim",
+        "export": "Exportálás",
+        "study_sort": "Tanulmányok rendezése",
+        "study_sort_date_desc": "Legújabb",
+        "study_sort_date_asc": "Legrégebbi",
+        "study_sort_title_asc": "Név A–Z",
+        "study_sort_title_desc": "Név Z–A",
+        "tools_history": "Előzmények",
+        "tools_stones": "Kövek",
+        "tools_marks": "Jelölések",
+        "tools_label": "Címke",
+        "study_discard_confirm": "Nem mentett módosításaid vannak, ezek elvesznek. Folytatod?",
+        "tab_help": "Súgó",
+        "help_what_title": "Mi a Hexplorer?",
+        "help_what": "Ingyenes elemzőtábla a Hexhez: fedezz fel bármilyen pozíciót, próbálj ki több változatot, és nézd meg, mit gondol róluk az MI.",
+        "help_why_title": "Miért használd?",
+        "help_why": "Hogy megértsd a játszmáidat, jobb lépéseket találj, és megoszthasd egy pozícióval kapcsolatos ötleteidet más játékosokkal.",
+        "help_how_title": "Használat",
+        "help_how_play": "Rakj le köveket szabadon egy saját pozíció felépítéséhez",
+        "help_how_import": "vagy importálj egy Hex-játszmát linkből vagy szövegből",
+        "help_how_ai": "A tábla bal oldalán lévő sáv mutatja, ki áll nyerésre, a tábla pedig az MI által mérlegelt lépéseket.",
+        "help_how_setup": "Felállítási módban jelöléseket tehetsz a táblára, és szabadon szerkesztheted a pozíciót",
+        "help_how_file": "Mentsd a tanulmányt (Ctrl+S), oszd meg, vagy exportáld SGF-ként",
+        "help_dismiss": "Értem, ne mutasd újra",
+        "study_nodes_one": "{{count}} csomópont",
+        "study_nodes_other": "{{count}} csomópont"
     },
     "player_menu": {
         "open_menu": "Játékosmenü megnyitása",
@@ -863,7 +959,8 @@
         "reserved_for_other_player": "Ez a játszma egy másik játékosnak fenntartott kihívás.",
         "reserved_for_other_player_named": "Ez a játszma {{pseudo}} számára fenntartott kihívás.",
         "other": "Nem csatlakozhatsz ehhez a játszmához.",
-        "game_canceled": "Ezt a játszmát törölték."
+        "game_canceled": "Ezt a játszmát törölték.",
+        "is_host_closed": "Ez a játszma zárt: csak az csatlakozhat, akinek megvan a játszma linkje."
     },
     "board_mount_error": {
         "error": "A táblát nem sikerült megjeleníteni, hiba történt:",
@@ -1084,7 +1181,8 @@
         "create_game": "játszma létrehozása",
         "challenge_player": "játékos kihívása",
         "challenge_same_target": "ugyanannak a játékosnak az újbóli kihívása",
-        "analyze_position": "állások elemzése"
+        "analyze_position": "állások elemzése",
+        "create_hexplorer_study": "Hexplorer-tanulmányok létrehozása"
     },
     "head_to_head": "Egymás ellen",
     "never_played_together": "Még soha nem játszottál ez ellen a játékos ellen.",
@@ -1238,7 +1336,17 @@
             "fixed_fill_twice": "{{move}} kétszer van rögzített színnel megadva",
             "invalid_type": "Érvénytelen {{property}}",
             "solver_unproven_one": "{{count}} állást nem sikerült időben megoldani, a feladvány csak részben lett ellenőrizve",
-            "solver_unproven_other": "{{count}} állást nem sikerült időben megoldani, a feladvány csak részben lett ellenőrizve"
+            "solver_unproven_other": "{{count}} állást nem sikerült időben megoldani, a feladvány csak részben lett ellenőrizve",
+            "generator_initial_not_winning": "A Mohex megoldó itt nem talál nyerő lépést",
+            "generator_depends_on_disabled_cells": "A győzelem csak a feladaton kívüli mezők segítségével lehetséges: a pozíció lépésnél jelöld meg a saját szélükhöz kapcsolódó köveket",
+            "generator_already_connected": "Itt már van összeköttetés, nincs mit generálni",
+            "generator_unproven": "Nem sikerült időben nyerő lépést bizonyítani, az ág üresen maradt",
+            "generator_budget_exceeded": "A fa túl nagy, az ág üresen maradt",
+            "generator_parallel_dropped": "Az ellenfél hídjába való {{move}} betörést nem lehetett párhuzamos sorozatként hozzáadni, a megjátszása elrontja a feladatot",
+            "generator_accepted_losing": "Ez a lépés elfogadott, de a Mohex megoldó bizonyítja, hogy veszít",
+            "generator_accepted_unproven": "Ez a lépés elfogadott, de a Mohex megoldó nem bizonyítja, hogy nyer: nem folytatódik",
+            "generator_failed_winning": "Ez a lépés hibás, de a Mohex megoldó bizonyítja, hogy nyer",
+            "generator_invalid_tree": "A generált fa érvénytelen ({{error}})"
         },
         "editor": {
             "optional": "Opcionális",
@@ -1403,7 +1511,24 @@
             "warnings_badge_one": "{{count}} ellenőrzési figyelmeztetés",
             "warnings_badge_other": "{{count}} ellenőrzési figyelmeztetés",
             "errors_count_one": "{{count}} javítandó probléma, lásd a Közzététel fület",
-            "errors_count_other": "{{count}} javítandó probléma, lásd a Közzététel fület"
+            "errors_count_other": "{{count}} javítandó probléma, lásd a Közzététel fület",
+            "solver_position": "Pozíció a Mohexnek",
+            "solver_position_help": "A Mohex az egész táblán játszik: ellenőrizd, hogy a feladaton kívüli mezők a pozíciónak megfelelően ki vannak-e töltve, és a szélhez kapcsolódó kövek meg vannak-e jelölve.",
+            "check_section": "Feladat ellenőrzése",
+            "generate": "Fa generálása",
+            "generate_tab": "Generálás",
+            "generate_help": "Kiegészíti a fát a kijelölt csomóponttól, megtartva a meglévő lépéseket: nyerő lépések és cáfolatok a Mohextől, a gép válaszai a Katahextől.",
+            "generate_templates": "Megállás sablonnal elért összeköttetésnél, legfeljebb",
+            "generate_templates_none": "Nincs sablon: a feladat csak az összeköttetés teljessé válásakor ér véget.",
+            "generate_templates_help": "A feladat véget ér, amint az összeköttetés bizonyított ezzel vagy egy kisebb sablonnal.",
+            "generate_templates_none_option": "Nincs",
+            "generate_from_node": "Generálás ettől a csomóponttól",
+            "generate_not_here": "A Fa lapon jelölj ki egy csomópontot a fő sorozatból a feladat vége előtt.",
+            "generate_progress": "Pozíciók megoldása: {{done}}/{{total}}",
+            "generate_ok": "A fa elkészült.",
+            "generate_warnings": "Generálási figyelmeztetések ({{count}}):",
+            "generate_stop": "Leállítás",
+            "generate_tree_changed": "A fa megváltozott a generálás közben, az eredményt figyelmen kívül hagytuk. Generáld újra."
         },
         "next_puzzle": "Következő feladvány",
         "collections": {
@@ -1461,7 +1586,12 @@
         "published_ago": "Közzétéve: {{date}}",
         "sort_by": "Rendezés",
         "sort_published_at": "Közzététel dátuma",
-        "sort_created_at": "Hozzáadás dátuma"
+        "sort_created_at": "Hozzáadás dátuma",
+        "field_secondary_urls": "További linkek",
+        "field_secondary_urls_help": "Ha a videó más platformokon is megjelent (PeerTube, Dailymotion…). A fenti link marad a fő link.",
+        "add_link": "Link hozzáadása",
+        "remove_link": "Link eltávolítása",
+        "watch_on": "Megtekintés itt: {{platform}}"
     },
     "swap_maps": {
         "title": "Cseretérképek",
@@ -1529,13 +1659,20 @@
         "opening_moves": "Leggyakoribb nyitólépések",
         "opening_moves_note": "{{boardsize}} táblákon, a legtöbbet játszott méreten.",
         "rating_distribution": "Értékszám-eloszlás",
-        "rating_distribution_note": "Csak a nem bot játékosok számítanak, akiknek stabil az értékszámuk ({{deviation}} alatti eltérés). A vendégek is benne vannak."
+        "rating_distribution_note": "Csak a nem bot játékosok számítanak, akiknek stabil az értékszámuk ({{deviation}} alatti eltérés). A vendégek is benne vannak.",
+        "lobby_join_chances": "Esély arra, hogy élő játszmádhoz csatlakozzanak",
+        "lobby_join_chances_first_minute": "< 1 perc",
+        "lobby_join_chances_next_minutes": "+10 perc",
+        "lobby_join_chances_note": "A lobbiban létrehozott élő játszmák aránya, amelyek az első percben ellenfelet találnak, majd a következő 10 percben, ha az első perc után senki sem csatlakozott. Az elmúlt 8 hét alapján becsülve, mintha a házigazdák törlés helyett vártak volna. Az időpontok a helyi időzónádban (UTC{{offset}}) látszanak."
     },
     "ladder": {
         "title": "A domb királya",
+        "title_female": "A domb királynője",
         "intro": "Egy létra, egy trón. Hívj ki egy feletted álló játékost: ha nyersz, elfoglalod a helyét. Minél magasabban ülsz, annál többet kell védekezned.",
         "king": "A domb királya",
+        "king_female": "A domb királynője",
         "king_for": "Király {{duration}} óta",
+        "king_for_female": "Királynő {{duration}} óta",
         "no_king": "A trón üres. Csatlakozz és foglald el!",
         "join": "Csatlakozás A domb királyához",
         "leave": "Kilépés erről a dombról",
@@ -1561,6 +1698,7 @@
         "no_running_challenges": "Nincs folyamatban lévő kihívás.",
         "vs": "vs",
         "nobody_to_challenge": "Nincs kit kihívni: te vagy a Király!",
+        "nobody_to_challenge_female": "Nincs kit kihívni: te vagy a Királynő!",
         "live": "Élő",
         "challenge_overlay": {
             "title": "{{player}} kihívása",
@@ -1604,6 +1742,7 @@
             "challenge_defended": "{{opponent}} megvédte a helyét {{player}} ellen",
             "challenge_voided": "A(z) {{player}} vs {{opponent}} játszma törölve lett",
             "new_king": "{{player}} az új Domb királya!",
+            "new_king_female": "{{player}} az új Domb királynője!",
             "giant_slayer": "{{player}} Óriásölő: letaszította {{opponent}} játékost!",
             "climber": "{{player}} egymás után {{wins}} kihívást nyert!",
             "strike": "{{player}} ideje lejárt egy játszmában ({{strikes}}. figyelmeztetés)",
@@ -1782,5 +1921,356 @@
     "n_messages_one": "{{ count }} üzenet",
     "n_messages_other": "{{ count }} üzenet",
     "n_interested_one": "{{ count }} érdeklődő",
-    "n_interested_other": "{{ count }} érdeklődő"
+    "n_interested_other": "{{ count }} érdeklődő",
+    "pronouns": {
+        "title": "Névmások",
+        "explain": "Ezek a névmások nyilvánosak: megjelennek a profilodon és a felhasználónevedre kattintva. Arra is szolgálnak, hogy a felület szövegei hozzád igazodjanak, és hogy hogyan említ téged más játékosoknak.",
+        "save_error": "Nem sikerült menteni a névmásokat. Próbáld újra.",
+        "he/him": "he/him (ő)",
+        "she/her": "she/her (ő)",
+        "they/them": "they/them (ő)",
+        "unspecified": "Nincs megadva névmás"
+    },
+    "player_popover": {
+        "on_playhex_since": "{{duration}} óta a PlayHexen"
+    },
+    "closed_game": "Zárt játszma",
+    "closed_game_help": "Ez a játszma nem jelenik meg más játékosok lobbijában. Csak a link birtokában lehet csatlakozni, akkor is, ha valaki még nincs a PlayHexen.",
+    "closed_game_invite": {
+        "link_label": "Barátnak küldhető link",
+        "share": "Megosztás"
+    },
+    "chat_header": {
+        "game_started": "A játszma elkezdődött",
+        "game_ended": "A játszma véget ért",
+        "game_canceled": "A játszma törölve"
+    },
+    "host_waiting_join_chance_first_minute": "Ebben a napszakban a játszmák {{percent}}-ához az első percben csatlakozik valaki.",
+    "host_waiting_join_chance_next_minutes": "Még senki sem csatlakozott. Ha még 10 percet vársz, a házigazdák {{percent}}-a talál ellenfelet.",
+    "match_title_in_tournament": "{{ tournament }}: {{ match }}",
+    "chat_message_visibility": "Üzenet láthatósága",
+    "chat_attach_to_move_toggle": "Üzenet megjelenítése a(z) {{n}}. lépés alatt",
+    "chat_message_visibility_public": "Nyilvános",
+    "chat_message_visibility_private": "Személyes jegyzetek",
+    "chat_message_visibility_malkovich": "Malkovich",
+    "chat_message_placeholder_private": "Személyes jegyzet, csak te látod…",
+    "chat_message_placeholder_malkovich": "Malkovich, a játszma végén mindenki látja…",
+    "chat_new_messages": "Új",
+    "set_password": "Jelszó beállítása",
+    "set_password_explain": "A fiókodnak még nincs jelszava. Állíts be jelszót, hogy a(z) „{{login}}” felhasználóneveddel is be tudj jelentkezni.",
+    "saved": "Mentve",
+    "or": "vagy",
+    "log_in_with_discord": "Bejelentkezés Discorddal",
+    "must_be_logged_in": "Be kell jelentkezned",
+    "same_pseudo": "Ez már a felhasználóneved",
+    "pseudo_change_limit_reached": "Az utóbbi időben túl sokszor változtattad meg a felhasználóneved",
+    "must_set_password_first": "Előbb állíts be jelszót, különben nem tudnál többé bejelentkezni",
+    "discord_login_failed": "A Discordos bejelentkezés nem sikerült, próbáld újra",
+    "discord_login_cancelled": "A Discordos bejelentkezés megszakadt",
+    "discord_already_linked": "Ez a Discord-fiók már egy másik PlayHex-fiókhoz van kapcsolva",
+    "discord_account_creation_rate_limited": "Az utóbbi időben túl sok fiók jött létre, próbáld később",
+    "change_pseudo": {
+        "title": "Felhasználónév módosítása",
+        "new_pseudo": "Új felhasználónév",
+        "submit": "Felhasználónév módosítása",
+        "confirm": "Módosítod a felhasználóneved erre: „{{pseudo}}”?",
+        "success": "A felhasználóneved megváltozott.",
+        "next_allowed_at": "Az utóbbi időben túl sokszor változtattad meg a felhasználóneved. Ekkor módosíthatod újra: {{date}}.",
+        "old_pseudo_released": "A régi felhasználóneved elérhetővé válik más játékosok számára. A régi profilod címére mutató linkek az újra irányítanak. Ezután az új felhasználóneveddel jelentkezel be.",
+        "remaining_one": "30 napon belül még {{count}} alkalommal módosíthatod a felhasználóneved.",
+        "remaining_other": "30 napon belül még {{count}} alkalommal módosíthatod a felhasználóneved.",
+        "former_pseudo_note_one": "A profilodon {{count}} napig „korábban {pseudo}” látható.",
+        "former_pseudo_note_other": "A profilodon {{count}} napig „korábban {pseudo}” látható."
+    },
+    "formerly": "korábban",
+    "discord_account": {
+        "title": "Discord",
+        "private": "A kapcsolt Discord-fiókodat csak te látod, a profilodon nem jelenik meg.",
+        "explain": "Kapcsold össze a Discord-fiókodat, hogy Discorddal jelentkezhess be.",
+        "link": "Discord-fiókom összekapcsolása",
+        "linked_to": "Összekapcsolva a(z) {username} Discord-fiókkal. Bejelentkezhetsz Discorddal.",
+        "unlink": "Leválasztás",
+        "unlink_confirm": "Leválasztod a Discord-fiókodat? Többé nem tudsz Discorddal bejelentkezni.",
+        "set_password_to_unlink": "A Discord-fiók leválasztásához előbb állíts be jelszót, hogy továbbra is be tudj jelentkezni."
+    },
+    "recovery_email": {
+        "title": "Helyreállítási e-mail",
+        "explain": "Nem kötelező. A fiókod biztonságával kapcsolatos megkereséshez használjuk, például ha elfelejted a jelszavad.",
+        "email": "E-mail",
+        "private": "Az e-mail-címed privát, más játékosok soha nem látják. Hagyd üresen a törléshez.",
+        "invalid": "Érvénytelen e-mail-cím"
+    },
+    "cancel_request": {
+        "ask": "Törlés javaslata",
+        "player_wants_to_cancel": "{{ player }} a játszma törlését javasolja",
+        "accept": "Törlés elfogadása",
+        "reject": "Elutasítás",
+        "request_denied": "{{ player }} játszmatörlési kérését elutasították.",
+        "game_canceled_by_agreement": "A játszma közös megegyezéssel törölve, {{ player }} javaslatára.",
+        "confirm_overlay": {
+            "title": "Javaslod a játszma törlését?",
+            "message": "Ez kérést küld az ellenfelednek, aki elfogadhatja vagy elutasíthatja. Elfogadás esetén a játszma törlődik és nem számít bele semmibe.",
+            "confirmLabel": "Igen, kérés küldése",
+            "cancelLabel": "Nem, játék folytatása"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer élőben",
+        "tab_live": "Élő",
+        "tab_play": "Játék",
+        "bot_unavailable": "nem elérhető",
+        "tab_chat": "Csevegés",
+        "live": "Élő",
+        "stream": "Közvetítés",
+        "stream_description": "Ossz meg egy linket: bárki élőben követheti az elemzésedet, láthatja a kurzorodat és cseveghet.",
+        "start_stream": "Közvetítés indítása",
+        "stop_stream": "Közvetítés leállítása",
+        "share_link": "Megosztható link",
+        "copy_link": "Link másolása",
+        "match": "Játék ebből a pozícióból",
+        "match_description": "Játssz egy játszmát a táblán lévő pozícióból egy bot vagy egy másik játékos ellen. A végén a játszma változatként bekerül az elemzésedbe.",
+        "i_play": "Én játszom",
+        "opponent": "Ellenfél",
+        "opponent_player": "Egy játékos",
+        "invite_player_optional": "Játékos meghívása (nem kötelező)",
+        "invite_player_help": "A meghívott értesítést kap, és csak ő csatlakozhat. Egyébként az játszhat, aki elsőként megnyitja a linket.",
+        "validate_setup_first": "Előbb hagyd jóvá a felállított pozíciót.",
+        "start_match": "Játszma indítása",
+        "back_to_analysis": "Vissza az elemzéshez",
+        "back_to_match": "Vissza a játszmához",
+        "waiting_for_opponent": "Várakozás ellenfélre…",
+        "waiting_for_player": "Várakozás erre: {{pseudo}}…",
+        "you": "Te",
+        "your_turn": "Te jössz",
+        "swap_hint": "Kattints a kőre a cseréhez.",
+        "wins": "nyer",
+        "wins_by_resignation": "feladással nyer",
+        "match_expired": "A játszma véget ért: túl sokáig nem volt lépés.",
+        "match_canceled": "A játszma törölve.",
+        "join_match": "Játszma lejátszása",
+        "cancel_match": "Játszma törlése",
+        "hosted_by": "Házigazda:",
+        "session_ended": "Ez a munkamenet véget ért.",
+        "waiting_for_stream": "Várakozás a közvetítőre…",
+        "open_copy": "Másolat megnyitása",
+        "open_copy_failed": "Nem sikerült megnyitni a másolatot.",
+        "invitation_toast": "{{pseudo}} meghív egy játszmára egy Hexplorer-pozícióból.",
+        "invitation_open": "Megnyitás",
+        "live_elsewhere": "Már közvetítesz egy másik tanulmányból. Egyszerre csak egy élő munkamenet lehet.",
+        "go_to_live_study": "Ugrás oda",
+        "back_to_live": "A Hexplorer-közvetítésed még fut: térj vissza hozzá",
+        "errors": {
+            "session_not_found": "Ez az élő munkamenet már nem létezik.",
+            "already_live": "Már közvetítesz egy másik lapon. Előbb állítsd le.",
+            "not_host": "Ezt csak a házigazda teheti meg.",
+            "match_already_running": "Már folyik egy játszma.",
+            "position_already_won": "Ez a pozíció már eldőlt.",
+            "bot_unavailable": "Ez a bot jelenleg nem elérhető.",
+            "invalid_invited_player": "Ez a játékos nem hívható meg.",
+            "cannot_join": "Nem csatlakozhatsz ehhez a játszmához.",
+            "match_not_playing": "Ez a játszma nem folyik.",
+            "not_your_turn": "Nem te jössz.",
+            "not_a_player": "Nem játszol ebben a játszmában.",
+            "invalid_data": "Érvénytelen adatok.",
+            "illegal_move": "Ez a lépés nem játszható meg.",
+            "study_required": "Előbb mentsd el az elemzést tanulmányként."
+        }
+    },
+    "social_preview": {
+        "default_description": "Játssz Hex társasjátékot online más játékosok vagy MI ellen. Versenyek, feladványok, játszmaelemzés.",
+        "by": "szerző: {{author}}",
+        "game": {
+            "canceled_title": "Törölt Hex-játszma",
+            "canceled_description": "Ez a {{boardsize}} Hex-játszma törölve lett.",
+            "waiting_title": "{{player}} nyitott Hex-játszmája",
+            "waiting_title_anonymous": "Nyitott Hex-játszma",
+            "waiting_description": "{{boardsize}} Hex-játszma, {{timeControl}}, ellenfélre vár. Csatlakozz a PlayHexen.",
+            "ranked": "rangsorolt",
+            "friendly": "barátságos",
+            "playing_description": "Folyamatban lévő játszma, nézd élőben a PlayHexen.",
+            "outcome_path": "{{winner}} a saját oldalai összekötésével nyert",
+            "outcome_resign": "{{winner}} feladással nyert",
+            "outcome_time": "{{winner}} időre nyert",
+            "outcome_forfeit": "{{winner}} játék nélkül nyert",
+            "winner": "{{winner}} nyer",
+            "image_alt": "A(z) {{title}} Hex-játszma végállása",
+            "open_game": "Nyitott játszma",
+            "join": "Csatlakozz a PlayHexen",
+            "playing": "Játszma folyamatban",
+            "cadency_live": "Élő",
+            "cadency_correspondence": "Levelezős",
+            "n_moves_one": "{{count}} lépés",
+            "n_moves_other": "{{count}} lépés"
+        },
+        "tournament": {
+            "starts_at": "Kezdés: {{date}}",
+            "running": "Verseny folyamatban",
+            "rank_1": "1.: {{player}}",
+            "rank_2": "2.: {{player}}",
+            "rank_3": "3.: {{player}}",
+            "canceled": "Verseny törölve",
+            "hex_tournament": "Hex-verseny",
+            "n_registered_one": "{{count}} jelentkezett játékos",
+            "n_registered_other": "{{count}} jelentkezett játékos",
+            "n_participants_one": "{{count}} résztvevő",
+            "n_participants_other": "{{count}} résztvevő"
+        },
+        "tournament_series": {
+            "next": "Következő: {{title}}, {{date}}",
+            "hex_tournaments": "Hex-versenyek",
+            "n_editions_one": "{{count}} lejátszott forduló",
+            "n_editions_other": "{{count}} lejátszott forduló"
+        },
+        "puzzle": {
+            "default_title": "Hex-feladvány",
+            "red_to_play": "Piros lép és nyer",
+            "blue_to_play": "Kék lép és nyer",
+            "label": "Feladvány",
+            "hex_puzzle_by": "Hex-feladvány, szerző: {{author}}"
+        },
+        "hexplorer_study": {
+            "default_title": "Hexplorer-tanulmány",
+            "label": "Tanulmány",
+            "hex_study_by": "Hex-tanulmány, szerző: {{author}}"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "Hex-feladványok, szerző: {{author}}",
+            "n_puzzles_one": "{{count}} Hex-feladvány",
+            "n_puzzles_other": "{{count}} Hex-feladvány"
+        },
+        "player": {
+            "title": "{{player}}, Hex-játékos",
+            "bot": "Hex MI",
+            "rating": "Értékszám: {{rating}}",
+            "member_since": "Tag {{date}} óta",
+            "on_playhex": "Játékos a PlayHexen",
+            "n_games_one": "{{count}} lejátszott játszma",
+            "n_games_other": "{{count}} lejátszott játszma"
+        },
+        "ladder": {
+            "king": "Király: {{player}}",
+            "king_female": "Királynő: {{player}}",
+            "reign_one": "{{duration}} óta uralkodik, {{count}} védés",
+            "reign_other": "{{duration}} óta uralkodik, {{count}} védés",
+            "n_players_one": "{{count}} játékos a dombon",
+            "n_players_other": "{{count}} játékos a dombon"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hex-feladványok",
+                "description": "Oldj meg a közösség által készített Hex-feladványokat kezdőtől szakértőig, és készíts sajátokat."
+            },
+            "tournaments": {
+                "title": "Hex-versenyek",
+                "description": "Csatlakozz online Hex-versenyekhez: élő és levelezős, svájci és kieséses formában."
+            },
+            "tournament_series": {
+                "title": "Hex-versenysorozatok",
+                "description": "Ismétlődő Hex-versenyek: kövess egy sorozatot, hogy tudd, mikor lesz a következő forduló."
+            },
+            "ladders": {
+                "title": "A domb királya",
+                "description": "Mássz fel a Hex-létrán: hívd ki a feletted állókat, foglald el a helyüket, és védd meg a trónt."
+            },
+            "games_archive": {
+                "title": "Hex-játszmák archívuma",
+                "description": "Böngéssz és keress a PlayHexen lejátszott összes Hex-játszma között."
+            },
+            "videos": {
+                "title": "Hex-videók",
+                "description": "A közösség által készített videók a Hexről: oktatóanyagok, stratégia, játszmaelemzések."
+            },
+            "statistics": {
+                "title": "PlayHex-statisztikák",
+                "description": "Játszmák, játékosok, táblaméretek és győzelmi arányok a PlayHexen."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Fedezz fel Hex-pozíciókat MI-elemzéssel."
+            },
+            "swap_maps": {
+                "title": "Hex cseretérképek",
+                "description": "Mely nyitólépéseket érdemes cserélni az egyes táblaméreteken, a KataHex számításai alapján."
+            },
+            "guide": {
+                "title": "PlayHex útmutató",
+                "description": "Hogyan játssz Hexet a PlayHexen: szabályok, MI-elemzés, feltételes lépések, moderálás."
+            },
+            "export_games_data": {
+                "title": "PlayHex játszmaadatok exportálása",
+                "description": "Tölts le egy adatkészletet a PlayHexen lejátszott összes Hex-játszmáról, szabadon felhasználható."
+            },
+            "guide_ai_analysis": {
+                "title": "Játszmaelemzés MI-vel",
+                "description": "Nézd át a Hex-játszmáidat MI-vel: fedezd fel a hibáidat, nézd meg a legjobb lépéseket, és tudd meg, mikor szerezted meg vagy vesztetted el az előnyt."
+            },
+            "guide_conditional_moves": {
+                "title": "Feltételes lépések",
+                "description": "Játssz gyorsabban levelezős Hex-játszmákat: tervezd meg válaszaidat az ellenfél következő lépéseire, és játszd le a létrákat automatikusan."
+            },
+            "tutorial_rules": {
+                "title": "A Hex szabályai",
+                "description": "Tanuld meg a Hex 2 szabályát néhány perc alatt egy interaktív oktatóanyaggal, aztán játszd le első játszmáidat egy bot ellen."
+            },
+            "tutorial_swap": {
+                "title": "A csereszabály a Hexben",
+                "description": "A csereszabály kiegyensúlyozottan tartja a Hex-játszmákat."
+            },
+            "tutorial_bridge": {
+                "title": "A híd a Hexben",
+                "description": "A híd a Hex legfontosabb alakzata: két kő, amelyek érintkezés nélkül már össze vannak kötve. Ismerd meg a működését, és gyakorolj feladványokkal."
+            },
+            "tutorial_block": {
+                "title": "Hex-stratégia kezdőknek: blokkolj a győzelemért",
+                "description": "A Hexben a blokkolás a saját utadat építi: a legjobb stratégia a játszma elején."
+            },
+            "tutorial_ziggurat": {
+                "title": "A zikkurat sablon a Hexben",
+                "description": "A zikkurat a második alakzat, amit a Hexben ismerni kell: a harmadik sorban lévő kő, amely a szélével össze van kötve. Ismerd meg a működését, és gyakorolj feladványokkal."
+            },
+            "cijm_2025": {
+                "title": "Hex-verseny – Párizs 2025",
+                "description": "Két Hex-verseny 2025. június 14-én és 15-én a Kultúra és Matematikai Játékok Szalonján, Place Saint-Sulpice, Párizs. Ingyenes, minden szintnek."
+            },
+            "cijm_2026": {
+                "title": "Hex-verseny – Párizs 2026",
+                "description": "Óriás Hex-verseny 2026. május 24-én, vasárnap, a Kultúra és Matematikai Játékok Szalonján, Place Saint-Sulpice, Párizs. Ingyenes, minden szintnek, 8 éves kortól."
+            }
+        },
+        "n_days_one": "{{count}} nap",
+        "n_days_other": "{{count}} nap",
+        "n_hours_one": "{{count}} óra",
+        "n_hours_other": "{{count}} óra"
+    },
+    "game_outcome": {
+        "path": "Összeköttetés",
+        "resign": "Feladás",
+        "time": "Idő",
+        "forfeit": "Játék nélkül"
+    },
+    "has_chat_messages": "Csevegőüzenetekkel",
+    "has_analyze": "MI-elemzéssel",
+    "has_malkovich_messages": "Malkovich-jegyzetekkel",
+    "game_content_filter": "Tartalom",
+    "filters": "Szűrők",
+    "reset_filters": "Szűrők visszaállítása",
+    "reset_dates": "Dátumok visszaállítása",
+    "game_type": "Játszmatípus",
+    "game_state_filter": "Állapot",
+    "opponent_or_players": "Játékosok",
+    "one_or_two_players_help": "1 játékos: a játékos játszmái. 2 játékos: az egymás elleni játszmáik.",
+    "search_opponent": "Ellenfél",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "Összes szűrő",
+    "hide_filters": "Kevesebb szűrő",
+    "week_of": "{{date}} hete",
+    "chart_grouping": {
+        "label": "Csoportosítás",
+        "auto": "Automatikus",
+        "day": "Nap",
+        "week": "Hét",
+        "month": "Hónap"
+    },
+    "n_games_found_one": "{{count}} játszma található.",
+    "n_games_found_other": "{{count}} játszma található."
 }

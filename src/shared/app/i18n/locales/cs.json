@@ -8,7 +8,9 @@
         "open_live_games": "Připojit se k živé hře",
         "open_correspondence_games": "Připojit se ke korespondenční hře",
         "no_open_live_games": "Momentálně žádné otevřené živé hry",
-        "no_open_correspondence_games": "Momentálně žádné otevřené korespondenční hry"
+        "no_open_correspondence_games": "Momentálně žádné otevřené korespondenční hry",
+        "multiple_waiting_games": "Více čekajících her:",
+        "others_canceled_once_one_accepted": "Jakmile je jedna z vašich čekajících her přijata, ostatní se zruší."
     },
     "game": {
         "title": "Hra",
@@ -35,13 +37,21 @@
         "playing": "Probíhá",
         "watch": "Sledovat",
         "title_your_turn": "Tvůj tah!",
-        "title_waiting": "Čeká na protihráče: hostuje"
+        "title_waiting": "Čeká na protihráče: hostuje",
+        "winner": "Vítěz",
+        "loser": "Poražený",
+        "issue": "Výsledek",
+        "moves_count": "Tahy"
     },
     "game_rules": {
         "normal": "standardní",
-        "host_plays_first": "hostitel hraje první",
+        "host_plays_first": "hostitel(ka) hraje první",
+        "host_plays_first_male": "hostitel hraje první",
+        "host_plays_first_female": "hostitelka hraje první",
         "host_plays_second": "hostitel hraje druhý",
-        "no_swap": "bez výměny"
+        "no_swap": "bez výměny",
+        "handicap_for_host": "handicap {{n}} pro hostitele",
+        "handicap_for_opponent": "handicap {{n}} pro soupeře"
     },
     "game_state": {
         "created": "Vytvořena",
@@ -66,7 +76,8 @@
             "notifications": "Oznámení",
             "ai_workers": "AI workery",
             "connected_applications": "Propojené aplikace",
-            "technical_info": "Technické informace"
+            "technical_info": "Technické informace",
+            "security": "Zabezpečení"
         },
         "audio": "Zvuk",
         "moderation": "Moderace"
@@ -103,7 +114,9 @@
         "title": "Hraji",
         "random": "Náhodně",
         "first": "První",
-        "second": "Druhý"
+        "second": "Druhý/á",
+        "second_male": "Druhý",
+        "second_female": "Druhá"
     },
     "swap_rule": "Pravidlo výměny",
     "enable_swap_rule": "Povolit pravidlo výměny",
@@ -120,7 +133,37 @@
     "handicap": {
         "title": "Handicap",
         "none": "žádný",
-        "handicap_for_player": "{{n}} pro {{player}}"
+        "handicap_for_player": "{{n}} pro {{player}}",
+        "you": "vy",
+        "opponent": "soupeř",
+        "ai": "AI",
+        "increase": "Zvýšit handicap",
+        "decrease": "Snížit handicap",
+        "setup": {
+            "first_stone_then": "{{player}} položí vyměnitelný kámen, pak ještě {{count}}, nebo {{swappedCount}} po výměně.",
+            "first_stone_then_you": "Položte vyměnitelný kámen, pak ještě {{count}}, nebo {{swappedCount}} po výměně.",
+            "first_stone_for_blue": "{{player}} položí vyměnitelný kámen, pak {{beneficiary}} zahraje tahů: {{count}}.",
+            "first_stone_for_blue_you": "Položte vyměnitelný kámen, pak {{beneficiary}} zahraje tahů: {{count}}.",
+            "first_stone_for_blue_beneficiary": "{{player}} položí vyměnitelný kámen, pak zahrajete tahů: {{count}}.",
+            "swap_decision": "{{player}} rozhodne o výměně: {{beneficiary}} pak položí kamenů: {{swappedCount}}, nebo {{count}} při odmítnutí.",
+            "swap_decision_you": "Klikněte na kámen pro výměnu: {{beneficiary}} pak položí kamenů: {{swappedCount}}, nebo {{count}}, pokud odmítnete.",
+            "swap_decision_beneficiary": "{{player}} rozhodne o výměně: pak položíte kamenů: {{swappedCount}}, nebo {{count}} při odmítnutí.",
+            "stones_after_swap": "Kámen vyměněn: {{player}} položí kamenů: {{count}}.",
+            "stones_after_swap_you": "Kámen vyměněn: položte kamenů: {{count}}.",
+            "refuse_swap": "Nevyměňovat",
+            "no_swap_one": "Výměna vypnuta: {{player}} položí 1 kámen.",
+            "no_swap_few": "Výměna vypnuta: {{player}} položí {{count}} kameny.",
+            "no_swap_other": "Výměna vypnuta: {{player}} položí {{count}} kamenů.",
+            "no_swap_you_one": "Výměna vypnuta: položte 1 kámen.",
+            "no_swap_you_few": "Výměna vypnuta: položte {{count}} kameny.",
+            "no_swap_you_other": "Výměna vypnuta: položte {{count}} kamenů.",
+            "stones_one": "{{player}} položí ještě 1 kámen.",
+            "stones_few": "{{player}} položí ještě {{count}} kameny.",
+            "stones_other": "{{player}} položí ještě {{count}} kamenů.",
+            "stones_you_one": "Položte ještě 1 kámen.",
+            "stones_you_few": "Položte ještě {{count}} kameny.",
+            "stones_you_other": "Položte ještě {{count}} kamenů."
+        }
     },
     "2dots": "{{s}}:",
     "game_created_short": "vytvořena {{ date }}",
@@ -159,11 +202,14 @@
     "waiting_for_an_opponent": "Čekání na protihráče…",
     "confirm_overlay": {
         "confirmation": "Potvrzení",
-        "are_you_sure?": "Jste si jistý?"
+        "are_you_sure?": "Opravdu?",
+        "are_you_sure?_male": "Jste si jistý?",
+        "are_you_sure?_female": "Jste si jistá?"
     },
     "workers": {
         "see_how_to_spawn_a_worker": "Zjistit, jak počítat tahy AI pro PlayHex z mého počítače",
-        "engine_unavailable": "Některé AI enginy teď nemají žádný worker online, tyto AI nejsou k dispozici."
+        "engine_unavailable": "Některé AI enginy teď nemají žádný worker online, tyto AI nejsou k dispozici.",
+        "ai_not_available": "Momentálně nedostupné"
     },
     "game_analysis": {
         "game_analysis": "Analýza hry pomocí AI",
@@ -193,7 +239,9 @@
     "pass": "Pasovat",
     "pass_confirm_overlay": {
         "title": "Pasovat tah?",
-        "message": "Chystáte se přeskočit svůj tah. Jste si jistý?",
+        "message": "Chystáte se přeskočit svůj tah. Opravdu?",
+        "message_male": "Chystáte se přeskočit svůj tah. Jste si jistý?",
+        "message_female": "Chystáte se přeskočit svůj tah. Jste si jistá?",
         "confirmLabel": "Ano, pasovat",
         "cancelLabel": "Ne, chci hrát"
     },
@@ -235,7 +283,12 @@
     },
     "1vAI_friendly": {
         "title": "Hrát vs AI",
-        "create": "Hrát vs AI"
+        "create": "Hrát vs AI",
+        "easy": "Lehká",
+        "medium": "Střední",
+        "hard": "Těžká",
+        "beaten": "Už poražena",
+        "unlock_stronger_ais": "Zobrazit další možnosti AI"
     },
     "1vAI_offline": {
         "title": "Offline AI",
@@ -356,7 +409,9 @@
     "tournament_subscribe": "Mám zájem!",
     "tournament_unsubscribe": "Už nemám zájem.",
     "tournament_checkin": "Registrace",
-    "tournament_checkedin": "Registrován",
+    "tournament_checkedin": "Registrován(a)",
+    "tournament_checkedin_male": "Registrován",
+    "tournament_checkedin_female": "Registrována",
     "tournament_checked_in_players": "Registrován",
     "no_player_checked_in_yet": "Zatím se nikdo nezaregistroval.",
     "not_yet_checked_in": "Ještě nezaregistrován",
@@ -420,16 +475,24 @@
         "edited": "Organizátor změnil „{{ field }}“ turnaje: nová hodnota je „{{ value }}“. (Předchozí hodnota byla „{{ oldValue }}“)",
         "player_subscribed": "{{ playerPseudo }} má zájem",
         "player_unsubscribed": "{{ playerPseudo }} už nemá zájem",
-        "player_kicked": "{{ playerPseudo }} byl vyloučen",
-        "player_checked_in": "{{ playerPseudo }} se zaregistroval",
-        "player_banned": "{{ playerPseudo }} byl z tohoto turnaje vyloučen",
+        "player_kicked": "{{ playerPseudo }} byl(a) vyloučen(a)",
+        "player_kicked_male": "{{ playerPseudo }} byl vyloučen",
+        "player_kicked_female": "{{ playerPseudo }} byla vyloučena",
+        "player_checked_in": "{{ playerPseudo }} se zaregistroval(a)",
+        "player_checked_in_male": "{{ playerPseudo }} se zaregistroval",
+        "player_checked_in_female": "{{ playerPseudo }} se zaregistrovala",
+        "player_banned": "{{ playerPseudo }} byl(a) z tohoto turnaje vyloučen(a)",
+        "player_banned_male": "{{ playerPseudo }} byl z tohoto turnaje vyloučen",
+        "player_banned_female": "{{ playerPseudo }} byla z tohoto turnaje vyloučena",
         "changed_admins": "Organizátor přidělil správce: {{ newAdmins }}",
         "started": "Turnaj začal!",
         "match_ended": "Zápas {{ round }}.{{ number }} skončil: {{ winnerPseudo }} zvítězil nad {{ loserPseudo }}.",
         "match_canceled_recreated": "Zápas {{ round }}.{{ number }} byl znovu vytvořen z důvodu zrušení.",
         "ended": "Turnaj skončil."
     },
-    "tournament_player_is_banned": "Vyloučen z tohoto turnaje",
+    "tournament_player_is_banned": "Vyloučen(a) z tohoto turnaje",
+    "tournament_player_is_banned_male": "Vyloučen z tohoto turnaje",
+    "tournament_player_is_banned_female": "Vyloučena z tohoto turnaje",
     "tournament_account_required": "Tento turnaj vyžaduje účet, hosté nejsou povoleni. Nejprve se přihlaste nebo si vytvořte účet.",
     "tournament_not_enough_participants_to_start": "Turnaj nelze spustit. Pro tento formát není dostatek registrovaných účastníků.",
     "now!": "Nyní!",
@@ -454,7 +517,9 @@
     "resign": "Vzdát se",
     "resign_confirm_overlay": {
         "title": "Vzdát hru",
-        "message": "Jste si jistý, že chcete hru vzdát?",
+        "message": "Opravdu chcete hru vzdát?",
+        "message_male": "Jste si jistý, že chcete hru vzdát?",
+        "message_female": "Jste si jistá, že chcete hru vzdát?",
         "confirmLabel": "Ano, vzdávám se",
         "cancelLabel": "Ne, pokračovat ve hře"
     },
@@ -524,7 +589,9 @@
     "invalid_pseudo": "Uživatelské jméno je neplatné",
     "undo": {
         "player_wants_to_takeback": "{{ player }} chce vzít zpět svůj tah",
-        "player_takeback_his_move": "{{ player }} vzal zpět svůj tah.",
+        "player_takeback_his_move": "{{ player }} vzal(a) zpět svůj tah.",
+        "player_takeback_his_move_male": "{{ player }} vzal zpět svůj tah.",
+        "player_takeback_his_move_female": "{{ player }} vzala zpět svůj tah.",
         "takeback_request_denied": "Žádost {{ player }} o vzetí tahu zpět byla zamítnuta.",
         "undo_move": "Vzít zpět",
         "accept": "Přijmout vzetí zpět",
@@ -721,7 +788,12 @@
         "block_at_a_distance": "Nepokládejte svůj kámen těsně ke kameni soupeře: sousední blok se snadno obejde. Blokujte dál a nechte trochu prostoru: budete mít čas odpovídat na jeho tahy.",
         "block_remember": "Pamatujte: v Hexu je dobrý tah obranný i útočný zároveň.",
         "ziggurat_defense_1": "Modrý vniká doprostřed: červený odpovídá vedle svého kamene a vytváří most s okrajem.",
-        "ziggurat_defense_2": "Modrý vniká do první řady: červený odpovídá mostem a nový kámen je spojen s okrajem."
+        "ziggurat_defense_2": "Modrý vniká do první řady: červený odpovídá mostem a nový kámen je spojen s okrajem.",
+        "demo_0_play": "Hrát",
+        "chapters": {
+            "hex_rule": "I. Pravidla Hexu",
+            "beginners_strategy": "II. Strategie pro začátečníky"
+        }
     },
     "donate": "Podpořit PlayHex",
     "enable_notifications_overlay": {
@@ -744,7 +816,9 @@
     "notification": {
         "you_won": "Vyhráli jste hru!",
         "you_lost": "Prohráli jste hru :(",
-        "opponent_moderated": "{{player}} byl moderován. Omlouváme se za nevhodné zprávy, které jste obdrželi."
+        "opponent_moderated": "{{player}} byl(a) moderován(a). Omlouváme se za nevhodné zprávy, které jste obdrželi.",
+        "opponent_moderated_male": "{{player}} byl moderován. Omlouváme se za nevhodné zprávy, které jste obdrželi.",
+        "opponent_moderated_female": "{{player}} byla moderována. Omlouváme se za nevhodné zprávy, které jste obdrželi."
     },
     "player_sent_you_rematch_offer": "{{ player }} vás vyzval na odvetu!",
     "player_sent_rematch_offer": "{{ player }} poslal nabídku odvety",
@@ -793,7 +867,9 @@
     "player_loses_reason": {
         "default": "{player} prohrává.",
         "path": "{player} prohrává.",
-        "time": "{player} vyčerpal čas.",
+        "time": "{player} vyčerpal(a) čas.",
+        "time_male": "{player} vyčerpal čas.",
+        "time_female": "{player} vyčerpala čas.",
         "resign": "{player} se vzdává.",
         "forfeit": "{player} prohrává kontumačně."
     },
@@ -854,7 +930,58 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Zkopírujte z „Debugging information“ pod herní deskou",
         "engine_unavailable": "Pro tento engine teď není online žádný AI worker, pozice nelze analyzovat.",
-        "analysis_failed": "Tuto pozici nelze analyzovat."
+        "analysis_failed": "Tuto pozici nelze analyzovat.",
+        "analyze_in_hexplorer": "Analyzovat v Hexploreru",
+        "play_from_position": "Hrát z pozice",
+        "tab_file": "Soubor",
+        "tab_tree": "Strom",
+        "comment": "Komentář",
+        "comment_placeholder": "Okomentujte tuto pozici…",
+        "current_study": "Aktuální studie",
+        "new_study": "Nová studie",
+        "study_title": "Název studie",
+        "study_default_title": "Studie bez názvu",
+        "study_by": "Od {{author}}",
+        "study_fork": "Rozvětvit",
+        "study_fork_help": "Uložit vlastní kopii této studie i se změnami",
+        "study_forked_from": "Rozvětveno z",
+        "study_share": "Sdílet tuto studii",
+        "study_link_copied": "Odkaz zkopírován",
+        "study_delete": "Smazat tuto studii",
+        "study_delete_confirm": "Smazat tuto studii? Její odkaz přestane fungovat.",
+        "study_too_large": "Tato studie je příliš velká na uložení: odeberte některé větve nebo komentáře.",
+        "study_not_found": "Tato studie neexistuje nebo byla smazána.",
+        "study_unsaved_changes": "Neuložené změny",
+        "study_save_shortcut": "Uložit studii (Ctrl+S)",
+        "study_validate_setup_first": "Pro uložení studie ukončete režim rozestavení.",
+        "study_save_to_share": "Uložte tuto studii, abyste ji mohli rozvětvit nebo sdílet.",
+        "my_studies": "Moje studie",
+        "export": "Exportovat",
+        "study_sort": "Řadit studie",
+        "study_sort_date_desc": "Nejnovější",
+        "study_sort_date_asc": "Nejstarší",
+        "study_sort_title_asc": "Název A–Z",
+        "study_sort_title_desc": "Název Z–A",
+        "tools_history": "Historie",
+        "tools_stones": "Kameny",
+        "tools_marks": "Značky",
+        "tools_label": "Popisek",
+        "study_discard_confirm": "Máte neuložené změny, budou ztraceny. Pokračovat?",
+        "tab_help": "Nápověda",
+        "help_what_title": "Co je Hexplorer?",
+        "help_what": "Bezplatná analytická deska pro Hex: prozkoumejte jakoukoli pozici, zkuste různé varianty a podívejte se, co si o nich myslí AI.",
+        "help_why_title": "K čemu?",
+        "help_why": "Abyste pochopili své hry, našli lepší tahy a sdíleli své nápady k pozici s ostatními hráči.",
+        "help_how_title": "Jak ho používat",
+        "help_how_play": "Volně pokládejte kameny a vytvořte si vlastní pozici",
+        "help_how_import": "nebo importujte hru Hexu z odkazu či textu",
+        "help_how_ai": "Pruh vlevo od desky ukazuje, kdo vyhrává, a deska ukazuje tahy, které AI zvažuje.",
+        "help_how_setup": "Režim rozestavení umožňuje přidávat značky na desku a volně upravovat pozici",
+        "help_how_file": "Uložte studii (Ctrl+S), sdílejte ji nebo ji exportujte do SGF",
+        "help_dismiss": "Rozumím, už nezobrazovat",
+        "study_nodes_one": "{{count}} uzel",
+        "study_nodes_few": "{{count}} uzly",
+        "study_nodes_other": "{{count}} uzlů"
     },
     "player_menu": {
         "open_menu": "Otevřít menu hráče",
@@ -873,7 +1000,8 @@
         "reserved_for_other_player": "Tato hra je výzva vyhrazená jinému hráči.",
         "reserved_for_other_player_named": "Tato hra je výzva vyhrazená hráči {{pseudo}}.",
         "other": "K této hře se nemůžete připojit.",
-        "game_canceled": "Tato hra byla zrušena."
+        "game_canceled": "Tato hra byla zrušena.",
+        "is_host_closed": "Tato hra je uzavřená: připojit se může jen ten, kdo má odkaz na tuto hru."
     },
     "board_mount_error": {
         "error": "Desku nelze zobrazit, došlo k chybě:",
@@ -943,7 +1071,9 @@
         "empty": "Zatím žádné série turnajů.",
         "load_error": "Série turnajů nelze načíst",
         "next": "Další:",
-        "last_winner": "Poslední vítěz:",
+        "last_winner": "Poslední vítěz(ka):",
+        "last_winner_male": "Poslední vítěz:",
+        "last_winner_female": "Poslední vítězka:",
         "see_all": "Zobrazit všechny série"
     },
     "tournament_series_page": {
@@ -1095,7 +1225,8 @@
         "create_game": "vytváření hry",
         "challenge_player": "vyzývání hráče",
         "challenge_same_target": "opětovné vyzývání tohoto hráče",
-        "analyze_position": "analyzování pozic"
+        "analyze_position": "analyzování pozic",
+        "create_hexplorer_study": "vytváření studií v Hexploreru"
     },
     "head_to_head": "Vzájemné zápasy",
     "never_played_together": "S tímto hráčem jste ještě nikdy nehráli.",
@@ -1250,7 +1381,17 @@
             "invalid_type": "Neplatné {{property}}",
             "solver_unproven_one": "{{count}} pozici nebylo možné včas vyřešit, úloha byla zkontrolována jen částečně",
             "solver_unproven_few": "{{count}} pozice nebylo možné včas vyřešit, úloha byla zkontrolována jen částečně",
-            "solver_unproven_other": "{{count}} pozic nebylo možné včas vyřešit, úloha byla zkontrolována jen částečně"
+            "solver_unproven_other": "{{count}} pozic nebylo možné včas vyřešit, úloha byla zkontrolována jen částečně",
+            "generator_initial_not_winning": "Řešič Mohex zde nenachází žádný vítězný tah",
+            "generator_depends_on_disabled_cells": "Vyhrát lze jen s pomocí polí mimo úlohu: v kroku pozice označte kameny spojené se svým okrajem",
+            "generator_already_connected": "Spojení zde už existuje, není co generovat",
+            "generator_unproven": "Žádný vítězný tah nebyl včas dokázán, větev ponechána prázdná",
+            "generator_budget_exceeded": "Strom je příliš velký, větev ponechána prázdná",
+            "generator_parallel_dropped": "Průnik {{move}} do soupeřova mostu nešlo přidat jako paralelní sekvenci, jeho zahrání úlohu nesplní",
+            "generator_accepted_losing": "Tento tah je přijat, ale řešič Mohex dokazuje, že prohrává",
+            "generator_accepted_unproven": "Tento tah je přijat, ale řešič Mohex nedokazuje, že vyhrává: nepokračuje se v něm",
+            "generator_failed_winning": "Tento tah je chybný, ale řešič Mohex dokazuje, že vyhrává",
+            "generator_invalid_tree": "Vygenerovaný strom je neplatný ({{error}})"
         },
         "editor": {
             "optional": "Volitelné",
@@ -1421,7 +1562,24 @@
             "warnings_badge_other": "{{count}} varování kontroly",
             "errors_count_one": "{{count}} problém k opravě, viz kartu Zveřejnit",
             "errors_count_few": "{{count}} problémy k opravě, viz kartu Zveřejnit",
-            "errors_count_other": "{{count}} problémů k opravě, viz kartu Zveřejnit"
+            "errors_count_other": "{{count}} problémů k opravě, viz kartu Zveřejnit",
+            "solver_position": "Pozice pro Mohex",
+            "solver_position_help": "Mohex hraje na celé desce: zkontrolujte, že pole mimo úlohu jsou vyplněna podle pozice a kameny spojené s okrajem jsou označeny.",
+            "check_section": "Zkontrolovat úlohu",
+            "generate": "Generovat strom",
+            "generate_tab": "Generování",
+            "generate_help": "Doplní strom od vybraného uzlu a zachová existující tahy: vítězné tahy a vyvrácení od Mohexu, odpovědi počítače od Katahexu.",
+            "generate_templates": "Zastavit u spojení šablonou, až do",
+            "generate_templates_none": "Bez šablony: úloha končí až po dokončení spojení.",
+            "generate_templates_help": "Úloha končí, jakmile je spojení dokázáno touto šablonou nebo menší.",
+            "generate_templates_none_option": "Žádná",
+            "generate_from_node": "Generovat od tohoto uzlu",
+            "generate_not_here": "Na kartě Strom vyberte uzel hlavní sekvence před koncem úlohy.",
+            "generate_progress": "Řešení pozic: {{done}}/{{total}}",
+            "generate_ok": "Strom vygenerován.",
+            "generate_warnings": "Varování při generování ({{count}}):",
+            "generate_stop": "Zastavit",
+            "generate_tree_changed": "Strom se během generování změnil, výsledek byl ignorován. Generujte znovu."
         },
         "next_puzzle": "Další úloha",
         "collections": {
@@ -1480,7 +1638,12 @@
         "published_ago": "Zveřejněno {{date}}",
         "sort_by": "Řadit podle",
         "sort_published_at": "Data zveřejnění",
-        "sort_created_at": "Data přidání"
+        "sort_created_at": "Data přidání",
+        "field_secondary_urls": "Další odkazy",
+        "field_secondary_urls_help": "Pokud je toto video zveřejněno i na jiných platformách (PeerTube, Dailymotion…). Odkaz výše zůstává hlavním.",
+        "add_link": "Přidat odkaz",
+        "remove_link": "Odebrat tento odkaz",
+        "watch_on": "Sledovat na {{platform}}"
     },
     "swap_maps": {
         "title": "Mapy výměny",
@@ -1548,13 +1711,20 @@
         "opening_moves": "Nejčastější zahajovací tahy",
         "opening_moves_note": "Pro desky {{boardsize}}, nejhranější velikost.",
         "rating_distribution": "Rozložení ratingu",
-        "rating_distribution_note": "Započítávají se jen hráči, kteří nejsou boti, s ustáleným ratingem (odchylka pod {{deviation}}). Hosté jsou zahrnuti."
+        "rating_distribution_note": "Započítávají se jen hráči, kteří nejsou boti, s ustáleným ratingem (odchylka pod {{deviation}}). Hosté jsou zahrnuti.",
+        "lobby_join_chances": "Šance, že se k živé hře někdo připojí",
+        "lobby_join_chances_first_minute": "< 1 min",
+        "lobby_join_chances_next_minutes": "+10 min",
+        "lobby_join_chances_note": "Podíl živých her vytvořených v lobby, které najdou soupeře během první minuty, a pak během dalších 10 minut, pokud se po první minutě nikdo nepřipojil. Odhad za posledních 8 týdnů, jako by hostitelé čekali místo rušení. Časy jsou ve vašem místním časovém pásmu (UTC{{offset}})."
     },
     "ladder": {
         "title": "Král kopce",
+        "title_female": "Královna kopce",
         "intro": "Jeden žebříček, jeden trůn. Vyzvěte hráče nad sebou: když vyhrajete, zaujmete jeho místo. Čím výš sedíte, tím víc musíte bránit.",
         "king": "Král kopce",
+        "king_female": "Královna kopce",
         "king_for": "Králem {{duration}}",
+        "king_for_female": "Královnou {{duration}}",
         "no_king": "Trůn je prázdný. Připojte se a obsaďte ho!",
         "join": "Připojit se ke Králi kopce",
         "leave": "Opustit tento kopec",
@@ -1580,6 +1750,7 @@
         "no_running_challenges": "Žádná probíhající výzva.",
         "vs": "vs",
         "nobody_to_challenge": "Nikoho k vyzvání: jste Král!",
+        "nobody_to_challenge_female": "Nikoho k vyzvání: jste Královna!",
         "live": "Živě",
         "challenge_overlay": {
             "title": "Vyzvat {{player}}",
@@ -1587,6 +1758,7 @@
             "propose_live": "Navrhnout živou hru",
             "propose_live_help": "Soupeř může přijmout, nebo odmítnout a hrát korespondenčně. Bez odpovědi do 10 minut začne korespondenční hra.",
             "defender_not_active": "{{player}} teď není na PlayHex aktivní, živou hru můžete navrhnout jen aktivnímu hráči.",
+            "defender_not_active_female": "{{player}} teď není na PlayHex aktivní, živou hru můžete navrhnout jen aktivní hráčce.",
             "live_time_control": "Časová kontrola živé hry",
             "submit": "Vyzvat"
         },
@@ -1596,7 +1768,9 @@
         "decline_live": "Hrát korespondenčně",
         "title_name": {
             "giant_slayer": "Přemožitel obrů",
-            "climber": "Horolezec"
+            "climber": "Horolezec/kyně",
+            "climber_male": "Horolezec",
+            "climber_female": "Horolezkyně"
         },
         "title_help": {
             "giant_slayer": "Sesadil krále, který se ubránil 5krát nebo víckrát",
@@ -1613,21 +1787,48 @@
             "empty": "Zatím nic."
         },
         "event": {
-            "join": "{{player}} se připojil na místo #{{position}}",
-            "leave": "{{player}} opustil Krále kopce z místa #{{position}}",
-            "removed_inactive": "{{player}} byl kvůli neaktivitě odebrán z místa #{{position}}",
-            "removed_strikes": "{{player}} byl odebrán z místa #{{position}} po {{strikes}} vypršeních času",
-            "removed_strikes_before_first_game": "{{player}} byl odebrán z místa #{{position}}, protože mu vypršel čas dřív, než dokončil jakoukoli hru",
-            "challenge_won": "{{player}} porazil {{opponent}} a posunul se z #{{from}} na #{{position}}",
-            "challenge_won_no_move": "{{player}} porazil {{opponent}}",
-            "challenge_defended": "{{opponent}} ubránil své místo proti {{player}}",
+            "join": "{{player}} se připojil(a) na místo #{{position}}",
+            "join_male": "{{player}} se připojil na místo #{{position}}",
+            "join_female": "{{player}} se připojila na místo #{{position}}",
+            "leave": "{{player}} opustil(a) Krále kopce z místa #{{position}}",
+            "leave_male": "{{player}} opustil Krále kopce z místa #{{position}}",
+            "leave_female": "{{player}} opustila Krále kopce z místa #{{position}}",
+            "removed_inactive": "{{player}} byl(a) kvůli neaktivitě odebrán(a) z místa #{{position}}",
+            "removed_inactive_male": "{{player}} byl kvůli neaktivitě odebrán z místa #{{position}}",
+            "removed_inactive_female": "{{player}} byla kvůli neaktivitě odebrána z místa #{{position}}",
+            "removed_strikes": "{{player}} byl(a) odebrán(a) z místa #{{position}} po {{strikes}} vypršeních času",
+            "removed_strikes_male": "{{player}} byl odebrán z místa #{{position}} po {{strikes}} vypršeních času",
+            "removed_strikes_female": "{{player}} byla odebrána z místa #{{position}} po {{strikes}} vypršeních času",
+            "removed_strikes_before_first_game": "{{player}} byl(a) odebrán(a) z místa #{{position}}, protože čas vypršel dřív, než byla dokončena jakákoli hra",
+            "removed_strikes_before_first_game_male": "{{player}} byl odebrán z místa #{{position}}, protože mu vypršel čas dřív, než dokončil jakoukoli hru",
+            "removed_strikes_before_first_game_female": "{{player}} byla odebrána z místa #{{position}}, protože jí vypršel čas dřív, než dokončila jakoukoli hru",
+            "challenge_won": "{{player}} porazil(a) {{opponent}} a posunul(a) se z #{{from}} na #{{position}}",
+            "challenge_won_male": "{{player}} porazil {{opponent}} a posunul se z #{{from}} na #{{position}}",
+            "challenge_won_female": "{{player}} porazila {{opponent}} a posunula se z #{{from}} na #{{position}}",
+            "challenge_won_no_move": "{{player}} porazil(a) {{opponent}}",
+            "challenge_won_no_move_male": "{{player}} porazil {{opponent}}",
+            "challenge_won_no_move_female": "{{player}} porazila {{opponent}}",
+            "challenge_defended": "{{opponent}} ubránil(a) své místo proti {{player}}",
+            "challenge_defended_male": "{{opponent}} ubránil své místo proti {{player}}",
+            "challenge_defended_female": "{{opponent}} ubránila své místo proti {{player}}",
             "challenge_voided": "Hra {{player}} vs {{opponent}} byla zrušena",
             "new_king": "{{player}} je nový Král kopce!",
-            "giant_slayer": "{{player}} je Přemožitel obrů: sesadil {{opponent}}!",
-            "climber": "{{player}} vyhrál {{wins}} výzev v řadě!",
-            "strike": "{{player}} nechal ve hře vypršet čas (prohřešek {{strikes}})",
-            "cheat": "{{player}} byl za podvádění přesunut na konec, hra proti {{opponent}} zrušena",
-            "excluded": "{{player}} byl moderátorem vyloučen z místa #{{position}}"
+            "new_king_female": "{{player}} je nová Královna kopce!",
+            "giant_slayer": "{{player}} je Přemožitel(ka) obrů: sesadil(a) {{opponent}}!",
+            "giant_slayer_male": "{{player}} je Přemožitel obrů: sesadil {{opponent}}!",
+            "giant_slayer_female": "{{player}} je Přemožitelka obrů: sesadila {{opponent}}!",
+            "climber": "{{player}} vyhrál(a) {{wins}} výzev v řadě!",
+            "climber_male": "{{player}} vyhrál {{wins}} výzev v řadě!",
+            "climber_female": "{{player}} vyhrála {{wins}} výzev v řadě!",
+            "strike": "{{player}} nechal(a) ve hře vypršet čas (prohřešek {{strikes}})",
+            "strike_male": "{{player}} nechal ve hře vypršet čas (prohřešek {{strikes}})",
+            "strike_female": "{{player}} nechala ve hře vypršet čas (prohřešek {{strikes}})",
+            "cheat": "{{player}} byl(a) za podvádění přesunut(a) na konec, hra proti {{opponent}} zrušena",
+            "cheat_male": "{{player}} byl za podvádění přesunut na konec, hra proti {{opponent}} zrušena",
+            "cheat_female": "{{player}} byla za podvádění přesunuta na konec, hra proti {{opponent}} zrušena",
+            "excluded": "{{player}} byl(a) moderátorem vyloučen(a) z místa #{{position}}",
+            "excluded_male": "{{player}} byl moderátorem vyloučen z místa #{{position}}",
+            "excluded_female": "{{player}} byla moderátorem vyloučena z místa #{{position}}"
         },
         "load_more": "Načíst další",
         "load_error": "Krále kopce nelze načíst",
@@ -1641,18 +1842,28 @@
             "not_member": "Nejste v Králi kopce.",
             "cannot_challenge_yourself": "Nemůžete vyzvat sami sebe.",
             "defender_not_member": "Tento hráč není v Králi kopce.",
+            "defender_not_member_female": "Tato hráčka není v Králi kopce.",
             "out_of_range": "Tento hráč je mimo váš dosah.",
+            "out_of_range_female": "Tato hráčka je mimo váš dosah.",
             "invalid_boardsize": "Tato velikost desky není povolena.",
             "no_outgoing_slot": "Už jste odeslali tolik výzev, kolik vaše místo dovoluje.",
             "defender_incoming_full": "Tento hráč teď nemůže přijímat další výzvy.",
+            "defender_incoming_full_female": "Tato hráčka teď nemůže přijímat další výzvy.",
             "defender_cooling_down": "Tento hráč právě dohrál hru a lze ho znovu vyzvat od {{date}}.",
+            "defender_cooling_down_female": "Tato hráčka právě dohrála hru a lze ji znovu vyzvat od {{date}}.",
             "opponent_cooldown": "S tímto hráčem jste nedávno hráli. Znovu ho můžete vyzvat od {{date}}.",
+            "opponent_cooldown_female": "S touto hráčkou jste nedávno hráli. Znovu ji můžete vyzvat od {{date}}.",
             "diversity_limit": "Příliš mnoho vašich posledních her bylo proti tomuto hráči.",
+            "diversity_limit_female": "Příliš mnoho vašich posledních her bylo proti této hráčce.",
             "defender_diversity_limit": "Příliš mnoho posledních her tohoto hráče bylo proti vám.",
+            "defender_diversity_limit_female": "Příliš mnoho posledních her této hráčky bylo proti vám.",
             "already_playing_opponent": "Proti tomuto hráči už máte probíhající hru.",
+            "already_playing_opponent_female": "Proti této hráčce už máte probíhající hru.",
             "live_time_control_not_live": "Tato časová kontrola není pro živou hru.",
             "defender_not_active": "Váš soupeř teď není aktivní, živou hru nemůžete navrhnout.",
-            "challenger_not_active": "Váš vyzyvatel už není aktivní, živou hru nemůžete přijmout."
+            "defender_not_active_female": "Vaše soupeřka teď není aktivní, živou hru nemůžete navrhnout.",
+            "challenger_not_active": "Váš vyzyvatel už není aktivní, živou hru nemůžete přijmout.",
+            "challenger_not_active_female": "Vaše vyzyvatelka už není aktivní, živou hru nemůžete přijmout."
         },
         "not_found": "Král kopce nenalezen.",
         "invalid_incoming_slots": "Neplatný počet výzev.",
@@ -1665,8 +1876,8 @@
         "live_proposal_already_answered": "Na tento návrh už bylo odpovězeno nebo vypršel.",
         "game_creation_failed": "Hru nelze vytvořit, zkuste to prosím znovu.",
         "notification": {
-            "challenge": "{{player}} vás vyzval v Králi kopce!",
-            "live_proposal": "{{player}} vás vyzval v Králi kopce a navrhuje hrát živě.",
+            "challenge": "{{player}}: výzva pro vás v Králi kopce!",
+            "live_proposal": "{{player}}: výzva pro vás v Králi kopce s návrhem hrát živě.",
             "strike": "Ve hře Krále kopce vám vypršel čas (prohřešek {{strikes}}).",
             "strike_removed": "Ve hře Krále kopce vám vypršel čas a po {{strikes}} prohřešcích jste byli odebráni.",
             "strike_removed_before_first_game": "Ve hře Krále kopce vám vypršel čas dřív, než jste dokončili jakoukoli hru, a byli jste odebráni.",
@@ -1805,5 +2016,371 @@
     "n_messages_other": "{{ count }} zpráv",
     "n_interested_one": "{{ count }} zájemce",
     "n_interested_few": "{{ count }} zájemci",
-    "n_interested_other": "{{ count }} zájemců"
+    "n_interested_other": "{{ count }} zájemců",
+    "pronouns": {
+        "title": "Zájmena",
+        "explain": "Tato zájmena jsou veřejná: zobrazují se na vašem profilu a po kliknutí na vaši přezdívku. Používají se také k přizpůsobení textů rozhraní vám a toho, jak o vás mluví ostatním hráčům.",
+        "save_error": "Zájmena se nepodařilo uložit. Zkuste to prosím znovu.",
+        "he/him": "on/jeho",
+        "she/her": "ona/její",
+        "they/them": "neutrální",
+        "unspecified": "Zájmena neuvedena"
+    },
+    "player_popover": {
+        "on_playhex_since": "Na PlayHex už {{duration}}"
+    },
+    "closed_game": "Uzavřená hra",
+    "closed_game_help": "Tato hra se nezobrazuje v lobby ostatních hráčů. Připojit se mohou jen lidé s odkazem, i když ještě nejsou na PlayHex.",
+    "closed_game_invite": {
+        "link_label": "Odkaz k odeslání kamarádovi",
+        "share": "Sdílet"
+    },
+    "chat_header": {
+        "game_started": "Hra začala",
+        "game_ended": "Hra skončila",
+        "game_canceled": "Hra zrušena"
+    },
+    "host_waiting_join_chance_first_minute": "V tuto denní dobu se k {{percent}} her někdo připojí během první minuty.",
+    "host_waiting_join_chance_next_minutes": "Zatím se nikdo nepřipojil. Pokud počkáte dalších 10 minut, {{percent}} hostitelů najde soupeře.",
+    "match_title_in_tournament": "{{ match }} turnaje {{ tournament }}",
+    "chat_message_visibility": "Viditelnost zprávy",
+    "chat_attach_to_move_toggle": "Zobrazit tuto zprávu pod tahem {{n}}",
+    "chat_message_visibility_public": "Veřejná",
+    "chat_message_visibility_private": "Osobní poznámky",
+    "chat_message_visibility_malkovich": "Malkovich",
+    "chat_message_placeholder_private": "Osobní poznámka, viditelná jen pro vás…",
+    "chat_message_placeholder_malkovich": "Malkovich, po skončení hry viditelný pro všechny…",
+    "chat_new_messages": "Nové",
+    "set_password": "Nastavit heslo",
+    "set_password_explain": "Váš účet zatím nemá heslo. Nastavte heslo, abyste se mohli přihlašovat také přezdívkou „{{login}}“.",
+    "saved": "Uloženo",
+    "or": "nebo",
+    "log_in_with_discord": "Přihlásit se přes Discord",
+    "must_be_logged_in": "Musíte být přihlášeni",
+    "same_pseudo": "To už je vaše přezdívka",
+    "pseudo_change_limit_reached": "V poslední době jste přezdívku měnili příliš často",
+    "must_set_password_first": "Nejdřív nastavte heslo, jinak byste se už nemohli přihlásit",
+    "discord_login_failed": "Přihlášení přes Discord selhalo, zkuste to znovu",
+    "discord_login_cancelled": "Přihlášení přes Discord bylo zrušeno",
+    "discord_already_linked": "Tento účet Discord je už propojen s jiným účtem PlayHex",
+    "discord_account_creation_rate_limited": "V poslední době bylo vytvořeno příliš mnoho účtů, zkuste to později",
+    "change_pseudo": {
+        "title": "Změnit přezdívku",
+        "new_pseudo": "Nová přezdívka",
+        "submit": "Změnit přezdívku",
+        "confirm": "Změnit přezdívku na „{{pseudo}}“?",
+        "success": "Vaše přezdívka byla změněna.",
+        "next_allowed_at": "V poslední době jste přezdívku měnili příliš často. Znovu ji můžete změnit {{date}}.",
+        "old_pseudo_released": "Vaše stará přezdívka bude dostupná ostatním hráčům. Odkazy na adresu vašeho starého profilu budou přesměrovány na nový. Přihlašovat se budete novou přezdívkou.",
+        "remaining_one": "Přezdívku můžete během 30 dní změnit ještě {{count}}krát.",
+        "remaining_few": "Přezdívku můžete během 30 dní změnit ještě {{count}}krát.",
+        "remaining_other": "Přezdívku můžete během 30 dní změnit ještě {{count}}krát.",
+        "former_pseudo_note_one": "Váš profil bude {{count}} den zobrazovat „dříve {pseudo}“.",
+        "former_pseudo_note_few": "Váš profil bude {{count}} dny zobrazovat „dříve {pseudo}“.",
+        "former_pseudo_note_other": "Váš profil bude {{count}} dní zobrazovat „dříve {pseudo}“."
+    },
+    "formerly": "dříve",
+    "discord_account": {
+        "title": "Discord",
+        "private": "Propojený účet Discord vidíte jen vy, na profilu se nezobrazuje.",
+        "explain": "Propojte svůj účet Discord, abyste se mohli přihlašovat přes Discord.",
+        "link": "Propojit můj účet Discord",
+        "linked_to": "Propojeno s účtem Discord {username}. Můžete se přihlašovat přes Discord.",
+        "unlink": "Odpojit",
+        "unlink_confirm": "Odpojit účet Discord? Už se nebudete moci přihlásit přes Discord.",
+        "set_password_to_unlink": "Před odpojením účtu Discord nejdřív nastavte heslo, abyste se mohli dál přihlašovat."
+    },
+    "recovery_email": {
+        "title": "E-mail pro obnovení",
+        "explain": "Nepovinné. Slouží ke kontaktu ohledně zabezpečení vašeho účtu, např. když zapomenete heslo.",
+        "email": "E-mail",
+        "private": "Váš e-mail je soukromý a nikdy se nezobrazuje ostatním hráčům. Nechte prázdné pro odstranění.",
+        "invalid": "Neplatný e-mail"
+    },
+    "cancel_request": {
+        "ask": "Navrhnout zrušení",
+        "player_wants_to_cancel": "{{ player }} navrhuje zrušit hru",
+        "accept": "Přijmout zrušení",
+        "reject": "Odmítnout",
+        "request_denied": "Žádost {{ player }} o zrušení hry byla zamítnuta.",
+        "game_canceled_by_agreement": "Hra zrušena po dohodě obou stran, na návrh {{ player }}.",
+        "confirm_overlay": {
+            "title": "Navrhnout zrušení hry?",
+            "message": "Soupeři se odešle žádost, kterou může přijmout nebo odmítnout. Pokud ji přijme, hra se zruší a nebude se počítat.",
+            "confirmLabel": "Ano, odeslat žádost",
+            "cancelLabel": "Ne, hrát dál"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer živě",
+        "tab_live": "Živě",
+        "tab_play": "Hrát",
+        "bot_unavailable": "nedostupný",
+        "tab_chat": "Chat",
+        "live": "Živě",
+        "stream": "Přenos",
+        "stream_description": "Sdílejte odkaz: kdokoli může živě sledovat vaši analýzu, vidět váš kurzor a chatovat.",
+        "start_stream": "Spustit přenos",
+        "stop_stream": "Ukončit přenos",
+        "share_link": "Odkaz ke sdílení",
+        "copy_link": "Kopírovat odkaz",
+        "match": "Hrát z této pozice",
+        "match_description": "Zahrajte si partii z pozice na desce proti botovi nebo jinému hráči. Po skončení se partie přidá do vaší analýzy jako varianta.",
+        "i_play": "Hraji",
+        "opponent": "Soupeř",
+        "opponent_player": "Hráč",
+        "invite_player_optional": "Pozvat hráče (nepovinné)",
+        "invite_player_help": "Pozvaný dostane upozornění a jen on se může připojit. Jinak může hrát první, kdo otevře odkaz.",
+        "validate_setup_first": "Nejprve potvrďte rozestavenou pozici.",
+        "start_match": "Zahájit partii",
+        "back_to_analysis": "Zpět k analýze",
+        "back_to_match": "Zpět k partii",
+        "waiting_for_opponent": "Čeká se na soupeře…",
+        "waiting_for_player": "Čeká se na {{pseudo}}…",
+        "you": "Vy",
+        "your_turn": "Jste na tahu",
+        "swap_hint": "Klikněte na kámen pro výměnu.",
+        "wins": "vyhrává",
+        "wins_by_resignation": "vyhrává vzdáním",
+        "match_expired": "Partie skončila: příliš dlouho bez tahu.",
+        "match_canceled": "Partie zrušena.",
+        "join_match": "Hrát tuto partii",
+        "cancel_match": "Zrušit partii",
+        "hosted_by": "Pořádá",
+        "session_ended": "Tato relace skončila.",
+        "waiting_for_stream": "Čeká se na přenos…",
+        "open_copy": "Otevřít kopii",
+        "open_copy_failed": "Kopii se nepodařilo otevřít.",
+        "invitation_toast": "{{pseudo}} vás zve k partii z pozice v Hexploreru.",
+        "invitation_open": "Otevřít",
+        "live_elsewhere": "Už vysíláte z jiné studie. Najednou může běžet jen jedna živá relace.",
+        "go_to_live_study": "Přejít tam",
+        "back_to_live": "Váš přenos z Hexploreru stále běží: vraťte se k němu",
+        "errors": {
+            "session_not_found": "Tato živá relace už neexistuje.",
+            "already_live": "Už vysíláte v jiné kartě. Nejdřív ji ukončete.",
+            "not_host": "To může udělat jen hostitel.",
+            "match_already_running": "Partie už probíhá.",
+            "position_already_won": "Tato pozice je už vyhraná.",
+            "bot_unavailable": "Tento bot teď není dostupný.",
+            "invalid_invited_player": "Tohoto hráče nelze pozvat.",
+            "cannot_join": "K této partii se nemůžete připojit.",
+            "match_not_playing": "Tato partie se nehraje.",
+            "not_your_turn": "Nejste na tahu.",
+            "not_a_player": "V této partii nehrajete.",
+            "invalid_data": "Neplatná data.",
+            "illegal_move": "Tento tah nelze zahrát.",
+            "study_required": "Nejdřív uložte analýzu jako studii."
+        }
+    },
+    "social_preview": {
+        "default_description": "Hrajte deskovou hru Hex online proti ostatním hráčům nebo AI. Turnaje, úlohy, analýza her.",
+        "by": "od {{author}}",
+        "game": {
+            "canceled_title": "Zrušená hra Hex",
+            "canceled_description": "Tato hra Hex {{boardsize}} byla zrušena.",
+            "waiting_title": "Otevřená hra Hex od {{player}}",
+            "waiting_title_anonymous": "Otevřená hra Hex",
+            "waiting_description": "Hra Hex {{boardsize}}, {{timeControl}}, čeká na soupeře. Připojte se na PlayHex.",
+            "ranked": "hodnocená",
+            "friendly": "přátelská",
+            "playing_description": "Hra probíhá, sledujte ji živě na PlayHex.",
+            "outcome_path": "{{winner}}: výhra spojením svých stran",
+            "outcome_resign": "{{winner}}: výhra vzdáním soupeře",
+            "outcome_time": "{{winner}}: výhra na čas",
+            "outcome_forfeit": "{{winner}}: kontumační výhra",
+            "winner": "{{winner}} vyhrává",
+            "image_alt": "Konečná pozice hry Hex {{title}}",
+            "open_game": "Otevřená hra",
+            "join": "Připojte se na PlayHex",
+            "playing": "Hra probíhá",
+            "cadency_live": "Živě",
+            "cadency_correspondence": "Korespondenčně",
+            "n_moves_one": "{{count}} tah",
+            "n_moves_few": "{{count}} tahy",
+            "n_moves_other": "{{count}} tahů"
+        },
+        "tournament": {
+            "starts_at": "Začíná {{date}}",
+            "running": "Turnaj probíhá",
+            "rank_1": "1. místo: {{player}}",
+            "rank_2": "2. místo: {{player}}",
+            "rank_3": "3. místo: {{player}}",
+            "canceled": "Turnaj zrušen",
+            "hex_tournament": "Turnaj v Hexu",
+            "n_registered_one": "{{count}} registrovaný hráč",
+            "n_registered_few": "{{count}} registrovaní hráči",
+            "n_registered_other": "{{count}} registrovaných hráčů",
+            "n_participants_one": "{{count}} účastník",
+            "n_participants_few": "{{count}} účastníci",
+            "n_participants_other": "{{count}} účastníků"
+        },
+        "tournament_series": {
+            "next": "Další: {{title}}, {{date}}",
+            "hex_tournaments": "Turnaje v Hexu",
+            "n_editions_one": "{{count}} odehraný ročník",
+            "n_editions_few": "{{count}} odehrané ročníky",
+            "n_editions_other": "{{count}} odehraných ročníků"
+        },
+        "puzzle": {
+            "default_title": "Úloha Hex",
+            "red_to_play": "Červený na tahu vyhraje",
+            "blue_to_play": "Modrý na tahu vyhraje",
+            "label": "Úloha",
+            "hex_puzzle_by": "Úloha Hex od {{author}}"
+        },
+        "hexplorer_study": {
+            "default_title": "Studie v Hexploreru",
+            "label": "Studie",
+            "hex_study_by": "Studie Hex od {{author}}"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "Úlohy Hex od {{author}}",
+            "n_puzzles_one": "{{count}} úloha Hex",
+            "n_puzzles_few": "{{count}} úlohy Hex",
+            "n_puzzles_other": "{{count}} úloh Hex"
+        },
+        "player": {
+            "title": "{{player}}, hráč(ka) Hexu",
+            "title_male": "{{player}}, hráč Hexu",
+            "title_female": "{{player}}, hráčka Hexu",
+            "bot": "AI pro Hex",
+            "rating": "Hodnocení {{rating}}",
+            "member_since": "Členem od {{date}}",
+            "on_playhex": "Hraje na PlayHex",
+            "n_games_one": "{{count}} odehraná hra",
+            "n_games_few": "{{count}} odehrané hry",
+            "n_games_other": "{{count}} odehraných her"
+        },
+        "ladder": {
+            "king": "Král: {{player}}",
+            "king_female": "Královna: {{player}}",
+            "reign_one": "Vládne {{duration}}, {{count}} obrana",
+            "reign_few": "Vládne {{duration}}, {{count}} obrany",
+            "reign_other": "Vládne {{duration}}, {{count}} obran",
+            "n_players_one": "{{count}} hráč na kopci",
+            "n_players_few": "{{count}} hráči na kopci",
+            "n_players_other": "{{count}} hráčů na kopci"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Úlohy Hex",
+                "description": "Řešte úlohy Hex vytvořené komunitou, od začátečníků po experty, a vytvářejte vlastní."
+            },
+            "tournaments": {
+                "title": "Turnaje v Hexu",
+                "description": "Zapojte se do online turnajů v Hexu: živých i korespondenčních, švýcarským systémem i vyřazovacích."
+            },
+            "tournament_series": {
+                "title": "Série turnajů v Hexu",
+                "description": "Pravidelné turnaje v Hexu: sledujte sérii, abyste věděli, kdy se hraje další ročník."
+            },
+            "ladders": {
+                "title": "Král kopce",
+                "description": "Stoupejte po žebříčku Hexu: vyzývejte hráče nad sebou, zaujměte jejich místo a braňte trůn."
+            },
+            "games_archive": {
+                "title": "Archiv her Hex",
+                "description": "Procházejte a vyhledávejte všechny hry Hex odehrané na PlayHex."
+            },
+            "videos": {
+                "title": "Videa o Hexu",
+                "description": "Videa o Hexu od komunity: návody, strategie, rozbory her."
+            },
+            "statistics": {
+                "title": "Statistiky PlayHex",
+                "description": "Hry, hráči, velikosti desek a úspěšnost na PlayHex."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Zkoumejte pozice Hexu s analýzou AI."
+            },
+            "swap_maps": {
+                "title": "Mapy výměn v Hexu",
+                "description": "Které úvodní tahy je vhodné vyměnit pro každou velikost desky, spočítáno pomocí KataHex."
+            },
+            "guide": {
+                "title": "Průvodce PlayHex",
+                "description": "Jak hrát Hex na PlayHex: pravidla, analýza AI, podmíněné tahy, moderace."
+            },
+            "export_games_data": {
+                "title": "Export dat her z PlayHex",
+                "description": "Stáhněte si datovou sadu všech her Hex odehraných na PlayHex, volně k dalšímu použití."
+            },
+            "guide_ai_analysis": {
+                "title": "Analýza her pomocí AI",
+                "description": "Projděte své hry Hex s AI: odhalte hrubé chyby, prohlédněte si nejlepší tahy a zjistěte, kdy jste získali nebo ztratili výhodu."
+            },
+            "guide_conditional_moves": {
+                "title": "Podmíněné tahy",
+                "description": "Hrajte korespondenční hry Hex rychleji: naplánujte odpovědi na další tahy soupeře a hrajte žebříky automaticky."
+            },
+            "tutorial_rules": {
+                "title": "Pravidla Hexu",
+                "description": "Naučte se 2 pravidla Hexu za pár minut s interaktivním návodem a pak si zahrajte první hry proti botovi."
+            },
+            "tutorial_swap": {
+                "title": "Pravidlo výměny v Hexu",
+                "description": "Pravidlo výměny udržuje hry Hexu vyrovnané."
+            },
+            "tutorial_bridge": {
+                "title": "Most v Hexu",
+                "description": "Most je nejdůležitější tvar v Hexu: dva kameny už spojené, aniž by se dotýkaly. Zjistěte, jak funguje, a procvičte si ho na úlohách."
+            },
+            "tutorial_block": {
+                "title": "Strategie Hexu pro začátečníky: blokujte a vyhrajte",
+                "description": "V Hexu blokování staví vaši vlastní cestu: nejlepší strategie na začátku hry."
+            },
+            "tutorial_ziggurat": {
+                "title": "Šablona zikkurat v Hexu",
+                "description": "Zikkurat je druhý tvar, který je v Hexu dobré znát: kámen ve třetí řadě spojený se svým okrajem. Zjistěte, jak funguje, a procvičte si ho na úlohách."
+            },
+            "cijm_2025": {
+                "title": "Turnaj v Hexu – Paříž 2025",
+                "description": "Dva turnaje v Hexu 14. a 15. června 2025 na veletrhu Kultura a matematické hry, Place Saint-Sulpice, Paříž. Zdarma, všechny úrovně."
+            },
+            "cijm_2026": {
+                "title": "Turnaj v Hexu – Paříž 2026",
+                "description": "Obří turnaj v Hexu v neděli 24. května 2026 na veletrhu Kultura a matematické hry, Place Saint-Sulpice, Paříž. Zdarma, všechny úrovně, od 8 let."
+            }
+        },
+        "n_days_one": "{{count}} den",
+        "n_days_few": "{{count}} dny",
+        "n_days_other": "{{count}} dní",
+        "n_hours_one": "{{count}} hodina",
+        "n_hours_few": "{{count}} hodiny",
+        "n_hours_other": "{{count}} hodin"
+    },
+    "game_outcome": {
+        "path": "Spojení",
+        "resign": "Vzdání",
+        "time": "Čas",
+        "forfeit": "Kontumace"
+    },
+    "has_chat_messages": "Se zprávami v chatu",
+    "has_analyze": "S analýzou AI",
+    "has_malkovich_messages": "Se záznamy Malkovich",
+    "game_content_filter": "Obsah",
+    "filters": "Filtry",
+    "reset_filters": "Obnovit filtry",
+    "reset_dates": "Obnovit data",
+    "game_type": "Typ hry",
+    "game_state_filter": "Stav",
+    "opponent_or_players": "Hráči",
+    "one_or_two_players_help": "1 hráč: hry tohoto hráče. 2 hráči: hry mezi nimi.",
+    "search_opponent": "Soupeř",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "Všechny filtry",
+    "hide_filters": "Méně filtrů",
+    "week_of": "Týden od {{date}}",
+    "chart_grouping": {
+        "label": "Seskupit podle",
+        "auto": "Auto",
+        "day": "Den",
+        "week": "Týden",
+        "month": "Měsíc"
+    },
+    "n_games_found_one": "Nalezena {{count}} hra.",
+    "n_games_found_few": "Nalezeny {{count}} hry.",
+    "n_games_found_other": "Nalezeno {{count}} her."
 }

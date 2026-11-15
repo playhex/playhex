@@ -8,7 +8,9 @@
         "open_live_games": "Deltag i et live-spil",
         "open_correspondence_games": "Deltag i et korrespondancespil",
         "no_open_live_games": "Ingen åbne live-spil lige nu",
-        "no_open_correspondence_games": "Ingen åbne korrespondancespil lige nu"
+        "no_open_correspondence_games": "Ingen åbne korrespondancespil lige nu",
+        "multiple_waiting_games": "Flere ventende partier:",
+        "others_canceled_once_one_accepted": "Så snart et af dine ventende partier bliver accepteret, annulleres de andre."
     },
     "game": {
         "opponent": "Modstander",
@@ -35,13 +37,19 @@
         "duration": "Varighed",
         "title": "Spil",
         "info": "Info",
-        "title_waiting": "Venter på en modstander: oprettet af"
+        "title_waiting": "Venter på en modstander: oprettet af",
+        "winner": "Vinder",
+        "loser": "Taber",
+        "issue": "Resultat",
+        "moves_count": "Træk"
     },
     "game_rules": {
         "normal": "normal",
         "host_plays_first": "vært spiller først",
         "host_plays_second": "vært spiller anden",
-        "no_swap": "ingen bytte"
+        "no_swap": "ingen bytte",
+        "handicap_for_host": "handicap {{n}} til værten",
+        "handicap_for_opponent": "handicap {{n}} til modstanderen"
     },
     "create_game": {
         "custom_size": "Brugerdefineret",
@@ -60,7 +68,8 @@
             "notifications": "Notifikationer",
             "ai_workers": "AI-workers",
             "connected_applications": "Tilknyttede applikationer",
-            "technical_info": "Teknisk info"
+            "technical_info": "Teknisk info",
+            "security": "Sikkerhed"
         },
         "audio": "Lyd",
         "moderation": "Moderation"
@@ -140,7 +149,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "Se, hvordan man beregner AI-træk for PlayHex fra min computer",
-        "engine_unavailable": "Nogle AI-motorer har ingen worker online lige nu, disse AI'er er ikke tilgængelige."
+        "engine_unavailable": "Nogle AI-motorer har ingen worker online lige nu, disse AI'er er ikke tilgængelige.",
+        "ai_not_available": "Ikke tilgængelig lige nu"
     },
     "game_analysis": {
         "game_analysis": "Spilanalyse af AI",
@@ -191,7 +201,12 @@
     },
     "1vAI_friendly": {
         "title": "Spil vs AI",
-        "create": "Spil vs AI"
+        "create": "Spil vs AI",
+        "easy": "Let",
+        "medium": "Middel",
+        "hard": "Svær",
+        "beaten": "Allerede slået",
+        "unlock_stronger_ais": "Vis flere AI-muligheder"
     },
     "1vAI_offline": {
         "title": "Offline AI",
@@ -455,7 +470,33 @@
     "handicap": {
         "title": "Handicap",
         "none": "ingen",
-        "handicap_for_player": "{{n}} for {{player}}"
+        "handicap_for_player": "{{n}} for {{player}}",
+        "you": "dig",
+        "opponent": "modstander",
+        "ai": "AI",
+        "increase": "Øg handicap",
+        "decrease": "Mindsk handicap",
+        "setup": {
+            "first_stone_then": "{{player}} placerer en byttebar sten, derefter {{count}} mere, eller {{swappedCount}} ved bytte.",
+            "first_stone_then_you": "Placér en byttebar sten, derefter {{count}} mere, eller {{swappedCount}} ved bytte.",
+            "first_stone_for_blue": "{{player}} placerer en byttebar sten, derefter spiller {{beneficiary}} {{count}} træk.",
+            "first_stone_for_blue_you": "Placér en byttebar sten, derefter spiller {{beneficiary}} {{count}} træk.",
+            "first_stone_for_blue_beneficiary": "{{player}} placerer en byttebar sten, derefter spiller du {{count}} træk.",
+            "swap_decision": "{{player}} vælger, om der byttes: {{beneficiary}} placerer så {{swappedCount}} sten, eller {{count}} hvis der afslås.",
+            "swap_decision_you": "Klik på stenen for at bytte: {{beneficiary}} placerer så {{swappedCount}} sten, eller {{count}} hvis du afslår.",
+            "swap_decision_beneficiary": "{{player}} vælger, om der byttes: du placerer så {{swappedCount}} sten, eller {{count}} hvis der afslås.",
+            "stones_after_swap": "Sten byttet: {{player}} placerer {{count}} sten.",
+            "stones_after_swap_you": "Sten byttet: placér {{count}} sten.",
+            "refuse_swap": "Byt ikke",
+            "no_swap_one": "Bytte slået fra: {{player}} placerer 1 sten.",
+            "no_swap_other": "Bytte slået fra: {{player}} placerer {{count}} sten.",
+            "no_swap_you_one": "Bytte slået fra: placér 1 sten.",
+            "no_swap_you_other": "Bytte slået fra: placér {{count}} sten.",
+            "stones_one": "{{player}} placerer 1 sten mere.",
+            "stones_other": "{{player}} placerer {{count}} sten mere.",
+            "stones_you_one": "Placér 1 sten mere.",
+            "stones_you_other": "Placér {{count}} sten mere."
+        }
     },
     "game_created_short": "oprettet {{ date }}",
     "game_created_by_system_time_ago": "Spil oprettet af systemet, {timeAgo}.",
@@ -724,7 +765,12 @@
         "block_at_a_distance": "Placér ikke din sten lige op ad modstanderens: en tilstødende blokering er let at gå uden om. Blokér længere væk og efterlad lidt plads: du får tid til at svare på dens træk.",
         "block_remember": "Husk: i Hex er et godt træk både defensivt og offensivt.",
         "ziggurat_defense_1": "Blå trænger ind i midten: Rød svarer ved siden af sin sten og laver en bro med kanten.",
-        "ziggurat_defense_2": "Blå trænger ind på første række: Rød svarer med en bro, og den nye sten er forbundet til kanten."
+        "ziggurat_defense_2": "Blå trænger ind på første række: Rød svarer med en bro, og den nye sten er forbundet til kanten.",
+        "demo_0_play": "Spil",
+        "chapters": {
+            "hex_rule": "I. Hex-regler",
+            "beginners_strategy": "II. Strategi for begyndere"
+        }
     },
     "donate": "Donér til PlayHex",
     "notifications": "Notifikationer",
@@ -844,7 +890,57 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Kopiér fra \"Fejlfindingsoplysninger\" under spillebrættet",
         "engine_unavailable": "Ingen AI-worker er online for denne motor lige nu, stillinger kan ikke analyseres.",
-        "analysis_failed": "Kunne ikke analysere denne stilling."
+        "analysis_failed": "Kunne ikke analysere denne stilling.",
+        "analyze_in_hexplorer": "Analysér i Hexplorer",
+        "play_from_position": "Spil fra en position",
+        "tab_file": "Fil",
+        "tab_tree": "Træ",
+        "comment": "Kommentar",
+        "comment_placeholder": "Kommentér denne position…",
+        "current_study": "Nuværende studie",
+        "new_study": "Nyt studie",
+        "study_title": "Studiets titel",
+        "study_default_title": "Unavngivet studie",
+        "study_by": "Af {{author}}",
+        "study_fork": "Fork",
+        "study_fork_help": "Gem din egen kopi af dette studie med ændringerne",
+        "study_forked_from": "Forket fra",
+        "study_share": "Del dette studie",
+        "study_link_copied": "Link kopieret",
+        "study_delete": "Slet dette studie",
+        "study_delete_confirm": "Slet dette studie? Linket til det vil ikke længere virke.",
+        "study_too_large": "Dette studie er for stort til at blive gemt: fjern nogle grene eller kommentarer.",
+        "study_not_found": "Dette studie findes ikke eller er blevet slettet.",
+        "study_unsaved_changes": "Ikke-gemte ændringer",
+        "study_save_shortcut": "Gem studie (Ctrl+S)",
+        "study_validate_setup_first": "Afslut opstillingstilstand for at gemme studiet.",
+        "study_save_to_share": "Gem dette studie for at forke eller dele det.",
+        "my_studies": "Mine studier",
+        "export": "Eksportér",
+        "study_sort": "Sortér studier",
+        "study_sort_date_desc": "Nyeste",
+        "study_sort_date_asc": "Ældste",
+        "study_sort_title_asc": "Navn A–Å",
+        "study_sort_title_desc": "Navn Å–A",
+        "tools_history": "Historik",
+        "tools_stones": "Sten",
+        "tools_marks": "Markeringer",
+        "tools_label": "Etiket",
+        "study_discard_confirm": "Du har ikke-gemte ændringer, de vil gå tabt. Fortsæt?",
+        "tab_help": "Hjælp",
+        "help_what_title": "Hvad er Hexplorer?",
+        "help_what": "Et gratis analysebræt til Hex: udforsk enhver position, prøv flere varianter og se, hvad AI'en mener om dem.",
+        "help_why_title": "Hvorfor bruge det?",
+        "help_why": "For at forstå dine partier, finde bedre træk og dele dine idéer om en position med andre spillere.",
+        "help_how_title": "Sådan bruges det",
+        "help_how_play": "Placér sten frit for at bygge en egen position",
+        "help_how_import": "eller importér et Hex-parti fra et link eller en tekst",
+        "help_how_ai": "Bjælken til venstre for brættet viser, hvem der vinder, og brættet viser de træk, AI'en overvejer.",
+        "help_how_setup": "Opstillingstilstand lader dig tilføje markeringer på brættet og frit redigere en position",
+        "help_how_file": "Gem dit studie (Ctrl+S), del det eller eksportér det som SGF",
+        "help_dismiss": "Forstået, vis ikke igen",
+        "study_nodes_one": "{{count}} knude",
+        "study_nodes_other": "{{count}} knuder"
     },
     "player_menu": {
         "open_menu": "Åbn spillermenu",
@@ -863,7 +959,8 @@
         "reserved_for_other_player": "Dette spil er en udfordring reserveret til en anden spiller.",
         "reserved_for_other_player_named": "Dette spil er en udfordring reserveret til {{pseudo}}.",
         "other": "Du kan ikke deltage i dette spil.",
-        "game_canceled": "Dette spil er blevet annulleret."
+        "game_canceled": "Dette spil er blevet annulleret.",
+        "is_host_closed": "Dette parti er lukket: kun nogen med linket til partiet kan deltage."
     },
     "lobby_challenges_you_badge": "Udfordrer dig!",
     "sort_recently_played": "Spillet for nylig",
@@ -1030,7 +1127,8 @@
         "challenge_player": "udfordre en spiller",
         "challenge_same_target": "udfordre denne spiller igen",
         "analyze_position": "analysere positioner",
-        "channel_slow_mode": "langsom tilstand"
+        "channel_slow_mode": "langsom tilstand",
+        "create_hexplorer_study": "oprettelse af Hexplorer-studier"
     },
     "head_to_head": "Indbyrdes",
     "never_played_together": "Du har endnu ikke spillet mod denne spiller.",
@@ -1107,7 +1205,11 @@
         "opening_moves": "Mest almindelige åbningsspil",
         "opening_moves_note": "For {{ boardsize }}-brætter, den mest spillede størrelse.",
         "rating_distribution": "Ratingfordeling",
-        "rating_distribution_note": "Kun ikke-bot-spillere med en fastlagt rating (afvigelse under {{ deviation }}) tælles med. Gæster er inkluderet."
+        "rating_distribution_note": "Kun ikke-bot-spillere med en fastlagt rating (afvigelse under {{ deviation }}) tælles med. Gæster er inkluderet.",
+        "lobby_join_chances": "Chancer for at få en modstander i et liveparti",
+        "lobby_join_chances_first_minute": "< 1 min",
+        "lobby_join_chances_next_minutes": "+10 min",
+        "lobby_join_chances_note": "Andel af livepartier oprettet i lobbyen, der får en modstander inden for det første minut, og derefter inden for de næste 10 minutter, hvis ingen har tilmeldt sig efter det første minut. Estimeret over de sidste 8 uger, som om værterne havde ventet i stedet for at annullere. Tider vises i din lokale tidszone (UTC{{offset}})."
     },
     "board_mount_error": {
         "error": "Brættet kunne ikke vises, der opstod en fejl:",
@@ -1295,7 +1397,17 @@
             "fixed_fill_twice": "{{move}} har en fast farve to gange",
             "invalid_type": "Ugyldig {{property}}",
             "solver_unproven_one": "{{count}} stilling kunne ikke løses i tide, opgaven er kun delvist kontrolleret",
-            "solver_unproven_other": "{{count}} stillinger kunne ikke løses i tide, opgaven er kun delvist kontrolleret"
+            "solver_unproven_other": "{{count}} stillinger kunne ikke løses i tide, opgaven er kun delvist kontrolleret",
+            "generator_initial_not_winning": "Mohex-løseren finder intet vindende træk her",
+            "generator_depends_on_disabled_cells": "Sejr er kun mulig med hjælp fra felter uden for opgaven: markér sten forbundet til deres kant i positionstrinnet",
+            "generator_already_connected": "Der er allerede forbindelse her, intet at generere",
+            "generator_unproven": "Intet vindende træk bevist i tide, gren efterladt tom",
+            "generator_budget_exceeded": "Træet er for stort, gren efterladt tom",
+            "generator_parallel_dropped": "Indtrængen {{move}} i en modstanders bro kunne ikke tilføjes som parallel sekvens, at spille den får opgaven til at mislykkes",
+            "generator_accepted_losing": "Dette træk accepteres, men Mohex-løseren beviser, at det taber",
+            "generator_accepted_unproven": "Dette træk accepteres, men Mohex-løseren beviser ikke, at det vinder: det fortsættes ikke",
+            "generator_failed_winning": "Dette træk fejler, men Mohex-løseren beviser, at det vinder",
+            "generator_invalid_tree": "Det genererede træ er ugyldigt ({{error}})"
         },
         "editor": {
             "optional": "Valgfri",
@@ -1460,7 +1572,24 @@
             "warnings_badge_one": "{{count}} kontroladvarsel",
             "warnings_badge_other": "{{count}} kontroladvarsler",
             "errors_count_one": "{{count}} problem at rette, se fanen Udgiv",
-            "errors_count_other": "{{count}} problemer at rette, se fanen Udgiv"
+            "errors_count_other": "{{count}} problemer at rette, se fanen Udgiv",
+            "solver_position": "Position til Mohex",
+            "solver_position_help": "Mohex spiller på hele brættet: tjek at felter uden for opgaven er udfyldt efter positionen, og at sten forbundet til en kant er markeret.",
+            "check_section": "Tjek opgaven",
+            "generate": "Generér træ",
+            "generate_tab": "Generering",
+            "generate_help": "Fuldender træet fra den valgte knude og bevarer eksisterende træk: vindende træk og gendrivelser fra Mohex, computerens svar fra Katahex.",
+            "generate_templates": "Stop ved en forbindelse via skabelon, op til",
+            "generate_templates_none": "Ingen skabelon: opgaven slutter først, når forbindelsen er fuldendt.",
+            "generate_templates_help": "Opgaven slutter, så snart forbindelsen er bevist med denne skabelon eller en mindre.",
+            "generate_templates_none_option": "Ingen",
+            "generate_from_node": "Generér fra denne knude",
+            "generate_not_here": "Vælg i fanen Træ en knude i hovedsekvensen, før opgaven slutter.",
+            "generate_progress": "Løser positioner: {{done}}/{{total}}",
+            "generate_ok": "Træ genereret.",
+            "generate_warnings": "Advarsler ved generering ({{count}}):",
+            "generate_stop": "Stop",
+            "generate_tree_changed": "Træet ændrede sig under genereringen, resultatet blev ignoreret. Generér igen."
         },
         "next_puzzle": "Næste opgave",
         "collections": {
@@ -1518,7 +1647,12 @@
         "published_ago": "Udgivet {{date}}",
         "sort_by": "Sortér efter",
         "sort_published_at": "Udgivelsesdato",
-        "sort_created_at": "Dato tilføjet"
+        "sort_created_at": "Dato tilføjet",
+        "field_secondary_urls": "Andre links",
+        "field_secondary_urls_help": "Hvis videoen også er udgivet på andre platforme (PeerTube, Dailymotion…). Linket ovenfor forbliver hovedlinket.",
+        "add_link": "Tilføj et link",
+        "remove_link": "Fjern dette link",
+        "watch_on": "Se på {{platform}}"
     },
     "swap_maps": {
         "title": "Byttekort",
@@ -1539,9 +1673,12 @@
     },
     "ladder": {
         "title": "Bakkens konge",
+        "title_female": "Bakkens dronning",
         "intro": "Én stige, én trone. Udfordr en spiller over dig: vinder du, tager du vedkommendes plads. Jo højere du sidder, jo mere skal du forsvare.",
         "king": "Bakkens konge",
+        "king_female": "Bakkens dronning",
         "king_for": "Konge i {{duration}}",
+        "king_for_female": "Dronning i {{duration}}",
         "no_king": "Tronen er tom. Deltag og tag den!",
         "join": "Deltag i Bakkens konge",
         "leave": "Forlad denne bakke",
@@ -1567,6 +1704,7 @@
         "no_running_challenges": "Ingen igangværende udfordring.",
         "vs": "mod",
         "nobody_to_challenge": "Ingen at udfordre: du er Kongen!",
+        "nobody_to_challenge_female": "Ingen at udfordre: du er Dronningen!",
         "live": "Live",
         "challenge_overlay": {
             "title": "Udfordr {{player}}",
@@ -1610,6 +1748,7 @@
             "challenge_defended": "{{opponent}} forsvarede sin plads mod {{player}}",
             "challenge_voided": "Partiet {{player}} mod {{opponent}} er blevet annulleret",
             "new_king": "{{player}} er den nye Bakkens konge!",
+            "new_king_female": "{{player}} er den nye Bakkens dronning!",
             "giant_slayer": "{{player}} er en Kæmpedræber: væltede {{opponent}}!",
             "climber": "{{player}} vandt {{wins}} udfordringer i træk!",
             "strike": "{{player}} overskred tiden i et parti (advarsel {{strikes}})",
@@ -1782,5 +1921,356 @@
             }
         },
         "check_device_code": "Kontrollér, at denne kode svarer til den, der vises på din enhed:"
-    }
+    },
+    "pronouns": {
+        "title": "Pronominer",
+        "explain": "Disse pronominer er offentlige: de vises på din profil og når man klikker på dit brugernavn. De bruges også til at tilpasse grænsefladens tekster til dig, og hvordan den omtaler dig over for andre spillere.",
+        "save_error": "Kunne ikke gemme pronominer. Prøv igen.",
+        "he/him": "han/ham",
+        "she/her": "hun/hende",
+        "they/them": "de/dem",
+        "unspecified": "Pronominer ikke angivet"
+    },
+    "player_popover": {
+        "on_playhex_since": "På PlayHex i {{duration}}"
+    },
+    "closed_game": "Lukket parti",
+    "closed_game_help": "Dette parti vises ikke i andre spilleres lobby. Kun personer med linket kan deltage, også selvom de ikke er på PlayHex endnu.",
+    "closed_game_invite": {
+        "link_label": "Link til at sende til en ven",
+        "share": "Del"
+    },
+    "chat_header": {
+        "game_started": "Parti startet",
+        "game_ended": "Parti afsluttet",
+        "game_canceled": "Parti annulleret"
+    },
+    "host_waiting_join_chance_first_minute": "På dette tidspunkt af dagen får {{percent}} af partierne en modstander inden for det første minut.",
+    "host_waiting_join_chance_next_minutes": "Ingen har tilmeldt sig endnu. Ved at vente 10 minutter mere finder {{percent}} af værterne en modstander.",
+    "match_title_in_tournament": "{{ match }} i {{ tournament }}",
+    "chat_message_visibility": "Beskedens synlighed",
+    "chat_attach_to_move_toggle": "Vis denne besked under træk {{n}}",
+    "chat_message_visibility_public": "Offentlig",
+    "chat_message_visibility_private": "Personlige noter",
+    "chat_message_visibility_malkovich": "Malkovich",
+    "chat_message_placeholder_private": "Personlig note, kun synlig for dig…",
+    "chat_message_placeholder_malkovich": "Malkovich, synlig for alle når partiet er slut…",
+    "chat_new_messages": "Ny",
+    "set_password": "Angiv en adgangskode",
+    "set_password_explain": "Din konto har endnu ingen adgangskode. Angiv en adgangskode for også at kunne logge ind med dit brugernavn \"{{login}}\".",
+    "saved": "Gemt",
+    "or": "eller",
+    "log_in_with_discord": "Log ind med Discord",
+    "must_be_logged_in": "Du skal være logget ind",
+    "same_pseudo": "Det er allerede dit brugernavn",
+    "pseudo_change_limit_reached": "Du har ændret dit brugernavn for mange gange for nylig",
+    "must_set_password_first": "Angiv først en adgangskode, ellers vil du ikke kunne logge ind igen",
+    "discord_login_failed": "Login med Discord mislykkedes, prøv igen",
+    "discord_login_cancelled": "Login med Discord blev annulleret",
+    "discord_already_linked": "Denne Discord-konto er allerede knyttet til en anden PlayHex-konto",
+    "discord_account_creation_rate_limited": "Der er oprettet for mange konti for nylig, prøv igen senere",
+    "change_pseudo": {
+        "title": "Skift brugernavn",
+        "new_pseudo": "Nyt brugernavn",
+        "submit": "Skift brugernavn",
+        "confirm": "Skift dit brugernavn til \"{{pseudo}}\"?",
+        "success": "Dit brugernavn er blevet ændret.",
+        "next_allowed_at": "Du har ændret dit brugernavn for mange gange for nylig. Du kan ændre det igen den {{date}}.",
+        "old_pseudo_released": "Dit gamle brugernavn bliver tilgængeligt for andre spillere. Links til din gamle profil-url omdirigeres til den nye. Du logger også ind med dit nye brugernavn.",
+        "remaining_one": "Du kan ændre dit brugernavn {{count}} gang mere inden for 30 dage.",
+        "remaining_other": "Du kan ændre dit brugernavn {{count}} gange mere inden for 30 dage.",
+        "former_pseudo_note_one": "Din profil viser \"tidligere {pseudo}\" i {{count}} dag.",
+        "former_pseudo_note_other": "Din profil viser \"tidligere {pseudo}\" i {{count}} dage."
+    },
+    "formerly": "tidligere",
+    "discord_account": {
+        "title": "Discord",
+        "private": "Kun du kan se din tilknyttede Discord-konto, den vises ikke på din profil.",
+        "explain": "Tilknyt din Discord-konto for at logge ind med Discord.",
+        "link": "Tilknyt min Discord-konto",
+        "linked_to": "Tilknyttet Discord-kontoen {username}. Du kan logge ind med Discord.",
+        "unlink": "Fjern tilknytning",
+        "unlink_confirm": "Fjern tilknytningen til din Discord-konto? Du kan så ikke længere logge ind med Discord.",
+        "set_password_to_unlink": "For at fjerne tilknytningen til din Discord-konto skal du først angive en adgangskode, så du stadig kan logge ind."
+    },
+    "recovery_email": {
+        "title": "Gendannelses-e-mail",
+        "explain": "Valgfri. Bruges til at kontakte dig om din kontos sikkerhed, f.eks. hvis du mister din adgangskode.",
+        "email": "E-mail",
+        "private": "Din e-mail er privat og vises aldrig for andre spillere. Lad feltet være tomt for at fjerne den.",
+        "invalid": "Ugyldig e-mail"
+    },
+    "cancel_request": {
+        "ask": "Foreslå annullering",
+        "player_wants_to_cancel": "{{ player }} foreslår at annullere partiet",
+        "accept": "Accepter annullering",
+        "reject": "Afvis",
+        "request_denied": "{{ player }}s anmodning om at annullere partiet er blevet afvist.",
+        "game_canceled_by_agreement": "Partiet er annulleret efter aftale mellem begge spillere, foreslået af {{ player }}.",
+        "confirm_overlay": {
+            "title": "Foreslå at annullere partiet?",
+            "message": "Dette sender en anmodning til din modstander, som kan acceptere eller afvise den. Accepteres den, annulleres partiet og tæller ikke.",
+            "confirmLabel": "Ja, send anmodningen",
+            "cancelLabel": "Nej, spil videre"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer live",
+        "tab_live": "Live",
+        "tab_play": "Spil",
+        "bot_unavailable": "ikke tilgængelig",
+        "tab_chat": "Chat",
+        "live": "Live",
+        "stream": "Stream",
+        "stream_description": "Del et link: alle kan følge din analyse live, se din markør og chatte.",
+        "start_stream": "Start stream",
+        "stop_stream": "Stop stream",
+        "share_link": "Link til deling",
+        "copy_link": "Kopiér link",
+        "match": "Spil fra denne position",
+        "match_description": "Spil et parti fra positionen på brættet mod en bot eller en anden spiller. Når det er slut, tilføjes partiet til din analyse som variant.",
+        "i_play": "Jeg spiller",
+        "opponent": "Modstander",
+        "opponent_player": "En spiller",
+        "invite_player_optional": "Invitér en spiller (valgfrit)",
+        "invite_player_help": "Den inviterede får en notifikation og er den eneste, der kan deltage. Ellers kan den første, der åbner linket, spille.",
+        "validate_setup_first": "Bekræft først opstillingen.",
+        "start_match": "Start parti",
+        "back_to_analysis": "Tilbage til analysen",
+        "back_to_match": "Tilbage til partiet",
+        "waiting_for_opponent": "Venter på en modstander…",
+        "waiting_for_player": "Venter på {{pseudo}}…",
+        "you": "Dig",
+        "your_turn": "Din tur",
+        "swap_hint": "Klik på stenen for at bytte.",
+        "wins": "vinder",
+        "wins_by_resignation": "vinder ved opgivelse",
+        "match_expired": "Partiet er slut: intet træk i for lang tid.",
+        "match_canceled": "Partiet er annulleret.",
+        "join_match": "Spil dette parti",
+        "cancel_match": "Annullér parti",
+        "hosted_by": "Vært:",
+        "session_ended": "Denne session er afsluttet.",
+        "waiting_for_stream": "Venter på streameren…",
+        "open_copy": "Åbn en kopi",
+        "open_copy_failed": "Kunne ikke åbne en kopi.",
+        "invitation_toast": "{{pseudo}} inviterer dig til et parti fra en Hexplorer-position.",
+        "invitation_open": "Åbn",
+        "live_elsewhere": "Du er allerede live fra et andet studie. Kun én livesession ad gangen.",
+        "go_to_live_study": "Gå dertil",
+        "back_to_live": "Din Hexplorer-stream kører stadig: gå tilbage til den",
+        "errors": {
+            "session_not_found": "Denne livesession findes ikke længere.",
+            "already_live": "Du er allerede live i en anden fane. Stop den først.",
+            "not_host": "Kun værten kan gøre dette.",
+            "match_already_running": "Et parti er allerede i gang.",
+            "position_already_won": "Denne position er allerede vundet.",
+            "bot_unavailable": "Denne bot er ikke tilgængelig lige nu.",
+            "invalid_invited_player": "Denne spiller kan ikke inviteres.",
+            "cannot_join": "Du kan ikke deltage i dette parti.",
+            "match_not_playing": "Dette parti bliver ikke spillet.",
+            "not_your_turn": "Det er ikke din tur.",
+            "not_a_player": "Du spiller ikke i dette parti.",
+            "invalid_data": "Ugyldige data.",
+            "illegal_move": "Dette træk kan ikke spilles.",
+            "study_required": "Gem først analysen som et studie."
+        }
+    },
+    "social_preview": {
+        "default_description": "Spil brætspillet Hex online mod andre spillere eller AI. Turneringer, opgaver, partianalyse.",
+        "by": "af {{author}}",
+        "game": {
+            "canceled_title": "Annulleret Hex-parti",
+            "canceled_description": "Dette Hex-parti {{boardsize}} er blevet annulleret.",
+            "waiting_title": "Åbent Hex-parti af {{player}}",
+            "waiting_title_anonymous": "Åbent Hex-parti",
+            "waiting_description": "Hex-parti {{boardsize}}, {{timeControl}}, venter på en modstander. Deltag på PlayHex.",
+            "ranked": "rangeret",
+            "friendly": "venskabeligt",
+            "playing_description": "Parti i gang, se det live på PlayHex.",
+            "outcome_path": "{{winner}} vandt ved at forbinde sine sider",
+            "outcome_resign": "{{winner}} vandt ved opgivelse",
+            "outcome_time": "{{winner}} vandt på tid",
+            "outcome_forfeit": "{{winner}} vandt uden kamp",
+            "winner": "{{winner}} vinder",
+            "image_alt": "Slutposition i Hex-partiet {{title}}",
+            "open_game": "Åbent parti",
+            "join": "Deltag på PlayHex",
+            "playing": "Parti i gang",
+            "cadency_live": "Live",
+            "cadency_correspondence": "Korrespondance",
+            "n_moves_one": "{{count}} træk",
+            "n_moves_other": "{{count}} træk"
+        },
+        "tournament": {
+            "starts_at": "Starter {{date}}",
+            "running": "Turnering i gang",
+            "rank_1": "1.: {{player}}",
+            "rank_2": "2.: {{player}}",
+            "rank_3": "3.: {{player}}",
+            "canceled": "Turnering aflyst",
+            "hex_tournament": "Hex-turnering",
+            "n_registered_one": "{{count}} spiller tilmeldt",
+            "n_registered_other": "{{count}} spillere tilmeldt",
+            "n_participants_one": "{{count}} deltager",
+            "n_participants_other": "{{count}} deltagere"
+        },
+        "tournament_series": {
+            "next": "Næste: {{title}}, {{date}}",
+            "hex_tournaments": "Hex-turneringer",
+            "n_editions_one": "{{count}} udgave spillet",
+            "n_editions_other": "{{count}} udgaver spillet"
+        },
+        "puzzle": {
+            "default_title": "Hex-opgave",
+            "red_to_play": "Rød trækker og vinder",
+            "blue_to_play": "Blå trækker og vinder",
+            "label": "Opgave",
+            "hex_puzzle_by": "Hex-opgave af {{author}}"
+        },
+        "hexplorer_study": {
+            "default_title": "Hexplorer-studie",
+            "label": "Studie",
+            "hex_study_by": "Hex-studie af {{author}}"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "Hex-opgaver af {{author}}",
+            "n_puzzles_one": "{{count}} Hex-opgave",
+            "n_puzzles_other": "{{count}} Hex-opgaver"
+        },
+        "player": {
+            "title": "{{player}}, Hex-spiller",
+            "bot": "Hex-AI",
+            "rating": "Rating {{rating}}",
+            "member_since": "Medlem siden {{date}}",
+            "on_playhex": "Spiller på PlayHex",
+            "n_games_one": "{{count}} parti spillet",
+            "n_games_other": "{{count}} partier spillet"
+        },
+        "ladder": {
+            "king": "Konge: {{player}}",
+            "king_female": "Dronning: {{player}}",
+            "reign_one": "Har regeret i {{duration}}, {{count}} forsvar",
+            "reign_other": "Har regeret i {{duration}}, {{count}} forsvar",
+            "n_players_one": "{{count}} spiller på bakken",
+            "n_players_other": "{{count}} spillere på bakken"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hex-opgaver",
+                "description": "Løs Hex-opgaver lavet af fællesskabet, fra begynder til ekspert, og lav dine egne."
+            },
+            "tournaments": {
+                "title": "Hex-turneringer",
+                "description": "Deltag i online Hex-turneringer: live og korrespondance, schweizisk system og knockout."
+            },
+            "tournament_series": {
+                "title": "Hex-turneringsserier",
+                "description": "Tilbagevendende Hex-turneringer: følg en serie for at vide, hvornår den næste udgave spilles."
+            },
+            "ladders": {
+                "title": "Bakkens konge",
+                "description": "Klatr op ad Hex-stigen: udfordr spillere over dig, tag deres plads og forsvar tronen."
+            },
+            "games_archive": {
+                "title": "Arkiv over Hex-partier",
+                "description": "Gennemse og søg i alle Hex-partier spillet på PlayHex."
+            },
+            "videos": {
+                "title": "Hex-videoer",
+                "description": "Videoer om Hex lavet af fællesskabet: vejledninger, strategi, partigennemgange."
+            },
+            "statistics": {
+                "title": "PlayHex-statistik",
+                "description": "Partier, spillere, brætstørrelser og vinderprocenter på PlayHex."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Udforsk Hex-positioner med AI-analyse."
+            },
+            "swap_maps": {
+                "title": "Hex-byttekort",
+                "description": "Hvilke åbningstræk der bør byttes for hver brætstørrelse, beregnet af KataHex."
+            },
+            "guide": {
+                "title": "PlayHex-guide",
+                "description": "Sådan spiller du Hex på PlayHex: regler, AI-analyse, betingede træk, moderation."
+            },
+            "export_games_data": {
+                "title": "Eksportér PlayHex-partidata",
+                "description": "Download et datasæt med alle Hex-partier spillet på PlayHex, frit til genbrug."
+            },
+            "guide_ai_analysis": {
+                "title": "AI-partianalyse",
+                "description": "Gennemgå dine Hex-partier med AI: find dine bommerter, se de bedste træk, og find ud af, hvornår du vandt eller tabte fordelen."
+            },
+            "guide_conditional_moves": {
+                "title": "Betingede træk",
+                "description": "Spil Hex-korrespondancepartier hurtigere: planlæg dine svar på modstanderens næste træk, og spil stiger automatisk."
+            },
+            "tutorial_rules": {
+                "title": "Hex-regler",
+                "description": "Lær Hex' 2 regler på få minutter med en interaktiv vejledning, og spil derefter dine første partier mod en bot."
+            },
+            "tutorial_swap": {
+                "title": "Bytteregel i Hex",
+                "description": "Bytteregel holder Hex-partier afbalancerede."
+            },
+            "tutorial_bridge": {
+                "title": "Broen i Hex",
+                "description": "Broen er den vigtigste form i Hex: to sten, der allerede er forbundet uden at røre hinanden. Lær hvordan den virker, og øv dig med opgaver."
+            },
+            "tutorial_block": {
+                "title": "Hex-strategi for begyndere: blokér for at vinde",
+                "description": "I Hex bygger blokering din egen vej: den bedste strategi i starten af partiet."
+            },
+            "tutorial_ziggurat": {
+                "title": "Ziggurat-skabelonen i Hex",
+                "description": "Zigguraten er den anden form, du skal kende i Hex: en sten på tredje række forbundet til sin kant. Lær hvordan den virker, og øv dig med opgaver."
+            },
+            "cijm_2025": {
+                "title": "Hex-turnering – Paris 2025",
+                "description": "To Hex-turneringer den 14. og 15. juni 2025 på Salon Culture & Jeux Mathématiques, Place Saint-Sulpice, Paris. Gratis, alle niveauer."
+            },
+            "cijm_2026": {
+                "title": "Hex-turnering – Paris 2026",
+                "description": "Kæmpe Hex-turnering søndag den 24. maj 2026 på Salon Culture & Jeux Mathématiques, Place Saint-Sulpice, Paris. Gratis, alle niveauer, fra 8 år."
+            }
+        },
+        "n_days_one": "{{count}} dag",
+        "n_days_other": "{{count}} dage",
+        "n_hours_one": "{{count}} time",
+        "n_hours_other": "{{count}} timer"
+    },
+    "game_outcome": {
+        "path": "Forbindelse",
+        "resign": "Opgivelse",
+        "time": "Tid",
+        "forfeit": "Uden kamp"
+    },
+    "has_chat_messages": "Med chatbeskeder",
+    "has_analyze": "Med AI-analyse",
+    "has_malkovich_messages": "Med Malkovich-noter",
+    "game_content_filter": "Indhold",
+    "filters": "Filtre",
+    "reset_filters": "Nulstil filtre",
+    "reset_dates": "Nulstil datoer",
+    "game_type": "Partitype",
+    "game_state_filter": "Status",
+    "opponent_or_players": "Spillere",
+    "one_or_two_players_help": "1 spiller: denne spillers partier. 2 spillere: partier mellem dem.",
+    "search_opponent": "Modstander",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "Alle filtre",
+    "hide_filters": "Færre filtre",
+    "week_of": "Uge fra {{date}}",
+    "chart_grouping": {
+        "label": "Gruppér efter",
+        "auto": "Auto",
+        "day": "Dag",
+        "week": "Uge",
+        "month": "Måned"
+    },
+    "n_games_found_one": "{{count}} parti fundet.",
+    "n_games_found_other": "{{count}} partier fundet."
 }

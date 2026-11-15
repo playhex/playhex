@@ -8,7 +8,9 @@
         "open_live_games": "ライブ対局に参加",
         "open_correspondence_games": "通信対局に参加",
         "no_open_live_games": "現在参加可能なライブ対局はありません",
-        "no_open_correspondence_games": "現在参加可能な通信対局はありません"
+        "no_open_correspondence_games": "現在参加可能な通信対局はありません",
+        "multiple_waiting_games": "複数の待機中の対局：",
+        "others_canceled_once_one_accepted": "待機中の対局のいずれかが承諾されると、ほかの対局はキャンセルされます。"
     },
     "game": {
         "opponent": "対戦相手",
@@ -35,13 +37,19 @@
         "info": "情報",
         "duration": "時間",
         "title_your_turn": "あなたの番です！",
-        "title_waiting": "対戦相手を待機中：作成者"
+        "title_waiting": "対戦相手を待機中：作成者",
+        "winner": "勝者",
+        "loser": "敗者",
+        "issue": "結果",
+        "moves_count": "手数"
     },
     "game_rules": {
         "normal": "通常",
         "host_plays_first": "ホストが先手",
         "host_plays_second": "ホストが後手",
-        "no_swap": "スワップなし"
+        "no_swap": "スワップなし",
+        "handicap_for_host": "ホストにハンデ {{n}}",
+        "handicap_for_opponent": "相手にハンデ {{n}}"
     },
     "create_game": {
         "custom_size": "カスタム",
@@ -60,7 +68,8 @@
             "notifications": "通知",
             "ai_workers": "AIワーカー",
             "connected_applications": "連携アプリ",
-            "technical_info": "技術情報"
+            "technical_info": "技術情報",
+            "security": "セキュリティ"
         },
         "audio": "音声",
         "moderation": "モデレーション"
@@ -140,7 +149,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "自分のコンピュータでPlayHexのAI移動を計算する方法を見る",
-        "engine_unavailable": "一部のAIエンジンは現在オンラインのワーカーがないため、これらのAIは利用できません。"
+        "engine_unavailable": "一部のAIエンジンは現在オンラインのワーカーがないため、これらのAIは利用できません。",
+        "ai_not_available": "現在利用できません"
     },
     "game_analysis": {
         "game_analysis": "AIによるゲーム分析",
@@ -190,7 +200,12 @@
     },
     "1vAI_friendly": {
         "title": "AIとプレイ",
-        "create": "AIとプレイ"
+        "create": "AIとプレイ",
+        "easy": "やさしい",
+        "medium": "ふつう",
+        "hard": "むずかしい",
+        "beaten": "撃破済み",
+        "unlock_stronger_ais": "AIの選択肢をもっと表示"
     },
     "1vAI_offline": {
         "title": "オフラインAI",
@@ -496,7 +511,12 @@
         "block_at_a_distance": "相手の石にぴったりくっつけて置かないでください：隣接したブロックは簡単に回り込まれます。少し間を空けて、離れたところでブロックしましょう：相手の手に応じる時間ができます。",
         "block_remember": "覚えておきましょう：Hexでは、良い手は守りと攻めを兼ねています。",
         "ziggurat_defense_1": "青が真ん中に侵入：赤は自分の石の隣に応じ、辺とブリッジを作ります。",
-        "ziggurat_defense_2": "青が1段目に侵入：赤はブリッジで応じ、新しい石は辺につながります。"
+        "ziggurat_defense_2": "青が1段目に侵入：赤はブリッジで応じ、新しい石は辺につながります。",
+        "demo_0_play": "プレイ",
+        "chapters": {
+            "hex_rule": "I. Hexのルール",
+            "beginners_strategy": "II. 初心者向け戦略"
+        }
     },
     "player_made_a_move": "{{player}} が手を打ちました",
     "game_with_player_has_started": "{{player}} とのゲームが始まりました",
@@ -575,7 +595,29 @@
     "handicap": {
         "title": "ハンデ",
         "none": "なし",
-        "handicap_for_player": "{{player}} に {{n}}"
+        "handicap_for_player": "{{player}} に {{n}}",
+        "you": "あなた",
+        "opponent": "相手",
+        "ai": "AI",
+        "increase": "ハンデを増やす",
+        "decrease": "ハンデを減らす",
+        "setup": {
+            "first_stone_then": "{{player}} がスワップ可能な石を置き、続けて {{count}} 個、スワップされた場合は {{swappedCount}} 個置きます。",
+            "first_stone_then_you": "スワップ可能な石を置き、続けて {{count}} 個、スワップされた場合は {{swappedCount}} 個置いてください。",
+            "first_stone_for_blue": "{{player}} がスワップ可能な石を置き、その後 {{beneficiary}} が {{count}} 手打ちます。",
+            "first_stone_for_blue_you": "スワップ可能な石を置いてください。その後 {{beneficiary}} が {{count}} 手打ちます。",
+            "first_stone_for_blue_beneficiary": "{{player}} がスワップ可能な石を置き、その後あなたが {{count}} 手打ちます。",
+            "swap_decision": "{{player}} がスワップするか選びます：その後 {{beneficiary}} が {{swappedCount}} 個、拒否された場合は {{count}} 個の石を置きます。",
+            "swap_decision_you": "石をクリックしてスワップ：その後 {{beneficiary}} が {{swappedCount}} 個、拒否した場合は {{count}} 個の石を置きます。",
+            "swap_decision_beneficiary": "{{player}} がスワップするか選びます：その後あなたが {{swappedCount}} 個、拒否された場合は {{count}} 個の石を置きます。",
+            "stones_after_swap": "石がスワップされました：{{player}} が {{count}} 個の石を置きます。",
+            "stones_after_swap_you": "石がスワップされました：{{count}} 個の石を置いてください。",
+            "refuse_swap": "スワップしない",
+            "no_swap_other": "スワップ無効：{{player}} が {{count}} 個の石を置きます。",
+            "no_swap_you_other": "スワップ無効：{{count}} 個の石を置いてください。",
+            "stones_other": "{{player}} があと {{count}} 個の石を置きます。",
+            "stones_you_other": "あと {{count}} 個の石を置いてください。"
+        }
     },
     "game_created_short": "{{ date }} に作成",
     "game_created_by_system_time_ago": "システムにより {timeAgo} に作成された対局です。",
@@ -834,7 +876,56 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: ゲームボード下の「デバッグ情報」からコピー",
         "engine_unavailable": "このエンジンには現在オンラインのAIワーカーがないため、局面を解析できません。",
-        "analysis_failed": "この局面を解析できませんでした。"
+        "analysis_failed": "この局面を解析できませんでした。",
+        "analyze_in_hexplorer": "Hexplorerで解析",
+        "play_from_position": "局面から対局",
+        "tab_file": "ファイル",
+        "tab_tree": "木",
+        "comment": "コメント",
+        "comment_placeholder": "この局面にコメント…",
+        "current_study": "現在の研究",
+        "new_study": "新しい研究",
+        "study_title": "研究のタイトル",
+        "study_default_title": "無題の研究",
+        "study_by": "作成者：{{author}}",
+        "study_fork": "フォーク",
+        "study_fork_help": "変更を含めて、この研究の自分用コピーを保存",
+        "study_forked_from": "フォーク元",
+        "study_share": "この研究を共有",
+        "study_link_copied": "リンクをコピーしました",
+        "study_delete": "この研究を削除",
+        "study_delete_confirm": "この研究を削除しますか？リンクは使えなくなります。",
+        "study_too_large": "この研究は大きすぎて保存できません：分岐やコメントをいくつか削除してください。",
+        "study_not_found": "この研究は存在しないか、削除されました。",
+        "study_unsaved_changes": "未保存の変更",
+        "study_save_shortcut": "研究を保存（Ctrl+S）",
+        "study_validate_setup_first": "研究を保存するには配置モードを終了してください。",
+        "study_save_to_share": "フォークや共有をするには、この研究を保存してください。",
+        "my_studies": "自分の研究",
+        "export": "エクスポート",
+        "study_sort": "研究を並べ替え",
+        "study_sort_date_desc": "新しい順",
+        "study_sort_date_asc": "古い順",
+        "study_sort_title_asc": "名前 A–Z",
+        "study_sort_title_desc": "名前 Z–A",
+        "tools_history": "履歴",
+        "tools_stones": "石",
+        "tools_marks": "マーク",
+        "tools_label": "ラベル",
+        "study_discard_confirm": "未保存の変更は失われます。続けますか？",
+        "tab_help": "ヘルプ",
+        "help_what_title": "Hexplorerとは？",
+        "help_what": "Hexの無料解析盤：どんな局面でも探索し、複数の変化を試して、AIの評価を確認できます。",
+        "help_why_title": "何に使う？",
+        "help_why": "自分の対局を理解し、より良い手を見つけ、局面についての考えを他のプレイヤーと共有するために。",
+        "help_how_title": "使い方",
+        "help_how_play": "石を自由に置いて独自の局面を作る",
+        "help_how_import": "またはリンクやテキストからHexの対局をインポート",
+        "help_how_ai": "盤の左のバーがどちらが優勢かを示し、盤上にはAIが検討している手が表示されます。",
+        "help_how_setup": "配置モードでは盤にマークを付けたり、局面を自由に編集したりできます",
+        "help_how_file": "研究を保存（Ctrl+S）、共有、またはSGFとしてエクスポート",
+        "help_dismiss": "了解、今後表示しない",
+        "study_nodes_other": "{{count}} ノード"
     },
     "player_menu": {
         "open_menu": "プレイヤーメニューを開く",
@@ -853,7 +944,8 @@
         "reserved_for_other_player": "このゲームは別のプレイヤー専用のチャレンジです。",
         "reserved_for_other_player_named": "このゲームは {{pseudo}} 専用のチャレンジです。",
         "other": "このゲームには参加できません。",
-        "game_canceled": "このゲームはキャンセルされました。"
+        "game_canceled": "このゲームはキャンセルされました。",
+        "is_host_closed": "この対局は非公開です：この対局のリンクを持っている人だけが参加できます。"
     },
     "lobby_challenges_you_badge": "あなたへのチャレンジ",
     "sort_recently_played": "最近プレイしたもの",
@@ -1016,7 +1108,8 @@
         "challenge_player": "プレイヤーへのチャレンジ",
         "challenge_same_target": "同じプレイヤーへの再チャレンジ",
         "analyze_position": "局面の分析",
-        "channel_slow_mode": "スローモード"
+        "channel_slow_mode": "スローモード",
+        "create_hexplorer_study": "Hexplorer研究の作成"
     },
     "head_to_head": "対戦成績",
     "never_played_together": "このプレイヤーとはまだ対戦していません。",
@@ -1093,7 +1186,11 @@
         "opening_moves": "最も一般的な序盤の手",
         "opening_moves_note": "{{boardsize}} 盤では、最も多くプレイされたサイズです。",
         "rating_distribution": "レーティング分布",
-        "rating_distribution_note": "確定したレーティング（偏差が {{deviation}} 未満）を持つボット以外のプレイヤーのみが集計対象です。ゲストも含まれます。"
+        "rating_distribution_note": "確定したレーティング（偏差が {{deviation}} 未満）を持つボット以外のプレイヤーのみが集計対象です。ゲストも含まれます。",
+        "lobby_join_chances": "ライブ対局に相手が見つかる確率",
+        "lobby_join_chances_first_minute": "1分未満",
+        "lobby_join_chances_next_minutes": "+10分",
+        "lobby_join_chances_note": "ロビーで作成されたライブ対局のうち、最初の1分以内に相手が見つかった割合と、最初の1分で誰も参加しなかった場合にその後10分以内に見つかった割合です。ホストがキャンセルせずに待ったと仮定し、直近8週間から推定しています。時刻はローカルタイムゾーン（UTC{{offset}}）で表示されます。"
     },
     "board_mount_error": {
         "error": "盤面を表示できませんでした。エラーが発生しました：",
@@ -1280,7 +1377,17 @@
             "fixed_fill_not_disabled": "{{move}} は固定色がありますが、パズルの外ではありません",
             "fixed_fill_twice": "{{move}} に固定色が2回設定されています",
             "invalid_type": "無効な {{property}}",
-            "solver_unproven_other": "{{count}}局面を時間内に解けなかったため、パズルは一部のみ検証されています"
+            "solver_unproven_other": "{{count}}局面を時間内に解けなかったため、パズルは一部のみ検証されています",
+            "generator_initial_not_winning": "Mohexソルバーはここで勝ち手を見つけられません",
+            "generator_depends_on_disabled_cells": "パズル外のマスの助けがないと勝てません：局面ステップで、辺につながった石にマークを付けてください",
+            "generator_already_connected": "ここではすでにつながっています。生成するものはありません",
+            "generator_unproven": "時間内に勝ち手が証明されず、分岐は空のままです",
+            "generator_budget_exceeded": "木が大きすぎるため、分岐は空のままです",
+            "generator_parallel_dropped": "相手のブリッジへの侵入 {{move}} を並行手順として追加できませんでした。この手を打つとパズル失敗になります",
+            "generator_accepted_losing": "この手は正解扱いですが、Mohexソルバーは負けると証明しています",
+            "generator_accepted_unproven": "この手は正解扱いですが、Mohexソルバーは勝ちを証明していないため、続きは生成されません",
+            "generator_failed_winning": "この手は失敗扱いですが、Mohexソルバーは勝ちと証明しています",
+            "generator_invalid_tree": "生成された木が不正です（{{error}}）"
         },
         "editor": {
             "optional": "任意",
@@ -1439,7 +1546,24 @@
             "monitor_badge_other": "ツリーにない手順 {{count}}件",
             "errors_badge_other": "修正すべき問題 {{count}}件",
             "warnings_badge_other": "検証の警告 {{count}}件",
-            "errors_count_other": "修正すべき問題 {{count}}件、公開タブを参照してください"
+            "errors_count_other": "修正すべき問題 {{count}}件、公開タブを参照してください",
+            "solver_position": "Mohex用の局面",
+            "solver_position_help": "Mohexは盤全体で打ちます：パズル外のマスが局面どおりに埋まっているか、辺につながった石にマークが付いているか確認してください。",
+            "check_section": "パズルを確認",
+            "generate": "木を生成",
+            "generate_tab": "生成",
+            "generate_help": "既存の手を残したまま、選択したノードから木を補完します：勝ち手と反駁はMohex、コンピュータの応手はKatahexが担当します。",
+            "generate_templates": "テンプレートによる接続で停止、最大",
+            "generate_templates_none": "テンプレートなし：接続が完成した時点でのみパズルが終わります。",
+            "generate_templates_help": "このテンプレート以下で接続が証明された時点でパズルが終わります。",
+            "generate_templates_none_option": "なし",
+            "generate_from_node": "このノードから生成",
+            "generate_not_here": "木タブで、パズル終了前のメイン手順のノードを選択してください。",
+            "generate_progress": "局面を解析中：{{done}}/{{total}}",
+            "generate_ok": "木を生成しました。",
+            "generate_warnings": "生成時の警告（{{count}}）：",
+            "generate_stop": "停止",
+            "generate_tree_changed": "生成中に木が変更されたため、結果は破棄されました。もう一度生成してください。"
         },
         "next_puzzle": "次のパズル",
         "collections": {
@@ -1496,7 +1620,12 @@
         "published_ago": "{{date}}に公開",
         "sort_by": "並べ替え",
         "sort_published_at": "公開日",
-        "sort_created_at": "追加日"
+        "sort_created_at": "追加日",
+        "field_secondary_urls": "その他のリンク",
+        "field_secondary_urls_help": "この動画が他のプラットフォーム（PeerTube、Dailymotion…）でも公開されている場合。上のリンクがメインのままです。",
+        "add_link": "リンクを追加",
+        "remove_link": "このリンクを削除",
+        "watch_on": "{{platform}} で見る"
     },
     "swap_maps": {
         "title": "スワップマップ",
@@ -1517,8 +1646,10 @@
     },
     "ladder": {
         "title": "キング・オブ・ザ・ヒル",
+        "title_female": "クイーン・オブ・ザ・ヒル",
         "intro": "ひとつのラダー、ひとつの王座。自分より上のプレイヤーに挑戦しましょう：勝てばその席を奪えます。上に行くほど、守らなければならないことが増えます。",
         "king": "キング・オブ・ザ・ヒル",
+        "king_female": "クイーン・オブ・ザ・ヒル",
         "king_for": "王座について{{duration}}",
         "no_king": "王座は空いています。参加して奪いましょう！",
         "join": "キング・オブ・ザ・ヒルに参加",
@@ -1545,6 +1676,7 @@
         "no_running_challenges": "進行中の挑戦はありません。",
         "vs": "vs",
         "nobody_to_challenge": "挑戦する相手はいません：あなたが王です！",
+        "nobody_to_challenge_female": "挑戦する相手はいません：あなたが女王です！",
         "live": "ライブ",
         "challenge_overlay": {
             "title": "{{player}} に挑戦",
@@ -1588,6 +1720,7 @@
             "challenge_defended": "{{opponent}} が {{player}} から席を守りました",
             "challenge_voided": "{{player}} 対 {{opponent}} の対局はキャンセルされました",
             "new_king": "{{player}} が新しいキング・オブ・ザ・ヒルです！",
+            "new_king_female": "{{player}} が新しいクイーン・オブ・ザ・ヒルです！",
             "giant_slayer": "{{player}} はジャイアントキラー：{{opponent}} を王座から降ろしました！",
             "climber": "{{player}} が{{wins}}連続で挑戦に勝ちました！",
             "strike": "{{player}} が対局で時間切れになりました（警告{{strikes}}）",
@@ -1759,5 +1892,342 @@
             }
         },
         "check_device_code": "このコードが端末に表示されているコードと一致することを確認してください："
-    }
+    },
+    "pronouns": {
+        "title": "代名詞",
+        "explain": "代名詞は公開されます：プロフィールや、ユーザー名をクリックしたときに表示されます。また、インターフェースの文言をあなたに合わせたり、他のプレイヤーに対してあなたをどう表すかにも使われます。",
+        "save_error": "代名詞を保存できませんでした。もう一度お試しください。",
+        "he/him": "he/him（彼）",
+        "she/her": "she/her（彼女）",
+        "they/them": "they/them",
+        "unspecified": "代名詞未設定"
+    },
+    "player_popover": {
+        "on_playhex_since": "PlayHex歴 {{duration}}"
+    },
+    "closed_game": "非公開対局",
+    "closed_game_help": "この対局は他のプレイヤーのロビーに表示されません。リンクを持っている人だけが、まだPlayHexに登録していなくても参加できます。",
+    "closed_game_invite": {
+        "link_label": "友だちに送るリンク",
+        "share": "共有"
+    },
+    "chat_header": {
+        "game_started": "対局開始",
+        "game_ended": "対局終了",
+        "game_canceled": "対局キャンセル"
+    },
+    "host_waiting_join_chance_first_minute": "この時間帯は、対局の {{percent}} が最初の1分以内に相手が見つかります。",
+    "host_waiting_join_chance_next_minutes": "まだ誰も参加していません。あと10分待つと、ホストの {{percent}} が相手を見つけています。",
+    "match_title_in_tournament": "{{ tournament }} の {{ match }}",
+    "chat_message_visibility": "メッセージの公開範囲",
+    "chat_attach_to_move_toggle": "このメッセージを {{n}} 手目の下に表示",
+    "chat_message_visibility_public": "公開",
+    "chat_message_visibility_private": "個人メモ",
+    "chat_message_visibility_malkovich": "マルコビッチ",
+    "chat_message_placeholder_private": "個人メモ、あなたにだけ表示されます…",
+    "chat_message_placeholder_malkovich": "マルコビッチ、対局終了後に全員に表示されます…",
+    "chat_new_messages": "新着",
+    "set_password": "パスワードを設定",
+    "set_password_explain": "アカウントにまだパスワードがありません。パスワードを設定すると、ユーザー名「{{login}}」でもログインできます。",
+    "saved": "保存しました",
+    "or": "または",
+    "log_in_with_discord": "Discordでログイン",
+    "must_be_logged_in": "ログインが必要です",
+    "same_pseudo": "すでにこのユーザー名です",
+    "pseudo_change_limit_reached": "最近ユーザー名を変更しすぎています",
+    "must_set_password_first": "先にパスワードを設定してください。設定しないとログインできなくなります",
+    "discord_login_failed": "Discordでのログインに失敗しました。もう一度お試しください",
+    "discord_login_cancelled": "Discordでのログインがキャンセルされました",
+    "discord_already_linked": "このDiscordアカウントはすでに別のPlayHexアカウントに連携されています",
+    "discord_account_creation_rate_limited": "最近作成されたアカウントが多すぎます。しばらくしてからお試しください",
+    "change_pseudo": {
+        "title": "ユーザー名を変更",
+        "new_pseudo": "新しいユーザー名",
+        "submit": "ユーザー名を変更",
+        "confirm": "ユーザー名を「{{pseudo}}」に変更しますか？",
+        "success": "ユーザー名を変更しました。",
+        "next_allowed_at": "最近ユーザー名を変更しすぎています。{{date}} に再度変更できます。",
+        "old_pseudo_released": "古いユーザー名は他のプレイヤーが使えるようになります。古いプロフィールURLへのリンクは新しいURLにリダイレクトされます。今後は新しいユーザー名でログインします。",
+        "remaining_other": "30日以内にあと {{count}} 回ユーザー名を変更できます。",
+        "former_pseudo_note_other": "プロフィールに「旧名 {pseudo}」が {{count}} 日間表示されます。"
+    },
+    "formerly": "旧名",
+    "discord_account": {
+        "title": "Discord",
+        "private": "連携したDiscordアカウントはあなたにだけ表示され、プロフィールには表示されません。",
+        "explain": "Discordアカウントを連携すると、Discordでログインできます。",
+        "link": "Discordアカウントを連携",
+        "linked_to": "Discordアカウント {username} と連携済み。Discordでログインできます。",
+        "unlink": "連携を解除",
+        "unlink_confirm": "Discordアカウントの連携を解除しますか？Discordでログインできなくなります。",
+        "set_password_to_unlink": "Discordアカウントの連携を解除するには、ログインできるよう先にパスワードを設定してください。"
+    },
+    "recovery_email": {
+        "title": "復旧用メールアドレス",
+        "explain": "任意。パスワードを忘れた場合など、アカウントのセキュリティに関する連絡に使います。",
+        "email": "メールアドレス",
+        "private": "メールアドレスは非公開で、他のプレイヤーに表示されることはありません。削除するには空欄にしてください。",
+        "invalid": "無効なメールアドレス"
+    },
+    "cancel_request": {
+        "ask": "中止を提案",
+        "player_wants_to_cancel": "{{ player }} が対局の中止を提案しています",
+        "accept": "中止を承諾",
+        "reject": "拒否",
+        "request_denied": "{{ player }} の対局中止のリクエストは拒否されました。",
+        "game_canceled_by_agreement": "{{ player }} の提案により、両者合意のうえ対局は中止されました。",
+        "confirm_overlay": {
+            "title": "対局の中止を提案しますか？",
+            "message": "相手にリクエストが送られ、相手は承諾または拒否できます。承諾されると対局は中止され、記録に残りません。",
+            "confirmLabel": "はい、リクエストを送る",
+            "cancelLabel": "いいえ、対局を続ける"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorerライブ",
+        "tab_live": "ライブ",
+        "tab_play": "対局",
+        "bot_unavailable": "利用不可",
+        "tab_chat": "チャット",
+        "live": "ライブ",
+        "stream": "配信",
+        "stream_description": "リンクを共有：誰でもあなたの解析をライブで見て、カーソルを確認し、チャットできます。",
+        "start_stream": "配信を開始",
+        "stop_stream": "配信を停止",
+        "share_link": "共有用リンク",
+        "copy_link": "リンクをコピー",
+        "match": "この局面から対局",
+        "match_description": "盤上の局面から、ボットまたは他のプレイヤーと対局します。終了すると、対局は変化として解析に追加されます。",
+        "i_play": "自分の手番",
+        "opponent": "相手",
+        "opponent_player": "プレイヤー",
+        "invite_player_optional": "プレイヤーを招待（任意）",
+        "invite_player_help": "招待されたプレイヤーには通知が届き、その人だけが参加できます。招待しない場合は、最初にリンクを開いた人が対局できます。",
+        "validate_setup_first": "先に配置した局面を確定してください。",
+        "start_match": "対局開始",
+        "back_to_analysis": "解析に戻る",
+        "back_to_match": "対局に戻る",
+        "waiting_for_opponent": "相手を待っています…",
+        "waiting_for_player": "{{pseudo}} を待っています…",
+        "you": "あなた",
+        "your_turn": "あなたの手番",
+        "swap_hint": "石をクリックしてスワップ。",
+        "wins": "の勝ち",
+        "wins_by_resignation": "の投了勝ち",
+        "match_expired": "対局終了：長時間着手がありませんでした。",
+        "match_canceled": "対局はキャンセルされました。",
+        "join_match": "この対局をプレイ",
+        "cancel_match": "対局をキャンセル",
+        "hosted_by": "ホスト：",
+        "session_ended": "このセッションは終了しました。",
+        "waiting_for_stream": "配信者を待っています…",
+        "open_copy": "コピーを開く",
+        "open_copy_failed": "コピーを開けませんでした。",
+        "invitation_toast": "{{pseudo}} からHexplorerの局面での対局に招待されました。",
+        "invitation_open": "開く",
+        "live_elsewhere": "すでに別の研究からライブ配信中です。ライブセッションは一度に1つだけです。",
+        "go_to_live_study": "そちらへ移動",
+        "back_to_live": "Hexplorer配信はまだ続いています：配信に戻る",
+        "errors": {
+            "session_not_found": "このライブセッションはもう存在しません。",
+            "already_live": "すでに別のタブでライブ配信中です。先に停止してください。",
+            "not_host": "この操作はホストのみ可能です。",
+            "match_already_running": "すでに対局が進行中です。",
+            "position_already_won": "この局面はすでに勝敗が決まっています。",
+            "bot_unavailable": "このボットは現在利用できません。",
+            "invalid_invited_player": "このプレイヤーは招待できません。",
+            "cannot_join": "この対局には参加できません。",
+            "match_not_playing": "この対局は進行していません。",
+            "not_your_turn": "あなたの手番ではありません。",
+            "not_a_player": "あなたはこの対局のプレイヤーではありません。",
+            "invalid_data": "無効なデータです。",
+            "illegal_move": "この手は打てません。",
+            "study_required": "先に解析を研究として保存してください。"
+        }
+    },
+    "social_preview": {
+        "default_description": "ボードゲームHexをオンラインで、他のプレイヤーやAIと対戦。大会、パズル、対局解析。",
+        "by": "作成者：{{author}}",
+        "game": {
+            "canceled_title": "キャンセルされたHexの対局",
+            "canceled_description": "このHex {{boardsize}} の対局はキャンセルされました。",
+            "waiting_title": "{{player}} の募集中のHex対局",
+            "waiting_title_anonymous": "募集中のHex対局",
+            "waiting_description": "Hex {{boardsize}} の対局、{{timeControl}}、相手を募集中。PlayHexで参加しよう。",
+            "ranked": "レーティング戦",
+            "friendly": "フレンドリー戦",
+            "playing_description": "対局中。PlayHexでライブ観戦できます。",
+            "outcome_path": "{{winner}} が自分の辺をつないで勝利",
+            "outcome_resign": "{{winner}} が投了により勝利",
+            "outcome_time": "{{winner}} が時間切れにより勝利",
+            "outcome_forfeit": "{{winner}} が不戦勝",
+            "winner": "{{winner}} の勝ち",
+            "image_alt": "Hexの対局 {{title}} の最終局面",
+            "open_game": "募集中の対局",
+            "join": "PlayHexで参加",
+            "playing": "対局中",
+            "cadency_live": "ライブ",
+            "cadency_correspondence": "通信対局",
+            "n_moves_other": "{{count}} 手"
+        },
+        "tournament": {
+            "starts_at": "{{date}} 開始",
+            "running": "大会進行中",
+            "rank_1": "1位：{{player}}",
+            "rank_2": "2位：{{player}}",
+            "rank_3": "3位：{{player}}",
+            "canceled": "大会は中止されました",
+            "hex_tournament": "Hex大会",
+            "n_registered_other": "{{count}} 人登録",
+            "n_participants_other": "参加者 {{count}} 人"
+        },
+        "tournament_series": {
+            "next": "次回：{{title}}、{{date}}",
+            "hex_tournaments": "Hex大会",
+            "n_editions_other": "{{count}} 回開催"
+        },
+        "puzzle": {
+            "default_title": "Hexパズル",
+            "red_to_play": "赤番で勝ち",
+            "blue_to_play": "青番で勝ち",
+            "label": "パズル",
+            "hex_puzzle_by": "{{author}} のHexパズル"
+        },
+        "hexplorer_study": {
+            "default_title": "Hexplorer研究",
+            "label": "研究",
+            "hex_study_by": "{{author}} のHex研究"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "{{author}} のHexパズル集",
+            "n_puzzles_other": "Hexパズル {{count}} 問"
+        },
+        "player": {
+            "title": "{{player}}、Hexプレイヤー",
+            "bot": "Hex AI",
+            "rating": "レーティング {{rating}}",
+            "member_since": "{{date}} から登録",
+            "on_playhex": "PlayHexのプレイヤー",
+            "n_games_other": "{{count}} 局対局"
+        },
+        "ladder": {
+            "king": "王者：{{player}}",
+            "reign_other": "在位 {{duration}}、防衛 {{count}} 回",
+            "n_players_other": "丘に {{count}} 人"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hexパズル",
+                "description": "コミュニティが作った初級から上級までのHexパズルを解いて、自分でも作ってみよう。"
+            },
+            "tournaments": {
+                "title": "Hex大会",
+                "description": "オンラインのHex大会に参加：ライブと通信対局、スイス式とトーナメント式。"
+            },
+            "tournament_series": {
+                "title": "Hex大会シリーズ",
+                "description": "定期開催のHex大会：シリーズをフォローして次回の開催日を確認しよう。"
+            },
+            "ladders": {
+                "title": "キング・オブ・ザ・ヒル",
+                "description": "Hexのラダーを登ろう：上位のプレイヤーに挑戦し、その座を奪い、王座を守ろう。"
+            },
+            "games_archive": {
+                "title": "Hex対局アーカイブ",
+                "description": "PlayHexで行われたすべてのHex対局を閲覧・検索。"
+            },
+            "videos": {
+                "title": "Hex動画",
+                "description": "コミュニティが作ったHexの動画：チュートリアル、戦略、対局解説。"
+            },
+            "statistics": {
+                "title": "PlayHex統計",
+                "description": "PlayHexの対局数、プレイヤー、盤サイズ、勝率。"
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "AI解析でHexの局面を探索。"
+            },
+            "swap_maps": {
+                "title": "Hexスワップマップ",
+                "description": "各盤サイズでスワップすべき初手を、KataHexで計算。"
+            },
+            "guide": {
+                "title": "PlayHexガイド",
+                "description": "PlayHexでのHexの遊び方：ルール、AI解析、条件付き着手、モデレーション。"
+            },
+            "export_games_data": {
+                "title": "PlayHex対局データのエクスポート",
+                "description": "PlayHexで行われたすべてのHex対局のデータセットをダウンロード。自由に再利用できます。"
+            },
+            "guide_ai_analysis": {
+                "title": "AIによる対局解析",
+                "description": "AIでHexの対局を振り返ろう：悪手を見つけ、最善手を確認し、優勢を得た・失った局面を知ろう。"
+            },
+            "guide_conditional_moves": {
+                "title": "条件付き着手",
+                "description": "Hexの通信対局をもっと速く：相手の次の手への応手を予約し、ラダーを自動で打とう。"
+            },
+            "tutorial_rules": {
+                "title": "Hexのルール",
+                "description": "インタラクティブなチュートリアルでHexの2つのルールを数分で学び、ボットと最初の対局をしてみよう。"
+            },
+            "tutorial_swap": {
+                "title": "Hexのスワップルール",
+                "description": "スワップルールはHexの対局のバランスを保ちます。"
+            },
+            "tutorial_bridge": {
+                "title": "Hexのブリッジ",
+                "description": "ブリッジはHexで最も重要な形：触れ合わずにすでにつながっている2つの石。仕組みを学び、パズルで練習しよう。"
+            },
+            "tutorial_block": {
+                "title": "初心者向けHex戦略：ブロックして勝つ",
+                "description": "Hexでは、ブロックすることが自分の道を作ります：序盤の最善の戦略です。"
+            },
+            "tutorial_ziggurat": {
+                "title": "Hexのジッグラト・テンプレート",
+                "description": "ジッグラトはHexで2番目に知っておくべき形：3段目の石が自分の辺につながっています。仕組みを学び、パズルで練習しよう。"
+            },
+            "cijm_2025": {
+                "title": "Hex大会 – パリ 2025",
+                "description": "2025年6月14日・15日、パリのサン＝シュルピス広場で開催される「文化と数学ゲームの見本市」で2つのHex大会。参加無料、全レベル対象。"
+            },
+            "cijm_2026": {
+                "title": "Hex大会 – パリ 2026",
+                "description": "2026年5月24日（日）、パリのサン＝シュルピス広場で開催される「文化と数学ゲームの見本市」でジャイアントHex大会。参加無料、全レベル対象、8歳から。"
+            }
+        },
+        "n_days_other": "{{count}} 日",
+        "n_hours_other": "{{count}} 時間"
+    },
+    "game_outcome": {
+        "path": "接続",
+        "resign": "投了",
+        "time": "時間切れ",
+        "forfeit": "不戦"
+    },
+    "has_chat_messages": "チャットあり",
+    "has_analyze": "AI解析あり",
+    "has_malkovich_messages": "マルコビッチの記録あり",
+    "game_content_filter": "内容",
+    "filters": "フィルター",
+    "reset_filters": "フィルターをリセット",
+    "reset_dates": "日付をリセット",
+    "game_type": "対局の種類",
+    "game_state_filter": "状態",
+    "opponent_or_players": "プレイヤー",
+    "one_or_two_players_help": "1人：そのプレイヤーの対局。2人：2人の間の対局。",
+    "search_opponent": "相手",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "すべてのフィルター",
+    "hide_filters": "フィルターを減らす",
+    "week_of": "{{date}} の週",
+    "chart_grouping": {
+        "label": "グループ化",
+        "auto": "自動",
+        "day": "日",
+        "week": "週",
+        "month": "月"
+    },
+    "n_games_found_other": "{{count}} 局見つかりました。"
 }

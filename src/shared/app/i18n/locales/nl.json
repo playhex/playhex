@@ -8,7 +8,9 @@
         "open_live_games": "Doe mee aan een live spel",
         "open_correspondence_games": "Doe mee aan een correspondentiespel",
         "no_open_live_games": "Momenteel geen open live spellen",
-        "no_open_correspondence_games": "Momenteel geen open correspondentiespellen"
+        "no_open_correspondence_games": "Momenteel geen open correspondentiespellen",
+        "multiple_waiting_games": "Meerdere wachtende partijen:",
+        "others_canceled_once_one_accepted": "Zodra een van je wachtende partijen wordt geaccepteerd, worden de andere geannuleerd."
     },
     "game": {
         "opponent": "Tegenstander",
@@ -35,13 +37,19 @@
         "info": "Info",
         "duration": "Lengte",
         "title_your_turn": "Jou beurt!",
-        "title_waiting": "Wachten op een tegenstander: gehost door"
+        "title_waiting": "Wachten op een tegenstander: gehost door",
+        "winner": "Winnaar",
+        "loser": "Verliezer",
+        "issue": "Uitslag",
+        "moves_count": "Zetten"
     },
     "game_rules": {
         "normal": "standaard",
         "host_plays_first": "gastheer speelt eerst",
         "host_plays_second": "gastheer speelt als tweede",
-        "no_swap": "geen ruil"
+        "no_swap": "geen ruil",
+        "handicap_for_host": "handicap {{n}} voor de host",
+        "handicap_for_opponent": "handicap {{n}} voor de tegenstander"
     },
     "create_game": {
         "custom_size": "Aangepast",
@@ -60,7 +68,8 @@
             "notifications": "Meldingen",
             "ai_workers": "AI-workers",
             "connected_applications": "Gekoppelde applicaties",
-            "technical_info": "Technische info"
+            "technical_info": "Technische info",
+            "security": "Beveiliging"
         },
         "audio": "Geluid",
         "moderation": "Moderatie"
@@ -140,7 +149,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "Zie hoe je AI zetten kunt berekenen voor PlayHex vanaf mijn computer",
-        "engine_unavailable": "Sommige AI-engines hebben op dit moment geen worker online, deze AI's zijn niet beschikbaar."
+        "engine_unavailable": "Sommige AI-engines hebben op dit moment geen worker online, deze AI's zijn niet beschikbaar.",
+        "ai_not_available": "Nu niet beschikbaar"
     },
     "game_analysis": {
         "game_analysis": "Spelanalyse door AI",
@@ -191,7 +201,12 @@
     },
     "1vAI_friendly": {
         "title": "Speel vs AI",
-        "create": "Speel vs AI"
+        "create": "Speel vs AI",
+        "easy": "Makkelijk",
+        "medium": "Gemiddeld",
+        "hard": "Moeilijk",
+        "beaten": "Al verslagen",
+        "unlock_stronger_ais": "Meer AI-opties tonen"
     },
     "1vAI_offline": {
         "title": "Offline AI",
@@ -361,8 +376,12 @@
         "undo_move": "Ongedaan maken",
         "accept": "Ongedaan maken accepteren",
         "reject": "Afwijzen",
-        "player_wants_to_takeback": "{{ player }} wil zijn/haar zet terugnemen",
-        "player_takeback_his_move": "{{ player }} heeft zijn/haar zet teruggenomen.",
+        "player_wants_to_takeback": "{{ player }} wil de zet terugnemen",
+        "player_wants_to_takeback_male": "{{ player }} wil zijn zet terugnemen",
+        "player_wants_to_takeback_female": "{{ player }} wil haar zet terugnemen",
+        "player_takeback_his_move": "{{ player }} heeft de zet teruggenomen.",
+        "player_takeback_his_move_male": "{{ player }} heeft zijn zet teruggenomen.",
+        "player_takeback_his_move_female": "{{ player }} heeft haar zet teruggenomen.",
         "takeback_request_denied": "Verzoek van {{ player }} om de zet terug te nemen is geweigerd.",
         "takeback_confirm_overlay": {
             "title": "Zet terugnemen vragen?",
@@ -426,7 +445,33 @@
     "handicap": {
         "title": "Handicap",
         "none": "geen",
-        "handicap_for_player": "{{n}} voor {{player}}"
+        "handicap_for_player": "{{n}} voor {{player}}",
+        "you": "jij",
+        "opponent": "tegenstander",
+        "ai": "AI",
+        "increase": "Handicap verhogen",
+        "decrease": "Handicap verlagen",
+        "setup": {
+            "first_stone_then": "{{player}} plaatst een ruilbare steen, daarna nog {{count}}, of {{swappedCount}} bij ruilen.",
+            "first_stone_then_you": "Plaats een ruilbare steen, daarna nog {{count}}, of {{swappedCount}} bij ruilen.",
+            "first_stone_for_blue": "{{player}} plaatst een ruilbare steen, daarna speelt {{beneficiary}} {{count}} zetten.",
+            "first_stone_for_blue_you": "Plaats een ruilbare steen, daarna speelt {{beneficiary}} {{count}} zetten.",
+            "first_stone_for_blue_beneficiary": "{{player}} plaatst een ruilbare steen, daarna speel jij {{count}} zetten.",
+            "swap_decision": "{{player}} kiest of er geruild wordt: {{beneficiary}} plaatst dan {{swappedCount}} stenen, of {{count}} bij weigering.",
+            "swap_decision_you": "Klik op de steen om te ruilen: {{beneficiary}} plaatst dan {{swappedCount}} stenen, of {{count}} als je weigert.",
+            "swap_decision_beneficiary": "{{player}} kiest of er geruild wordt: jij plaatst dan {{swappedCount}} stenen, of {{count}} bij weigering.",
+            "stones_after_swap": "Steen geruild: {{player}} plaatst {{count}} stenen.",
+            "stones_after_swap_you": "Steen geruild: plaats {{count}} stenen.",
+            "refuse_swap": "Niet ruilen",
+            "no_swap_one": "Ruilen uitgeschakeld: {{player}} plaatst 1 steen.",
+            "no_swap_other": "Ruilen uitgeschakeld: {{player}} plaatst {{count}} stenen.",
+            "no_swap_you_one": "Ruilen uitgeschakeld: plaats 1 steen.",
+            "no_swap_you_other": "Ruilen uitgeschakeld: plaats {{count}} stenen.",
+            "stones_one": "{{player}} plaatst nog 1 steen.",
+            "stones_other": "{{player}} plaatst nog {{count}} stenen.",
+            "stones_you_one": "Plaats nog 1 steen.",
+            "stones_you_other": "Plaats nog {{count}} stenen."
+        }
     },
     "game_created_short": "gemaakt {{ date }}",
     "game_created_by_system_time_ago": "Spel aangemaakt door systeem, {timeAgo}.",
@@ -724,7 +769,12 @@
         "block_at_a_distance": "Leg je steen niet direct tegen die van je tegenstander: een aangrenzende blokkade is makkelijk te omzeilen. Blokkeer verder weg en laat wat ruimte: je hebt dan tijd om op zijn zetten te antwoorden.",
         "block_remember": "Onthoud: in Hex is een goede zet zowel verdedigend als aanvallend.",
         "ziggurat_defense_1": "Blauw dringt het midden binnen: Rood antwoordt naast zijn steen en maakt een brug met de rand.",
-        "ziggurat_defense_2": "Blauw dringt de eerste rij binnen: Rood antwoordt met een brug, en de nieuwe steen is verbonden met de rand."
+        "ziggurat_defense_2": "Blauw dringt de eerste rij binnen: Rood antwoordt met een brug, en de nieuwe steen is verbonden met de rand.",
+        "demo_0_play": "Spelen",
+        "chapters": {
+            "hex_rule": "I. Hex-regels",
+            "beginners_strategy": "II. Strategie voor beginners"
+        }
     },
     "donate": "Doneer aan PlayHex",
     "notifications": "Meldingen",
@@ -844,7 +894,57 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Kopiëren van \"Debuginformatie\" onder het speelbord",
         "engine_unavailable": "Er is op dit moment geen AI-worker online voor deze engine, posities kunnen niet worden geanalyseerd.",
-        "analysis_failed": "Kon deze positie niet analyseren."
+        "analysis_failed": "Kon deze positie niet analyseren.",
+        "analyze_in_hexplorer": "Analyseren in Hexplorer",
+        "play_from_position": "Spelen vanaf een positie",
+        "tab_file": "Bestand",
+        "tab_tree": "Boom",
+        "comment": "Commentaar",
+        "comment_placeholder": "Geef commentaar op deze positie…",
+        "current_study": "Huidige studie",
+        "new_study": "Nieuwe studie",
+        "study_title": "Titel van de studie",
+        "study_default_title": "Naamloze studie",
+        "study_by": "Door {{author}}",
+        "study_fork": "Forken",
+        "study_fork_help": "Je eigen kopie van deze studie opslaan, met de wijzigingen",
+        "study_forked_from": "Geforkt van",
+        "study_share": "Deze studie delen",
+        "study_link_copied": "Link gekopieerd",
+        "study_delete": "Deze studie verwijderen",
+        "study_delete_confirm": "Deze studie verwijderen? De link werkt dan niet meer.",
+        "study_too_large": "Deze studie is te groot om op te slaan: verwijder enkele takken of commentaren.",
+        "study_not_found": "Deze studie bestaat niet of is verwijderd.",
+        "study_unsaved_changes": "Niet-opgeslagen wijzigingen",
+        "study_save_shortcut": "Studie opslaan (Ctrl+S)",
+        "study_validate_setup_first": "Beëindig de opstellingsmodus om de studie op te slaan.",
+        "study_save_to_share": "Sla deze studie op om haar te forken of te delen.",
+        "my_studies": "Mijn studies",
+        "export": "Exporteren",
+        "study_sort": "Studies sorteren",
+        "study_sort_date_desc": "Nieuwste",
+        "study_sort_date_asc": "Oudste",
+        "study_sort_title_asc": "Naam A–Z",
+        "study_sort_title_desc": "Naam Z–A",
+        "tools_history": "Geschiedenis",
+        "tools_stones": "Stenen",
+        "tools_marks": "Markeringen",
+        "tools_label": "Label",
+        "study_discard_confirm": "Je hebt niet-opgeslagen wijzigingen, die gaan verloren. Doorgaan?",
+        "tab_help": "Help",
+        "help_what_title": "Wat is Hexplorer?",
+        "help_what": "Een gratis analysebord voor Hex: verken elke positie, probeer varianten uit en zie wat de AI ervan vindt.",
+        "help_why_title": "Waarom gebruiken?",
+        "help_why": "Om je partijen te begrijpen, betere zetten te vinden en je ideeën over een positie met andere spelers te delen.",
+        "help_how_title": "Hoe gebruik je het",
+        "help_how_play": "Plaats vrij stenen om een eigen positie te bouwen",
+        "help_how_import": "of importeer een Hex-partij via een link of tekst",
+        "help_how_ai": "De balk links van het bord toont wie er wint, en het bord toont de zetten die de AI overweegt.",
+        "help_how_setup": "In de opstellingsmodus kun je markeringen op het bord zetten en een positie vrij bewerken",
+        "help_how_file": "Sla je studie op (Ctrl+S), deel haar of exporteer haar als SGF",
+        "help_dismiss": "Begrepen, niet meer tonen",
+        "study_nodes_one": "{{count}} knoop",
+        "study_nodes_other": "{{count}} knopen"
     },
     "player_menu": {
         "open_menu": "Spelersmenu openen",
@@ -863,7 +963,8 @@
         "reserved_for_other_player": "Deze partij is een uitdaging voor een andere speler.",
         "reserved_for_other_player_named": "Deze partij is een uitdaging voor {{pseudo}}.",
         "other": "Je kunt niet aan deze partij deelnemen.",
-        "game_canceled": "Deze partij is geannuleerd."
+        "game_canceled": "Deze partij is geannuleerd.",
+        "is_host_closed": "Deze partij is gesloten: alleen iemand met de link naar deze partij kan meedoen."
     },
     "board_mount_error": {
         "error": "Het bord kon niet worden weergegeven, er is een fout opgetreden:",
@@ -934,6 +1035,7 @@
         "load_error": "Kon toernooireeksen niet laden",
         "next": "Volgende:",
         "last_winner": "Laatste winnaar:",
+        "last_winner_female": "Laatste winnares:",
         "see_all": "Alle reeksen bekijken"
     },
     "tournament_series_page": {
@@ -1084,7 +1186,8 @@
         "create_game": "een partij aanmaken",
         "challenge_player": "een speler uitdagen",
         "challenge_same_target": "deze speler opnieuw uitdagen",
-        "analyze_position": "posities analyseren"
+        "analyze_position": "posities analyseren",
+        "create_hexplorer_study": "Hexplorer-studies aanmaken"
     },
     "head_to_head": "Onderling",
     "never_played_together": "Je hebt nog nooit tegen deze speler gespeeld.",
@@ -1238,7 +1341,17 @@
             "fixed_fill_twice": "{{move}} heeft twee keer een vaste kleur",
             "invalid_type": "Ongeldige {{property}}",
             "solver_unproven_one": "{{count}} positie kon niet op tijd worden opgelost, de puzzel is maar gedeeltelijk gecontroleerd",
-            "solver_unproven_other": "{{count}} posities konden niet op tijd worden opgelost, de puzzel is maar gedeeltelijk gecontroleerd"
+            "solver_unproven_other": "{{count}} posities konden niet op tijd worden opgelost, de puzzel is maar gedeeltelijk gecontroleerd",
+            "generator_initial_not_winning": "De Mohex-solver vindt hier geen winnende zet",
+            "generator_depends_on_disabled_cells": "Winst lukt alleen met hulp van velden buiten de puzzel: markeer in de positiestap stenen die met hun rand verbonden zijn",
+            "generator_already_connected": "Hier is al een verbinding, niets te genereren",
+            "generator_unproven": "Geen winnende zet op tijd bewezen, tak leeg gelaten",
+            "generator_budget_exceeded": "Boom te groot, tak leeg gelaten",
+            "generator_parallel_dropped": "Indringing {{move}} in een brug van de tegenstander kon niet als parallelle reeks worden toegevoegd, die zet spelen laat de puzzel mislukken",
+            "generator_accepted_losing": "Deze zet wordt geaccepteerd, maar de Mohex-solver bewijst dat hij verliest",
+            "generator_accepted_unproven": "Deze zet wordt geaccepteerd, maar de Mohex-solver bewijst niet dat hij wint: hij wordt niet voortgezet",
+            "generator_failed_winning": "Deze zet faalt, maar de Mohex-solver bewijst dat hij wint",
+            "generator_invalid_tree": "Gegenereerde boom is ongeldig ({{error}})"
         },
         "editor": {
             "optional": "Optioneel",
@@ -1403,7 +1516,24 @@
             "warnings_badge_one": "{{count}} controlewaarschuwing",
             "warnings_badge_other": "{{count}} controlewaarschuwingen",
             "errors_count_one": "{{count}} probleem op te lossen, zie tabblad Publiceren",
-            "errors_count_other": "{{count}} problemen op te lossen, zie tabblad Publiceren"
+            "errors_count_other": "{{count}} problemen op te lossen, zie tabblad Publiceren",
+            "solver_position": "Positie voor Mohex",
+            "solver_position_help": "Mohex speelt op het hele bord: controleer dat velden buiten de puzzel volgens de positie gevuld zijn en dat stenen die met een rand verbonden zijn gemarkeerd zijn.",
+            "check_section": "Puzzel controleren",
+            "generate": "Boom genereren",
+            "generate_tab": "Genereren",
+            "generate_help": "Vult de boom aan vanaf de geselecteerde knoop en behoudt bestaande zetten: winnende zetten en weerleggingen door Mohex, antwoorden van de computer door Katahex.",
+            "generate_templates": "Stoppen bij een verbinding via template, tot",
+            "generate_templates_none": "Geen template: de puzzel eindigt pas als de verbinding compleet is.",
+            "generate_templates_help": "De puzzel eindigt zodra de verbinding bewezen is met dit template of een kleiner.",
+            "generate_templates_none_option": "Geen",
+            "generate_from_node": "Genereren vanaf deze knoop",
+            "generate_not_here": "Selecteer in het tabblad Boom een knoop van de hoofdreeks, vóór het einde van de puzzel.",
+            "generate_progress": "Posities oplossen: {{done}}/{{total}}",
+            "generate_ok": "Boom gegenereerd.",
+            "generate_warnings": "Waarschuwingen bij genereren ({{count}}):",
+            "generate_stop": "Stoppen",
+            "generate_tree_changed": "De boom is tijdens het genereren gewijzigd, het resultaat is genegeerd. Genereer opnieuw."
         },
         "next_puzzle": "Volgende puzzel",
         "collections": {
@@ -1461,7 +1591,12 @@
         "published_ago": "Gepubliceerd {{date}}",
         "sort_by": "Sorteren op",
         "sort_published_at": "Publicatiedatum",
-        "sort_created_at": "Datum toegevoegd"
+        "sort_created_at": "Datum toegevoegd",
+        "field_secondary_urls": "Andere links",
+        "field_secondary_urls_help": "Als deze video ook op andere platforms staat (PeerTube, Dailymotion…). De link hierboven blijft de hoofdlink.",
+        "add_link": "Link toevoegen",
+        "remove_link": "Deze link verwijderen",
+        "watch_on": "Bekijken op {{platform}}"
     },
     "swap_maps": {
         "title": "Swapkaarten",
@@ -1529,13 +1664,20 @@
         "opening_moves": "Meest gespeelde openingszetten",
         "opening_moves_note": "Voor {{boardsize}}-borden, de meest gespeelde grootte.",
         "rating_distribution": "Ratingverdeling",
-        "rating_distribution_note": "Alleen spelers die geen bot zijn met een stabiele rating (afwijking onder {{deviation}}) worden meegeteld. Gasten zijn inbegrepen."
+        "rating_distribution_note": "Alleen spelers die geen bot zijn met een stabiele rating (afwijking onder {{deviation}}) worden meegeteld. Gasten zijn inbegrepen.",
+        "lobby_join_chances": "Kans dat iemand meedoet aan een livepartij",
+        "lobby_join_chances_first_minute": "< 1 min",
+        "lobby_join_chances_next_minutes": "+10 min",
+        "lobby_join_chances_note": "Percentage livepartijen aangemaakt in de lobby dat binnen de eerste minuut een tegenstander krijgt, en daarna binnen de volgende 10 minuten als niemand na de eerste minuut meedeed. Geschat over de laatste 8 weken, alsof hosts hadden gewacht in plaats van te annuleren. Tijden in je lokale tijdzone (UTC{{offset}})."
     },
     "ladder": {
         "title": "Koning van de heuvel",
+        "title_female": "Koningin van de heuvel",
         "intro": "Eén ladder, één troon. Daag een speler boven je uit: win je, dan neem je zijn plaats in. Hoe hoger je zit, hoe meer je moet verdedigen.",
         "king": "Koning van de heuvel",
+        "king_female": "Koningin van de heuvel",
         "king_for": "Al {{duration}} koning",
+        "king_for_female": "Al {{duration}} koningin",
         "no_king": "De troon is leeg. Doe mee en neem hem in!",
         "join": "Meedoen aan Koning van de heuvel",
         "leave": "Deze heuvel verlaten",
@@ -1561,6 +1703,7 @@
         "no_running_challenges": "Geen lopende uitdaging.",
         "vs": "vs",
         "nobody_to_challenge": "Niemand om uit te dagen: jij bent de Koning!",
+        "nobody_to_challenge_female": "Niemand om uit te dagen: jij bent de Koningin!",
         "live": "Live",
         "challenge_overlay": {
             "title": "{{player}} uitdagen",
@@ -1601,9 +1744,12 @@
             "removed_strikes_before_first_game": "{{player}} is verwijderd van plaats #{{position}} na tijdoverschrijding voordat er een partij was uitgespeeld",
             "challenge_won": "{{player}} versloeg {{opponent}} en ging van #{{from}} naar #{{position}}",
             "challenge_won_no_move": "{{player}} versloeg {{opponent}}",
-            "challenge_defended": "{{opponent}} verdedigde zijn plaats tegen {{player}}",
+            "challenge_defended": "{{opponent}} verdedigde de eigen plaats tegen {{player}}",
+            "challenge_defended_male": "{{opponent}} verdedigde zijn plaats tegen {{player}}",
+            "challenge_defended_female": "{{opponent}} verdedigde haar plaats tegen {{player}}",
             "challenge_voided": "Partij {{player}} vs {{opponent}} is geannuleerd",
             "new_king": "{{player}} is de nieuwe Koning van de heuvel!",
+            "new_king_female": "{{player}} is de nieuwe Koningin van de heuvel!",
             "giant_slayer": "{{player}} is een Reuzendoder: onttroonde {{opponent}}!",
             "climber": "{{player}} won {{wins}} uitdagingen op rij!",
             "strike": "{{player}} overschreed de tijd in een partij (waarschuwing {{strikes}})",
@@ -1627,7 +1773,9 @@
             "no_outgoing_slot": "Je hebt al zoveel uitdagingen verstuurd als je plaats toestaat.",
             "defender_incoming_full": "Deze speler kan op dit moment geen uitdagingen meer ontvangen.",
             "defender_cooling_down": "Deze speler heeft net een partij uitgespeeld en kan weer worden uitgedaagd vanaf {{date}}.",
-            "opponent_cooldown": "Je hebt onlangs tegen deze speler gespeeld. Je kunt hem weer uitdagen vanaf {{date}}.",
+            "opponent_cooldown": "Je hebt onlangs tegen deze speler gespeeld. Je kunt opnieuw uitdagen vanaf {{date}}.",
+            "opponent_cooldown_male": "Je hebt onlangs tegen deze speler gespeeld. Je kunt hem weer uitdagen vanaf {{date}}.",
+            "opponent_cooldown_female": "Je hebt onlangs tegen deze speelster gespeeld. Je kunt haar weer uitdagen vanaf {{date}}.",
             "diversity_limit": "Te veel van je laatste partijen waren tegen deze speler.",
             "defender_diversity_limit": "Te veel van de laatste partijen van deze speler waren tegen jou.",
             "already_playing_opponent": "Je hebt al een lopende partij tegen deze speler.",
@@ -1782,5 +1930,356 @@
     "n_messages_one": "{{ count }} bericht",
     "n_messages_other": "{{ count }} berichten",
     "n_interested_one": "{{ count }} geïnteresseerde",
-    "n_interested_other": "{{ count }} geïnteresseerden"
+    "n_interested_other": "{{ count }} geïnteresseerden",
+    "pronouns": {
+        "title": "Voornaamwoorden",
+        "explain": "Deze voornaamwoorden zijn openbaar: ze staan op je profiel en verschijnen als iemand op je gebruikersnaam klikt. Ze worden ook gebruikt om de teksten van de interface op jou af te stemmen, en hoe die over jou spreekt tegen andere spelers.",
+        "save_error": "Kan voornaamwoorden niet opslaan. Probeer het opnieuw.",
+        "he/him": "hij/hem",
+        "she/her": "zij/haar",
+        "they/them": "hen/die",
+        "unspecified": "Voornaamwoorden niet opgegeven"
+    },
+    "player_popover": {
+        "on_playhex_since": "Al {{duration}} op PlayHex"
+    },
+    "closed_game": "Gesloten partij",
+    "closed_game_help": "Deze partij verschijnt niet in de lobby van andere spelers. Alleen wie de link heeft kan meedoen, ook als die nog niet op PlayHex is.",
+    "closed_game_invite": {
+        "link_label": "Link om naar een vriend te sturen",
+        "share": "Delen"
+    },
+    "chat_header": {
+        "game_started": "Partij gestart",
+        "game_ended": "Partij beëindigd",
+        "game_canceled": "Partij geannuleerd"
+    },
+    "host_waiting_join_chance_first_minute": "Op dit tijdstip krijgt {{percent}} van de partijen binnen de eerste minuut een tegenstander.",
+    "host_waiting_join_chance_next_minutes": "Nog niemand doet mee. Wie 10 minuten langer wacht, vindt in {{percent}} van de gevallen een tegenstander.",
+    "match_title_in_tournament": "{{ match }} van {{ tournament }}",
+    "chat_message_visibility": "Zichtbaarheid van bericht",
+    "chat_attach_to_move_toggle": "Dit bericht onder zet {{n}} tonen",
+    "chat_message_visibility_public": "Openbaar",
+    "chat_message_visibility_private": "Persoonlijke notities",
+    "chat_message_visibility_malkovich": "Malkovich",
+    "chat_message_placeholder_private": "Persoonlijke notitie, alleen zichtbaar voor jou…",
+    "chat_message_placeholder_malkovich": "Malkovich, zichtbaar voor iedereen zodra de partij voorbij is…",
+    "chat_new_messages": "Nieuw",
+    "set_password": "Wachtwoord instellen",
+    "set_password_explain": "Je account heeft nog geen wachtwoord. Stel een wachtwoord in om ook in te loggen met je gebruikersnaam \"{{login}}\".",
+    "saved": "Opgeslagen",
+    "or": "of",
+    "log_in_with_discord": "Inloggen met Discord",
+    "must_be_logged_in": "Je moet ingelogd zijn",
+    "same_pseudo": "Dit is al je gebruikersnaam",
+    "pseudo_change_limit_reached": "Je hebt je gebruikersnaam onlangs te vaak gewijzigd",
+    "must_set_password_first": "Stel eerst een wachtwoord in, anders kun je niet meer inloggen",
+    "discord_login_failed": "Inloggen met Discord mislukt, probeer het opnieuw",
+    "discord_login_cancelled": "Inloggen met Discord is geannuleerd",
+    "discord_already_linked": "Dit Discord-account is al gekoppeld aan een ander PlayHex-account",
+    "discord_account_creation_rate_limited": "Er zijn onlangs te veel accounts aangemaakt, probeer het later opnieuw",
+    "change_pseudo": {
+        "title": "Gebruikersnaam wijzigen",
+        "new_pseudo": "Nieuwe gebruikersnaam",
+        "submit": "Gebruikersnaam wijzigen",
+        "confirm": "Je gebruikersnaam wijzigen in \"{{pseudo}}\"?",
+        "success": "Je gebruikersnaam is gewijzigd.",
+        "next_allowed_at": "Je hebt je gebruikersnaam onlangs te vaak gewijzigd. Je kunt hem weer wijzigen op {{date}}.",
+        "old_pseudo_released": "Je oude gebruikersnaam komt beschikbaar voor andere spelers. Links naar de url van je oude profiel worden doorgestuurd naar je nieuwe. Je logt voortaan in met je nieuwe gebruikersnaam.",
+        "remaining_one": "Je kunt je gebruikersnaam binnen 30 dagen nog {{count}} keer wijzigen.",
+        "remaining_other": "Je kunt je gebruikersnaam binnen 30 dagen nog {{count}} keer wijzigen.",
+        "former_pseudo_note_one": "Je profiel toont {{count}} dag \"voorheen {pseudo}\".",
+        "former_pseudo_note_other": "Je profiel toont {{count}} dagen \"voorheen {pseudo}\"."
+    },
+    "formerly": "voorheen",
+    "discord_account": {
+        "title": "Discord",
+        "private": "Alleen jij ziet je gekoppelde Discord-account, het wordt niet op je profiel getoond.",
+        "explain": "Koppel je Discord-account om in te loggen met Discord.",
+        "link": "Mijn Discord-account koppelen",
+        "linked_to": "Gekoppeld aan Discord-account {username}. Je kunt inloggen met Discord.",
+        "unlink": "Ontkoppelen",
+        "unlink_confirm": "Je Discord-account ontkoppelen? Je kunt dan niet meer inloggen met Discord.",
+        "set_password_to_unlink": "Stel eerst een wachtwoord in om je Discord-account te ontkoppelen, zodat je nog kunt inloggen."
+    },
+    "recovery_email": {
+        "title": "Herstel-e-mail",
+        "explain": "Optioneel. Wordt gebruikt om contact met je op te nemen over de beveiliging van je account, bijvoorbeeld als je je wachtwoord kwijt bent.",
+        "email": "E-mail",
+        "private": "Je e-mail is privé en wordt nooit aan andere spelers getoond. Laat leeg om te verwijderen.",
+        "invalid": "Ongeldig e-mailadres"
+    },
+    "cancel_request": {
+        "ask": "Annuleren voorstellen",
+        "player_wants_to_cancel": "{{ player }} stelt voor de partij te annuleren",
+        "accept": "Annulering accepteren",
+        "reject": "Weigeren",
+        "request_denied": "Het verzoek van {{ player }} om de partij te annuleren is geweigerd.",
+        "game_canceled_by_agreement": "Partij in onderling overleg geannuleerd, voorgesteld door {{ player }}.",
+        "confirm_overlay": {
+            "title": "Voorstellen de partij te annuleren?",
+            "message": "Dit stuurt een verzoek naar je tegenstander, die het kan accepteren of weigeren. Bij acceptatie wordt de partij geannuleerd en telt niet mee.",
+            "confirmLabel": "Ja, verzoek versturen",
+            "cancelLabel": "Nee, verder spelen"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer live",
+        "tab_live": "Live",
+        "tab_play": "Spelen",
+        "bot_unavailable": "niet beschikbaar",
+        "tab_chat": "Chat",
+        "live": "Live",
+        "stream": "Stream",
+        "stream_description": "Deel een link: iedereen kan je analyse live volgen, je cursor zien en chatten.",
+        "start_stream": "Stream starten",
+        "stop_stream": "Stream stoppen",
+        "share_link": "Link om te delen",
+        "copy_link": "Link kopiëren",
+        "match": "Spelen vanaf deze positie",
+        "match_description": "Speel een partij vanaf de positie op het bord, tegen een bot of een andere speler. Na afloop wordt de partij als variant aan je analyse toegevoegd.",
+        "i_play": "Ik speel",
+        "opponent": "Tegenstander",
+        "opponent_player": "Een speler",
+        "invite_player_optional": "Een speler uitnodigen (optioneel)",
+        "invite_player_help": "Wie uitgenodigd is krijgt een melding en is de enige die mee kan doen. Anders kan de eerste die de link opent spelen.",
+        "validate_setup_first": "Bevestig eerst de opstelling.",
+        "start_match": "Partij starten",
+        "back_to_analysis": "Terug naar de analyse",
+        "back_to_match": "Terug naar de partij",
+        "waiting_for_opponent": "Wachten op een tegenstander…",
+        "waiting_for_player": "Wachten op {{pseudo}}…",
+        "you": "Jij",
+        "your_turn": "Jouw beurt",
+        "swap_hint": "Klik op de steen om te ruilen.",
+        "wins": "wint",
+        "wins_by_resignation": "wint door opgave",
+        "match_expired": "Partij beëindigd: te lang geen zet.",
+        "match_canceled": "Partij geannuleerd.",
+        "join_match": "Deze partij spelen",
+        "cancel_match": "Partij annuleren",
+        "hosted_by": "Georganiseerd door",
+        "session_ended": "Deze sessie is beëindigd.",
+        "waiting_for_stream": "Wachten op de stream…",
+        "open_copy": "Een kopie openen",
+        "open_copy_failed": "Kan geen kopie openen.",
+        "invitation_toast": "{{pseudo}} nodigt je uit voor een partij vanaf een Hexplorer-positie.",
+        "invitation_open": "Openen",
+        "live_elsewhere": "Je bent al live vanuit een andere studie. Maar één livesessie tegelijk.",
+        "go_to_live_study": "Ga erheen",
+        "back_to_live": "Je Hexplorer-stream loopt nog: ga terug",
+        "errors": {
+            "session_not_found": "Deze livesessie bestaat niet meer.",
+            "already_live": "Je bent al live in een ander tabblad. Stop die eerst.",
+            "not_host": "Alleen de host kan dit doen.",
+            "match_already_running": "Er loopt al een partij.",
+            "position_already_won": "Deze positie is al gewonnen.",
+            "bot_unavailable": "Deze bot is nu niet beschikbaar.",
+            "invalid_invited_player": "Deze speler kan niet worden uitgenodigd.",
+            "cannot_join": "Je kunt niet meedoen aan deze partij.",
+            "match_not_playing": "Deze partij wordt niet gespeeld.",
+            "not_your_turn": "Het is niet jouw beurt.",
+            "not_a_player": "Je speelt niet mee in deze partij.",
+            "invalid_data": "Ongeldige gegevens.",
+            "illegal_move": "Deze zet kan niet gespeeld worden.",
+            "study_required": "Sla de analyse eerst op als studie."
+        }
+    },
+    "social_preview": {
+        "default_description": "Speel het bordspel Hex online, tegen andere spelers of tegen AI. Toernooien, puzzels, partijanalyse.",
+        "by": "door {{author}}",
+        "game": {
+            "canceled_title": "Geannuleerde Hex-partij",
+            "canceled_description": "Deze Hex-partij {{boardsize}} is geannuleerd.",
+            "waiting_title": "Open Hex-partij van {{player}}",
+            "waiting_title_anonymous": "Open Hex-partij",
+            "waiting_description": "Hex-partij {{boardsize}}, {{timeControl}}, wacht op een tegenstander. Doe mee op PlayHex.",
+            "ranked": "gerangschikt",
+            "friendly": "vriendschappelijk",
+            "playing_description": "Partij bezig, kijk live mee op PlayHex.",
+            "outcome_path": "{{winner}} won door de eigen zijden te verbinden",
+            "outcome_resign": "{{winner}} won door opgave",
+            "outcome_time": "{{winner}} won op tijd",
+            "outcome_forfeit": "{{winner}} won reglementair",
+            "winner": "{{winner}} wint",
+            "image_alt": "Eindpositie van de Hex-partij {{title}}",
+            "open_game": "Open partij",
+            "join": "Doe mee op PlayHex",
+            "playing": "Partij bezig",
+            "cadency_live": "Live",
+            "cadency_correspondence": "Correspondentie",
+            "n_moves_one": "{{count}} zet",
+            "n_moves_other": "{{count}} zetten"
+        },
+        "tournament": {
+            "starts_at": "Begint {{date}}",
+            "running": "Toernooi bezig",
+            "rank_1": "1e: {{player}}",
+            "rank_2": "2e: {{player}}",
+            "rank_3": "3e: {{player}}",
+            "canceled": "Toernooi geannuleerd",
+            "hex_tournament": "Hex-toernooi",
+            "n_registered_one": "{{count}} speler ingeschreven",
+            "n_registered_other": "{{count}} spelers ingeschreven",
+            "n_participants_one": "{{count}} deelnemer",
+            "n_participants_other": "{{count}} deelnemers"
+        },
+        "tournament_series": {
+            "next": "Volgende: {{title}}, {{date}}",
+            "hex_tournaments": "Hex-toernooien",
+            "n_editions_one": "{{count}} editie gespeeld",
+            "n_editions_other": "{{count}} edities gespeeld"
+        },
+        "puzzle": {
+            "default_title": "Hex-puzzel",
+            "red_to_play": "Rood aan zet en wint",
+            "blue_to_play": "Blauw aan zet en wint",
+            "label": "Puzzel",
+            "hex_puzzle_by": "Hex-puzzel van {{author}}"
+        },
+        "hexplorer_study": {
+            "default_title": "Hexplorer-studie",
+            "label": "Studie",
+            "hex_study_by": "Hex-studie van {{author}}"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "Hex-puzzels van {{author}}",
+            "n_puzzles_one": "{{count}} Hex-puzzel",
+            "n_puzzles_other": "{{count}} Hex-puzzels"
+        },
+        "player": {
+            "title": "{{player}}, Hex-speler",
+            "bot": "Hex-AI",
+            "rating": "Rating {{rating}}",
+            "member_since": "Lid sinds {{date}}",
+            "on_playhex": "Speler op PlayHex",
+            "n_games_one": "{{count}} partij gespeeld",
+            "n_games_other": "{{count}} partijen gespeeld"
+        },
+        "ladder": {
+            "king": "Koning: {{player}}",
+            "king_female": "Koningin: {{player}}",
+            "reign_one": "Regeert al {{duration}}, {{count}} verdediging",
+            "reign_other": "Regeert al {{duration}}, {{count}} verdedigingen",
+            "n_players_one": "{{count}} speler op de heuvel",
+            "n_players_other": "{{count}} spelers op de heuvel"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hex-puzzels",
+                "description": "Los Hex-puzzels van de community op, van beginner tot expert, en maak je eigen puzzels."
+            },
+            "tournaments": {
+                "title": "Hex-toernooien",
+                "description": "Doe mee aan online Hex-toernooien: live en per correspondentie, Zwitsers systeem en knock-out."
+            },
+            "tournament_series": {
+                "title": "Hex-toernooireeksen",
+                "description": "Terugkerende Hex-toernooien: volg een reeks om te weten wanneer de volgende editie wordt gespeeld."
+            },
+            "ladders": {
+                "title": "Koning van de heuvel",
+                "description": "Klim op de Hex-ladder: daag spelers boven je uit, neem hun plaats in en verdedig de troon."
+            },
+            "games_archive": {
+                "title": "Archief van Hex-partijen",
+                "description": "Blader door en zoek in alle Hex-partijen gespeeld op PlayHex."
+            },
+            "videos": {
+                "title": "Hex-video's",
+                "description": "Video's over Hex gemaakt door de community: tutorials, strategie, partijbesprekingen."
+            },
+            "statistics": {
+                "title": "PlayHex-statistieken",
+                "description": "Partijen, spelers, bordgroottes en winstpercentages op PlayHex."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Verken Hex-posities met AI-analyse."
+            },
+            "swap_maps": {
+                "title": "Hex-ruilkaarten",
+                "description": "Welke openingszetten je moet ruilen, per bordgrootte, berekend door KataHex."
+            },
+            "guide": {
+                "title": "PlayHex-gids",
+                "description": "Hoe speel je Hex op PlayHex: regels, AI-analyse, voorwaardelijke zetten, moderatie."
+            },
+            "export_games_data": {
+                "title": "Partijgegevens van PlayHex exporteren",
+                "description": "Download een dataset van alle Hex-partijen gespeeld op PlayHex, vrij herbruikbaar."
+            },
+            "guide_ai_analysis": {
+                "title": "AI-partijanalyse",
+                "description": "Bekijk je Hex-partijen met AI: vind je blunders, zie de beste zetten en ontdek wanneer je het voordeel won of verloor."
+            },
+            "guide_conditional_moves": {
+                "title": "Voorwaardelijke zetten",
+                "description": "Speel Hex-correspondentiepartijen sneller: plan je antwoorden op de volgende zetten van je tegenstander en speel ladders automatisch."
+            },
+            "tutorial_rules": {
+                "title": "Hex-regels",
+                "description": "Leer de 2 regels van Hex in een paar minuten met een interactieve tutorial en speel daarna je eerste partijen tegen een bot."
+            },
+            "tutorial_swap": {
+                "title": "De ruilregel in Hex",
+                "description": "De ruilregel houdt Hex-partijen in balans."
+            },
+            "tutorial_bridge": {
+                "title": "De brug in Hex",
+                "description": "De brug is de belangrijkste vorm in Hex: twee stenen die al verbonden zijn zonder elkaar te raken. Leer hoe het werkt en oefen met puzzels."
+            },
+            "tutorial_block": {
+                "title": "Hex-strategie voor beginners: blokkeren om te winnen",
+                "description": "In Hex bouw je met blokkeren je eigen pad: de beste strategie aan het begin van de partij."
+            },
+            "tutorial_ziggurat": {
+                "title": "Het ziggurat-template in Hex",
+                "description": "De ziggurat is de tweede vorm die je in Hex moet kennen: een steen op de derde rij die met zijn rand verbonden is. Leer hoe het werkt en oefen met puzzels."
+            },
+            "cijm_2025": {
+                "title": "Hex-toernooi – Parijs 2025",
+                "description": "Twee Hex-toernooien op 14 en 15 juni 2025, op de Salon Culture & Jeux Mathématiques, Place Saint-Sulpice, Parijs. Gratis, alle niveaus."
+            },
+            "cijm_2026": {
+                "title": "Hex-toernooi – Parijs 2026",
+                "description": "Reuzen-Hex-toernooi op zondag 24 mei 2026, op de Salon Culture & Jeux Mathématiques, Place Saint-Sulpice, Parijs. Gratis, alle niveaus, vanaf 8 jaar."
+            }
+        },
+        "n_days_one": "{{count}} dag",
+        "n_days_other": "{{count}} dagen",
+        "n_hours_one": "{{count}} uur",
+        "n_hours_other": "{{count}} uur"
+    },
+    "game_outcome": {
+        "path": "Verbinding",
+        "resign": "Opgave",
+        "time": "Tijd",
+        "forfeit": "Reglementair"
+    },
+    "has_chat_messages": "Met chatberichten",
+    "has_analyze": "Met AI-analyse",
+    "has_malkovich_messages": "Met Malkovich-notities",
+    "game_content_filter": "Inhoud",
+    "filters": "Filters",
+    "reset_filters": "Filters wissen",
+    "reset_dates": "Datums wissen",
+    "game_type": "Type partij",
+    "game_state_filter": "Status",
+    "opponent_or_players": "Spelers",
+    "one_or_two_players_help": "1 speler: partijen van deze speler. 2 spelers: partijen tussen hen.",
+    "search_opponent": "Tegenstander",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "Alle filters",
+    "hide_filters": "Minder filters",
+    "week_of": "Week van {{date}}",
+    "chart_grouping": {
+        "label": "Groeperen per",
+        "auto": "Auto",
+        "day": "Dag",
+        "week": "Week",
+        "month": "Maand"
+    },
+    "n_games_found_one": "{{count}} partij gevonden.",
+    "n_games_found_other": "{{count}} partijen gevonden."
 }

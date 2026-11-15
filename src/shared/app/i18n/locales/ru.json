@@ -8,7 +8,9 @@
         "open_live_games": "Присоединиться к игре в реальном времени",
         "open_correspondence_games": "Присоединиться к заочной игре",
         "no_open_live_games": "Сейчас нет открытых игр в реальном времени",
-        "no_open_correspondence_games": "Сейчас нет открытых заочных игр"
+        "no_open_correspondence_games": "Сейчас нет открытых заочных игр",
+        "multiple_waiting_games": "Несколько ожидающих партий:",
+        "others_canceled_once_one_accepted": "Как только одна из ваших ожидающих партий будет принята, остальные отменятся."
     },
     "game": {
         "opponent": "Противник",
@@ -35,13 +37,21 @@
         "title_waiting": "Ожидание соперника: в гостях у",
         "title": "Игра",
         "info": "Информация",
-        "duration": "Продолжительность"
+        "duration": "Продолжительность",
+        "winner": "Победитель",
+        "loser": "Проигравший",
+        "issue": "Итог",
+        "moves_count": "Ходы"
     },
     "game_rules": {
         "normal": "обычные",
-        "host_plays_first": "хост ходит первым",
+        "host_plays_first": "хост ходит первым(-ой)",
+        "host_plays_first_male": "хост ходит первым",
+        "host_plays_first_female": "хост ходит первой",
         "host_plays_second": "хост ходит вторым",
-        "no_swap": "без обмена"
+        "no_swap": "без обмена",
+        "handicap_for_host": "фора {{n}} для хоста",
+        "handicap_for_opponent": "фора {{n}} для соперника"
     },
     "create_game": {
         "custom_size": "Пользовательский",
@@ -60,7 +70,8 @@
             "notifications": "Уведомления",
             "ai_workers": "Воркеры ИИ",
             "connected_applications": "Подключённые приложения",
-            "technical_info": "Техническая информация"
+            "technical_info": "Техническая информация",
+            "security": "Безопасность"
         },
         "audio": "Аудио",
         "moderation": "Модерация"
@@ -92,8 +103,12 @@
     "i_play": {
         "title": "Я играю",
         "random": "Случайно",
-        "first": "Первый",
-        "second": "Второй"
+        "first": "Первый(-ая)",
+        "first_male": "Первый",
+        "first_female": "Первая",
+        "second": "Второй(-ая)",
+        "second_male": "Второй",
+        "second_female": "Вторая"
     },
     "swap_rule": "Правило обмена",
     "enable_swap_rule": "Разрешить обмен фигур",
@@ -140,7 +155,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "Узнайте, как вычислять ходы AI для PlayHex с моего компьютера",
-        "engine_unavailable": "У некоторых движков ИИ сейчас нет ни одного воркера в сети, эти ИИ недоступны."
+        "engine_unavailable": "У некоторых движков ИИ сейчас нет ни одного воркера в сети, эти ИИ недоступны.",
+        "ai_not_available": "Сейчас недоступно"
     },
     "game_analysis": {
         "game_analysis": "Анализ игры AI",
@@ -192,7 +208,12 @@
     },
     "1vAI_friendly": {
         "title": "Играть против AI",
-        "create": "Играть против AI"
+        "create": "Играть против AI",
+        "easy": "Лёгкий",
+        "medium": "Средний",
+        "hard": "Сложный",
+        "beaten": "Уже побеждён",
+        "unlock_stronger_ais": "Показать больше вариантов ИИ"
     },
     "1vAI_offline": {
         "title": "Офлайн AI",
@@ -257,7 +278,9 @@
         "accept": "Принять отмену",
         "reject": "Отклонить",
         "player_wants_to_takeback": "{{ player }} хочет отменить свой ход",
-        "player_takeback_his_move": "{{ player }} отменил свой ход.",
+        "player_takeback_his_move": "{{ player }} отменил(а) свой ход.",
+        "player_takeback_his_move_male": "{{ player }} отменил свой ход.",
+        "player_takeback_his_move_female": "{{ player }} отменила свой ход.",
         "takeback_request_denied": "Запрос {{ player }} на отмену хода был отклонён.",
         "takeback_confirm_overlay": {
             "title": "Запросить отмену хода?",
@@ -318,8 +341,12 @@
     },
     "player_loses_reason": {
         "forfeit": "{player} проигрывает.",
-        "default": "{player} проиграл.",
-        "path": "{player} проиграл.",
+        "default": "{player} проиграл(а).",
+        "default_male": "{player} проиграл.",
+        "default_female": "{player} проиграла.",
+        "path": "{player} проиграл(а).",
+        "path_male": "{player} проиграл.",
+        "path_female": "{player} проиграла.",
         "time": "{player} истекло время ожидания.",
         "resign": "{player} уходит."
     },
@@ -456,18 +483,30 @@
     "tournament_history": {
         "created": "{{organizerPseudo}} создал турнир",
         "edited": "Организатор изменил '{{ field }}' турнира: новое значение '{{ value }}' (старое значение '{{ oldValue }}')",
-        "player_subscribed": "{{ playerPseudo }} подписался на турнир",
-        "player_unsubscribed": "{{ playerPseudo }} отписался от турнира",
-        "player_kicked": "{{ playerPseudo }} был исключён",
-        "player_checked_in": "{{ playerPseudo }} подтвердил участие",
-        "player_banned": "{{ playerPseudo }} был забанен в этом турнире",
+        "player_subscribed": "{{ playerPseudo }} подписался(-ась) на турнир",
+        "player_subscribed_male": "{{ playerPseudo }} подписался на турнир",
+        "player_subscribed_female": "{{ playerPseudo }} подписалась на турнир",
+        "player_unsubscribed": "{{ playerPseudo }} отписался(-ась) от турнира",
+        "player_unsubscribed_male": "{{ playerPseudo }} отписался от турнира",
+        "player_unsubscribed_female": "{{ playerPseudo }} отписалась от турнира",
+        "player_kicked": "{{ playerPseudo }} был(а) исключён(а)",
+        "player_kicked_male": "{{ playerPseudo }} был исключён",
+        "player_kicked_female": "{{ playerPseudo }} была исключена",
+        "player_checked_in": "{{ playerPseudo }} подтвердил(а) участие",
+        "player_checked_in_male": "{{ playerPseudo }} подтвердил участие",
+        "player_checked_in_female": "{{ playerPseudo }} подтвердила участие",
+        "player_banned": "{{ playerPseudo }} был(а) забанен(а) в этом турнире",
+        "player_banned_male": "{{ playerPseudo }} был забанен в этом турнире",
+        "player_banned_female": "{{ playerPseudo }} была забанена в этом турнире",
         "started": "Турнир начался!",
         "match_ended": "Матч {{ round }}.{{ number }} завершён: {{ winnerPseudo }} победил {{ loserPseudo }}.",
         "match_canceled_recreated": "Матч {{ round }}.{{ number }} был пересоздан после отмены.",
         "ended": "Турнир завершён.",
         "changed_admins": "Организатор назначил администраторов: {{ newAdmins }}"
     },
-    "tournament_player_is_banned": "Забанен в этом турнире",
+    "tournament_player_is_banned": "Забанен(а) в этом турнире",
+    "tournament_player_is_banned_male": "Забанен в этом турнире",
+    "tournament_player_is_banned_female": "Забанена в этом турнире",
     "tournament_account_required": "Для участия необходим аккаунт. Гостевой доступ запрещён. Пожалуйста, войдите или зарегистрируйтесь.",
     "tournament_not_enough_participants_to_start": "Невозможно начать турнир. Недостаточно подтверждённых участников для выбранного формата.",
     "save": "Сохранить",
@@ -641,13 +680,48 @@
         "block_at_a_distance": "Не ставьте камень вплотную к камню соперника: соседний блок легко обойти. Блокируйте дальше, оставляя немного места: у вас будет время ответить на его ходы.",
         "block_remember": "Помните: в Hex хороший ход одновременно оборонительный и атакующий.",
         "ziggurat_defense_1": "Синие вторгаются в середину: красные отвечают рядом со своим камнем и образуют мост с краем.",
-        "ziggurat_defense_2": "Синие вторгаются в первый ряд: красные отвечают мостом, и новый камень соединён с краем."
+        "ziggurat_defense_2": "Синие вторгаются в первый ряд: красные отвечают мостом, и новый камень соединён с краем.",
+        "demo_0_play": "Играть",
+        "chapters": {
+            "hex_rule": "I. Правила Hex",
+            "beginners_strategy": "II. Стратегия для начинающих"
+        }
     },
     "force_board_orientation_mode": "Принудительно отображать экран в альбомной или портретной ориентации для этого экрана",
     "handicap": {
         "title": "Помеха",
         "none": "нет",
-        "handicap_for_player": "{{n}} для {{player}}"
+        "handicap_for_player": "{{n}} для {{player}}",
+        "you": "вы",
+        "opponent": "соперник",
+        "ai": "ИИ",
+        "increase": "Увеличить фору",
+        "decrease": "Уменьшить фору",
+        "setup": {
+            "first_stone_then": "{{player}} ставит камень, который можно обменять, затем ещё {{count}}, или {{swappedCount}} при обмене.",
+            "first_stone_then_you": "Поставьте камень, который можно обменять, затем ещё {{count}}, или {{swappedCount}} при обмене.",
+            "first_stone_for_blue": "{{player}} ставит камень, который можно обменять, затем {{beneficiary}} делает ходов: {{count}}.",
+            "first_stone_for_blue_you": "Поставьте камень, который можно обменять, затем {{beneficiary}} делает ходов: {{count}}.",
+            "first_stone_for_blue_beneficiary": "{{player}} ставит камень, который можно обменять, затем вы делаете ходов: {{count}}.",
+            "swap_decision": "{{player}} решает, менять ли: затем {{beneficiary}} ставит камней: {{swappedCount}}, или {{count}} при отказе.",
+            "swap_decision_you": "Нажмите на камень, чтобы обменять: затем {{beneficiary}} ставит камней: {{swappedCount}}, или {{count}}, если вы откажетесь.",
+            "swap_decision_beneficiary": "{{player}} решает, менять ли: затем вы ставите камней: {{swappedCount}}, или {{count}} при отказе.",
+            "stones_after_swap": "Камень обменян: {{player}} ставит камней: {{count}}.",
+            "stones_after_swap_you": "Камень обменян: поставьте камней: {{count}}.",
+            "refuse_swap": "Не менять",
+            "no_swap_one": "Обмен отключён: {{player}} ставит {{count}} камень.",
+            "no_swap_few": "Обмен отключён: {{player}} ставит {{count}} камня.",
+            "no_swap_many": "Обмен отключён: {{player}} ставит {{count}} камней.",
+            "no_swap_you_one": "Обмен отключён: поставьте {{count}} камень.",
+            "no_swap_you_few": "Обмен отключён: поставьте {{count}} камня.",
+            "no_swap_you_many": "Обмен отключён: поставьте {{count}} камней.",
+            "stones_one": "{{player}} ставит ещё {{count}} камень.",
+            "stones_few": "{{player}} ставит ещё {{count}} камня.",
+            "stones_many": "{{player}} ставит ещё {{count}} камней.",
+            "stones_you_one": "Поставьте ещё {{count}} камень.",
+            "stones_you_few": "Поставьте ещё {{count}} камня.",
+            "stones_you_many": "Поставьте ещё {{count}} камней."
+        }
     },
     "muted": {
         "on": "Без звука",
@@ -752,7 +826,9 @@
     "notification": {
         "you_won": "Вы выиграли партию!",
         "you_lost": "Вы проиграли партию :(",
-        "opponent_moderated": "{{player}} был подвергнут модерации. Извините за неподобающие сообщения, которые вы получили."
+        "opponent_moderated": "{{player}} был(а) подвергнут(а) модерации. Извините за неподобающие сообщения, которые вы получили.",
+        "opponent_moderated_male": "{{player}} был подвергнут модерации. Извините за неподобающие сообщения, которые вы получили.",
+        "opponent_moderated_female": "{{player}} была подвергнута модерации. Извините за неподобающие сообщения, которые вы получили."
     },
     "player_sent_you_rematch_offer": "{{ player }} предложил вам матч-реванш!",
     "player_sent_rematch_offer": "{{ player }} отправил предложение реванша",
@@ -854,7 +930,58 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Скопировать из «Отладочная информация» под игровой доской",
         "engine_unavailable": "Для этого движка сейчас нет ни одного воркера ИИ в сети, позиции не могут быть проанализированы.",
-        "analysis_failed": "Не удалось проанализировать эту позицию."
+        "analysis_failed": "Не удалось проанализировать эту позицию.",
+        "analyze_in_hexplorer": "Анализировать в Hexplorer",
+        "play_from_position": "Играть с позиции",
+        "tab_file": "Файл",
+        "tab_tree": "Дерево",
+        "comment": "Комментарий",
+        "comment_placeholder": "Прокомментируйте эту позицию…",
+        "current_study": "Текущее исследование",
+        "new_study": "Новое исследование",
+        "study_title": "Название исследования",
+        "study_default_title": "Исследование без названия",
+        "study_by": "Автор: {{author}}",
+        "study_fork": "Копировать",
+        "study_fork_help": "Сохранить собственную копию этого исследования с изменениями",
+        "study_forked_from": "Скопировано из",
+        "study_share": "Поделиться исследованием",
+        "study_link_copied": "Ссылка скопирована",
+        "study_delete": "Удалить исследование",
+        "study_delete_confirm": "Удалить это исследование? Ссылка на него перестанет работать.",
+        "study_too_large": "Исследование слишком большое для сохранения: удалите некоторые ветки или комментарии.",
+        "study_not_found": "Это исследование не существует или было удалено.",
+        "study_unsaved_changes": "Несохранённые изменения",
+        "study_save_shortcut": "Сохранить исследование (Ctrl+S)",
+        "study_validate_setup_first": "Завершите режим расстановки, чтобы сохранить исследование.",
+        "study_save_to_share": "Сохраните исследование, чтобы скопировать его или поделиться им.",
+        "my_studies": "Мои исследования",
+        "export": "Экспорт",
+        "study_sort": "Сортировка исследований",
+        "study_sort_date_desc": "Сначала новые",
+        "study_sort_date_asc": "Сначала старые",
+        "study_sort_title_asc": "Название А–Я",
+        "study_sort_title_desc": "Название Я–А",
+        "tools_history": "История",
+        "tools_stones": "Камни",
+        "tools_marks": "Пометки",
+        "tools_label": "Метка",
+        "study_discard_confirm": "У вас есть несохранённые изменения, они будут потеряны. Продолжить?",
+        "tab_help": "Помощь",
+        "help_what_title": "Что такое Hexplorer?",
+        "help_what": "Бесплатная доска для анализа Hex: исследуйте любую позицию, пробуйте разные варианты и смотрите, что о них думает ИИ.",
+        "help_why_title": "Зачем?",
+        "help_why": "Чтобы понимать свои партии, находить лучшие ходы и делиться идеями о позиции с другими игроками.",
+        "help_how_title": "Как пользоваться",
+        "help_how_play": "Свободно ставьте камни, чтобы построить свою позицию",
+        "help_how_import": "или импортируйте партию Hex по ссылке или из текста",
+        "help_how_ai": "Полоса слева от доски показывает, кто выигрывает, а на доске видны ходы, которые рассматривает ИИ.",
+        "help_how_setup": "Режим расстановки позволяет добавлять пометки на доске и свободно редактировать позицию",
+        "help_how_file": "Сохраните исследование (Ctrl+S), поделитесь им или экспортируйте в SGF",
+        "help_dismiss": "Понятно, больше не показывать",
+        "study_nodes_one": "{{count}} узел",
+        "study_nodes_few": "{{count}} узла",
+        "study_nodes_many": "{{count}} узлов"
     },
     "player_menu": {
         "open_menu": "Открыть меню игрока",
@@ -873,7 +1000,8 @@
         "reserved_for_other_player": "Эта игра предназначена для другого игрока.",
         "reserved_for_other_player_named": "Эта игра предназначена для {{pseudo}}.",
         "other": "Вы не можете присоединиться к этой игре.",
-        "game_canceled": "Эта игра была отменена."
+        "game_canceled": "Эта игра была отменена.",
+        "is_host_closed": "Эта партия закрыта: присоединиться может только тот, у кого есть ссылка на неё."
     },
     "lobby_challenges_you_badge": "Вам бросили вызов!",
     "sort_recently_played": "Недавно сыгранные",
@@ -897,7 +1025,9 @@
         "empty": "Серий турниров пока нет.",
         "load_error": "Не удалось загрузить серии турниров",
         "next": "Следующий:",
-        "last_winner": "Последний победитель:",
+        "last_winner": "Последняя победа:",
+        "last_winner_male": "Последний победитель:",
+        "last_winner_female": "Последняя победительница:",
         "see_all": "Посмотреть все серии"
     },
     "tournament_series_page": {
@@ -1044,7 +1174,8 @@
         "challenge_player": "вызов игрока",
         "challenge_same_target": "повторный вызов этого игрока",
         "analyze_position": "анализ позиций",
-        "channel_slow_mode": "медленный режим"
+        "channel_slow_mode": "медленный режим",
+        "create_hexplorer_study": "создание исследований Hexplorer"
     },
     "head_to_head": "Личные встречи",
     "never_played_together": "Вы ещё ни разу не играли против этого игрока.",
@@ -1121,7 +1252,11 @@
         "opening_moves": "Самые распространённые первые ходы",
         "opening_moves_note": "Для досок размера {{boardsize}}, самого популярного размера.",
         "rating_distribution": "Распределение рейтинга",
-        "rating_distribution_note": "Учитываются только игроки без ботов с установившимся рейтингом (отклонение ниже {{deviation}}). Гости включены."
+        "rating_distribution_note": "Учитываются только игроки без ботов с установившимся рейтингом (отклонение ниже {{deviation}}). Гости включены.",
+        "lobby_join_chances": "Шансы, что к партии вживую присоединятся",
+        "lobby_join_chances_first_minute": "< 1 мин",
+        "lobby_join_chances_next_minutes": "+10 мин",
+        "lobby_join_chances_note": "Доля партий вживую, созданных в лобби, которые находят соперника в первую минуту, а затем в следующие 10 минут, если никто не присоединился за первую минуту. Оценка за последние 8 недель, как если бы хосты ждали, а не отменяли. Время указано в вашем часовом поясе (UTC{{offset}})."
     },
     "board_mount_error": {
         "error": "Не удалось отобразить доску, произошла ошибка:",
@@ -1310,7 +1445,17 @@
             "invalid_type": "Недопустимое значение {{property}}",
             "solver_unproven_one": "{{count}} позицию не удалось решить вовремя, задача проверена лишь частично",
             "solver_unproven_few": "{{count}} позиции не удалось решить вовремя, задача проверена лишь частично",
-            "solver_unproven_many": "{{count}} позиций не удалось решить вовремя, задача проверена лишь частично"
+            "solver_unproven_many": "{{count}} позиций не удалось решить вовремя, задача проверена лишь частично",
+            "generator_initial_not_winning": "Решатель Mohex не находит здесь выигрышного хода",
+            "generator_depends_on_disabled_cells": "Победа возможна только с помощью клеток вне задачи: отметьте камни, соединённые со своим краем, на шаге позиции",
+            "generator_already_connected": "Соединение здесь уже есть, генерировать нечего",
+            "generator_unproven": "Выигрышный ход не доказан вовремя, ветка оставлена пустой",
+            "generator_budget_exceeded": "Дерево слишком большое, ветка оставлена пустой",
+            "generator_parallel_dropped": "Вторжение {{move}} в мост соперника не удалось добавить как параллельную последовательность, этот ход проваливает задачу",
+            "generator_accepted_losing": "Этот ход принимается, но решатель Mohex доказывает, что он проигрывает",
+            "generator_accepted_unproven": "Этот ход принимается, но решатель Mohex не доказывает, что он выигрывает: он не продолжается",
+            "generator_failed_winning": "Этот ход считается ошибкой, но решатель Mohex доказывает, что он выигрывает",
+            "generator_invalid_tree": "Сгенерированное дерево некорректно ({{error}})"
         },
         "editor": {
             "optional": "Необязательно",
@@ -1481,7 +1626,24 @@
             "warnings_badge_many": "{{count}} предупреждений проверки",
             "errors_count_one": "{{count}} проблема для исправления, см. вкладку Публикация",
             "errors_count_few": "{{count}} проблемы для исправления, см. вкладку Публикация",
-            "errors_count_many": "{{count}} проблем для исправления, см. вкладку Публикация"
+            "errors_count_many": "{{count}} проблем для исправления, см. вкладку Публикация",
+            "solver_position": "Позиция для Mohex",
+            "solver_position_help": "Mohex играет на всей доске: проверьте, что клетки вне задачи заполнены в соответствии с позицией, а камни, соединённые с краем, отмечены.",
+            "check_section": "Проверить задачу",
+            "generate": "Сгенерировать дерево",
+            "generate_tab": "Генерация",
+            "generate_help": "Дополняет дерево от выбранного узла, сохраняя существующие ходы: выигрышные ходы и опровержения от Mohex, ответы компьютера от Katahex.",
+            "generate_templates": "Останавливаться на соединении шаблоном, вплоть до",
+            "generate_templates_none": "Без шаблона: задача заканчивается только когда соединение завершено.",
+            "generate_templates_help": "Задача заканчивается, как только соединение доказано этим шаблоном или меньшим.",
+            "generate_templates_none_option": "Нет",
+            "generate_from_node": "Сгенерировать от этого узла",
+            "generate_not_here": "Во вкладке «Дерево» выберите узел основной последовательности до конца задачи.",
+            "generate_progress": "Решение позиций: {{done}}/{{total}}",
+            "generate_ok": "Дерево сгенерировано.",
+            "generate_warnings": "Предупреждения генерации ({{count}}):",
+            "generate_stop": "Остановить",
+            "generate_tree_changed": "Дерево изменилось во время генерации, результат проигнорирован. Сгенерируйте снова."
         },
         "next_puzzle": "Следующая задача",
         "collections": {
@@ -1540,7 +1702,12 @@
         "published_ago": "Опубликовано {{date}}",
         "sort_by": "Сортировать по",
         "sort_published_at": "Дате публикации",
-        "sort_created_at": "Дате добавления"
+        "sort_created_at": "Дате добавления",
+        "field_secondary_urls": "Другие ссылки",
+        "field_secondary_urls_help": "Если это видео также опубликовано на других платформах (PeerTube, Dailymotion…). Ссылка выше остаётся основной.",
+        "add_link": "Добавить ссылку",
+        "remove_link": "Удалить эту ссылку",
+        "watch_on": "Смотреть на {{platform}}"
     },
     "swap_maps": {
         "title": "Карты обмена",
@@ -1561,9 +1728,12 @@
     },
     "ladder": {
         "title": "Царь горы",
+        "title_female": "Царица горы",
         "intro": "Одна лестница, один трон. Бросьте вызов игроку выше вас: если победите, займёте его место. Чем выше вы сидите, тем больше приходится защищаться.",
         "king": "Царь горы",
+        "king_female": "Царица горы",
         "king_for": "Царь уже {{duration}}",
+        "king_for_female": "Царица уже {{duration}}",
         "no_king": "Трон пуст. Присоединяйтесь и займите его!",
         "join": "Присоединиться к «Царю горы»",
         "leave": "Покинуть эту гору",
@@ -1589,23 +1759,30 @@
         "no_running_challenges": "Нет текущих вызовов.",
         "vs": "против",
         "nobody_to_challenge": "Некого вызывать: Царь — это вы!",
+        "nobody_to_challenge_female": "Некого вызывать: Царица — это вы!",
         "live": "Вживую",
         "challenge_overlay": {
             "title": "Вызвать {{player}}",
             "intro": "Партия начинается сразу. Вы ходите первым, соперник может сделать обмен.",
             "propose_live": "Предложить играть вживую",
             "propose_live_help": "Соперник может согласиться или отказаться и играть по переписке. Если ответа нет в течение 10 минут, начинается партия по переписке.",
-            "defender_not_active": "{{player}} сейчас не активен на PlayHex, предложить партию вживую можно только активному игроку.",
+            "defender_not_active": "{{player}} сейчас не активен(-на) на PlayHex, предложить партию вживую можно только активному игроку.",
+            "defender_not_active_male": "{{player}} сейчас не активен на PlayHex, предложить партию вживую можно только активному игроку.",
+            "defender_not_active_female": "{{player}} сейчас не активна на PlayHex, предложить партию вживую можно только активному игроку.",
             "live_time_control": "Контроль времени вживую",
             "submit": "Вызвать"
         },
         "live_proposal_expires": "Если ответа не будет {{date}}, начнётся партия по переписке.",
-        "challenger_not_active": "{{player}} больше не активен, вы не можете принять партию вживую. Можно играть по переписке.",
+        "challenger_not_active": "{{player}} больше не активен(-на), вы не можете принять партию вживую. Можно играть по переписке.",
+        "challenger_not_active_male": "{{player}} больше не активен, вы не можете принять партию вживую. Можно играть по переписке.",
+        "challenger_not_active_female": "{{player}} больше не активна, вы не можете принять партию вживую. Можно играть по переписке.",
         "accept_live": "Играть вживую",
         "decline_live": "Играть по переписке",
         "title_name": {
             "giant_slayer": "Победитель гигантов",
-            "climber": "Скалолаз"
+            "climber": "Скалолаз(ка)",
+            "climber_male": "Скалолаз",
+            "climber_female": "Скалолазка"
         },
         "title_help": {
             "giant_slayer": "Сверг Царя, который защитился 5 раз или больше",
@@ -1622,21 +1799,46 @@
             "empty": "Пока ничего."
         },
         "event": {
-            "join": "{{player}} присоединился на место #{{position}}",
-            "leave": "{{player}} покинул «Царя горы» с места #{{position}}",
-            "removed_inactive": "{{player}} удалён с места #{{position}} за неактивность",
-            "removed_strikes": "{{player}} удалён с места #{{position}} после истечения времени ({{strikes}})",
-            "removed_strikes_before_first_game": "{{player}} удалён с места #{{position}} после истечения времени, не завершив ни одной партии",
-            "challenge_won": "{{player}} победил {{opponent}} и переместился с #{{from}} на #{{position}}",
-            "challenge_won_no_move": "{{player}} победил {{opponent}}",
-            "challenge_defended": "{{opponent}} защитил своё место от {{player}}",
+            "join": "{{player}} присоединился(-ась) на место #{{position}}",
+            "join_male": "{{player}} присоединился на место #{{position}}",
+            "join_female": "{{player}} присоединилась на место #{{position}}",
+            "leave": "{{player}} покинул(а) «Царя горы» с места #{{position}}",
+            "leave_male": "{{player}} покинул «Царя горы» с места #{{position}}",
+            "leave_female": "{{player}} покинула «Царя горы» с места #{{position}}",
+            "removed_inactive": "{{player}} удалён(а) с места #{{position}} за неактивность",
+            "removed_inactive_male": "{{player}} удалён с места #{{position}} за неактивность",
+            "removed_inactive_female": "{{player}} удалена с места #{{position}} за неактивность",
+            "removed_strikes": "{{player}} удалён(а) с места #{{position}} после истечения времени ({{strikes}})",
+            "removed_strikes_male": "{{player}} удалён с места #{{position}} после истечения времени ({{strikes}})",
+            "removed_strikes_female": "{{player}} удалена с места #{{position}} после истечения времени ({{strikes}})",
+            "removed_strikes_before_first_game": "{{player}} удалён(а) с места #{{position}} после истечения времени, не завершив ни одной партии",
+            "removed_strikes_before_first_game_male": "{{player}} удалён с места #{{position}} после истечения времени, не завершив ни одной партии",
+            "removed_strikes_before_first_game_female": "{{player}} удалена с места #{{position}} после истечения времени, не завершив ни одной партии",
+            "challenge_won": "{{player}} победил(а) {{opponent}} и переместился(-ась) с #{{from}} на #{{position}}",
+            "challenge_won_male": "{{player}} победил {{opponent}} и переместился с #{{from}} на #{{position}}",
+            "challenge_won_female": "{{player}} победила {{opponent}} и переместилась с #{{from}} на #{{position}}",
+            "challenge_won_no_move": "{{player}} победил(а) {{opponent}}",
+            "challenge_won_no_move_male": "{{player}} победил {{opponent}}",
+            "challenge_won_no_move_female": "{{player}} победила {{opponent}}",
+            "challenge_defended": "{{opponent}} защитил(а) своё место от {{player}}",
+            "challenge_defended_male": "{{opponent}} защитил своё место от {{player}}",
+            "challenge_defended_female": "{{opponent}} защитила своё место от {{player}}",
             "challenge_voided": "Партия {{player}} против {{opponent}} отменена",
             "new_king": "{{player}} — новый Царь горы!",
-            "giant_slayer": "{{player}} — Победитель гигантов: сверг {{opponent}}!",
-            "climber": "{{player}} выиграл {{wins}} вызовов подряд!",
+            "new_king_female": "{{player}} — новая Царица горы!",
+            "giant_slayer": "{{player}} — Победитель(ница) гигантов: сверг(ла) {{opponent}}!",
+            "giant_slayer_male": "{{player}} — Победитель гигантов: сверг {{opponent}}!",
+            "giant_slayer_female": "{{player}} — Победительница гигантов: свергла {{opponent}}!",
+            "climber": "{{player}} выиграл(а) {{wins}} вызовов подряд!",
+            "climber_male": "{{player}} выиграл {{wins}} вызовов подряд!",
+            "climber_female": "{{player}} выиграла {{wins}} вызовов подряд!",
             "strike": "У {{player}} истекло время в партии (штраф {{strikes}})",
-            "cheat": "{{player}} перемещён в самый низ за жульничество, партия против {{opponent}} отменена",
-            "excluded": "{{player}} исключён модератором с места #{{position}}"
+            "cheat": "{{player}} перемещён(а) в самый низ за жульничество, партия против {{opponent}} отменена",
+            "cheat_male": "{{player}} перемещён в самый низ за жульничество, партия против {{opponent}} отменена",
+            "cheat_female": "{{player}} перемещена в самый низ за жульничество, партия против {{opponent}} отменена",
+            "excluded": "{{player}} исключён(а) модератором с места #{{position}}",
+            "excluded_male": "{{player}} исключён модератором с места #{{position}}",
+            "excluded_female": "{{player}} исключена модератором с места #{{position}}"
         },
         "load_more": "Загрузить ещё",
         "load_error": "Не удалось загрузить «Царя горы»",
@@ -1648,20 +1850,26 @@
             "already_member": "Вы уже участвуете в «Царе горы».",
             "rejoin_too_early": "Вы пока не можете снова присоединиться к «Царю горы».",
             "not_member": "Вы не участвуете в «Царе горы».",
-            "cannot_challenge_yourself": "Нельзя вызвать самого себя.",
+            "cannot_challenge_yourself": "Нельзя вызвать себя.",
             "defender_not_member": "Этот игрок не участвует в «Царе горы».",
             "out_of_range": "Этот игрок вне вашего диапазона.",
             "invalid_boardsize": "Этот размер доски не разрешён.",
             "no_outgoing_slot": "Вы уже отправили столько вызовов, сколько позволяет ваше место.",
             "defender_incoming_full": "Этот игрок сейчас не может получать больше вызовов.",
-            "defender_cooling_down": "Этот игрок только что закончил партию, его можно будет снова вызвать с {{date}}.",
-            "opponent_cooldown": "Вы недавно играли с этим игроком. Вы сможете снова вызвать его с {{date}}.",
+            "defender_cooling_down": "Этот игрок только что закончил(а) партию, его/её можно будет снова вызвать с {{date}}.",
+            "defender_cooling_down_male": "Этот игрок только что закончил партию, его можно будет снова вызвать с {{date}}.",
+            "defender_cooling_down_female": "Эта соперница только что закончила партию, её можно будет снова вызвать с {{date}}.",
+            "opponent_cooldown": "Вы недавно играли с этим игроком. Вы сможете снова вызвать этого игрока с {{date}}.",
+            "opponent_cooldown_male": "Вы недавно играли с этим игроком. Вы сможете снова вызвать его с {{date}}.",
+            "opponent_cooldown_female": "Вы недавно играли с этой соперницей. Вы сможете снова вызвать её с {{date}}.",
             "diversity_limit": "Слишком много ваших последних партий было против этого игрока.",
             "defender_diversity_limit": "Слишком много последних партий этого игрока было против вас.",
             "already_playing_opponent": "У вас уже идёт партия с этим игроком.",
             "live_time_control_not_live": "Этот контроль времени не предназначен для игры вживую.",
             "defender_not_active": "Ваш соперник сейчас не активен, вы не можете предложить партию вживую.",
-            "challenger_not_active": "Бросивший вызов больше не активен, вы не можете принять партию вживую."
+            "defender_not_active_female": "Ваша соперница сейчас не активна, вы не можете предложить партию вживую.",
+            "challenger_not_active": "Бросивший вызов больше не активен, вы не можете принять партию вживую.",
+            "challenger_not_active_female": "Бросившая вызов больше не активна, вы не можете принять партию вживую."
         },
         "not_found": "«Царь горы» не найден.",
         "invalid_incoming_slots": "Недопустимое количество вызовов.",
@@ -1674,8 +1882,8 @@
         "live_proposal_already_answered": "На это предложение уже ответили, или срок его действия истёк.",
         "game_creation_failed": "Не удалось создать партию, попробуйте ещё раз.",
         "notification": {
-            "challenge": "{{player}} бросил вам вызов в «Царе горы»!",
-            "live_proposal": "{{player}} бросил вам вызов в «Царе горы» и предлагает играть вживую.",
+            "challenge": "{{player}}: вызов вам в «Царе горы»!",
+            "live_proposal": "{{player}}: вызов вам в «Царе горы» с предложением играть вживую.",
             "strike": "У вас истекло время в партии «Царя горы» (штраф {{strikes}}).",
             "strike_removed": "У вас истекло время в партии «Царя горы», и вы удалены после {{strikes}} штрафов.",
             "strike_removed_before_first_game": "У вас истекло время в партии «Царя горы» до завершения хотя бы одной партии, и вы удалены.",
@@ -1805,5 +2013,369 @@
             }
         },
         "check_device_code": "Убедитесь, что этот код совпадает с кодом, отображаемым на вашем устройстве:"
-    }
+    },
+    "pronouns": {
+        "title": "Местоимения",
+        "explain": "Эти местоимения публичны: они видны в вашем профиле и при нажатии на ваш никнейм. Они также используются, чтобы адаптировать тексты интерфейса для вас и то, как он упоминает вас другим игрокам.",
+        "save_error": "Не удалось сохранить местоимения. Попробуйте ещё раз.",
+        "he/him": "он/его",
+        "she/her": "она/её",
+        "they/them": "нейтрально",
+        "unspecified": "Местоимения не указаны"
+    },
+    "player_popover": {
+        "on_playhex_since": "На PlayHex уже {{duration}}"
+    },
+    "closed_game": "Закрытая партия",
+    "closed_game_help": "Эта партия не отображается в лобби других игроков. Присоединиться могут только те, у кого есть ссылка, даже если они ещё не зарегистрированы на PlayHex.",
+    "closed_game_invite": {
+        "link_label": "Ссылка для отправки другу",
+        "share": "Поделиться"
+    },
+    "chat_header": {
+        "game_started": "Партия началась",
+        "game_ended": "Партия окончена",
+        "game_canceled": "Партия отменена"
+    },
+    "host_waiting_join_chance_first_minute": "В это время суток к {{percent}} партий присоединяются в первую минуту.",
+    "host_waiting_join_chance_next_minutes": "Пока никто не присоединился. Если подождать ещё 10 минут, {{percent}} хостов находят соперника.",
+    "match_title_in_tournament": "{{ match }} турнира {{ tournament }}",
+    "chat_message_visibility": "Видимость сообщения",
+    "chat_attach_to_move_toggle": "Показать это сообщение под ходом {{n}}",
+    "chat_message_visibility_public": "Публичное",
+    "chat_message_visibility_private": "Личные заметки",
+    "chat_message_visibility_malkovich": "Малкович",
+    "chat_message_placeholder_private": "Личная заметка, видна только вам…",
+    "chat_message_placeholder_malkovich": "Малкович, станет видно всем после окончания партии…",
+    "chat_new_messages": "Новые",
+    "set_password": "Задать пароль",
+    "set_password_explain": "У вашего аккаунта ещё нет пароля. Задайте пароль, чтобы также входить с помощью имени пользователя «{{login}}».",
+    "saved": "Сохранено",
+    "or": "или",
+    "log_in_with_discord": "Войти через Discord",
+    "must_be_logged_in": "Необходимо войти в аккаунт",
+    "same_pseudo": "Это уже ваше имя пользователя",
+    "pseudo_change_limit_reached": "Вы слишком часто меняли имя пользователя в последнее время",
+    "must_set_password_first": "Сначала задайте пароль, иначе вы не сможете войти",
+    "discord_login_failed": "Не удалось войти через Discord, попробуйте ещё раз",
+    "discord_login_cancelled": "Вход через Discord отменён",
+    "discord_already_linked": "Этот аккаунт Discord уже привязан к другому аккаунту PlayHex",
+    "discord_account_creation_rate_limited": "Недавно создано слишком много аккаунтов, попробуйте позже",
+    "change_pseudo": {
+        "title": "Сменить имя пользователя",
+        "new_pseudo": "Новое имя пользователя",
+        "submit": "Сменить имя пользователя",
+        "confirm": "Сменить имя пользователя на «{{pseudo}}»?",
+        "success": "Ваше имя пользователя изменено.",
+        "next_allowed_at": "Вы слишком часто меняли имя пользователя в последнее время. Вы сможете сменить его снова {{date}}.",
+        "old_pseudo_released": "Ваше старое имя пользователя станет доступно другим игрокам. Ссылки на старый адрес профиля будут перенаправлять на новый. Входить нужно будет с новым именем пользователя.",
+        "remaining_one": "Вы можете сменить имя пользователя ещё {{count}} раз в течение 30 дней.",
+        "remaining_few": "Вы можете сменить имя пользователя ещё {{count}} раза в течение 30 дней.",
+        "remaining_many": "Вы можете сменить имя пользователя ещё {{count}} раз в течение 30 дней.",
+        "former_pseudo_note_one": "В вашем профиле будет показано «ранее {pseudo}» в течение {{count}} дня.",
+        "former_pseudo_note_few": "В вашем профиле будет показано «ранее {pseudo}» в течение {{count}} дней.",
+        "former_pseudo_note_many": "В вашем профиле будет показано «ранее {pseudo}» в течение {{count}} дней."
+    },
+    "formerly": "ранее",
+    "discord_account": {
+        "title": "Discord",
+        "private": "Только вы видите привязанный аккаунт Discord, он не отображается в вашем профиле.",
+        "explain": "Привяжите аккаунт Discord, чтобы входить через Discord.",
+        "link": "Привязать мой аккаунт Discord",
+        "linked_to": "Привязан к аккаунту Discord {username}. Вы можете входить через Discord.",
+        "unlink": "Отвязать",
+        "unlink_confirm": "Отвязать аккаунт Discord? Вы больше не сможете входить через Discord.",
+        "set_password_to_unlink": "Чтобы отвязать аккаунт Discord, сначала задайте пароль, чтобы по-прежнему иметь возможность войти."
+    },
+    "recovery_email": {
+        "title": "Резервный email",
+        "explain": "Необязательно. Используется, чтобы связаться с вами по поводу безопасности аккаунта, например если вы забудете пароль.",
+        "email": "Email",
+        "private": "Ваш email скрыт и никогда не показывается другим игрокам. Оставьте поле пустым, чтобы удалить его.",
+        "invalid": "Некорректный email"
+    },
+    "cancel_request": {
+        "ask": "Предложить отмену",
+        "player_wants_to_cancel": "{{ player }} предлагает отменить партию",
+        "accept": "Принять отмену",
+        "reject": "Отклонить",
+        "request_denied": "Запрос {{ player }} на отмену партии отклонён.",
+        "game_canceled_by_agreement": "Партия отменена по согласию обеих сторон, по предложению {{ player }}.",
+        "confirm_overlay": {
+            "title": "Предложить отменить партию?",
+            "message": "Сопернику будет отправлен запрос, который он может принять или отклонить. Если запрос принят, партия отменяется и не засчитывается.",
+            "confirmLabel": "Да, отправить запрос",
+            "cancelLabel": "Нет, продолжить игру"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer в прямом эфире",
+        "tab_live": "Эфир",
+        "tab_play": "Играть",
+        "bot_unavailable": "недоступен",
+        "tab_chat": "Чат",
+        "live": "В эфире",
+        "stream": "Трансляция",
+        "stream_description": "Поделитесь ссылкой: любой сможет следить за вашим анализом в прямом эфире, видеть ваш курсор и общаться в чате.",
+        "start_stream": "Начать трансляцию",
+        "stop_stream": "Остановить трансляцию",
+        "share_link": "Ссылка для отправки",
+        "copy_link": "Скопировать ссылку",
+        "match": "Играть с этой позиции",
+        "match_description": "Сыграйте партию с позиции на доске против бота или другого игрока. После окончания партия добавится в ваш анализ как вариант.",
+        "i_play": "Я играю",
+        "opponent": "Соперник",
+        "opponent_player": "Игрок",
+        "invite_player_optional": "Пригласить игрока (необязательно)",
+        "invite_player_help": "Приглашённый получит уведомление и будет единственным, кто сможет присоединиться. Иначе играть сможет первый, кто откроет ссылку.",
+        "validate_setup_first": "Сначала подтвердите позицию расстановки.",
+        "start_match": "Начать партию",
+        "back_to_analysis": "Вернуться к анализу",
+        "back_to_match": "Вернуться к партии",
+        "waiting_for_opponent": "Ожидание соперника…",
+        "waiting_for_player": "Ожидание {{pseudo}}…",
+        "you": "Вы",
+        "your_turn": "Ваш ход",
+        "swap_hint": "Нажмите на камень, чтобы обменять.",
+        "wins": "побеждает",
+        "wins_by_resignation": "побеждает после сдачи соперника",
+        "match_expired": "Партия окончена: слишком долго не было ходов.",
+        "match_canceled": "Партия отменена.",
+        "join_match": "Сыграть эту партию",
+        "cancel_match": "Отменить партию",
+        "hosted_by": "Организатор",
+        "session_ended": "Эта сессия завершена.",
+        "waiting_for_stream": "Ожидание трансляции…",
+        "open_copy": "Открыть копию",
+        "open_copy_failed": "Не удалось открыть копию.",
+        "invitation_toast": "{{pseudo}} приглашает вас сыграть партию с позиции Hexplorer.",
+        "invitation_open": "Открыть",
+        "live_elsewhere": "Вы уже в эфире из другого исследования. Одновременно возможна только одна трансляция.",
+        "go_to_live_study": "Перейти",
+        "back_to_live": "Ваша трансляция Hexplorer ещё идёт: вернуться к ней",
+        "errors": {
+            "session_not_found": "Эта трансляция больше не существует.",
+            "already_live": "Вы уже в эфире в другой вкладке. Сначала остановите её.",
+            "not_host": "Это может сделать только хост.",
+            "match_already_running": "Партия уже идёт.",
+            "position_already_won": "Эта позиция уже выиграна.",
+            "bot_unavailable": "Этот бот сейчас недоступен.",
+            "invalid_invited_player": "Этого игрока нельзя пригласить.",
+            "cannot_join": "Вы не можете присоединиться к этой партии.",
+            "match_not_playing": "Эта партия не идёт.",
+            "not_your_turn": "Сейчас не ваш ход.",
+            "not_a_player": "Вы не участвуете в этой партии.",
+            "invalid_data": "Некорректные данные.",
+            "illegal_move": "Этот ход невозможен.",
+            "study_required": "Сначала сохраните анализ как исследование."
+        }
+    },
+    "social_preview": {
+        "default_description": "Играйте в настольную игру Hex онлайн против других игроков или ИИ. Турниры, задачи, анализ партий.",
+        "by": "автор: {{author}}",
+        "game": {
+            "canceled_title": "Отменённая партия Hex",
+            "canceled_description": "Эта партия Hex {{boardsize}} была отменена.",
+            "waiting_title": "Открытая партия Hex от {{player}}",
+            "waiting_title_anonymous": "Открытая партия Hex",
+            "waiting_description": "Партия Hex {{boardsize}}, {{timeControl}}, ожидает соперника. Присоединяйтесь на PlayHex.",
+            "ranked": "рейтинговая",
+            "friendly": "товарищеская",
+            "playing_description": "Партия идёт, смотрите её вживую на PlayHex.",
+            "outcome_path": "{{winner}}: победа соединением своих сторон",
+            "outcome_resign": "{{winner}}: победа после сдачи соперника",
+            "outcome_time": "{{winner}}: победа по времени",
+            "outcome_forfeit": "{{winner}}: техническая победа",
+            "winner": "{{winner}} побеждает",
+            "image_alt": "Финальная позиция партии Hex {{title}}",
+            "open_game": "Открытая партия",
+            "join": "Присоединяйтесь на PlayHex",
+            "playing": "Партия идёт",
+            "cadency_live": "Вживую",
+            "cadency_correspondence": "По переписке",
+            "n_moves_one": "{{count}} ход",
+            "n_moves_few": "{{count}} хода",
+            "n_moves_many": "{{count}} ходов"
+        },
+        "tournament": {
+            "starts_at": "Начало {{date}}",
+            "running": "Турнир идёт",
+            "rank_1": "1-е место: {{player}}",
+            "rank_2": "2-е место: {{player}}",
+            "rank_3": "3-е место: {{player}}",
+            "canceled": "Турнир отменён",
+            "hex_tournament": "Турнир по Hex",
+            "n_registered_one": "{{count}} игрок зарегистрирован",
+            "n_registered_few": "{{count}} игрока зарегистрировано",
+            "n_registered_many": "{{count}} игроков зарегистрировано",
+            "n_participants_one": "{{count}} участник",
+            "n_participants_few": "{{count}} участника",
+            "n_participants_many": "{{count}} участников"
+        },
+        "tournament_series": {
+            "next": "Следующий: {{title}}, {{date}}",
+            "hex_tournaments": "Турниры по Hex",
+            "n_editions_one": "{{count}} турнир сыгран",
+            "n_editions_few": "{{count}} турнира сыграно",
+            "n_editions_many": "{{count}} турниров сыграно"
+        },
+        "puzzle": {
+            "default_title": "Задача Hex",
+            "red_to_play": "Ход красных, выигрыш",
+            "blue_to_play": "Ход синих, выигрыш",
+            "label": "Задача",
+            "hex_puzzle_by": "Задача Hex от {{author}}"
+        },
+        "hexplorer_study": {
+            "default_title": "Исследование Hexplorer",
+            "label": "Исследование",
+            "hex_study_by": "Исследование Hex от {{author}}"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "Задачи Hex от {{author}}",
+            "n_puzzles_one": "{{count}} задача Hex",
+            "n_puzzles_few": "{{count}} задачи Hex",
+            "n_puzzles_many": "{{count}} задач Hex"
+        },
+        "player": {
+            "title": "{{player}}, игрок в Hex",
+            "bot": "ИИ для Hex",
+            "rating": "Рейтинг {{rating}}",
+            "member_since": "Участник с {{date}}",
+            "on_playhex": "Игрок на PlayHex",
+            "n_games_one": "{{count}} партия сыграна",
+            "n_games_few": "{{count}} партии сыграно",
+            "n_games_many": "{{count}} партий сыграно"
+        },
+        "ladder": {
+            "king": "Царь: {{player}}",
+            "king_female": "Царица: {{player}}",
+            "reign_one": "Правит уже {{duration}}, {{count}} защита",
+            "reign_few": "Правит уже {{duration}}, {{count}} защиты",
+            "reign_many": "Правит уже {{duration}}, {{count}} защит",
+            "n_players_one": "{{count}} игрок на горе",
+            "n_players_few": "{{count}} игрока на горе",
+            "n_players_many": "{{count}} игроков на горе"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Задачи Hex",
+                "description": "Решайте задачи Hex, созданные сообществом, от начального до экспертного уровня, и создавайте свои."
+            },
+            "tournaments": {
+                "title": "Турниры по Hex",
+                "description": "Участвуйте в онлайн-турнирах по Hex: вживую и по переписке, швейцарская система и на выбывание."
+            },
+            "tournament_series": {
+                "title": "Серии турниров по Hex",
+                "description": "Регулярные турниры по Hex: следите за серией, чтобы знать, когда пройдёт следующий турнир."
+            },
+            "ladders": {
+                "title": "Царь горы",
+                "description": "Поднимайтесь по лестнице Hex: бросайте вызов игрокам выше вас, занимайте их места и защищайте трон."
+            },
+            "games_archive": {
+                "title": "Архив партий Hex",
+                "description": "Просматривайте и ищите все партии Hex, сыгранные на PlayHex."
+            },
+            "videos": {
+                "title": "Видео о Hex",
+                "description": "Видео о Hex от сообщества: обучение, стратегия, разборы партий."
+            },
+            "statistics": {
+                "title": "Статистика PlayHex",
+                "description": "Партии, игроки, размеры досок и процент побед на PlayHex."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Исследуйте позиции Hex с анализом ИИ."
+            },
+            "swap_maps": {
+                "title": "Карты обмена Hex",
+                "description": "Какие первые ходы стоит обменивать на каждом размере доски, по расчётам KataHex."
+            },
+            "guide": {
+                "title": "Руководство PlayHex",
+                "description": "Как играть в Hex на PlayHex: правила, анализ ИИ, условные ходы, модерация."
+            },
+            "export_games_data": {
+                "title": "Экспорт данных партий PlayHex",
+                "description": "Скачайте набор данных всех партий Hex, сыгранных на PlayHex, для свободного использования."
+            },
+            "guide_ai_analysis": {
+                "title": "Анализ партий с ИИ",
+                "description": "Разбирайте свои партии Hex с ИИ: находите грубые ошибки, смотрите лучшие ходы и узнавайте, когда вы получили или упустили преимущество."
+            },
+            "guide_conditional_moves": {
+                "title": "Условные ходы",
+                "description": "Играйте партии Hex по переписке быстрее: планируйте ответы на следующие ходы соперника и разыгрывайте лестницы автоматически."
+            },
+            "tutorial_rules": {
+                "title": "Правила Hex",
+                "description": "Изучите 2 правила Hex за несколько минут с интерактивным обучением, а затем сыграйте первые партии против бота."
+            },
+            "tutorial_swap": {
+                "title": "Правило обмена в Hex",
+                "description": "Правило обмена сохраняет баланс в партиях Hex."
+            },
+            "tutorial_bridge": {
+                "title": "Мост в Hex",
+                "description": "Мост — самая важная фигура в Hex: два камня, уже соединённые, не касаясь друг друга. Узнайте, как он работает, и потренируйтесь на задачах."
+            },
+            "tutorial_block": {
+                "title": "Стратегия Hex для начинающих: блокируйте, чтобы победить",
+                "description": "В Hex блокировка строит ваш собственный путь: лучшая стратегия в начале партии."
+            },
+            "tutorial_ziggurat": {
+                "title": "Шаблон «зиккурат» в Hex",
+                "description": "Зиккурат — вторая фигура, которую нужно знать в Hex: камень на третьем ряду, соединённый со своим краем. Узнайте, как он работает, и потренируйтесь на задачах."
+            },
+            "cijm_2025": {
+                "title": "Турнир по Hex – Париж 2025",
+                "description": "Два турнира по Hex 14 и 15 июня 2025 года на фестивале «Культура и математические игры», площадь Сен-Сюльпис, Париж. Бесплатно, все уровни."
+            },
+            "cijm_2026": {
+                "title": "Турнир по Hex – Париж 2026",
+                "description": "Гигантский турнир по Hex в воскресенье, 24 мая 2026 года, на фестивале «Культура и математические игры», площадь Сен-Сюльпис, Париж. Бесплатно, все уровни, с 8 лет."
+            }
+        },
+        "n_days_one": "{{count}} день",
+        "n_days_few": "{{count}} дня",
+        "n_days_many": "{{count}} дней",
+        "n_hours_one": "{{count}} час",
+        "n_hours_few": "{{count}} часа",
+        "n_hours_many": "{{count}} часов"
+    },
+    "game_outcome": {
+        "path": "Соединение",
+        "resign": "Сдача",
+        "time": "Время",
+        "forfeit": "Неявка"
+    },
+    "has_chat_messages": "С сообщениями в чате",
+    "has_analyze": "С анализом ИИ",
+    "has_malkovich_messages": "С записями Малковича",
+    "game_content_filter": "Содержимое",
+    "filters": "Фильтры",
+    "reset_filters": "Сбросить фильтры",
+    "reset_dates": "Сбросить даты",
+    "game_type": "Тип партии",
+    "game_state_filter": "Состояние",
+    "opponent_or_players": "Игроки",
+    "one_or_two_players_help": "1 игрок: партии этого игрока. 2 игрока: партии между ними.",
+    "search_opponent": "Соперник",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "Все фильтры",
+    "hide_filters": "Меньше фильтров",
+    "week_of": "Неделя с {{date}}",
+    "chart_grouping": {
+        "label": "Группировать по",
+        "auto": "Авто",
+        "day": "День",
+        "week": "Неделя",
+        "month": "Месяц"
+    },
+    "n_games_found_one": "Найдена {{count}} партия.",
+    "n_games_found_few": "Найдено {{count}} партии.",
+    "n_games_found_many": "Найдено {{count}} партий."
 }

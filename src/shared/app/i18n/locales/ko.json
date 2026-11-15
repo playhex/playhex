@@ -8,7 +8,9 @@
         "open_live_games": "실시간 게임 참가",
         "open_correspondence_games": "통신 게임 참가",
         "no_open_live_games": "현재 참가 가능한 실시간 게임이 없습니다",
-        "no_open_correspondence_games": "현재 참가 가능한 통신 게임이 없습니다"
+        "no_open_correspondence_games": "현재 참가 가능한 통신 게임이 없습니다",
+        "multiple_waiting_games": "대기 중인 대국 여러 개:",
+        "others_canceled_once_one_accepted": "대기 중인 대국 중 하나가 수락되면 나머지는 취소됩니다."
     },
     "game": {
         "opponent": "상대",
@@ -35,13 +37,19 @@
         "info": "정보",
         "duration": "진행 시간",
         "title_your_turn": "당신의 차례입니다!",
-        "title_waiting": "상대를 기다리는 중: 호스트"
+        "title_waiting": "상대를 기다리는 중: 호스트",
+        "winner": "승자",
+        "loser": "패자",
+        "issue": "결과",
+        "moves_count": "수"
     },
     "game_rules": {
         "normal": "일반",
         "host_plays_first": "호스트가 먼저 플레이",
         "host_plays_second": "호스트가 두 번째로 플레이",
-        "no_swap": "교환 없음"
+        "no_swap": "교환 없음",
+        "handicap_for_host": "호스트에게 핸디캡 {{n}}",
+        "handicap_for_opponent": "상대에게 핸디캡 {{n}}"
     },
     "create_game": {
         "custom_size": "사용자 정의",
@@ -60,7 +68,8 @@
             "notifications": "알림",
             "ai_workers": "AI 워커",
             "connected_applications": "연결된 애플리케이션",
-            "technical_info": "기술 정보"
+            "technical_info": "기술 정보",
+            "security": "보안"
         },
         "audio": "오디오",
         "moderation": "관리"
@@ -140,7 +149,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "내 컴퓨터에서 PlayHex의 AI 이동을 계산하는 방법을 확인하세요",
-        "engine_unavailable": "일부 AI 엔진은 현재 온라인 워커가 없어 해당 AI를 사용할 수 없습니다."
+        "engine_unavailable": "일부 AI 엔진은 현재 온라인 워커가 없어 해당 AI를 사용할 수 없습니다.",
+        "ai_not_available": "현재 사용할 수 없음"
     },
     "game_analysis": {
         "game_analysis": "AI로 게임 분석",
@@ -190,7 +200,12 @@
     },
     "1vAI_friendly": {
         "title": "AI와 플레이",
-        "create": "AI와 플레이"
+        "create": "AI와 플레이",
+        "easy": "쉬움",
+        "medium": "보통",
+        "hard": "어려움",
+        "beaten": "이미 이김",
+        "unlock_stronger_ais": "AI 옵션 더 보기"
     },
     "1vAI_offline": {
         "title": "오프라인 AI",
@@ -419,7 +434,29 @@
     "handicap": {
         "title": "핸디캡",
         "none": "없음",
-        "handicap_for_player": "{{player}}에게 {{n}}"
+        "handicap_for_player": "{{player}}에게 {{n}}",
+        "you": "나",
+        "opponent": "상대",
+        "ai": "AI",
+        "increase": "핸디캡 늘리기",
+        "decrease": "핸디캡 줄이기",
+        "setup": {
+            "first_stone_then": "{{player}}님이 교환 가능한 돌을 놓은 뒤 {{count}}개를 더 놓습니다. 교환되면 {{swappedCount}}개를 놓습니다.",
+            "first_stone_then_you": "교환 가능한 돌을 놓은 뒤 {{count}}개를 더 놓으세요. 교환되면 {{swappedCount}}개를 놓습니다.",
+            "first_stone_for_blue": "{{player}}님이 교환 가능한 돌을 놓은 뒤 {{beneficiary}}님이 {{count}}수를 둡니다.",
+            "first_stone_for_blue_you": "교환 가능한 돌을 놓으세요. 그 뒤 {{beneficiary}}님이 {{count}}수를 둡니다.",
+            "first_stone_for_blue_beneficiary": "{{player}}님이 교환 가능한 돌을 놓은 뒤 내가 {{count}}수를 둡니다.",
+            "swap_decision": "{{player}}님이 교환 여부를 선택합니다: 그 뒤 {{beneficiary}}님이 돌 {{swappedCount}}개를, 거절되면 {{count}}개를 놓습니다.",
+            "swap_decision_you": "돌을 클릭해 교환하세요: 그 뒤 {{beneficiary}}님이 돌 {{swappedCount}}개를, 거절하면 {{count}}개를 놓습니다.",
+            "swap_decision_beneficiary": "{{player}}님이 교환 여부를 선택합니다: 그 뒤 내가 돌 {{swappedCount}}개를, 거절되면 {{count}}개를 놓습니다.",
+            "stones_after_swap": "돌 교환됨: {{player}}님이 돌 {{count}}개를 놓습니다.",
+            "stones_after_swap_you": "돌 교환됨: 돌 {{count}}개를 놓으세요.",
+            "refuse_swap": "교환하지 않기",
+            "no_swap_other": "교환 비활성화: {{player}}님이 돌 {{count}}개를 놓습니다.",
+            "no_swap_you_other": "교환 비활성화: 돌 {{count}}개를 놓으세요.",
+            "stones_other": "{{player}}님이 돌 {{count}}개를 더 놓습니다.",
+            "stones_you_other": "돌 {{count}}개를 더 놓으세요."
+        }
     },
     "game_created_short": "{{ date }} 생성됨",
     "game_created_by_system_time_ago": "시스템이 {timeAgo} 전에 게임을 생성했습니다.",
@@ -722,7 +759,12 @@
         "block_at_a_distance": "상대의 돌 바로 옆에 돌을 놓지 마세요: 붙어 있는 막기는 쉽게 돌아갈 수 있습니다. 여유 공간을 두고 더 멀리서 막으세요: 상대의 수에 응수할 시간이 생깁니다.",
         "block_remember": "기억하세요: Hex에서 좋은 수는 수비이자 공격입니다.",
         "ziggurat_defense_1": "파랑이 가운데로 침입: 빨강은 자기 돌 옆에 응수하여 변과 브리지를 만듭니다.",
-        "ziggurat_defense_2": "파랑이 첫째 줄로 침입: 빨강은 브리지로 응수하고, 새 돌은 변에 연결됩니다."
+        "ziggurat_defense_2": "파랑이 첫째 줄로 침입: 빨강은 브리지로 응수하고, 새 돌은 변에 연결됩니다.",
+        "demo_0_play": "플레이",
+        "chapters": {
+            "hex_rule": "I. Hex 규칙",
+            "beginners_strategy": "II. 초보자 전략"
+        }
     },
     "donate": "PlayHex에 기부",
     "enable_notifications_overlay": {
@@ -834,7 +876,56 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: 게임 보드 아래 \"디버깅 정보\"에서 복사",
         "engine_unavailable": "현재 이 엔진에 온라인 AI 워커가 없어 국면을 분석할 수 없습니다.",
-        "analysis_failed": "이 국면을 분석할 수 없습니다."
+        "analysis_failed": "이 국면을 분석할 수 없습니다.",
+        "analyze_in_hexplorer": "Hexplorer에서 분석",
+        "play_from_position": "국면에서 대국",
+        "tab_file": "파일",
+        "tab_tree": "트리",
+        "comment": "코멘트",
+        "comment_placeholder": "이 국면에 코멘트 달기…",
+        "current_study": "현재 연구",
+        "new_study": "새 연구",
+        "study_title": "연구 제목",
+        "study_default_title": "제목 없는 연구",
+        "study_by": "작성자: {{author}}",
+        "study_fork": "포크",
+        "study_fork_help": "변경 사항을 포함해 이 연구의 내 사본 저장",
+        "study_forked_from": "포크 원본",
+        "study_share": "이 연구 공유",
+        "study_link_copied": "링크 복사됨",
+        "study_delete": "이 연구 삭제",
+        "study_delete_confirm": "이 연구를 삭제할까요? 링크가 더 이상 작동하지 않습니다.",
+        "study_too_large": "이 연구는 너무 커서 저장할 수 없습니다: 일부 가지나 코멘트를 삭제하세요.",
+        "study_not_found": "이 연구가 존재하지 않거나 삭제되었습니다.",
+        "study_unsaved_changes": "저장되지 않은 변경 사항",
+        "study_save_shortcut": "연구 저장 (Ctrl+S)",
+        "study_validate_setup_first": "연구를 저장하려면 배치 모드를 종료하세요.",
+        "study_save_to_share": "포크하거나 공유하려면 이 연구를 저장하세요.",
+        "my_studies": "내 연구",
+        "export": "내보내기",
+        "study_sort": "연구 정렬",
+        "study_sort_date_desc": "최신순",
+        "study_sort_date_asc": "오래된순",
+        "study_sort_title_asc": "이름 A–Z",
+        "study_sort_title_desc": "이름 Z–A",
+        "tools_history": "기록",
+        "tools_stones": "돌",
+        "tools_marks": "표시",
+        "tools_label": "라벨",
+        "study_discard_confirm": "저장되지 않은 변경 사항이 사라집니다. 계속할까요?",
+        "tab_help": "도움말",
+        "help_what_title": "Hexplorer란?",
+        "help_what": "Hex를 위한 무료 분석판: 어떤 국면이든 탐색하고, 여러 변화를 시도하고, AI의 평가를 확인하세요.",
+        "help_why_title": "왜 사용하나요?",
+        "help_why": "내 대국을 이해하고, 더 좋은 수를 찾고, 국면에 대한 생각을 다른 플레이어와 공유하기 위해서입니다.",
+        "help_how_title": "사용 방법",
+        "help_how_play": "돌을 자유롭게 놓아 원하는 국면을 만드세요",
+        "help_how_import": "또는 링크나 텍스트에서 Hex 대국을 가져오세요",
+        "help_how_ai": "판 왼쪽의 막대가 누가 유리한지 보여 주고, 판에는 AI가 고려하는 수가 표시됩니다.",
+        "help_how_setup": "배치 모드에서는 판에 표시를 추가하고 국면을 자유롭게 편집할 수 있습니다",
+        "help_how_file": "연구를 저장(Ctrl+S)하거나, 공유하거나, SGF로 내보내세요",
+        "help_dismiss": "알겠습니다, 다시 표시하지 않기",
+        "study_nodes_other": "노드 {{count}}개"
     },
     "player_menu": {
         "open_menu": "플레이어 메뉴 열기",
@@ -853,7 +944,8 @@
         "reserved_for_other_player": "이 게임은 다른 플레이어를 위해 예약된 도전 게임입니다.",
         "reserved_for_other_player_named": "이 게임은 {{pseudo}} 님을 위해 예약된 도전 게임입니다.",
         "other": "이 게임에 참가할 수 없습니다.",
-        "game_canceled": "이 게임은 취소되었습니다."
+        "game_canceled": "이 게임은 취소되었습니다.",
+        "is_host_closed": "비공개 대국입니다: 이 대국의 링크가 있는 사람만 참가할 수 있습니다."
     },
     "lobby_challenges_you_badge": "당신에게 도전!",
     "sort_recently_played": "최근 플레이",
@@ -1016,7 +1108,8 @@
         "challenge_player": "플레이어에게 도전",
         "challenge_same_target": "이 플레이어에게 다시 도전",
         "analyze_position": "포지션 분석",
-        "channel_slow_mode": "슬로 모드"
+        "channel_slow_mode": "슬로 모드",
+        "create_hexplorer_study": "Hexplorer 연구 만들기"
     },
     "head_to_head": "상대 전적",
     "never_played_together": "아직 이 플레이어와 대전한 적이 없습니다.",
@@ -1093,7 +1186,11 @@
         "opening_moves": "가장 흔한 오프닝 수",
         "opening_moves_note": "{{boardsize}} 보드에서 가장 많이 플레이된 수입니다.",
         "rating_distribution": "레이팅 분포",
-        "rating_distribution_note": "확정된 레이팅(편차가 {{deviation}} 미만)을 가진 봇이 아닌 플레이어만 집계됩니다. 게스트도 포함됩니다."
+        "rating_distribution_note": "확정된 레이팅(편차가 {{deviation}} 미만)을 가진 봇이 아닌 플레이어만 집계됩니다. 게스트도 포함됩니다.",
+        "lobby_join_chances": "라이브 대국에 상대가 참가할 확률",
+        "lobby_join_chances_first_minute": "< 1분",
+        "lobby_join_chances_next_minutes": "+10분",
+        "lobby_join_chances_note": "로비에서 만든 라이브 대국 중 첫 1분 안에 상대를 찾은 비율과, 첫 1분 동안 아무도 참가하지 않았을 때 이후 10분 안에 상대를 찾은 비율입니다. 호스트가 취소하지 않고 기다렸다고 가정하여 최근 8주 데이터로 추정했습니다. 시간은 현지 시간대(UTC{{offset}})로 표시됩니다."
     },
     "board_mount_error": {
         "error": "보드를 표시할 수 없습니다. 오류가 발생했습니다:",
@@ -1280,7 +1377,17 @@
             "fixed_fill_not_disabled": "{{move}}에 고정 색이 있지만 퍼즐 밖에 있지 않습니다",
             "fixed_fill_twice": "{{move}}에 고정 색이 두 번 설정되었습니다",
             "invalid_type": "잘못된 {{property}}",
-            "solver_unproven_other": "{{count}}개 국면을 시간 내에 풀지 못해 퍼즐은 일부만 검증되었습니다"
+            "solver_unproven_other": "{{count}}개 국면을 시간 내에 풀지 못해 퍼즐은 일부만 검증되었습니다",
+            "generator_initial_not_winning": "Mohex 솔버가 여기서 이기는 수를 찾지 못했습니다",
+            "generator_depends_on_disabled_cells": "퍼즐 밖의 칸이 도와야만 이길 수 있습니다: 국면 단계에서 자기 변에 연결된 돌을 표시하세요",
+            "generator_already_connected": "이미 연결되어 있어 생성할 것이 없습니다",
+            "generator_unproven": "제한 시간 안에 이기는 수를 증명하지 못해 가지를 비워 두었습니다",
+            "generator_budget_exceeded": "트리가 너무 커서 가지를 비워 두었습니다",
+            "generator_parallel_dropped": "상대 브리지에 대한 침투 {{move}}를 병렬 수순으로 추가할 수 없었습니다. 이 수를 두면 퍼즐에 실패합니다",
+            "generator_accepted_losing": "이 수는 정답으로 인정되지만, Mohex 솔버는 지는 수라고 증명합니다",
+            "generator_accepted_unproven": "이 수는 정답으로 인정되지만, Mohex 솔버가 이기는 수임을 증명하지 못해 이어지지 않습니다",
+            "generator_failed_winning": "이 수는 실패로 처리되지만, Mohex 솔버는 이기는 수라고 증명합니다",
+            "generator_invalid_tree": "생성된 트리가 올바르지 않습니다 ({{error}})"
         },
         "editor": {
             "optional": "선택 사항",
@@ -1439,7 +1546,24 @@
             "monitor_badge_other": "트리에 없는 수순 {{count}}개",
             "errors_badge_other": "해결할 문제 {{count}}개",
             "warnings_badge_other": "검증 경고 {{count}}개",
-            "errors_count_other": "해결할 문제 {{count}}개, 게시 탭을 확인하세요"
+            "errors_count_other": "해결할 문제 {{count}}개, 게시 탭을 확인하세요",
+            "solver_position": "Mohex용 국면",
+            "solver_position_help": "Mohex는 판 전체에서 둡니다: 퍼즐 밖의 칸이 국면대로 채워져 있는지, 변에 연결된 돌이 표시되어 있는지 확인하세요.",
+            "check_section": "퍼즐 확인",
+            "generate": "트리 생성",
+            "generate_tab": "생성",
+            "generate_help": "기존 수를 유지하면서 선택한 노드부터 트리를 완성합니다: 이기는 수와 반박은 Mohex, 컴퓨터의 응수는 Katahex가 담당합니다.",
+            "generate_templates": "템플릿 연결에서 멈추기, 최대",
+            "generate_templates_none": "템플릿 없음: 연결이 완성될 때만 퍼즐이 끝납니다.",
+            "generate_templates_help": "이 템플릿 이하로 연결이 증명되는 즉시 퍼즐이 끝납니다.",
+            "generate_templates_none_option": "없음",
+            "generate_from_node": "이 노드부터 생성",
+            "generate_not_here": "트리 탭에서 퍼즐이 끝나기 전 메인 수순의 노드를 선택하세요.",
+            "generate_progress": "국면 해결 중: {{done}}/{{total}}",
+            "generate_ok": "트리가 생성되었습니다.",
+            "generate_warnings": "생성 경고 ({{count}}):",
+            "generate_stop": "중지",
+            "generate_tree_changed": "생성 중 트리가 변경되어 결과를 무시했습니다. 다시 생성하세요."
         },
         "next_puzzle": "다음 퍼즐",
         "collections": {
@@ -1496,7 +1620,12 @@
         "published_ago": "{{date}} 게시됨",
         "sort_by": "정렬",
         "sort_published_at": "게시일",
-        "sort_created_at": "추가일"
+        "sort_created_at": "추가일",
+        "field_secondary_urls": "기타 링크",
+        "field_secondary_urls_help": "이 동영상이 다른 플랫폼(PeerTube, Dailymotion…)에도 게시된 경우. 위의 링크가 기본 링크로 유지됩니다.",
+        "add_link": "링크 추가",
+        "remove_link": "이 링크 삭제",
+        "watch_on": "{{platform}}에서 보기"
     },
     "swap_maps": {
         "title": "스왑 맵",
@@ -1517,9 +1646,12 @@
     },
     "ladder": {
         "title": "킹 오브 더 힐",
+        "title_female": "퀸 오브 더 힐",
         "intro": "하나의 사다리, 하나의 왕좌. 나보다 위에 있는 플레이어에게 도전하세요: 이기면 그 자리를 차지합니다. 높이 앉을수록 더 많이 지켜야 합니다.",
         "king": "킹 오브 더 힐",
+        "king_female": "퀸 오브 더 힐",
         "king_for": "{{duration}} 동안 왕",
+        "king_for_female": "{{duration}} 동안 여왕",
         "no_king": "왕좌가 비어 있습니다. 참가해서 차지하세요!",
         "join": "킹 오브 더 힐 참가",
         "leave": "이 언덕 떠나기",
@@ -1545,6 +1677,7 @@
         "no_running_challenges": "진행 중인 도전이 없습니다.",
         "vs": "vs",
         "nobody_to_challenge": "도전할 상대가 없습니다: 당신이 왕입니다!",
+        "nobody_to_challenge_female": "도전할 상대가 없습니다: 당신이 여왕입니다!",
         "live": "실시간",
         "challenge_overlay": {
             "title": "{{player}}에게 도전",
@@ -1588,6 +1721,7 @@
             "challenge_defended": "{{opponent}}님이 {{player}}님으로부터 자리를 지켰습니다",
             "challenge_voided": "{{player}} 대 {{opponent}} 대국이 취소되었습니다",
             "new_king": "{{player}}님이 새로운 킹 오브 더 힐입니다!",
+            "new_king_female": "{{player}}님이 새로운 퀸 오브 더 힐입니다!",
             "giant_slayer": "{{player}}님은 거인 사냥꾼: {{opponent}}님을 왕좌에서 끌어내렸습니다!",
             "climber": "{{player}}님이 도전 {{wins}}연승을 거두었습니다!",
             "strike": "{{player}}님이 대국에서 시간 초과되었습니다 (경고 {{strikes}})",
@@ -1759,5 +1893,343 @@
             }
         },
         "check_device_code": "이 코드가 기기에 표시된 코드와 일치하는지 확인하세요:"
-    }
+    },
+    "pronouns": {
+        "title": "대명사",
+        "explain": "대명사는 공개됩니다: 프로필과 닉네임을 클릭했을 때 표시됩니다. 또한 인터페이스 문구를 회원님에게 맞추고, 다른 플레이어에게 회원님을 어떻게 지칭할지에도 사용됩니다.",
+        "save_error": "대명사를 저장할 수 없습니다. 다시 시도해 주세요.",
+        "he/him": "he/him (그)",
+        "she/her": "she/her (그녀)",
+        "they/them": "they/them",
+        "unspecified": "대명사 미지정"
+    },
+    "player_popover": {
+        "on_playhex_since": "PlayHex 활동 {{duration}}"
+    },
+    "closed_game": "비공개 대국",
+    "closed_game_help": "이 대국은 다른 플레이어의 로비에 표시되지 않습니다. 아직 PlayHex에 가입하지 않았더라도 링크가 있는 사람만 참가할 수 있습니다.",
+    "closed_game_invite": {
+        "link_label": "친구에게 보낼 링크",
+        "share": "공유"
+    },
+    "chat_header": {
+        "game_started": "대국 시작",
+        "game_ended": "대국 종료",
+        "game_canceled": "대국 취소"
+    },
+    "host_waiting_join_chance_first_minute": "이 시간대에는 대국의 {{percent}}가 첫 1분 안에 상대를 찾습니다.",
+    "host_waiting_join_chance_next_minutes": "아직 아무도 참가하지 않았습니다. 10분 더 기다리면 호스트의 {{percent}}가 상대를 찾습니다.",
+    "match_title_in_tournament": "{{ tournament }} {{ match }}",
+    "chat_message_visibility": "메시지 공개 범위",
+    "chat_attach_to_move_toggle": "이 메시지를 {{n}}수 아래에 표시",
+    "chat_message_visibility_public": "공개",
+    "chat_message_visibility_private": "개인 메모",
+    "chat_message_visibility_malkovich": "말코비치",
+    "chat_message_placeholder_private": "개인 메모, 나에게만 보입니다…",
+    "chat_message_placeholder_malkovich": "말코비치, 대국이 끝나면 모두에게 보입니다…",
+    "chat_new_messages": "새 메시지",
+    "set_password": "비밀번호 설정",
+    "set_password_explain": "계정에 아직 비밀번호가 없습니다. 비밀번호를 설정하면 사용자 이름 \"{{login}}\"(으)로도 로그인할 수 있습니다.",
+    "saved": "저장됨",
+    "or": "또는",
+    "log_in_with_discord": "Discord로 로그인",
+    "must_be_logged_in": "로그인이 필요합니다",
+    "same_pseudo": "이미 사용 중인 사용자 이름입니다",
+    "pseudo_change_limit_reached": "최근 사용자 이름을 너무 자주 변경했습니다",
+    "must_set_password_first": "먼저 비밀번호를 설정하세요. 그렇지 않으면 더 이상 로그인할 수 없습니다",
+    "discord_login_failed": "Discord 로그인에 실패했습니다. 다시 시도해 주세요",
+    "discord_login_cancelled": "Discord 로그인이 취소되었습니다",
+    "discord_already_linked": "이 Discord 계정은 이미 다른 PlayHex 계정에 연결되어 있습니다",
+    "discord_account_creation_rate_limited": "최근 생성된 계정이 너무 많습니다. 나중에 다시 시도해 주세요",
+    "change_pseudo": {
+        "title": "사용자 이름 변경",
+        "new_pseudo": "새 사용자 이름",
+        "submit": "사용자 이름 변경",
+        "confirm": "사용자 이름을 \"{{pseudo}}\"(으)로 변경할까요?",
+        "success": "사용자 이름이 변경되었습니다.",
+        "next_allowed_at": "최근 사용자 이름을 너무 자주 변경했습니다. {{date}}에 다시 변경할 수 있습니다.",
+        "old_pseudo_released": "이전 사용자 이름은 다른 플레이어가 사용할 수 있게 됩니다. 이전 프로필 URL로 연결된 링크는 새 URL로 이동합니다. 앞으로는 새 사용자 이름으로 로그인합니다.",
+        "remaining_other": "30일 안에 사용자 이름을 {{count}}번 더 변경할 수 있습니다.",
+        "former_pseudo_note_other": "프로필에 \"이전 이름 {pseudo}\"가 {{count}}일 동안 표시됩니다."
+    },
+    "formerly": "이전 이름",
+    "discord_account": {
+        "title": "Discord",
+        "private": "연결된 Discord 계정은 나에게만 보이며, 프로필에는 표시되지 않습니다.",
+        "explain": "Discord 계정을 연결하면 Discord로 로그인할 수 있습니다.",
+        "link": "내 Discord 계정 연결",
+        "linked_to": "Discord 계정 {username}에 연결됨. Discord로 로그인할 수 있습니다.",
+        "unlink": "연결 해제",
+        "unlink_confirm": "Discord 계정 연결을 해제할까요? 더 이상 Discord로 로그인할 수 없습니다.",
+        "set_password_to_unlink": "Discord 계정 연결을 해제하려면 계속 로그인할 수 있도록 먼저 비밀번호를 설정하세요."
+    },
+    "recovery_email": {
+        "title": "복구 이메일",
+        "explain": "선택 사항. 비밀번호를 잊어버린 경우 등 계정 보안에 관해 연락할 때 사용됩니다.",
+        "email": "이메일",
+        "private": "이메일은 비공개이며 다른 플레이어에게 표시되지 않습니다. 삭제하려면 비워 두세요.",
+        "invalid": "잘못된 이메일"
+    },
+    "cancel_request": {
+        "ask": "취소 제안",
+        "player_wants_to_cancel": "{{ player }}님이 대국 취소를 제안했습니다",
+        "accept": "취소 수락",
+        "reject": "거절",
+        "request_denied": "{{ player }}님의 대국 취소 요청이 거절되었습니다.",
+        "game_canceled_by_agreement": "{{ player }}님의 제안으로 양측 합의하에 대국이 취소되었습니다.",
+        "confirm_overlay": {
+            "title": "대국 취소를 제안할까요?",
+            "message": "상대에게 요청이 전송되며, 상대는 수락하거나 거절할 수 있습니다. 수락되면 대국은 취소되고 기록에 반영되지 않습니다.",
+            "confirmLabel": "예, 요청 보내기",
+            "cancelLabel": "아니요, 계속 두기"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer 라이브",
+        "tab_live": "라이브",
+        "tab_play": "대국",
+        "bot_unavailable": "사용 불가",
+        "tab_chat": "채팅",
+        "live": "라이브",
+        "stream": "방송",
+        "stream_description": "링크를 공유하세요: 누구나 내 분석을 실시간으로 보고, 커서를 확인하고, 채팅할 수 있습니다.",
+        "start_stream": "방송 시작",
+        "stop_stream": "방송 중지",
+        "share_link": "공유 링크",
+        "copy_link": "링크 복사",
+        "match": "이 국면에서 대국",
+        "match_description": "판 위의 국면에서 봇이나 다른 플레이어와 대국합니다. 끝나면 대국이 분석에 변화로 추가됩니다.",
+        "i_play": "내 차례",
+        "opponent": "상대",
+        "opponent_player": "플레이어",
+        "invite_player_optional": "플레이어 초대 (선택)",
+        "invite_player_help": "초대받은 플레이어는 알림을 받으며, 그 사람만 참가할 수 있습니다. 초대하지 않으면 링크를 처음 연 사람이 둘 수 있습니다.",
+        "validate_setup_first": "먼저 배치한 국면을 확정하세요.",
+        "start_match": "대국 시작",
+        "back_to_analysis": "분석으로 돌아가기",
+        "back_to_match": "대국으로 돌아가기",
+        "waiting_for_opponent": "상대를 기다리는 중…",
+        "waiting_for_player": "{{pseudo}}님을 기다리는 중…",
+        "you": "나",
+        "your_turn": "내 차례",
+        "swap_hint": "돌을 클릭해 교환하세요.",
+        "wins": "승리",
+        "wins_by_resignation": "기권승",
+        "match_expired": "대국 종료: 너무 오랫동안 수가 없었습니다.",
+        "match_canceled": "대국이 취소되었습니다.",
+        "join_match": "이 대국 두기",
+        "cancel_match": "대국 취소",
+        "hosted_by": "호스트:",
+        "session_ended": "이 세션은 종료되었습니다.",
+        "waiting_for_stream": "방송자를 기다리는 중…",
+        "open_copy": "사본 열기",
+        "open_copy_failed": "사본을 열 수 없습니다.",
+        "invitation_toast": "{{pseudo}}님이 Hexplorer 국면에서 대국하자고 초대했습니다.",
+        "invitation_open": "열기",
+        "live_elsewhere": "이미 다른 연구에서 라이브 중입니다. 라이브 세션은 한 번에 하나만 가능합니다.",
+        "go_to_live_study": "이동",
+        "back_to_live": "Hexplorer 방송이 아직 진행 중입니다: 돌아가기",
+        "errors": {
+            "session_not_found": "이 라이브 세션은 더 이상 존재하지 않습니다.",
+            "already_live": "이미 다른 탭에서 라이브 중입니다. 먼저 중지하세요.",
+            "not_host": "호스트만 할 수 있습니다.",
+            "match_already_running": "이미 대국이 진행 중입니다.",
+            "position_already_won": "이 국면은 이미 승부가 났습니다.",
+            "bot_unavailable": "이 봇은 현재 사용할 수 없습니다.",
+            "invalid_invited_player": "이 플레이어는 초대할 수 없습니다.",
+            "cannot_join": "이 대국에 참가할 수 없습니다.",
+            "match_not_playing": "이 대국은 진행 중이 아닙니다.",
+            "not_your_turn": "내 차례가 아닙니다.",
+            "not_a_player": "이 대국의 플레이어가 아닙니다.",
+            "invalid_data": "잘못된 데이터입니다.",
+            "illegal_move": "이 수는 둘 수 없습니다.",
+            "study_required": "먼저 분석을 연구로 저장하세요."
+        }
+    },
+    "social_preview": {
+        "default_description": "보드게임 Hex를 온라인에서 다른 플레이어나 AI와 즐기세요. 대회, 퍼즐, 대국 분석.",
+        "by": "작성자: {{author}}",
+        "game": {
+            "canceled_title": "취소된 Hex 대국",
+            "canceled_description": "이 Hex {{boardsize}} 대국은 취소되었습니다.",
+            "waiting_title": "{{player}}님의 모집 중인 Hex 대국",
+            "waiting_title_anonymous": "모집 중인 Hex 대국",
+            "waiting_description": "Hex {{boardsize}} 대국, {{timeControl}}, 상대를 기다리는 중. PlayHex에서 참가하세요.",
+            "ranked": "랭크",
+            "friendly": "친선",
+            "playing_description": "대국 진행 중, PlayHex에서 실시간으로 관전하세요.",
+            "outcome_path": "{{winner}}님이 자기 변을 연결해 승리",
+            "outcome_resign": "{{winner}}님이 기권승",
+            "outcome_time": "{{winner}}님이 시간승",
+            "outcome_forfeit": "{{winner}}님이 부전승",
+            "winner": "{{winner}}님 승리",
+            "image_alt": "Hex 대국 {{title}}의 최종 국면",
+            "open_game": "모집 중인 대국",
+            "join": "PlayHex에서 참가",
+            "playing": "대국 진행 중",
+            "cadency_live": "라이브",
+            "cadency_correspondence": "통신 대국",
+            "n_moves_other": "{{count}}수"
+        },
+        "tournament": {
+            "starts_at": "{{date}} 시작",
+            "running": "대회 진행 중",
+            "rank_1": "1위: {{player}}",
+            "rank_2": "2위: {{player}}",
+            "rank_3": "3위: {{player}}",
+            "canceled": "대회 취소됨",
+            "hex_tournament": "Hex 대회",
+            "n_registered_other": "{{count}}명 등록",
+            "n_participants_other": "참가자 {{count}}명"
+        },
+        "tournament_series": {
+            "next": "다음: {{title}}, {{date}}",
+            "hex_tournaments": "Hex 대회",
+            "n_editions_other": "{{count}}회 개최"
+        },
+        "puzzle": {
+            "default_title": "Hex 퍼즐",
+            "red_to_play": "빨강 차례, 승리하기",
+            "blue_to_play": "파랑 차례, 승리하기",
+            "label": "퍼즐",
+            "hex_puzzle_by": "{{author}}의 Hex 퍼즐"
+        },
+        "hexplorer_study": {
+            "default_title": "Hexplorer 연구",
+            "label": "연구",
+            "hex_study_by": "{{author}}의 Hex 연구"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "{{author}}의 Hex 퍼즐",
+            "n_puzzles_other": "Hex 퍼즐 {{count}}개"
+        },
+        "player": {
+            "title": "{{player}}, Hex 플레이어",
+            "bot": "Hex AI",
+            "rating": "레이팅 {{rating}}",
+            "member_since": "{{date}}부터 회원",
+            "on_playhex": "PlayHex 플레이어",
+            "n_games_other": "{{count}}판 대국"
+        },
+        "ladder": {
+            "king": "왕: {{player}}",
+            "king_female": "여왕: {{player}}",
+            "reign_other": "{{duration}} 동안 재위, 방어 {{count}}회",
+            "n_players_other": "언덕 위 {{count}}명"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hex 퍼즐",
+                "description": "커뮤니티가 만든 초급부터 고급까지의 Hex 퍼즐을 풀고, 직접 만들어 보세요."
+            },
+            "tournaments": {
+                "title": "Hex 대회",
+                "description": "온라인 Hex 대회에 참가하세요: 라이브와 통신 대국, 스위스 방식과 토너먼트 방식."
+            },
+            "tournament_series": {
+                "title": "Hex 대회 시리즈",
+                "description": "정기 Hex 대회: 시리즈를 팔로우하고 다음 대회 일정을 확인하세요."
+            },
+            "ladders": {
+                "title": "킹 오브 더 힐",
+                "description": "Hex 사다리를 올라가세요: 위의 플레이어에게 도전하고, 자리를 빼앗고, 왕좌를 지키세요."
+            },
+            "games_archive": {
+                "title": "Hex 대국 아카이브",
+                "description": "PlayHex에서 둔 모든 Hex 대국을 둘러보고 검색하세요."
+            },
+            "videos": {
+                "title": "Hex 동영상",
+                "description": "커뮤니티가 만든 Hex 동영상: 튜토리얼, 전략, 대국 리뷰."
+            },
+            "statistics": {
+                "title": "PlayHex 통계",
+                "description": "PlayHex의 대국, 플레이어, 판 크기, 승률."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "AI 분석으로 Hex 국면을 탐색하세요."
+            },
+            "swap_maps": {
+                "title": "Hex 교환 지도",
+                "description": "판 크기별로 교환해야 할 첫 수를 KataHex로 계산했습니다."
+            },
+            "guide": {
+                "title": "PlayHex 가이드",
+                "description": "PlayHex에서 Hex 두는 법: 규칙, AI 분석, 조건부 수, 운영 정책."
+            },
+            "export_games_data": {
+                "title": "PlayHex 대국 데이터 내보내기",
+                "description": "PlayHex에서 둔 모든 Hex 대국의 데이터셋을 내려받으세요. 자유롭게 재사용할 수 있습니다."
+            },
+            "guide_ai_analysis": {
+                "title": "AI 대국 분석",
+                "description": "AI로 Hex 대국을 복기하세요: 실수를 찾고, 최선의 수를 보고, 언제 우세를 잡거나 잃었는지 알아보세요."
+            },
+            "guide_conditional_moves": {
+                "title": "조건부 수",
+                "description": "Hex 통신 대국을 더 빠르게: 상대의 다음 수에 대한 응수를 미리 계획하고, 사다리를 자동으로 두세요."
+            },
+            "tutorial_rules": {
+                "title": "Hex 규칙",
+                "description": "인터랙티브 튜토리얼로 Hex의 2가지 규칙을 몇 분 만에 배우고, 봇과 첫 대국을 두어 보세요."
+            },
+            "tutorial_swap": {
+                "title": "Hex의 교환 규칙",
+                "description": "교환 규칙은 Hex 대국의 균형을 유지합니다."
+            },
+            "tutorial_bridge": {
+                "title": "Hex의 브리지",
+                "description": "브리지는 Hex에서 가장 중요한 모양입니다: 서로 닿지 않고도 이미 연결된 두 돌. 원리를 배우고 퍼즐로 연습하세요."
+            },
+            "tutorial_block": {
+                "title": "초보자를 위한 Hex 전략: 막아서 이기기",
+                "description": "Hex에서는 막는 것이 곧 자신의 길을 만드는 것입니다: 초반 최고의 전략입니다."
+            },
+            "tutorial_ziggurat": {
+                "title": "Hex의 지구라트 템플릿",
+                "description": "지구라트는 Hex에서 두 번째로 알아야 할 모양입니다: 세 번째 줄의 돌이 자기 변에 연결된 형태. 원리를 배우고 퍼즐로 연습하세요."
+            },
+            "cijm_2025": {
+                "title": "Hex 대회 – 파리 2025",
+                "description": "2025년 6월 14일과 15일, 파리 생쉴피스 광장의 '문화와 수학 게임 박람회'에서 열리는 두 개의 Hex 대회. 무료, 모든 레벨."
+            },
+            "cijm_2026": {
+                "title": "Hex 대회 – 파리 2026",
+                "description": "2026년 5월 24일 일요일, 파리 생쉴피스 광장의 '문화와 수학 게임 박람회'에서 열리는 대형 Hex 대회. 무료, 모든 레벨, 8세 이상."
+            }
+        },
+        "n_days_other": "{{count}}일",
+        "n_hours_other": "{{count}}시간"
+    },
+    "game_outcome": {
+        "path": "연결",
+        "resign": "기권",
+        "time": "시간",
+        "forfeit": "부전"
+    },
+    "has_chat_messages": "채팅 있음",
+    "has_analyze": "AI 분석 있음",
+    "has_malkovich_messages": "말코비치 기록 있음",
+    "game_content_filter": "내용",
+    "filters": "필터",
+    "reset_filters": "필터 초기화",
+    "reset_dates": "날짜 초기화",
+    "game_type": "대국 유형",
+    "game_state_filter": "상태",
+    "opponent_or_players": "플레이어",
+    "one_or_two_players_help": "1명: 해당 플레이어의 대국. 2명: 두 사람 사이의 대국.",
+    "search_opponent": "상대",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "모든 필터",
+    "hide_filters": "필터 줄이기",
+    "week_of": "{{date}} 주",
+    "chart_grouping": {
+        "label": "그룹 기준",
+        "auto": "자동",
+        "day": "일",
+        "week": "주",
+        "month": "월"
+    },
+    "n_games_found_other": "대국 {{count}}개를 찾았습니다."
 }

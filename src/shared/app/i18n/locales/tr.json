@@ -8,7 +8,9 @@
         "open_live_games": "Canlı bir oyuna katıl",
         "open_correspondence_games": "Yazışmalı bir oyuna katıl",
         "no_open_live_games": "Şu anda açık canlı oyun yok",
-        "no_open_correspondence_games": "Şu anda açık yazışmalı oyun yok"
+        "no_open_correspondence_games": "Şu anda açık yazışmalı oyun yok",
+        "multiple_waiting_games": "Bekleyen birden fazla oyun:",
+        "others_canceled_once_one_accepted": "Bekleyen oyunlarınızdan biri kabul edilince diğerleri iptal edilir."
     },
     "game": {
         "title": "Oyun",
@@ -35,13 +37,19 @@
         "playing": "Oynuyor",
         "watch": "İzle",
         "title_your_turn": "Senin sıran!",
-        "title_waiting": "Bir rakip bekleniyor: ev sahibi"
+        "title_waiting": "Bir rakip bekleniyor: ev sahibi",
+        "winner": "Kazanan",
+        "loser": "Kaybeden",
+        "issue": "Sonuç",
+        "moves_count": "Hamleler"
     },
     "game_rules": {
         "normal": "standart",
         "host_plays_first": "ev sahibi ilk hamleyi oynar",
         "host_plays_second": "ev sahibi ikinci hamleyi oynar",
-        "no_swap": "değiştirme yok"
+        "no_swap": "değiştirme yok",
+        "handicap_for_host": "ev sahibine {{n}} handikap",
+        "handicap_for_opponent": "rakibe {{n}} handikap"
     },
     "game_state": {
         "created": "Oluşturuldu",
@@ -66,7 +74,8 @@
             "notifications": "Bildirimler",
             "ai_workers": "Yapay zekâ worker'ları",
             "connected_applications": "Bağlı uygulamalar",
-            "technical_info": "Teknik bilgi"
+            "technical_info": "Teknik bilgi",
+            "security": "Güvenlik"
         },
         "audio": "Ses",
         "moderation": "Moderasyon"
@@ -111,7 +120,33 @@
     "handicap": {
         "title": "Engel",
         "none": "hiçbiri",
-        "handicap_for_player": "{{player}} için {{n}}"
+        "handicap_for_player": "{{player}} için {{n}}",
+        "you": "siz",
+        "opponent": "rakip",
+        "ai": "YZ",
+        "increase": "Handikapı artır",
+        "decrease": "Handikapı azalt",
+        "setup": {
+            "first_stone_then": "{{player}} değiştirilebilir bir taş koyar, sonra {{count}} taş daha, değiştirilirse {{swappedCount}} taş.",
+            "first_stone_then_you": "Değiştirilebilir bir taş koyun, sonra {{count}} taş daha, değiştirilirse {{swappedCount}} taş.",
+            "first_stone_for_blue": "{{player}} değiştirilebilir bir taş koyar, sonra {{beneficiary}} {{count}} hamle yapar.",
+            "first_stone_for_blue_you": "Değiştirilebilir bir taş koyun, sonra {{beneficiary}} {{count}} hamle yapar.",
+            "first_stone_for_blue_beneficiary": "{{player}} değiştirilebilir bir taş koyar, sonra siz {{count}} hamle yaparsınız.",
+            "swap_decision": "{{player}} değiştirip değiştirmeyeceğine karar verir: ardından {{beneficiary}} {{swappedCount}} taş koyar, reddedilirse {{count}} taş.",
+            "swap_decision_you": "Değiştirmek için taşa tıklayın: ardından {{beneficiary}} {{swappedCount}} taş koyar, reddederseniz {{count}} taş.",
+            "swap_decision_beneficiary": "{{player}} değiştirip değiştirmeyeceğine karar verir: ardından siz {{swappedCount}} taş koyarsınız, reddedilirse {{count}} taş.",
+            "stones_after_swap": "Taş değiştirildi: {{player}} {{count}} taş koyar.",
+            "stones_after_swap_you": "Taş değiştirildi: {{count}} taş koyun.",
+            "refuse_swap": "Değiştirme",
+            "no_swap_one": "Değiştirme kapalı: {{player}} 1 taş koyar.",
+            "no_swap_other": "Değiştirme kapalı: {{player}} {{count}} taş koyar.",
+            "no_swap_you_one": "Değiştirme kapalı: 1 taş koyun.",
+            "no_swap_you_other": "Değiştirme kapalı: {{count}} taş koyun.",
+            "stones_one": "{{player}} 1 taş daha koyar.",
+            "stones_other": "{{player}} {{count}} taş daha koyar.",
+            "stones_you_one": "1 taş daha koyun.",
+            "stones_you_other": "{{count}} taş daha koyun."
+        }
     },
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "Oyun {player} tarafından {timeAgo} oluşturuldu.",
@@ -153,7 +188,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "Kendi bilgisayarından AI hamlelerini nasıl hesaplayabileceğini öğren",
-        "engine_unavailable": "Bazı yapay zekâ motorlarının şu anda çevrimiçi worker'ı yok, bu yapay zekâlar kullanılamıyor."
+        "engine_unavailable": "Bazı yapay zekâ motorlarının şu anda çevrimiçi worker'ı yok, bu yapay zekâlar kullanılamıyor.",
+        "ai_not_available": "Şu anda kullanılamıyor"
     },
     "game_analysis": {
         "game_analysis": "AI oyun analizi",
@@ -216,7 +252,12 @@
     },
     "1vAI_friendly": {
         "title": "AI'ya karşı oyna",
-        "create": "AI'ya karşı oyna"
+        "create": "AI'ya karşı oyna",
+        "easy": "Kolay",
+        "medium": "Orta",
+        "hard": "Zor",
+        "beaten": "Zaten yenildi",
+        "unlock_stronger_ais": "Daha fazla YZ seçeneği göster"
     },
     "1vAI_offline": {
         "title": "Çevrimdışı AI",
@@ -561,7 +602,12 @@
         "block_at_a_distance": "Taşını rakibinin taşının hemen yanına koyma: bitişik bir engelin etrafından dolaşmak kolaydır. Biraz boşluk bırakarak daha uzaktan engelle: hamlelerine cevap vermek için zamanın olur.",
         "block_remember": "Unutma: Hex'te iyi bir hamle hem savunma hem de saldırıdır.",
         "ziggurat_defense_1": "Mavi ortaya giriyor: Kırmızı taşının yanına cevap veriyor ve kenarla bir köprü kuruyor.",
-        "ziggurat_defense_2": "Mavi birinci sıraya giriyor: Kırmızı bir köprüyle cevap veriyor ve yeni taş kenara bağlanıyor."
+        "ziggurat_defense_2": "Mavi birinci sıraya giriyor: Kırmızı bir köprüyle cevap veriyor ve yeni taş kenara bağlanıyor.",
+        "demo_0_play": "Oyna",
+        "chapters": {
+            "hex_rule": "I. Hex kuralları",
+            "beginners_strategy": "II. Yeni başlayanlar için strateji"
+        }
     },
     "undo": {
         "undo_move": "Hamleyi geri al",
@@ -844,7 +890,57 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Oyun tahtasının altındaki \"Hata ayıklama bilgisi\"nden kopyala",
         "engine_unavailable": "Bu motor için şu anda çevrimiçi yapay zekâ worker'ı yok, pozisyonlar analiz edilemiyor.",
-        "analysis_failed": "Bu pozisyon analiz edilemedi."
+        "analysis_failed": "Bu pozisyon analiz edilemedi.",
+        "analyze_in_hexplorer": "Hexplorer'da analiz et",
+        "play_from_position": "Bir konumdan oyna",
+        "tab_file": "Dosya",
+        "tab_tree": "Ağaç",
+        "comment": "Yorum",
+        "comment_placeholder": "Bu konumu yorumlayın…",
+        "current_study": "Mevcut çalışma",
+        "new_study": "Yeni çalışma",
+        "study_title": "Çalışma başlığı",
+        "study_default_title": "Adsız çalışma",
+        "study_by": "{{author}} tarafından",
+        "study_fork": "Çatalla",
+        "study_fork_help": "Bu çalışmanın değişiklikleriyle birlikte kendi kopyanızı kaydedin",
+        "study_forked_from": "Çatallandığı çalışma",
+        "study_share": "Bu çalışmayı paylaş",
+        "study_link_copied": "Bağlantı kopyalandı",
+        "study_delete": "Bu çalışmayı sil",
+        "study_delete_confirm": "Bu çalışma silinsin mi? Bağlantısı artık çalışmayacak.",
+        "study_too_large": "Bu çalışma kaydedilemeyecek kadar büyük: bazı dalları veya yorumları kaldırın.",
+        "study_not_found": "Bu çalışma yok veya silinmiş.",
+        "study_unsaved_changes": "Kaydedilmemiş değişiklikler",
+        "study_save_shortcut": "Çalışmayı kaydet (Ctrl+S)",
+        "study_validate_setup_first": "Çalışmayı kaydetmek için kurulum modunu bitirin.",
+        "study_save_to_share": "Çatallamak veya paylaşmak için bu çalışmayı kaydedin.",
+        "my_studies": "Çalışmalarım",
+        "export": "Dışa aktar",
+        "study_sort": "Çalışmaları sırala",
+        "study_sort_date_desc": "En yeni",
+        "study_sort_date_asc": "En eski",
+        "study_sort_title_asc": "Ad A–Z",
+        "study_sort_title_desc": "Ad Z–A",
+        "tools_history": "Geçmiş",
+        "tools_stones": "Taşlar",
+        "tools_marks": "İşaretler",
+        "tools_label": "Etiket",
+        "study_discard_confirm": "Kaydedilmemiş değişiklikleriniz var, kaybolacaklar. Devam edilsin mi?",
+        "tab_help": "Yardım",
+        "help_what_title": "Hexplorer nedir?",
+        "help_what": "Hex için ücretsiz bir analiz tahtası: herhangi bir konumu keşfedin, birkaç varyant deneyin ve YZ'nin bunlar hakkında ne düşündüğünü görün.",
+        "help_why_title": "Neden kullanmalı?",
+        "help_why": "Oyunlarınızı anlamak, daha iyi hamleler bulmak ve bir konum hakkındaki fikirlerinizi diğer oyuncularla paylaşmak için.",
+        "help_how_title": "Nasıl kullanılır",
+        "help_how_play": "Özel bir konum oluşturmak için taşları serbestçe koyun",
+        "help_how_import": "veya bir bağlantıdan ya da metinden Hex oyunu içe aktarın",
+        "help_how_ai": "Tahtanın solundaki çubuk kimin kazandığını, tahta ise YZ'nin değerlendirdiği hamleleri gösterir.",
+        "help_how_setup": "Kurulum modu tahtaya işaret eklemenizi ve bir konumu serbestçe düzenlemenizi sağlar",
+        "help_how_file": "Çalışmanızı kaydedin (Ctrl+S), paylaşın veya SGF olarak dışa aktarın",
+        "help_dismiss": "Anladım, tekrar gösterme",
+        "study_nodes_one": "{{count}} düğüm",
+        "study_nodes_other": "{{count}} düğüm"
     },
     "player_menu": {
         "open_menu": "Oyuncu menüsünü aç",
@@ -863,7 +959,8 @@
         "reserved_for_other_player": "Bu oyun başka bir oyuncuya ayrılmış bir meydan okumadır.",
         "reserved_for_other_player_named": "Bu oyun {{pseudo}} adlı oyuncuya ayrılmış bir meydan okumadır.",
         "other": "Bu oyuna katılamazsınız.",
-        "game_canceled": "Bu oyun iptal edildi."
+        "game_canceled": "Bu oyun iptal edildi.",
+        "is_host_closed": "Bu oyun kapalı: yalnızca bu oyunun bağlantısına sahip biri katılabilir."
     },
     "lobby_challenges_you_badge": "Size meydan okuyor!",
     "sort_recently_played": "Son oynananlar",
@@ -1030,7 +1127,8 @@
         "challenge_player": "bir oyuncuya meydan okuma",
         "challenge_same_target": "bu oyuncuya tekrar meydan okuma",
         "analyze_position": "konumları analiz etme",
-        "channel_slow_mode": "yavaş mod"
+        "channel_slow_mode": "yavaş mod",
+        "create_hexplorer_study": "Hexplorer çalışması oluşturma"
     },
     "head_to_head": "Bire bir",
     "never_played_together": "Bu oyuncuyla henüz hiç karşılaşmadınız.",
@@ -1107,7 +1205,11 @@
         "opening_moves": "En yaygın açılış hamleleri",
         "opening_moves_note": "{{boardsize}} tahtalar için, en çok oynanan tahta boyutu.",
         "rating_distribution": "Derecelendirme dağılımı",
-        "rating_distribution_note": "Yalnızca derecesi kesinleşmiş (sapması {{deviation}} değerinin altında olan) bot olmayan oyuncular sayılır. Misafirler dahildir."
+        "rating_distribution_note": "Yalnızca derecesi kesinleşmiş (sapması {{deviation}} değerinin altında olan) bot olmayan oyuncular sayılır. Misafirler dahildir.",
+        "lobby_join_chances": "Canlı oyuna katılım olasılığı",
+        "lobby_join_chances_first_minute": "< 1 dk",
+        "lobby_join_chances_next_minutes": "+10 dk",
+        "lobby_join_chances_note": "Lobide oluşturulan canlı oyunlardan ilk dakikada rakip bulanların, ardından ilk dakikadan sonra kimse katılmadığında sonraki 10 dakikada rakip bulanların yüzdesi. Ev sahipleri iptal etmek yerine beklemiş gibi, son 8 hafta üzerinden tahmin edilmiştir. Saatler yerel saat diliminizde gösterilir (UTC{{offset}})."
     },
     "board_mount_error": {
         "error": "Tahta görüntülenemedi, bir hata oluştu:",
@@ -1295,7 +1397,17 @@
             "fixed_fill_twice": "{{move}} iki kez sabit renge sahip",
             "invalid_type": "Geçersiz {{property}}",
             "solver_unproven_one": "{{count}} pozisyon zamanında çözülemedi, bulmaca yalnızca kısmen kontrol edildi",
-            "solver_unproven_other": "{{count}} pozisyon zamanında çözülemedi, bulmaca yalnızca kısmen kontrol edildi"
+            "solver_unproven_other": "{{count}} pozisyon zamanında çözülemedi, bulmaca yalnızca kısmen kontrol edildi",
+            "generator_initial_not_winning": "Mohex çözücü burada kazandıran bir hamle bulamıyor",
+            "generator_depends_on_disabled_cells": "Kazanmak yalnızca bulmaca dışındaki hücrelerin yardımıyla mümkün: konum adımında kenarlarına bağlı taşları işaretleyin",
+            "generator_already_connected": "Burada bağlantı zaten var, üretilecek bir şey yok",
+            "generator_unproven": "Zamanında kazandıran hamle kanıtlanamadı, dal boş bırakıldı",
+            "generator_budget_exceeded": "Ağaç çok büyük, dal boş bırakıldı",
+            "generator_parallel_dropped": "Rakip köprüsüne {{move}} sızması paralel dizi olarak eklenemedi, oynanması bulmacayı başarısız kılar",
+            "generator_accepted_losing": "Bu hamle kabul ediliyor, ancak Mohex çözücü kaybettiğini kanıtlıyor",
+            "generator_accepted_unproven": "Bu hamle kabul ediliyor, ancak Mohex çözücü kazandığını kanıtlamıyor: devam ettirilmiyor",
+            "generator_failed_winning": "Bu hamle başarısız sayılıyor, ancak Mohex çözücü kazandığını kanıtlıyor",
+            "generator_invalid_tree": "Üretilen ağaç geçersiz ({{error}})"
         },
         "editor": {
             "optional": "İsteğe bağlı",
@@ -1460,7 +1572,24 @@
             "warnings_badge_one": "{{count}} kontrol uyarısı",
             "warnings_badge_other": "{{count}} kontrol uyarısı",
             "errors_count_one": "Düzeltilecek {{count}} sorun, Yayınla sekmesine bakın",
-            "errors_count_other": "Düzeltilecek {{count}} sorun, Yayınla sekmesine bakın"
+            "errors_count_other": "Düzeltilecek {{count}} sorun, Yayınla sekmesine bakın",
+            "solver_position": "Mohex için konum",
+            "solver_position_help": "Mohex tüm tahtada oynar: bulmaca dışındaki hücrelerin konuma göre doldurulduğunu ve bir kenara bağlı taşların işaretlendiğini kontrol edin.",
+            "check_section": "Bulmacayı kontrol et",
+            "generate": "Ağaç üret",
+            "generate_tab": "Üretim",
+            "generate_help": "Mevcut hamleleri koruyarak seçili düğümden ağacı tamamlar: kazandıran hamleler ve çürütmeler Mohex'ten, bilgisayarın cevapları Katahex'ten.",
+            "generate_templates": "Şablonla bağlantıda dur, en fazla",
+            "generate_templates_none": "Şablon yok: bulmaca yalnızca bağlantı tamamlandığında biter.",
+            "generate_templates_help": "Bağlantı bu şablonla veya daha küçüğüyle kanıtlandığı anda bulmaca biter.",
+            "generate_templates_none_option": "Yok",
+            "generate_from_node": "Bu düğümden üret",
+            "generate_not_here": "Ağaç sekmesinde, bulmaca bitmeden önce ana dizinin bir düğümünü seçin.",
+            "generate_progress": "Konumlar çözülüyor: {{done}}/{{total}}",
+            "generate_ok": "Ağaç üretildi.",
+            "generate_warnings": "Üretim uyarıları ({{count}}):",
+            "generate_stop": "Durdur",
+            "generate_tree_changed": "Ağaç üretim sırasında değişti, sonuç yok sayıldı. Tekrar üretin."
         },
         "next_puzzle": "Sonraki bulmaca",
         "collections": {
@@ -1518,7 +1647,12 @@
         "published_ago": "{{date}} yayınlandı",
         "sort_by": "Sırala",
         "sort_published_at": "Yayın tarihi",
-        "sort_created_at": "Eklenme tarihi"
+        "sort_created_at": "Eklenme tarihi",
+        "field_secondary_urls": "Diğer bağlantılar",
+        "field_secondary_urls_help": "Bu video başka platformlarda da yayınlandıysa (PeerTube, Dailymotion…). Yukarıdaki bağlantı ana bağlantı olarak kalır.",
+        "add_link": "Bağlantı ekle",
+        "remove_link": "Bu bağlantıyı kaldır",
+        "watch_on": "{{platform}} üzerinde izle"
     },
     "swap_maps": {
         "title": "Değiştirme haritaları",
@@ -1539,9 +1673,12 @@
     },
     "ladder": {
         "title": "Tepenin Kralı",
+        "title_female": "Tepenin Kraliçesi",
         "intro": "Tek merdiven, tek taht. Üstündeki bir oyuncuya meydan oku: kazanırsan onun yerini alırsın. Ne kadar yükseğe çıkarsan o kadar çok savunman gerekir.",
         "king": "Tepenin Kralı",
+        "king_female": "Tepenin Kraliçesi",
         "king_for": "{{duration}} süredir Kral",
+        "king_for_female": "{{duration}} süredir Kraliçe",
         "no_king": "Taht boş. Katıl ve ele geçir!",
         "join": "Tepenin Kralı'na katıl",
         "leave": "Bu tepeden ayrıl",
@@ -1567,6 +1704,7 @@
         "no_running_challenges": "Devam eden meydan okuma yok.",
         "vs": "vs",
         "nobody_to_challenge": "Meydan okunacak kimse yok: Kral sensin!",
+        "nobody_to_challenge_female": "Meydan okunacak kimse yok: Kraliçe sensin!",
         "live": "Canlı",
         "challenge_overlay": {
             "title": "{{player}} oyuncusuna meydan oku",
@@ -1610,6 +1748,7 @@
             "challenge_defended": "{{opponent}}, {{player}} karşısında yerini savundu",
             "challenge_voided": "{{player}} - {{opponent}} oyunu iptal edildi",
             "new_king": "{{player}} yeni Tepenin Kralı!",
+            "new_king_female": "{{player}} yeni Tepenin Kraliçesi!",
             "giant_slayer": "{{player}} bir Dev Avcısı: {{opponent}} oyuncusunu tahttan indirdi!",
             "climber": "{{player}} art arda {{wins}} meydan okuma kazandı!",
             "strike": "{{player}} bir oyunda süreyi aştı (uyarı {{strikes}})",
@@ -1782,5 +1921,356 @@
             }
         },
         "check_device_code": "Bu kodun cihazınızda gösterilen kodla aynı olduğundan emin olun:"
-    }
+    },
+    "pronouns": {
+        "title": "Zamirler",
+        "explain": "Bu zamirler herkese açıktır: profilinizde ve kullanıcı adınıza tıklandığında görünür. Ayrıca arayüz metinlerini size göre uyarlamak ve diğer oyunculara sizden nasıl bahsedileceği için kullanılır.",
+        "save_error": "Zamirler kaydedilemedi. Lütfen tekrar deneyin.",
+        "he/him": "he/him (o)",
+        "she/her": "she/her (o)",
+        "they/them": "they/them (o)",
+        "unspecified": "Zamir belirtilmedi"
+    },
+    "player_popover": {
+        "on_playhex_since": "{{duration}} süredir PlayHex'te"
+    },
+    "closed_game": "Kapalı oyun",
+    "closed_game_help": "Bu oyun diğer oyuncuların lobisinde görünmez. Henüz PlayHex'te olmasalar bile yalnızca bağlantıya sahip kişiler katılabilir.",
+    "closed_game_invite": {
+        "link_label": "Bir arkadaşa gönderilecek bağlantı",
+        "share": "Paylaş"
+    },
+    "chat_header": {
+        "game_started": "Oyun başladı",
+        "game_ended": "Oyun bitti",
+        "game_canceled": "Oyun iptal edildi"
+    },
+    "host_waiting_join_chance_first_minute": "Günün bu saatinde oyunların {{percent}} kadarına ilk dakikada katılım oluyor.",
+    "host_waiting_join_chance_next_minutes": "Henüz kimse katılmadı. 10 dakika daha beklerseniz, ev sahiplerinin {{percent}} kadarı rakip buluyor.",
+    "match_title_in_tournament": "{{ tournament }} - {{ match }}",
+    "chat_message_visibility": "Mesaj görünürlüğü",
+    "chat_attach_to_move_toggle": "Bu mesajı {{n}}. hamlenin altında göster",
+    "chat_message_visibility_public": "Herkese açık",
+    "chat_message_visibility_private": "Kişisel notlar",
+    "chat_message_visibility_malkovich": "Malkovich",
+    "chat_message_placeholder_private": "Kişisel not, yalnızca size görünür…",
+    "chat_message_placeholder_malkovich": "Malkovich, oyun bittiğinde herkese görünür…",
+    "chat_new_messages": "Yeni",
+    "set_password": "Şifre belirle",
+    "set_password_explain": "Hesabınızın henüz şifresi yok. \"{{login}}\" kullanıcı adınızla da giriş yapmak için bir şifre belirleyin.",
+    "saved": "Kaydedildi",
+    "or": "veya",
+    "log_in_with_discord": "Discord ile giriş yap",
+    "must_be_logged_in": "Giriş yapmış olmalısınız",
+    "same_pseudo": "Bu zaten kullanıcı adınız",
+    "pseudo_change_limit_reached": "Son zamanlarda kullanıcı adınızı çok fazla değiştirdiniz",
+    "must_set_password_first": "Önce bir şifre belirleyin, yoksa artık giriş yapamazsınız",
+    "discord_login_failed": "Discord ile giriş başarısız oldu, lütfen tekrar deneyin",
+    "discord_login_cancelled": "Discord ile giriş iptal edildi",
+    "discord_already_linked": "Bu Discord hesabı zaten başka bir PlayHex hesabına bağlı",
+    "discord_account_creation_rate_limited": "Son zamanlarda çok fazla hesap oluşturuldu, lütfen daha sonra tekrar deneyin",
+    "change_pseudo": {
+        "title": "Kullanıcı adını değiştir",
+        "new_pseudo": "Yeni kullanıcı adı",
+        "submit": "Kullanıcı adını değiştir",
+        "confirm": "Kullanıcı adınız \"{{pseudo}}\" olarak değiştirilsin mi?",
+        "success": "Kullanıcı adınız değiştirildi.",
+        "next_allowed_at": "Son zamanlarda kullanıcı adınızı çok fazla değiştirdiniz. {{date}} tarihinde tekrar değiştirebilirsiniz.",
+        "old_pseudo_released": "Eski kullanıcı adınız diğer oyuncuların kullanımına açılacak. Eski profil adresinize giden bağlantılar yenisine yönlendirilecek. Yeni kullanıcı adınızla giriş yapacaksınız.",
+        "remaining_one": "Kullanıcı adınızı 30 gün içinde {{count}} kez daha değiştirebilirsiniz.",
+        "remaining_other": "Kullanıcı adınızı 30 gün içinde {{count}} kez daha değiştirebilirsiniz.",
+        "former_pseudo_note_one": "Profiliniz {{count}} gün boyunca \"eskiden {pseudo}\" gösterecek.",
+        "former_pseudo_note_other": "Profiliniz {{count}} gün boyunca \"eskiden {pseudo}\" gösterecek."
+    },
+    "formerly": "eskiden",
+    "discord_account": {
+        "title": "Discord",
+        "private": "Bağlı Discord hesabınızı yalnızca siz görebilirsiniz, profilinizde gösterilmez.",
+        "explain": "Discord ile giriş yapmak için Discord hesabınızı bağlayın.",
+        "link": "Discord hesabımı bağla",
+        "linked_to": "{username} Discord hesabına bağlı. Discord ile giriş yapabilirsiniz.",
+        "unlink": "Bağlantıyı kaldır",
+        "unlink_confirm": "Discord hesabınızın bağlantısı kaldırılsın mı? Artık Discord ile giriş yapamazsınız.",
+        "set_password_to_unlink": "Discord hesabınızın bağlantısını kaldırmak için, giriş yapmaya devam edebilmek adına önce bir şifre belirleyin."
+    },
+    "recovery_email": {
+        "title": "Kurtarma e-postası",
+        "explain": "İsteğe bağlı. Hesap güvenliğinizle ilgili, örneğin şifrenizi kaybederseniz, sizinle iletişim kurmak için kullanılır.",
+        "email": "E-posta",
+        "private": "E-postanız gizlidir, diğer oyunculara asla gösterilmez. Kaldırmak için boş bırakın.",
+        "invalid": "Geçersiz e-posta"
+    },
+    "cancel_request": {
+        "ask": "İptal öner",
+        "player_wants_to_cancel": "{{ player }} oyunun iptalini öneriyor",
+        "accept": "İptali kabul et",
+        "reject": "Reddet",
+        "request_denied": "{{ player }} oyuncusunun oyunu iptal etme isteği reddedildi.",
+        "game_canceled_by_agreement": "Oyun, {{ player }} tarafından önerildi ve iki oyuncunun anlaşmasıyla iptal edildi.",
+        "confirm_overlay": {
+            "title": "Oyunun iptali önerilsin mi?",
+            "message": "Bu, rakibinize kabul edebileceği veya reddedebileceği bir istek gönderir. Kabul edilirse oyun iptal edilir ve sayılmaz.",
+            "confirmLabel": "Evet, isteği gönder",
+            "cancelLabel": "Hayır, oynamaya devam et"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer canlı",
+        "tab_live": "Canlı",
+        "tab_play": "Oyna",
+        "bot_unavailable": "kullanılamıyor",
+        "tab_chat": "Sohbet",
+        "live": "Canlı",
+        "stream": "Yayın",
+        "stream_description": "Bir bağlantı paylaşın: herkes analizinizi canlı izleyebilir, imlecinizi görebilir ve sohbet edebilir.",
+        "start_stream": "Yayını başlat",
+        "stop_stream": "Yayını durdur",
+        "share_link": "Paylaşılacak bağlantı",
+        "copy_link": "Bağlantıyı kopyala",
+        "match": "Bu konumdan oyna",
+        "match_description": "Tahtadaki konumdan bir bota veya başka bir oyuncuya karşı oyun oynayın. Bitince oyun analizinize bir varyant olarak eklenir.",
+        "i_play": "Ben oynuyorum",
+        "opponent": "Rakip",
+        "opponent_player": "Bir oyuncu",
+        "invite_player_optional": "Bir oyuncu davet et (isteğe bağlı)",
+        "invite_player_help": "Davet edilen kişi bir bildirim alır ve katılabilecek tek kişi olur. Aksi halde bağlantıyı ilk açan oynayabilir.",
+        "validate_setup_first": "Önce kurulum konumunu onaylayın.",
+        "start_match": "Oyunu başlat",
+        "back_to_analysis": "Analize dön",
+        "back_to_match": "Oyuna dön",
+        "waiting_for_opponent": "Rakip bekleniyor…",
+        "waiting_for_player": "{{pseudo}} bekleniyor…",
+        "you": "Siz",
+        "your_turn": "Sıra sizde",
+        "swap_hint": "Değiştirmek için taşa tıklayın.",
+        "wins": "kazanır",
+        "wins_by_resignation": "pes etmeyle kazanır",
+        "match_expired": "Oyun bitti: çok uzun süre hamle yapılmadı.",
+        "match_canceled": "Oyun iptal edildi.",
+        "join_match": "Bu oyunu oyna",
+        "cancel_match": "Oyunu iptal et",
+        "hosted_by": "Ev sahibi:",
+        "session_ended": "Bu oturum sona erdi.",
+        "waiting_for_stream": "Yayıncı bekleniyor…",
+        "open_copy": "Bir kopya aç",
+        "open_copy_failed": "Kopya açılamadı.",
+        "invitation_toast": "{{pseudo}} sizi bir Hexplorer konumundan oyun oynamaya davet ediyor.",
+        "invitation_open": "Aç",
+        "live_elsewhere": "Zaten başka bir çalışmadan canlı yayındasınız. Aynı anda yalnızca bir canlı oturum olabilir.",
+        "go_to_live_study": "Oraya git",
+        "back_to_live": "Hexplorer yayınınız hâlâ sürüyor: ona dönün",
+        "errors": {
+            "session_not_found": "Bu canlı oturum artık yok.",
+            "already_live": "Zaten başka bir sekmede canlı yayındasınız. Önce onu durdurun.",
+            "not_host": "Bunu yalnızca ev sahibi yapabilir.",
+            "match_already_running": "Zaten süren bir oyun var.",
+            "position_already_won": "Bu konum zaten kazanılmış.",
+            "bot_unavailable": "Bu bot şu anda kullanılamıyor.",
+            "invalid_invited_player": "Bu oyuncu davet edilemez.",
+            "cannot_join": "Bu oyuna katılamazsınız.",
+            "match_not_playing": "Bu oyun oynanmıyor.",
+            "not_your_turn": "Sıra sizde değil.",
+            "not_a_player": "Bu oyunda oynamıyorsunuz.",
+            "invalid_data": "Geçersiz veri.",
+            "illegal_move": "Bu hamle oynanamaz.",
+            "study_required": "Önce analizi çalışma olarak kaydedin."
+        }
+    },
+    "social_preview": {
+        "default_description": "Hex masa oyununu diğer oyunculara veya YZ'ye karşı çevrimiçi oynayın. Turnuvalar, bulmacalar, oyun analizi.",
+        "by": "{{author}} tarafından",
+        "game": {
+            "canceled_title": "İptal edilen Hex oyunu",
+            "canceled_description": "Bu Hex {{boardsize}} oyunu iptal edildi.",
+            "waiting_title": "{{player}} tarafından açık Hex oyunu",
+            "waiting_title_anonymous": "Açık Hex oyunu",
+            "waiting_description": "Hex {{boardsize}} oyunu, {{timeControl}}, rakip bekliyor. PlayHex'te katılın.",
+            "ranked": "dereceli",
+            "friendly": "dostluk",
+            "playing_description": "Oyun sürüyor, PlayHex'te canlı izleyin.",
+            "outcome_path": "{{winner}} kendi kenarlarını birleştirerek kazandı",
+            "outcome_resign": "{{winner}} rakibin pes etmesiyle kazandı",
+            "outcome_time": "{{winner}} süreyle kazandı",
+            "outcome_forfeit": "{{winner}} hükmen kazandı",
+            "winner": "{{winner}} kazanır",
+            "image_alt": "{{title}} Hex oyununun son konumu",
+            "open_game": "Açık oyun",
+            "join": "PlayHex'te katılın",
+            "playing": "Oyun sürüyor",
+            "cadency_live": "Canlı",
+            "cadency_correspondence": "Yazışmalı",
+            "n_moves_one": "{{count}} hamle",
+            "n_moves_other": "{{count}} hamle"
+        },
+        "tournament": {
+            "starts_at": "Başlangıç {{date}}",
+            "running": "Turnuva sürüyor",
+            "rank_1": "1.: {{player}}",
+            "rank_2": "2.: {{player}}",
+            "rank_3": "3.: {{player}}",
+            "canceled": "Turnuva iptal edildi",
+            "hex_tournament": "Hex turnuvası",
+            "n_registered_one": "{{count}} kayıtlı oyuncu",
+            "n_registered_other": "{{count}} kayıtlı oyuncu",
+            "n_participants_one": "{{count}} katılımcı",
+            "n_participants_other": "{{count}} katılımcı"
+        },
+        "tournament_series": {
+            "next": "Sonraki: {{title}}, {{date}}",
+            "hex_tournaments": "Hex turnuvaları",
+            "n_editions_one": "{{count}} edisyon oynandı",
+            "n_editions_other": "{{count}} edisyon oynandı"
+        },
+        "puzzle": {
+            "default_title": "Hex bulmacası",
+            "red_to_play": "Kırmızı oynar ve kazanır",
+            "blue_to_play": "Mavi oynar ve kazanır",
+            "label": "Bulmaca",
+            "hex_puzzle_by": "{{author}} tarafından Hex bulmacası"
+        },
+        "hexplorer_study": {
+            "default_title": "Hexplorer çalışması",
+            "label": "Çalışma",
+            "hex_study_by": "{{author}} tarafından Hex çalışması"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "{{author}} tarafından Hex bulmacaları",
+            "n_puzzles_one": "{{count}} Hex bulmacası",
+            "n_puzzles_other": "{{count}} Hex bulmacası"
+        },
+        "player": {
+            "title": "{{player}}, Hex oyuncusu",
+            "bot": "Hex YZ",
+            "rating": "Puan {{rating}}",
+            "member_since": "{{date}} tarihinden beri üye",
+            "on_playhex": "PlayHex oyuncusu",
+            "n_games_one": "{{count}} oyun oynandı",
+            "n_games_other": "{{count}} oyun oynandı"
+        },
+        "ladder": {
+            "king": "Kral: {{player}}",
+            "king_female": "Kraliçe: {{player}}",
+            "reign_one": "{{duration}} süredir hüküm sürüyor, {{count}} savunma",
+            "reign_other": "{{duration}} süredir hüküm sürüyor, {{count}} savunma",
+            "n_players_one": "Tepede {{count}} oyuncu",
+            "n_players_other": "Tepede {{count}} oyuncu"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hex bulmacaları",
+                "description": "Topluluğun hazırladığı, başlangıçtan uzmana Hex bulmacalarını çözün ve kendinizinkini oluşturun."
+            },
+            "tournaments": {
+                "title": "Hex turnuvaları",
+                "description": "Çevrimiçi Hex turnuvalarına katılın: canlı ve yazışmalı, İsviçre sistemi ve eleme formatında."
+            },
+            "tournament_series": {
+                "title": "Hex turnuva serileri",
+                "description": "Düzenli Hex turnuvaları: bir sonraki edisyonun ne zaman oynanacağını bilmek için bir seriyi takip edin."
+            },
+            "ladders": {
+                "title": "Tepenin Kralı",
+                "description": "Hex merdiveninde yükselin: üstünüzdeki oyunculara meydan okuyun, yerlerini alın ve tahtı savunun."
+            },
+            "games_archive": {
+                "title": "Hex oyunları arşivi",
+                "description": "PlayHex'te oynanan tüm Hex oyunlarına göz atın ve arayın."
+            },
+            "videos": {
+                "title": "Hex videoları",
+                "description": "Topluluğun Hex hakkında hazırladığı videolar: eğitimler, strateji, oyun incelemeleri."
+            },
+            "statistics": {
+                "title": "PlayHex istatistikleri",
+                "description": "PlayHex'te oyunlar, oyuncular, tahta boyutları ve kazanma oranları."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Hex konumlarını YZ analiziyle keşfedin."
+            },
+            "swap_maps": {
+                "title": "Hex değiştirme haritaları",
+                "description": "Her tahta boyutu için hangi açılış hamlelerinin değiştirilmesi gerektiği, KataHex tarafından hesaplandı."
+            },
+            "guide": {
+                "title": "PlayHex rehberi",
+                "description": "PlayHex'te Hex nasıl oynanır: kurallar, YZ analizi, koşullu hamleler, moderasyon."
+            },
+            "export_games_data": {
+                "title": "PlayHex oyun verilerini dışa aktar",
+                "description": "PlayHex'te oynanan tüm Hex oyunlarının veri setini indirin, serbestçe yeniden kullanılabilir."
+            },
+            "guide_ai_analysis": {
+                "title": "YZ ile oyun analizi",
+                "description": "Hex oyunlarınızı YZ ile inceleyin: hatalarınızı bulun, en iyi hamleleri görün ve avantajı ne zaman kazandığınızı ya da kaybettiğinizi öğrenin."
+            },
+            "guide_conditional_moves": {
+                "title": "Koşullu hamleler",
+                "description": "Yazışmalı Hex oyunlarını daha hızlı oynayın: rakibinizin sonraki hamlelerine cevaplarınızı planlayın ve merdivenleri otomatik oynayın."
+            },
+            "tutorial_rules": {
+                "title": "Hex kuralları",
+                "description": "Etkileşimli bir eğitimle Hex'in 2 kuralını birkaç dakikada öğrenin, ardından ilk oyunlarınızı bir bota karşı oynayın."
+            },
+            "tutorial_swap": {
+                "title": "Hex'te değiştirme kuralı",
+                "description": "Değiştirme kuralı Hex oyunlarını dengeli tutar."
+            },
+            "tutorial_bridge": {
+                "title": "Hex'te köprü",
+                "description": "Köprü Hex'in en önemli şeklidir: birbirine değmeden zaten bağlı iki taş. Nasıl çalıştığını öğrenin ve bulmacalarla pratik yapın."
+            },
+            "tutorial_block": {
+                "title": "Yeni başlayanlar için Hex stratejisi: kazanmak için engelleyin",
+                "description": "Hex'te engellemek kendi yolunuzu inşa eder: oyunun başında en iyi strateji."
+            },
+            "tutorial_ziggurat": {
+                "title": "Hex'te zigurat şablonu",
+                "description": "Zigurat, Hex'te bilinmesi gereken ikinci şekildir: üçüncü sıradaki bir taşın kenarına bağlanması. Nasıl çalıştığını öğrenin ve bulmacalarla pratik yapın."
+            },
+            "cijm_2025": {
+                "title": "Hex turnuvası – Paris 2025",
+                "description": "14 ve 15 Haziran 2025'te Kültür ve Matematik Oyunları Fuarı'nda, Place Saint-Sulpice, Paris'te iki Hex turnuvası. Ücretsiz, her seviyeye açık."
+            },
+            "cijm_2026": {
+                "title": "Hex turnuvası – Paris 2026",
+                "description": "24 Mayıs 2026 Pazar günü Kültür ve Matematik Oyunları Fuarı'nda, Place Saint-Sulpice, Paris'te dev Hex turnuvası. Ücretsiz, her seviyeye açık, 8 yaşından itibaren."
+            }
+        },
+        "n_days_one": "{{count}} gün",
+        "n_days_other": "{{count}} gün",
+        "n_hours_one": "{{count}} saat",
+        "n_hours_other": "{{count}} saat"
+    },
+    "game_outcome": {
+        "path": "Bağlantı",
+        "resign": "Pes etme",
+        "time": "Süre",
+        "forfeit": "Hükmen"
+    },
+    "has_chat_messages": "Sohbet mesajı olanlar",
+    "has_analyze": "YZ analizi olanlar",
+    "has_malkovich_messages": "Malkovich notu olanlar",
+    "game_content_filter": "İçerik",
+    "filters": "Filtreler",
+    "reset_filters": "Filtreleri sıfırla",
+    "reset_dates": "Tarihleri sıfırla",
+    "game_type": "Oyun türü",
+    "game_state_filter": "Durum",
+    "opponent_or_players": "Oyuncular",
+    "one_or_two_players_help": "1 oyuncu: bu oyuncunun oyunları. 2 oyuncu: aralarındaki oyunlar.",
+    "search_opponent": "Rakip",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "Tüm filtreler",
+    "hide_filters": "Daha az filtre",
+    "week_of": "{{date}} haftası",
+    "chart_grouping": {
+        "label": "Gruplama",
+        "auto": "Otomatik",
+        "day": "Gün",
+        "week": "Hafta",
+        "month": "Ay"
+    },
+    "n_games_found_one": "{{count}} oyun bulundu.",
+    "n_games_found_other": "{{count}} oyun bulundu."
 }

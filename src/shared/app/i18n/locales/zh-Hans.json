@@ -8,7 +8,9 @@
         "open_live_games": "加入实时对局",
         "open_correspondence_games": "加入回合制对局",
         "no_open_live_games": "当前没有可加入的实时对局",
-        "no_open_correspondence_games": "当前没有可加入的回合制对局"
+        "no_open_correspondence_games": "当前没有可加入的回合制对局",
+        "multiple_waiting_games": "多个等待中的对局：",
+        "others_canceled_once_one_accepted": "一旦你的某个等待中的对局被接受，其他对局将被取消。"
     },
     "game": {
         "opponent": "对手",
@@ -35,13 +37,19 @@
         "info": "信息",
         "duration": "时长",
         "title_your_turn": "轮到你了！",
-        "title_waiting": "等待对手中：房主为"
+        "title_waiting": "等待对手中：房主为",
+        "winner": "胜者",
+        "loser": "败者",
+        "issue": "结果",
+        "moves_count": "手数"
     },
     "game_rules": {
         "normal": "普通",
         "host_plays_first": "主持人先手",
         "host_plays_second": "主持人后手",
-        "no_swap": "不交换"
+        "no_swap": "不交换",
+        "handicap_for_host": "房主让子 {{n}}",
+        "handicap_for_opponent": "对手让子 {{n}}"
     },
     "create_game": {
         "custom_size": "自定义",
@@ -60,7 +68,8 @@
             "notifications": "通知",
             "ai_workers": "AI 工作节点",
             "connected_applications": "已连接的应用",
-            "technical_info": "技术信息"
+            "technical_info": "技术信息",
+            "security": "安全"
         },
         "audio": "音频",
         "moderation": "管理"
@@ -140,7 +149,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "查看如何从我的电脑为PlayHex计算AI动作",
-        "engine_unavailable": "部分 AI 引擎当前没有在线的工作节点，这些 AI 暂不可用。"
+        "engine_unavailable": "部分 AI 引擎当前没有在线的工作节点，这些 AI 暂不可用。",
+        "ai_not_available": "暂不可用"
     },
     "game_analysis": {
         "game_analysis": "由AI分析游戏",
@@ -189,7 +199,12 @@
     },
     "1vAI_friendly": {
         "title": "对AI",
-        "create": "对AI"
+        "create": "对AI",
+        "easy": "简单",
+        "medium": "中等",
+        "hard": "困难",
+        "beaten": "已击败",
+        "unlock_stronger_ais": "显示更多 AI 选项"
     },
     "1vAI_offline": {
         "title": "离线AI",
@@ -492,7 +507,12 @@
         "block_at_a_distance": "不要把棋子紧贴着对手的棋子放：相邻的阻挡很容易被绕过。留出一些空间，在更远处阻挡：你将有时间应对对手的着法。",
         "block_remember": "记住：在 Hex 中，一步好棋既是防守也是进攻。",
         "ziggurat_defense_1": "蓝方侵入中间：红方在自己棋子旁应对，并与边形成桥。",
-        "ziggurat_defense_2": "蓝方侵入第一行：红方用桥应对，新棋子与边相连。"
+        "ziggurat_defense_2": "蓝方侵入第一行：红方用桥应对，新棋子与边相连。",
+        "demo_0_play": "开始",
+        "chapters": {
+            "hex_rule": "一、Hex 规则",
+            "beginners_strategy": "二、新手策略"
+        }
     },
     "contribute": "贡献",
     "contributors": "贡献者",
@@ -568,7 +588,29 @@
     "handicap": {
         "title": "让子",
         "none": "无",
-        "handicap_for_player": "{{n}} 给 {{player}}"
+        "handicap_for_player": "{{n}} 给 {{player}}",
+        "you": "你",
+        "opponent": "对手",
+        "ai": "AI",
+        "increase": "增加让子",
+        "decrease": "减少让子",
+        "setup": {
+            "first_stone_then": "{{player}} 先放一颗可交换的棋子，然后再放 {{count}} 颗，若被交换则放 {{swappedCount}} 颗。",
+            "first_stone_then_you": "先放一颗可交换的棋子，然后再放 {{count}} 颗，若被交换则放 {{swappedCount}} 颗。",
+            "first_stone_for_blue": "{{player}} 先放一颗可交换的棋子，然后 {{beneficiary}} 下 {{count}} 手。",
+            "first_stone_for_blue_you": "先放一颗可交换的棋子，然后 {{beneficiary}} 下 {{count}} 手。",
+            "first_stone_for_blue_beneficiary": "{{player}} 先放一颗可交换的棋子，然后你下 {{count}} 手。",
+            "swap_decision": "{{player}} 选择是否交换：之后 {{beneficiary}} 放 {{swappedCount}} 颗棋子，若拒绝则放 {{count}} 颗。",
+            "swap_decision_you": "点击棋子进行交换：之后 {{beneficiary}} 放 {{swappedCount}} 颗棋子，若你拒绝则放 {{count}} 颗。",
+            "swap_decision_beneficiary": "{{player}} 选择是否交换：之后你放 {{swappedCount}} 颗棋子，若拒绝则放 {{count}} 颗。",
+            "stones_after_swap": "棋子已交换：{{player}} 放 {{count}} 颗棋子。",
+            "stones_after_swap_you": "棋子已交换：请放 {{count}} 颗棋子。",
+            "refuse_swap": "不交换",
+            "no_swap_other": "交换已禁用：{{player}} 放 {{count}} 颗棋子。",
+            "no_swap_you_other": "交换已禁用：请放 {{count}} 颗棋子。",
+            "stones_other": "{{player}} 再放 {{count}} 颗棋子。",
+            "stones_you_other": "再放 {{count}} 颗棋子。"
+        }
     },
     "game_created_short": "创建于 {{ date }}",
     "game_created_by_system_time_ago": "系统创建的对局，{timeAgo}。",
@@ -834,7 +876,56 @@
         "abstract_play_url": "Abstract Play：URL",
         "abstract_play_debug": "Abstract Play：从棋盘下方的「调试信息」复制",
         "engine_unavailable": "此引擎当前没有在线的 AI 工作节点，无法分析局面。",
-        "analysis_failed": "无法分析此局面。"
+        "analysis_failed": "无法分析此局面。",
+        "analyze_in_hexplorer": "在 Hexplorer 中分析",
+        "play_from_position": "从局面开始对局",
+        "tab_file": "文件",
+        "tab_tree": "树",
+        "comment": "评论",
+        "comment_placeholder": "评论此局面…",
+        "current_study": "当前研究",
+        "new_study": "新研究",
+        "study_title": "研究标题",
+        "study_default_title": "未命名研究",
+        "study_by": "作者：{{author}}",
+        "study_fork": "复刻",
+        "study_fork_help": "保存此研究的个人副本，包含其修改",
+        "study_forked_from": "复刻自",
+        "study_share": "分享此研究",
+        "study_link_copied": "链接已复制",
+        "study_delete": "删除此研究",
+        "study_delete_confirm": "删除此研究？其链接将失效。",
+        "study_too_large": "此研究过大，无法保存：请删除一些分支或评论。",
+        "study_not_found": "此研究不存在或已被删除。",
+        "study_unsaved_changes": "未保存的修改",
+        "study_save_shortcut": "保存研究（Ctrl+S）",
+        "study_validate_setup_first": "请先退出摆棋模式再保存研究。",
+        "study_save_to_share": "保存此研究后才能复刻或分享。",
+        "my_studies": "我的研究",
+        "export": "导出",
+        "study_sort": "研究排序",
+        "study_sort_date_desc": "最新",
+        "study_sort_date_asc": "最早",
+        "study_sort_title_asc": "名称 A–Z",
+        "study_sort_title_desc": "名称 Z–A",
+        "tools_history": "历史",
+        "tools_stones": "棋子",
+        "tools_marks": "标记",
+        "tools_label": "标签",
+        "study_discard_confirm": "你有未保存的修改，它们将丢失。继续吗？",
+        "tab_help": "帮助",
+        "help_what_title": "Hexplorer 是什么？",
+        "help_what": "免费的 Hex 分析棋盘：探索任意局面，尝试多种变化，看看 AI 如何评价。",
+        "help_why_title": "为什么使用？",
+        "help_why": "理解你的对局，找到更好的着法，并与其他玩家分享你对某个局面的想法。",
+        "help_how_title": "如何使用",
+        "help_how_play": "自由放置棋子，摆出自定义局面",
+        "help_how_import": "或通过链接或文本导入 Hex 对局",
+        "help_how_ai": "棋盘左侧的条显示谁占优，棋盘上显示 AI 正在考虑的着法。",
+        "help_how_setup": "摆棋模式可以在棋盘上添加标记，并自由编辑局面",
+        "help_how_file": "保存你的研究（Ctrl+S），分享它，或导出为 SGF",
+        "help_dismiss": "知道了，不再显示",
+        "study_nodes_other": "{{count}} 个节点"
     },
     "player_menu": {
         "open_menu": "打开玩家菜单",
@@ -853,7 +944,8 @@
         "reserved_for_other_player": "这场游戏是一项为其他玩家保留的挑战。",
         "reserved_for_other_player_named": "这场游戏是一项为 {{pseudo}} 保留的挑战。",
         "other": "你无法加入这场游戏。",
-        "game_canceled": "这场游戏已被取消。"
+        "game_canceled": "这场游戏已被取消。",
+        "is_host_closed": "此对局为私密对局：只有持有对局链接的人才能加入。"
     },
     "lobby_challenges_you_badge": "向你发起挑战！",
     "sort_recently_played": "最近进行",
@@ -1016,7 +1108,8 @@
         "challenge_player": "向玩家发起挑战",
         "challenge_same_target": "再次向该玩家发起挑战",
         "analyze_position": "分析局面",
-        "channel_slow_mode": "慢速模式"
+        "channel_slow_mode": "慢速模式",
+        "create_hexplorer_study": "创建 Hexplorer 研究"
     },
     "head_to_head": "交手记录",
     "never_played_together": "你们还没有对局记录。",
@@ -1093,7 +1186,11 @@
         "opening_moves": "最常见的开局着法",
         "opening_moves_note": "针对 {{boardsize}} 棋盘，即最常使用的棋盘大小。",
         "rating_distribution": "等级分分布",
-        "rating_distribution_note": "仅统计评级已稳定的非机器人玩家（偏差低于 {{deviation}}）。访客玩家也包括在内。"
+        "rating_distribution_note": "仅统计评级已稳定的非机器人玩家（偏差低于 {{deviation}}）。访客玩家也包括在内。",
+        "lobby_join_chances": "实时对局有人加入的概率",
+        "lobby_join_chances_first_minute": "< 1 分钟",
+        "lobby_join_chances_next_minutes": "+10 分钟",
+        "lobby_join_chances_note": "在大厅创建的实时对局中，在第一分钟内找到对手的比例，以及第一分钟无人加入时在接下来 10 分钟内找到对手的比例。基于最近 8 周估算，假设房主一直等待而不取消。时间按你的本地时区显示（UTC{{offset}}）。"
     },
     "board_mount_error": {
         "error": "无法显示棋盘，发生错误：",
@@ -1280,7 +1377,17 @@
             "fixed_fill_not_disabled": "{{move}} 有固定颜色，但不在谜题之外",
             "fixed_fill_twice": "{{move}} 的固定颜色被设置了两次",
             "invalid_type": "无效的 {{property}}",
-            "solver_unproven_other": "有 {{count}} 个局面未能及时求解，谜题仅被部分检查"
+            "solver_unproven_other": "有 {{count}} 个局面未能及时求解，谜题仅被部分检查",
+            "generator_initial_not_winning": "Mohex 求解器在此找不到制胜着法",
+            "generator_depends_on_disabled_cells": "只有借助谜题外的格子才能获胜：请在局面步骤中标记与其边相连的棋子",
+            "generator_already_connected": "此处已经连通，无需生成",
+            "generator_unproven": "未能及时证明制胜着法，该分支留空",
+            "generator_budget_exceeded": "树太大，该分支留空",
+            "generator_parallel_dropped": "对对手桥的侵入 {{move}} 无法作为平行变化添加，走这一手会导致谜题失败",
+            "generator_accepted_losing": "这一手被接受，但 Mohex 求解器证明它会输",
+            "generator_accepted_unproven": "这一手被接受，但 Mohex 求解器未证明它能赢：不再继续展开",
+            "generator_failed_winning": "这一手被判为失败，但 Mohex 求解器证明它能赢",
+            "generator_invalid_tree": "生成的树无效（{{error}}）"
         },
         "editor": {
             "optional": "可选",
@@ -1439,7 +1546,24 @@
             "monitor_badge_other": "{{count}} 条未覆盖的线路",
             "errors_badge_other": "{{count}} 个待修复问题",
             "warnings_badge_other": "{{count}} 个检查警告",
-            "errors_count_other": "{{count}} 个待修复问题，请查看发布标签页"
+            "errors_count_other": "{{count}} 个待修复问题，请查看发布标签页",
+            "solver_position": "Mohex 使用的局面",
+            "solver_position_help": "Mohex 在整个棋盘上下棋：请检查谜题外的格子是否按局面填好，以及与边相连的棋子是否已标记。",
+            "check_section": "检查谜题",
+            "generate": "生成树",
+            "generate_tab": "生成",
+            "generate_help": "从所选节点补全树并保留已有着法：制胜着法和反驳由 Mohex 给出，电脑应着由 Katahex 给出。",
+            "generate_templates": "遇到模板连接时停止，最大到",
+            "generate_templates_none": "无模板：只有在连接完成时谜题才结束。",
+            "generate_templates_help": "一旦用此模板或更小的模板证明连接，谜题即结束。",
+            "generate_templates_none_option": "无",
+            "generate_from_node": "从此节点生成",
+            "generate_not_here": "请在“树”标签页中选择主变化中谜题结束前的节点。",
+            "generate_progress": "正在求解局面：{{done}}/{{total}}",
+            "generate_ok": "树已生成。",
+            "generate_warnings": "生成警告（{{count}}）：",
+            "generate_stop": "停止",
+            "generate_tree_changed": "生成过程中树已改变，结果已忽略。请重新生成。"
         },
         "next_puzzle": "下一题",
         "collections": {
@@ -1496,7 +1620,12 @@
         "published_ago": "发布于 {{date}}",
         "sort_by": "排序方式",
         "sort_published_at": "发布日期",
-        "sort_created_at": "添加日期"
+        "sort_created_at": "添加日期",
+        "field_secondary_urls": "其他链接",
+        "field_secondary_urls_help": "如果此视频也发布在其他平台（PeerTube、Dailymotion…）。上方链接仍为主链接。",
+        "add_link": "添加链接",
+        "remove_link": "删除此链接",
+        "watch_on": "在 {{platform}} 观看"
     },
     "swap_maps": {
         "title": "交换图",
@@ -1517,9 +1646,12 @@
     },
     "ladder": {
         "title": "山丘之王",
+        "title_female": "山丘女王",
         "intro": "一个天梯，一个王座。挑战排在你上方的玩家：如果你赢了，就夺取他的位置。你坐得越高，需要守卫的就越多。",
         "king": "山丘之王",
+        "king_female": "山丘女王",
         "king_for": "已称王 {{duration}}",
+        "king_for_female": "已为女王 {{duration}}",
         "no_king": "王座空缺。加入并夺取它！",
         "join": "加入山丘之王",
         "leave": "离开这座山丘",
@@ -1545,6 +1677,7 @@
         "no_running_challenges": "没有进行中的挑战。",
         "vs": "vs",
         "nobody_to_challenge": "没有可挑战的人：你就是国王！",
+        "nobody_to_challenge_female": "没有可挑战的人：你就是女王！",
         "live": "实时",
         "challenge_overlay": {
             "title": "挑战 {{player}}",
@@ -1588,6 +1721,7 @@
             "challenge_defended": "{{opponent}} 守住了自己的位置，击退了 {{player}}",
             "challenge_voided": "{{player}} 对 {{opponent}} 的对局已被取消",
             "new_king": "{{player}} 是新的山丘之王！",
+            "new_king_female": "{{player}} 是新的山丘女王！",
             "giant_slayer": "{{player}} 是巨人杀手：推翻了 {{opponent}}！",
             "climber": "{{player}} 连续赢得了 {{wins}} 次挑战！",
             "strike": "{{player}} 在一局对局中超时（警告 {{strikes}}）",
@@ -1759,5 +1893,342 @@
             }
         },
         "check_device_code": "请确认此代码与你设备上显示的代码一致："
-    }
+    },
+    "pronouns": {
+        "title": "代词",
+        "explain": "这些代词是公开的：会显示在你的个人资料中，以及别人点击你的昵称时。它们也用于让界面文字适配你，以及在其他玩家面前如何称呼你。",
+        "save_error": "无法保存代词，请重试。",
+        "he/him": "他",
+        "she/her": "她",
+        "they/them": "TA",
+        "unspecified": "未设置代词"
+    },
+    "player_popover": {
+        "on_playhex_since": "已加入 PlayHex {{duration}}"
+    },
+    "closed_game": "私密对局",
+    "closed_game_help": "此对局不会出现在其他玩家的大厅中。只有持有链接的人才能加入，即使对方还不是 PlayHex 用户。",
+    "closed_game_invite": {
+        "link_label": "发送给好友的链接",
+        "share": "分享"
+    },
+    "chat_header": {
+        "game_started": "对局开始",
+        "game_ended": "对局结束",
+        "game_canceled": "对局取消"
+    },
+    "host_waiting_join_chance_first_minute": "在这个时段，{{percent}} 的对局会在第一分钟内有人加入。",
+    "host_waiting_join_chance_next_minutes": "还没有人加入。再等 10 分钟，{{percent}} 的房主能找到对手。",
+    "match_title_in_tournament": "{{ tournament }} 的 {{ match }}",
+    "chat_message_visibility": "消息可见性",
+    "chat_attach_to_move_toggle": "在第 {{n}} 手下方显示此消息",
+    "chat_message_visibility_public": "公开",
+    "chat_message_visibility_private": "个人笔记",
+    "chat_message_visibility_malkovich": "马尔科维奇",
+    "chat_message_placeholder_private": "个人笔记，仅你可见…",
+    "chat_message_placeholder_malkovich": "马尔科维奇，对局结束后所有人可见…",
+    "chat_new_messages": "新消息",
+    "set_password": "设置密码",
+    "set_password_explain": "你的账户还没有密码。设置密码后，也可以用用户名“{{login}}”登录。",
+    "saved": "已保存",
+    "or": "或",
+    "log_in_with_discord": "使用 Discord 登录",
+    "must_be_logged_in": "你需要登录",
+    "same_pseudo": "这已经是你的用户名",
+    "pseudo_change_limit_reached": "你最近更改用户名的次数过多",
+    "must_set_password_first": "请先设置密码，否则你将无法再登录",
+    "discord_login_failed": "使用 Discord 登录失败，请重试",
+    "discord_login_cancelled": "已取消使用 Discord 登录",
+    "discord_already_linked": "此 Discord 账户已关联到另一个 PlayHex 账户",
+    "discord_account_creation_rate_limited": "最近创建的账户过多，请稍后再试",
+    "change_pseudo": {
+        "title": "更改用户名",
+        "new_pseudo": "新用户名",
+        "submit": "更改用户名",
+        "confirm": "将用户名更改为“{{pseudo}}”？",
+        "success": "你的用户名已更改。",
+        "next_allowed_at": "你最近更改用户名的次数过多。你可以在 {{date}} 再次更改。",
+        "old_pseudo_released": "你的旧用户名将可供其他玩家使用。指向旧个人资料网址的链接会重定向到新网址。之后你需要用新用户名登录。",
+        "remaining_other": "30 天内你还可以更改用户名 {{count}} 次。",
+        "former_pseudo_note_other": "你的个人资料将在 {{count}} 天内显示“曾用名 {pseudo}”。"
+    },
+    "formerly": "曾用名",
+    "discord_account": {
+        "title": "Discord",
+        "private": "只有你能看到已关联的 Discord 账户，它不会显示在你的个人资料中。",
+        "explain": "关联你的 Discord 账户，即可使用 Discord 登录。",
+        "link": "关联我的 Discord 账户",
+        "linked_to": "已关联 Discord 账户 {username}。你可以使用 Discord 登录。",
+        "unlink": "取消关联",
+        "unlink_confirm": "取消关联你的 Discord 账户？你将无法再使用 Discord 登录。",
+        "set_password_to_unlink": "要取消关联 Discord 账户，请先设置密码，以便仍能登录。"
+    },
+    "recovery_email": {
+        "title": "找回邮箱",
+        "explain": "可选。用于就账户安全问题联系你，例如你忘记密码时。",
+        "email": "邮箱",
+        "private": "你的邮箱是私密的，绝不会向其他玩家显示。留空即可删除。",
+        "invalid": "邮箱无效"
+    },
+    "cancel_request": {
+        "ask": "提议取消",
+        "player_wants_to_cancel": "{{ player }} 提议取消对局",
+        "accept": "同意取消",
+        "reject": "拒绝",
+        "request_denied": "{{ player }} 取消对局的请求已被拒绝。",
+        "game_canceled_by_agreement": "经双方同意，对局已取消，由 {{ player }} 提议。",
+        "confirm_overlay": {
+            "title": "提议取消对局？",
+            "message": "这会向你的对手发送请求，对手可以接受或拒绝。若接受，对局将被取消且不计入记录。",
+            "confirmLabel": "是，发送请求",
+            "cancelLabel": "不，继续对局"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer 直播",
+        "tab_live": "直播",
+        "tab_play": "对局",
+        "bot_unavailable": "不可用",
+        "tab_chat": "聊天",
+        "live": "直播",
+        "stream": "直播",
+        "stream_description": "分享链接：任何人都能实时观看你的分析、看到你的光标并聊天。",
+        "start_stream": "开始直播",
+        "stop_stream": "停止直播",
+        "share_link": "分享链接",
+        "copy_link": "复制链接",
+        "match": "从此局面开始对局",
+        "match_description": "从棋盘上的局面开始，与机器人或其他玩家对局。结束后，对局会作为变化添加到你的分析中。",
+        "i_play": "我执",
+        "opponent": "对手",
+        "opponent_player": "玩家",
+        "invite_player_optional": "邀请玩家（可选）",
+        "invite_player_help": "受邀玩家会收到通知，并且只有其可以加入。否则，第一个打开链接的人可以对局。",
+        "validate_setup_first": "请先确认摆好的局面。",
+        "start_match": "开始对局",
+        "back_to_analysis": "返回分析",
+        "back_to_match": "返回对局",
+        "waiting_for_opponent": "正在等待对手…",
+        "waiting_for_player": "正在等待 {{pseudo}}…",
+        "you": "你",
+        "your_turn": "轮到你了",
+        "swap_hint": "点击棋子进行交换。",
+        "wins": "获胜",
+        "wins_by_resignation": "因对手认输获胜",
+        "match_expired": "对局结束：太久没有落子。",
+        "match_canceled": "对局已取消。",
+        "join_match": "加入此对局",
+        "cancel_match": "取消对局",
+        "hosted_by": "主持人：",
+        "session_ended": "此会话已结束。",
+        "waiting_for_stream": "正在等待主播…",
+        "open_copy": "打开副本",
+        "open_copy_failed": "无法打开副本。",
+        "invitation_toast": "{{pseudo}} 邀请你从 Hexplorer 局面开始一局对局。",
+        "invitation_open": "打开",
+        "live_elsewhere": "你已在另一个研究中直播。同一时间只能有一个直播会话。",
+        "go_to_live_study": "前往",
+        "back_to_live": "你的 Hexplorer 直播仍在进行：返回直播",
+        "errors": {
+            "session_not_found": "此直播会话已不存在。",
+            "already_live": "你已在另一个标签页中直播，请先停止。",
+            "not_host": "只有主持人可以执行此操作。",
+            "match_already_running": "已有对局在进行中。",
+            "position_already_won": "此局面胜负已定。",
+            "bot_unavailable": "此机器人暂不可用。",
+            "invalid_invited_player": "无法邀请此玩家。",
+            "cannot_join": "你无法加入此对局。",
+            "match_not_playing": "此对局未在进行。",
+            "not_your_turn": "还没轮到你。",
+            "not_a_player": "你不是此对局的玩家。",
+            "invalid_data": "数据无效。",
+            "illegal_move": "这一手不能下。",
+            "study_required": "请先将分析保存为研究。"
+        }
+    },
+    "social_preview": {
+        "default_description": "在线玩 Hex 棋盘游戏，与其他玩家或 AI 对战。比赛、谜题、对局分析。",
+        "by": "作者：{{author}}",
+        "game": {
+            "canceled_title": "已取消的 Hex 对局",
+            "canceled_description": "这局 Hex {{boardsize}} 对局已被取消。",
+            "waiting_title": "{{player}} 的公开 Hex 对局",
+            "waiting_title_anonymous": "公开 Hex 对局",
+            "waiting_description": "Hex {{boardsize}} 对局，{{timeControl}}，等待对手中。在 PlayHex 上加入。",
+            "ranked": "排位",
+            "friendly": "友谊",
+            "playing_description": "对局进行中，在 PlayHex 上实时观战。",
+            "outcome_path": "{{winner}} 连通己方两边获胜",
+            "outcome_resign": "{{winner}} 因对手认输获胜",
+            "outcome_time": "{{winner}} 因对手超时获胜",
+            "outcome_forfeit": "{{winner}} 不战而胜",
+            "winner": "{{winner}} 获胜",
+            "image_alt": "Hex 对局 {{title}} 的最终局面",
+            "open_game": "公开对局",
+            "join": "在 PlayHex 上加入",
+            "playing": "对局进行中",
+            "cadency_live": "实时",
+            "cadency_correspondence": "通信对局",
+            "n_moves_other": "{{count}} 手"
+        },
+        "tournament": {
+            "starts_at": "{{date}} 开始",
+            "running": "比赛进行中",
+            "rank_1": "第 1 名：{{player}}",
+            "rank_2": "第 2 名：{{player}}",
+            "rank_3": "第 3 名：{{player}}",
+            "canceled": "比赛已取消",
+            "hex_tournament": "Hex 比赛",
+            "n_registered_other": "{{count}} 名玩家已报名",
+            "n_participants_other": "{{count}} 名参赛者"
+        },
+        "tournament_series": {
+            "next": "下一届：{{title}}，{{date}}",
+            "hex_tournaments": "Hex 比赛",
+            "n_editions_other": "已举办 {{count}} 届"
+        },
+        "puzzle": {
+            "default_title": "Hex 谜题",
+            "red_to_play": "红方先走必胜",
+            "blue_to_play": "蓝方先走必胜",
+            "label": "谜题",
+            "hex_puzzle_by": "{{author}} 的 Hex 谜题"
+        },
+        "hexplorer_study": {
+            "default_title": "Hexplorer 研究",
+            "label": "研究",
+            "hex_study_by": "{{author}} 的 Hex 研究"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "{{author}} 的 Hex 谜题",
+            "n_puzzles_other": "{{count}} 个 Hex 谜题"
+        },
+        "player": {
+            "title": "{{player}}，Hex 玩家",
+            "bot": "Hex AI",
+            "rating": "等级分 {{rating}}",
+            "member_since": "{{date}} 加入",
+            "on_playhex": "PlayHex 玩家",
+            "n_games_other": "已下 {{count}} 局"
+        },
+        "ladder": {
+            "king": "王者：{{player}}",
+            "reign_other": "在位 {{duration}}，防守 {{count}} 次",
+            "n_players_other": "山丘上有 {{count}} 名玩家"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hex 谜题",
+                "description": "解答社区制作的 Hex 谜题，从新手到高手，也可以自己创作。"
+            },
+            "tournaments": {
+                "title": "Hex 比赛",
+                "description": "参加在线 Hex 比赛：实时与通信对局，瑞士制与淘汰制。"
+            },
+            "tournament_series": {
+                "title": "Hex 系列赛",
+                "description": "定期举办的 Hex 比赛：关注系列赛，了解下一届何时举行。"
+            },
+            "ladders": {
+                "title": "山丘之王",
+                "description": "攀登 Hex 天梯：挑战排名在你之上的玩家，夺取他们的位置，守住王座。"
+            },
+            "games_archive": {
+                "title": "Hex 对局档案",
+                "description": "浏览和搜索在 PlayHex 上进行的所有 Hex 对局。"
+            },
+            "videos": {
+                "title": "Hex 视频",
+                "description": "社区制作的 Hex 视频：教程、策略、对局复盘。"
+            },
+            "statistics": {
+                "title": "PlayHex 统计",
+                "description": "PlayHex 上的对局、玩家、棋盘大小与胜率。"
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "借助 AI 分析探索 Hex 局面。"
+            },
+            "swap_maps": {
+                "title": "Hex 交换图",
+                "description": "各棋盘大小下哪些开局着法应被交换，由 KataHex 计算。"
+            },
+            "guide": {
+                "title": "PlayHex 指南",
+                "description": "如何在 PlayHex 上玩 Hex：规则、AI 分析、条件着法、管理规则。"
+            },
+            "export_games_data": {
+                "title": "导出 PlayHex 对局数据",
+                "description": "下载 PlayHex 上所有 Hex 对局的数据集，可自由再利用。"
+            },
+            "guide_ai_analysis": {
+                "title": "AI 对局分析",
+                "description": "用 AI 复盘你的 Hex 对局：找出失误，查看最佳着法，了解何时获得或失去优势。"
+            },
+            "guide_conditional_moves": {
+                "title": "条件着法",
+                "description": "更快地进行 Hex 通信对局：预先计划对对手下一手的应对，并自动走完梯子。"
+            },
+            "tutorial_rules": {
+                "title": "Hex 规则",
+                "description": "通过互动教程几分钟学会 Hex 的 2 条规则，然后与机器人下你的第一局。"
+            },
+            "tutorial_swap": {
+                "title": "Hex 的交换规则",
+                "description": "交换规则让 Hex 对局保持平衡。"
+            },
+            "tutorial_bridge": {
+                "title": "Hex 中的桥",
+                "description": "桥是 Hex 中最重要的形状：两颗不相邻却已相连的棋子。了解其原理并通过谜题练习。"
+            },
+            "tutorial_block": {
+                "title": "Hex 新手策略：阻挡以取胜",
+                "description": "在 Hex 中，阻挡就是在构建自己的路径：开局时的最佳策略。"
+            },
+            "tutorial_ziggurat": {
+                "title": "Hex 中的金字塔模板",
+                "description": "金字塔是 Hex 中需要了解的第二个形状：第三行的一颗棋子与其边相连。了解其原理并通过谜题练习。"
+            },
+            "cijm_2025": {
+                "title": "Hex 比赛 – 巴黎 2025",
+                "description": "2025 年 6 月 14 日和 15 日，在巴黎圣叙尔皮斯广场的文化与数学游戏博览会举办两场 Hex 比赛。免费，面向所有水平。"
+            },
+            "cijm_2026": {
+                "title": "Hex 比赛 – 巴黎 2026",
+                "description": "2026 年 5 月 24 日（星期日），在巴黎圣叙尔皮斯广场的文化与数学游戏博览会举办巨型 Hex 比赛。免费，面向所有水平，8 岁以上。"
+            }
+        },
+        "n_days_other": "{{count}} 天",
+        "n_hours_other": "{{count}} 小时"
+    },
+    "game_outcome": {
+        "path": "连通",
+        "resign": "认输",
+        "time": "超时",
+        "forfeit": "弃权"
+    },
+    "has_chat_messages": "有聊天消息",
+    "has_analyze": "有 AI 分析",
+    "has_malkovich_messages": "有马尔科维奇记录",
+    "game_content_filter": "内容",
+    "filters": "筛选",
+    "reset_filters": "重置筛选",
+    "reset_dates": "重置日期",
+    "game_type": "对局类型",
+    "game_state_filter": "状态",
+    "opponent_or_players": "玩家",
+    "one_or_two_players_help": "1 名玩家：该玩家的对局。2 名玩家：两人之间的对局。",
+    "search_opponent": "对手",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "全部筛选",
+    "hide_filters": "收起筛选",
+    "week_of": "{{date}} 当周",
+    "chart_grouping": {
+        "label": "分组方式",
+        "auto": "自动",
+        "day": "日",
+        "week": "周",
+        "month": "月"
+    },
+    "n_games_found_other": "找到 {{count}} 局对局。"
 }

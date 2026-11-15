@@ -8,7 +8,9 @@
         "open_live_games": "انضم إلى لعبة مباشرة",
         "open_correspondence_games": "انضم إلى لعبة بالمراسلة",
         "no_open_live_games": "لا توجد ألعاب مباشرة متاحة حاليًا",
-        "no_open_correspondence_games": "لا توجد ألعاب بالمراسلة متاحة حاليًا"
+        "no_open_correspondence_games": "لا توجد ألعاب بالمراسلة متاحة حاليًا",
+        "multiple_waiting_games": "عدة مباريات في الانتظار:",
+        "others_canceled_once_one_accepted": "بمجرد قبول إحدى مبارياتك المنتظرة، تُلغى الأخرى."
     },
     "game": {
         "title": "اللعبة",
@@ -35,13 +37,20 @@
         "playing": "جارية",
         "watch": "مشاهدة",
         "title_your_turn": "دورك!",
-        "title_waiting": "في انتظار خصم: مستضافة من قبل"
+        "title_waiting": "في انتظار خصم: مستضافة من قبل",
+        "winner": "الفائز",
+        "loser": "الخاسر",
+        "issue": "النتيجة",
+        "moves_count": "النقلات"
     },
     "game_rules": {
         "normal": "قياسي",
         "host_plays_first": "المضيف يلعب أولًا",
+        "host_plays_first_female": "المضيفة تلعب أولًا",
         "host_plays_second": "المضيف يلعب ثانيًا",
-        "no_swap": "بدون تبديل"
+        "no_swap": "بدون تبديل",
+        "handicap_for_host": "أفضلية {{n}} للمضيف",
+        "handicap_for_opponent": "أفضلية {{n}} للخصم"
     },
     "game_state": {
         "created": "أُنشئت",
@@ -66,7 +75,8 @@
             "notifications": "الإشعارات",
             "ai_workers": "عمّال الذكاء الاصطناعي",
             "connected_applications": "التطبيقات المتصلة",
-            "technical_info": "معلومات تقنية"
+            "technical_info": "معلومات تقنية",
+            "security": "الأمان"
         },
         "audio": "الصوت",
         "moderation": "الإشراف"
@@ -120,7 +130,49 @@
     "handicap": {
         "title": "أفضلية",
         "none": "لا شيء",
-        "handicap_for_player": "{{n}} لـ {{player}}"
+        "handicap_for_player": "{{n}} لـ {{player}}",
+        "you": "أنت",
+        "opponent": "الخصم",
+        "ai": "الذكاء الاصطناعي",
+        "increase": "زيادة الأفضلية",
+        "decrease": "تقليل الأفضلية",
+        "setup": {
+            "first_stone_then": "يضع {{player}} حجرًا قابلًا للتبديل، ثم {{count}} أخرى، أو {{swappedCount}} عند التبديل.",
+            "first_stone_then_you": "ضع حجرًا قابلًا للتبديل، ثم {{count}} أخرى، أو {{swappedCount}} عند التبديل.",
+            "first_stone_for_blue": "يضع {{player}} حجرًا قابلًا للتبديل، ثم يلعب {{beneficiary}} عدد {{count}} من النقلات.",
+            "first_stone_for_blue_you": "ضع حجرًا قابلًا للتبديل، ثم يلعب {{beneficiary}} عدد {{count}} من النقلات.",
+            "first_stone_for_blue_beneficiary": "يضع {{player}} حجرًا قابلًا للتبديل، ثم تلعب أنت عدد {{count}} من النقلات.",
+            "swap_decision": "يختار {{player}} ما إذا كان سيبدّل: يضع {{beneficiary}} بعدها {{swappedCount}} من الأحجار، أو {{count}} عند الرفض.",
+            "swap_decision_you": "انقر على الحجر للتبديل: يضع {{beneficiary}} بعدها {{swappedCount}} من الأحجار، أو {{count}} إذا رفضت.",
+            "swap_decision_beneficiary": "يختار {{player}} ما إذا كان سيبدّل: تضع أنت بعدها {{swappedCount}} من الأحجار، أو {{count}} عند الرفض.",
+            "stones_after_swap": "تم تبديل الحجر: يضع {{player}} عدد {{count}} من الأحجار.",
+            "stones_after_swap_you": "تم تبديل الحجر: ضع {{count}} من الأحجار.",
+            "refuse_swap": "عدم التبديل",
+            "no_swap_zero": "التبديل معطّل: لا يضع {{player}} أي حجر.",
+            "no_swap_one": "التبديل معطّل: يضع {{player}} حجرًا واحدًا.",
+            "no_swap_two": "التبديل معطّل: يضع {{player}} حجرين.",
+            "no_swap_few": "التبديل معطّل: يضع {{player}} {{count}} أحجار.",
+            "no_swap_many": "التبديل معطّل: يضع {{player}} {{count}} حجرًا.",
+            "no_swap_other": "التبديل معطّل: يضع {{player}} {{count}} حجر.",
+            "no_swap_you_zero": "التبديل معطّل: لا تضع أي حجر.",
+            "no_swap_you_one": "التبديل معطّل: ضع حجرًا واحدًا.",
+            "no_swap_you_two": "التبديل معطّل: ضع حجرين.",
+            "no_swap_you_few": "التبديل معطّل: ضع {{count}} أحجار.",
+            "no_swap_you_many": "التبديل معطّل: ضع {{count}} حجرًا.",
+            "no_swap_you_other": "التبديل معطّل: ضع {{count}} حجر.",
+            "stones_zero": "لا يضع {{player}} أي حجر إضافي.",
+            "stones_one": "يضع {{player}} حجرًا إضافيًا واحدًا.",
+            "stones_two": "يضع {{player}} حجرين إضافيين.",
+            "stones_few": "يضع {{player}} {{count}} أحجار إضافية.",
+            "stones_many": "يضع {{player}} {{count}} حجرًا إضافيًا.",
+            "stones_other": "يضع {{player}} {{count}} حجر إضافي.",
+            "stones_you_zero": "لا تضع أي حجر إضافي.",
+            "stones_you_one": "ضع حجرًا إضافيًا واحدًا.",
+            "stones_you_two": "ضع حجرين إضافيين.",
+            "stones_you_few": "ضع {{count}} أحجار إضافية.",
+            "stones_you_many": "ضع {{count}} حجرًا إضافيًا.",
+            "stones_you_other": "ضع {{count}} حجر إضافي."
+        }
     },
     "2dots": "{{s}}:",
     "game_created_short": "أُنشئت {{ date }}",
@@ -159,11 +211,14 @@
     "waiting_for_an_opponent": "في انتظار خصم…",
     "confirm_overlay": {
         "confirmation": "تأكيد",
-        "are_you_sure?": "هل أنت متأكد؟"
+        "are_you_sure?": "هل أنت متأكد/ة؟",
+        "are_you_sure?_male": "هل أنت متأكد؟",
+        "are_you_sure?_female": "هل أنتِ متأكدة؟"
     },
     "workers": {
         "see_how_to_spawn_a_worker": "تعرّف على كيفية حساب نقلات الذكاء الاصطناعي لـ PlayHex من جهازي",
-        "engine_unavailable": "بعض محركات الذكاء الاصطناعي ليس لديها أي عامل متصل حاليًا، هذه المحركات غير متاحة."
+        "engine_unavailable": "بعض محركات الذكاء الاصطناعي ليس لديها أي عامل متصل حاليًا، هذه المحركات غير متاحة.",
+        "ai_not_available": "غير متاح حاليًا"
     },
     "game_analysis": {
         "game_analysis": "تحليل اللعبة بالذكاء الاصطناعي",
@@ -196,7 +251,9 @@
     "pass": "تمرير",
     "pass_confirm_overlay": {
         "title": "تمرير دوري؟",
-        "message": "أنت على وشك تخطّي دورك الحالي. هل أنت متأكد؟",
+        "message": "أنت على وشك تخطّي دورك الحالي. هل أنت متأكد/ة؟",
+        "message_male": "أنت على وشك تخطّي دورك الحالي. هل أنت متأكد؟",
+        "message_female": "أنتِ على وشك تخطّي دوركِ الحالي. هل أنتِ متأكدة؟",
         "confirmLabel": "نعم، مرّر",
         "cancelLabel": "لا، دعني ألعب"
     },
@@ -238,7 +295,12 @@
     },
     "1vAI_friendly": {
         "title": "ضد AI",
-        "create": "العب ضد AI"
+        "create": "العب ضد AI",
+        "easy": "سهل",
+        "medium": "متوسط",
+        "hard": "صعب",
+        "beaten": "تمت هزيمته",
+        "unlock_stronger_ais": "عرض المزيد من خيارات الذكاء الاصطناعي"
     },
     "1vAI_offline": {
         "title": "AI دون اتصال",
@@ -353,7 +415,9 @@
     "n_matches_played_many": "{{ count }} مباراة لُعبت",
     "n_matches_played_other": "{{ count }} مباراة لُعبت",
     "tournament_subscription": {
-        "subscribed": "أنت مهتم",
+        "subscribed": "أنت مهتم/ة",
+        "subscribed_male": "أنت مهتم",
+        "subscribed_female": "أنتِ مهتمة",
         "checked_in": "تم تأكيد مشاركتك!",
         "must_check_in": "يجب عليك تسجيل الحضور!",
         "can_subscribe": "لم يُفتح تسجيل الحضور بعد، لكن يمكن للاعبين المهتمين الاشتراك ليتم إشعارهم عند فتحه.",
@@ -374,8 +438,12 @@
     "admins_many": "مشرفًا: { players }",
     "admins_other": "مشرفون: { players }",
     "checkin_opens_time_before": "يُفتح تسجيل الحضور قبل {{ time }}.",
-    "tournament_subscribe": "أنا مهتم!",
-    "tournament_unsubscribe": "لم أعد مهتمًا.",
+    "tournament_subscribe": "أنا مهتم/ة!",
+    "tournament_subscribe_male": "أنا مهتم!",
+    "tournament_subscribe_female": "أنا مهتمة!",
+    "tournament_unsubscribe": "لم أعد مهتمًا/ة.",
+    "tournament_unsubscribe_male": "لم أعد مهتمًا.",
+    "tournament_unsubscribe_female": "لم أعد مهتمة.",
     "tournament_checkin": "تسجيل الحضور",
     "tournament_checkedin": "تم تسجيل الحضور",
     "tournament_checked_in_players": "تم تسجيل الحضور",
@@ -443,9 +511,12 @@
         "created": "أنشأ {{organizerPseudo}} البطولة",
         "edited": "غيّر المنظّم \"{{ field }}\" في البطولة: القيمة الجديدة هي \"{{ value }}\". (كانت القيمة القديمة \"{{ oldValue }}\")",
         "player_subscribed": "{{ playerPseudo }} مهتم",
+        "player_subscribed_female": "{{ playerPseudo }} مهتمة",
         "player_unsubscribed": "{{ playerPseudo }} لم يعد مهتمًا",
+        "player_unsubscribed_female": "{{ playerPseudo }} لم تعد مهتمة",
         "player_kicked": "تم طرد {{ playerPseudo }}",
         "player_checked_in": "سجّل {{ playerPseudo }} حضوره",
+        "player_checked_in_female": "سجّلت {{ playerPseudo }} حضورها",
         "player_banned": "تم حظر {{ playerPseudo }} من هذه البطولة",
         "changed_admins": "عيّن المنظّم المشرفين: {{ newAdmins }}",
         "started": "بدأت البطولة!",
@@ -453,7 +524,9 @@
         "match_canceled_recreated": "أُعيد إنشاء المباراة {{ round }}.{{ number }} بسبب الإلغاء.",
         "ended": "انتهت البطولة."
     },
-    "tournament_player_is_banned": "محظور من هذه البطولة",
+    "tournament_player_is_banned": "محظور/ة من هذه البطولة",
+    "tournament_player_is_banned_male": "محظور من هذه البطولة",
+    "tournament_player_is_banned_female": "محظورة من هذه البطولة",
     "tournament_account_required": "تتطلب هذه البطولة حسابًا، الضيوف غير مسموح لهم. يرجى تسجيل الدخول أو إنشاء حساب أولًا.",
     "tournament_not_enough_participants_to_start": "تعذّر بدء البطولة. لا يوجد عدد كافٍ من المشاركين المسجّلين لهذه الصيغة.",
     "now!": "الآن!",
@@ -481,7 +554,9 @@
     "resign": "الاستسلام",
     "resign_confirm_overlay": {
         "title": "الاستسلام في اللعبة",
-        "message": "هل أنت متأكد من رغبتك في الاستسلام في اللعبة؟",
+        "message": "هل أنت متأكد/ة من رغبتك في الاستسلام في اللعبة؟",
+        "message_male": "هل أنت متأكد من رغبتك في الاستسلام في اللعبة؟",
+        "message_female": "هل أنتِ متأكدة من رغبتكِ في الاستسلام في اللعبة؟",
         "confirmLabel": "نعم، أستسلم",
         "cancelLabel": "لا، متابعة اللعب"
     },
@@ -554,8 +629,11 @@
     "invalid_pseudo": "اسم المستخدم غير صالح",
     "undo": {
         "player_wants_to_takeback": "يرغب {{ player }} في التراجع عن نقلته",
+        "player_wants_to_takeback_female": "ترغب {{ player }} في التراجع عن نقلتها",
         "player_takeback_his_move": "تراجع {{ player }} عن نقلته.",
+        "player_takeback_his_move_female": "تراجعت {{ player }} عن نقلتها.",
         "takeback_request_denied": "رُفض طلب {{ player }} للتراجع عن نقلته.",
+        "takeback_request_denied_female": "رُفض طلب {{ player }} للتراجع عن نقلتها.",
         "undo_move": "تراجع",
         "accept": "قبول التراجع",
         "reject": "رفض",
@@ -689,7 +767,9 @@
         "bridge_diagram": "الحجران الأحمران متصلان: يتشاركان الخليتين الخضراوين.",
         "bridge_edge_diagram": "يعمل الجسر أيضًا مع الحافة: هذا الحجر متصل بالحافة عبر الخليتين الخضراوين.",
         "bridge_how_to_defend": "إذا لعب خصمك في إحدى الخليتين، <strong>العب في الأخرى</strong>: تبقى أحجارك متصلة. لا يمكن لخصمك قطع الجسر أبدًا، إلا إذا نسيت الرد!",
-        "bridge_why_useful": "يمتد الجسر أبعد من الأحجار المتجاورة، فتبني طريقك أسرع مع البقاء متصلًا.",
+        "bridge_why_useful": "يمتد الجسر أبعد من الأحجار المتجاورة، فتبني طريقك أسرع مع البقاء متصلًا/ة.",
+        "bridge_why_useful_male": "يمتد الجسر أبعد من الأحجار المتجاورة، فتبني طريقك أسرع مع البقاء متصلًا.",
+        "bridge_why_useful_female": "يمتد الجسر أبعد من الأحجار المتجاورة، فتبنين طريقكِ أسرع مع البقاء متصلة.",
         "ziggurat_intro": "بعد الجسر، <strong>الزقورة</strong> هي الشكل الثاني الذي يجب معرفته: فهي تظهر كثيرًا جدًا في المباريات. يمكن لحجر في <strong>الصف الثالث</strong> أن يكون متصلًا بحافته، إذا كانت كل خلايا هذه المنطقة فارغة: يُسمى هذا الشكل زقورة.",
         "ziggurat_diagram": "الحجر الأحمر متصل بالحافة السفلية ما دامت الخلايا الخضراء الثماني فارغة.",
         "ziggurat_how_it_works": "مهما لعب خصمك داخل الزقورة، لديك دائمًا رد يحافظ على الاتصال، باستخدام <strong>الجسور</strong>. مثالان:",
@@ -751,7 +831,12 @@
         "block_at_a_distance": "لا تضع حجرك ملاصقًا لحجر خصمك: من السهل الالتفاف حول الصدّ المجاور. اصدّ أبعد، تاركًا بعض المساحة: سيكون لديك وقت للرد على نقلاته.",
         "block_remember": "تذكّر: في Hex، النقلة الجيدة دفاعية وهجومية في آن واحد.",
         "ziggurat_defense_1": "يتسلل الأزرق إلى الوسط: يرد الأحمر بجانب حجره، ويُكوّن جسرًا مع الحافة.",
-        "ziggurat_defense_2": "يتسلل الأزرق إلى الصف الأول: يرد الأحمر بجسر، ويصبح الحجر الجديد متصلًا بالحافة."
+        "ziggurat_defense_2": "يتسلل الأزرق إلى الصف الأول: يرد الأحمر بجسر، ويصبح الحجر الجديد متصلًا بالحافة.",
+        "demo_0_play": "العب",
+        "chapters": {
+            "hex_rule": "I. قواعد هيكس",
+            "beginners_strategy": "II. استراتيجية المبتدئين"
+        }
     },
     "donate": "تبرّع لـ PlayHex",
     "enable_notifications_overlay": {
@@ -822,10 +907,14 @@
     },
     "player_loses_reason": {
         "default": "{player} يخسر.",
+        "default_female": "{player} تخسر.",
         "path": "{player} يخسر.",
+        "path_female": "{player} تخسر.",
         "time": "نفد وقت {player}.",
         "resign": "{player} يستسلم.",
-        "forfeit": "{player} يخسر بالانسحاب."
+        "resign_female": "{player} تستسلم.",
+        "forfeit": "{player} يخسر بالانسحاب.",
+        "forfeit_female": "{player} تخسر بالانسحاب."
     },
     "country_flag": {
         "title": "علم الدولة",
@@ -884,7 +973,61 @@
         "abstract_play_url": "Abstract Play: رابط",
         "abstract_play_debug": "Abstract Play: انسخ من \"Debugging information\" أسفل لوحة اللعب",
         "engine_unavailable": "لا يوجد عامل ذكاء اصطناعي متصل لهذا المحرك حاليًا، لا يمكن تحليل المواقف.",
-        "analysis_failed": "تعذّر تحليل هذا الموقف."
+        "analysis_failed": "تعذّر تحليل هذا الموقف.",
+        "analyze_in_hexplorer": "التحليل في Hexplorer",
+        "play_from_position": "اللعب من وضعية",
+        "tab_file": "ملف",
+        "tab_tree": "الشجرة",
+        "comment": "تعليق",
+        "comment_placeholder": "علّق على هذه الوضعية…",
+        "current_study": "الدراسة الحالية",
+        "new_study": "دراسة جديدة",
+        "study_title": "عنوان الدراسة",
+        "study_default_title": "دراسة بلا عنوان",
+        "study_by": "بواسطة {{author}}",
+        "study_fork": "نسخ",
+        "study_fork_help": "حفظ نسختك الخاصة من هذه الدراسة مع تعديلاتها",
+        "study_forked_from": "منسوخة من",
+        "study_share": "مشاركة هذه الدراسة",
+        "study_link_copied": "تم نسخ الرابط",
+        "study_delete": "حذف هذه الدراسة",
+        "study_delete_confirm": "حذف هذه الدراسة؟ لن يعمل رابطها بعد ذلك.",
+        "study_too_large": "هذه الدراسة كبيرة جدًا للحفظ: احذف بعض الفروع أو التعليقات.",
+        "study_not_found": "هذه الدراسة غير موجودة أو تم حذفها.",
+        "study_unsaved_changes": "تغييرات غير محفوظة",
+        "study_save_shortcut": "حفظ الدراسة (Ctrl+S)",
+        "study_validate_setup_first": "أنهِ وضع الإعداد لحفظ الدراسة.",
+        "study_save_to_share": "احفظ هذه الدراسة لنسخها أو مشاركتها.",
+        "my_studies": "دراساتي",
+        "export": "تصدير",
+        "study_sort": "ترتيب الدراسات",
+        "study_sort_date_desc": "الأحدث",
+        "study_sort_date_asc": "الأقدم",
+        "study_sort_title_asc": "الاسم أ–ي",
+        "study_sort_title_desc": "الاسم ي–أ",
+        "tools_history": "السجل",
+        "tools_stones": "الأحجار",
+        "tools_marks": "العلامات",
+        "tools_label": "تسمية",
+        "study_discard_confirm": "لديك تغييرات غير محفوظة وستضيع. هل تريد المتابعة؟",
+        "tab_help": "مساعدة",
+        "help_what_title": "ما هو Hexplorer؟",
+        "help_what": "لوحة تحليل مجانية لهيكس: استكشف أي وضعية، وجرّب عدة تفرعات، واطّلع على رأي الذكاء الاصطناعي فيها.",
+        "help_why_title": "لماذا تستخدمه؟",
+        "help_why": "لفهم مبارياتك، وإيجاد نقلات أفضل، ومشاركة أفكارك حول وضعية ما مع لاعبين آخرين.",
+        "help_how_title": "طريقة الاستخدام",
+        "help_how_play": "ضع الأحجار بحرية لبناء وضعية مخصصة",
+        "help_how_import": "أو استورد مباراة هيكس من رابط أو نص",
+        "help_how_ai": "يُظهر الشريط على يسار اللوحة من الفائز، وتُظهر اللوحة النقلات التي يفكر فيها الذكاء الاصطناعي.",
+        "help_how_setup": "يتيح وضع الإعداد إضافة علامات على اللوحة وتعديل الوضعية بحرية",
+        "help_how_file": "احفظ دراستك (Ctrl+S)، أو شاركها، أو صدّرها بصيغة SGF",
+        "help_dismiss": "فهمت، لا تعرضه مجددًا",
+        "study_nodes_zero": "لا عُقد",
+        "study_nodes_one": "عقدة واحدة",
+        "study_nodes_two": "عقدتان",
+        "study_nodes_few": "{{count}} عُقد",
+        "study_nodes_many": "{{count}} عقدة",
+        "study_nodes_other": "{{count}} عقدة"
     },
     "player_menu": {
         "open_menu": "فتح قائمة اللاعب",
@@ -903,7 +1046,8 @@
         "reserved_for_other_player": "هذه المباراة تحدٍّ مخصص للاعب آخر.",
         "reserved_for_other_player_named": "هذه المباراة تحدٍّ مخصص لـ {{pseudo}}.",
         "other": "لا يمكنك الانضمام إلى هذه المباراة.",
-        "game_canceled": "تم إلغاء هذه المباراة."
+        "game_canceled": "تم إلغاء هذه المباراة.",
+        "is_host_closed": "هذه المباراة مغلقة: لا يمكن الانضمام إلا لمن لديه رابط هذه المباراة."
     },
     "board_mount_error": {
         "error": "تعذّر عرض اللوحة، حدث خطأ:",
@@ -974,6 +1118,7 @@
         "load_error": "تعذّر تحميل سلاسل البطولات",
         "next": "التالية:",
         "last_winner": "آخر فائز:",
+        "last_winner_female": "آخر فائزة:",
         "see_all": "عرض كل السلاسل"
     },
     "tournament_series_page": {
@@ -1031,7 +1176,9 @@
         "update_error": "خطأ أثناء تحديث سلسلة البطولات",
         "delete": "حذف السلسلة",
         "delete_help": "حذف هذه السلسلة نهائيًا. ممكن فقط عندما لا تحتوي على أي بطولة.",
-        "delete_confirm": "هل أنت متأكد من رغبتك في حذف سلسلة البطولات هذه؟",
+        "delete_confirm": "هل أنت متأكد/ة من رغبتك في حذف سلسلة البطولات هذه؟",
+        "delete_confirm_male": "هل أنت متأكد من رغبتك في حذف سلسلة البطولات هذه؟",
+        "delete_confirm_female": "هل أنتِ متأكدة من رغبتكِ في حذف سلسلة البطولات هذه؟",
         "deleted": "تم حذف سلسلة البطولات."
     },
     "tournament_series_auto_create": {
@@ -1096,12 +1243,16 @@
         "unban": "إلغاء الحظر",
         "start_now": "بدء البطولة الآن",
         "start_now_help": "يبدأ البطولة فورًا دون انتظار موعد البدء المحدد. يتم ترتيب اللاعبين الذين أكدوا حضورهم وإنشاء المباريات الأولى.",
-        "start_now_confirm": "هل أنت متأكد من رغبتك في بدء هذه البطولة الآن؟",
+        "start_now_confirm": "هل أنت متأكد/ة من رغبتك في بدء هذه البطولة الآن؟",
+        "start_now_confirm_male": "هل أنت متأكد من رغبتك في بدء هذه البطولة الآن؟",
+        "start_now_confirm_female": "هل أنتِ متأكدة من رغبتكِ في بدء هذه البطولة الآن؟",
         "progress_now": "التقدم الآن",
         "progress_now_help": "إذا بدت البطولة عالقة (المباريات التالية لا تبدأ)، فمن المفترض أن يصلح هذا الزر المشكلة عبر التحقق من حالة البطولة بالكامل.",
         "cancel_tournament": "إلغاء البطولة",
         "cancel_tournament_help": "يلغي البطولة. لن تظهر مجددًا في قائمة البطولات. إذا كانت البطولة قد بدأت، فسيتم إلغاء المباريات الجارية.",
-        "cancel_tournament_confirm": "هل أنت متأكد من رغبتك في إلغاء هذه البطولة؟ لا يمكن التراجع عن ذلك.",
+        "cancel_tournament_confirm": "هل أنت متأكد/ة من رغبتك في إلغاء هذه البطولة؟ لا يمكن التراجع عن ذلك.",
+        "cancel_tournament_confirm_male": "هل أنت متأكد من رغبتك في إلغاء هذه البطولة؟ لا يمكن التراجع عن ذلك.",
+        "cancel_tournament_confirm_female": "هل أنتِ متأكدة من رغبتكِ في إلغاء هذه البطولة؟ لا يمكن التراجع عن ذلك.",
         "tournament_canceled": "تم إلغاء البطولة {{ slug }}."
     },
     "chat_message_placeholder_slow_mode": "رسالة… (الوضع البطيء: {{ count }} في الدقيقة)",
@@ -1128,7 +1279,8 @@
         "create_game": "إنشاء مباراة",
         "challenge_player": "تحدي لاعب",
         "challenge_same_target": "تحدي هذا اللاعب مجددًا",
-        "analyze_position": "تحليل المواقف"
+        "analyze_position": "تحليل المواقف",
+        "create_hexplorer_study": "إنشاء دراسات Hexplorer"
     },
     "head_to_head": "المواجهات المباشرة",
     "never_played_together": "لم تلعب ضد هذا اللاعب من قبل.",
@@ -1286,7 +1438,17 @@
             "solver_unproven_two": "تعذّر حل موقفين في الوقت المحدد، تم فحص اللغز جزئيًا فقط",
             "solver_unproven_few": "تعذّر حل {{count}} مواقف في الوقت المحدد، تم فحص اللغز جزئيًا فقط",
             "solver_unproven_many": "تعذّر حل {{count}} موقفًا في الوقت المحدد، تم فحص اللغز جزئيًا فقط",
-            "solver_unproven_other": "تعذّر حل {{count}} موقف في الوقت المحدد، تم فحص اللغز جزئيًا فقط"
+            "solver_unproven_other": "تعذّر حل {{count}} موقف في الوقت المحدد، تم فحص اللغز جزئيًا فقط",
+            "generator_initial_not_winning": "لا يجد محلّل Mohex أي نقلة فائزة هنا",
+            "generator_depends_on_disabled_cells": "لا يتحقق الفوز إلا بمساعدة خانات خارج اللغز: علّم الأحجار المتصلة بحافتها في خطوة الوضعية",
+            "generator_already_connected": "الاتصال قائم بالفعل هنا، لا شيء لتوليده",
+            "generator_unproven": "لم تُثبت أي نقلة فائزة في الوقت المحدد، تُرك الفرع فارغًا",
+            "generator_budget_exceeded": "الشجرة كبيرة جدًا، تُرك الفرع فارغًا",
+            "generator_parallel_dropped": "تعذّرت إضافة الاقتحام {{move}} في جسر الخصم كتسلسل موازٍ، ولعبه يُفشل اللغز",
+            "generator_accepted_losing": "هذه النقلة مقبولة، لكن محلّل Mohex يثبت أنها خاسرة",
+            "generator_accepted_unproven": "هذه النقلة مقبولة، لكن محلّل Mohex لا يثبت أنها فائزة: لن تُستكمل",
+            "generator_failed_winning": "هذه النقلة تُعدّ فاشلة، لكن محلّل Mohex يثبت أنها فائزة",
+            "generator_invalid_tree": "الشجرة المولّدة غير صالحة ({{error}})"
         },
         "editor": {
             "optional": "اختياري",
@@ -1475,7 +1637,24 @@
             "errors_count_two": "مشكلتان للإصلاح، راجع علامة تبويب النشر",
             "errors_count_few": "{{count}} مشكلات للإصلاح، راجع علامة تبويب النشر",
             "errors_count_many": "{{count}} مشكلة للإصلاح، راجع علامة تبويب النشر",
-            "errors_count_other": "{{count}} مشكلة للإصلاح، راجع علامة تبويب النشر"
+            "errors_count_other": "{{count}} مشكلة للإصلاح، راجع علامة تبويب النشر",
+            "solver_position": "الوضعية لـ Mohex",
+            "solver_position_help": "يلعب Mohex على اللوحة كاملة: تحقق من أن الخانات خارج اللغز مملوءة وفق الوضعية، وأن الأحجار المتصلة بحافة معلّمة.",
+            "check_section": "التحقق من اللغز",
+            "generate": "توليد الشجرة",
+            "generate_tab": "التوليد",
+            "generate_help": "يكمل الشجرة من العقدة المحددة مع الإبقاء على النقلات الحالية: النقلات الفائزة والردود من Mohex، وأجوبة الحاسوب من Katahex.",
+            "generate_templates": "التوقف عند اتصال بقالب، حتى",
+            "generate_templates_none": "بلا قالب: لا ينتهي اللغز إلا عند اكتمال الاتصال.",
+            "generate_templates_help": "ينتهي اللغز بمجرد إثبات الاتصال بهذا القالب أو بقالب أصغر.",
+            "generate_templates_none_option": "لا شيء",
+            "generate_from_node": "التوليد من هذه العقدة",
+            "generate_not_here": "في تبويب الشجرة، حدّد عقدة من التسلسل الرئيسي قبل نهاية اللغز.",
+            "generate_progress": "جارٍ حل الوضعيات: {{done}}/{{total}}",
+            "generate_ok": "تم توليد الشجرة.",
+            "generate_warnings": "تحذيرات التوليد ({{count}}):",
+            "generate_stop": "إيقاف",
+            "generate_tree_changed": "تغيّرت الشجرة أثناء التوليد، فتم تجاهل النتيجة. أعد التوليد."
         },
         "next_puzzle": "اللغز التالي",
         "collections": {
@@ -1537,7 +1716,12 @@
         "published_ago": "نُشر {{date}}",
         "sort_by": "ترتيب حسب",
         "sort_published_at": "تاريخ النشر",
-        "sort_created_at": "تاريخ الإضافة"
+        "sort_created_at": "تاريخ الإضافة",
+        "field_secondary_urls": "روابط أخرى",
+        "field_secondary_urls_help": "إذا كان هذا الفيديو منشورًا أيضًا على منصات أخرى (PeerTube، Dailymotion…). يبقى الرابط أعلاه هو الرئيسي.",
+        "add_link": "إضافة رابط",
+        "remove_link": "حذف هذا الرابط",
+        "watch_on": "شاهد على {{platform}}"
     },
     "swap_maps": {
         "title": "خرائط التبديل",
@@ -1605,13 +1789,20 @@
         "opening_moves": "النقلات الافتتاحية الأكثر شيوعًا",
         "opening_moves_note": "للوحات {{boardsize}}، الحجم الأكثر لعبًا.",
         "rating_distribution": "توزيع التصنيف",
-        "rating_distribution_note": "يُحسب فقط اللاعبون غير الروبوتات ذوو تصنيف مستقر (انحراف أقل من {{deviation}}). الضيوف مشمولون."
+        "rating_distribution_note": "يُحسب فقط اللاعبون غير الروبوتات ذوو تصنيف مستقر (انحراف أقل من {{deviation}}). الضيوف مشمولون.",
+        "lobby_join_chances": "فرص انضمام أحد إلى مباراة مباشرة",
+        "lobby_join_chances_first_minute": "< 1 د",
+        "lobby_join_chances_next_minutes": "+10 د",
+        "lobby_join_chances_note": "نسبة المباريات المباشرة المنشأة في الردهة التي تجد خصمًا خلال الدقيقة الأولى، ثم خلال الدقائق العشر التالية عندما لا ينضم أحد بعد الدقيقة الأولى. تقدير على آخر 8 أسابيع، كما لو أن المضيفين انتظروا بدل الإلغاء. الأوقات معروضة بتوقيتك المحلي (UTC{{offset}})."
     },
     "ladder": {
         "title": "ملك التل",
+        "title_female": "ملكة التل",
         "intro": "سلّم واحد، عرش واحد. تحدَّ لاعبًا فوقك: إن فزت، تأخذ مقعده. كلما جلست أعلى، كان عليك الدفاع أكثر.",
         "king": "ملك التل",
+        "king_female": "ملكة التل",
         "king_for": "ملك منذ {{duration}}",
+        "king_for_female": "ملكة منذ {{duration}}",
         "no_king": "العرش شاغر. انضم واستولِ عليه!",
         "join": "انضم إلى ملك التل",
         "leave": "مغادرة هذا التل",
@@ -1637,6 +1828,7 @@
         "no_running_challenges": "لا يوجد تحدٍّ جارٍ.",
         "vs": "ضد",
         "nobody_to_challenge": "لا أحد لتتحداه: أنت الملك!",
+        "nobody_to_challenge_female": "لا أحد لتتحديه: أنتِ الملكة!",
         "live": "مباشر",
         "challenge_overlay": {
             "title": "تحدَّ {{player}}",
@@ -1644,16 +1836,19 @@
             "propose_live": "اقترح اللعب المباشر",
             "propose_live_help": "يمكن لخصمك القبول، أو الرفض واللعب بالمراسلة. دون رد خلال 10 دقائق، تبدأ مباراة المراسلة.",
             "defender_not_active": "{{player}} غير نشط على PlayHex حاليًا، يمكنك اقتراح مباراة مباشرة على لاعب نشط فقط.",
+            "defender_not_active_female": "{{player}} غير نشطة على PlayHex حاليًا، يمكنك اقتراح مباراة مباشرة على لاعبة نشطة فقط.",
             "live_time_control": "التحكم بالوقت للمباراة المباشرة",
             "submit": "تحدٍّ"
         },
         "live_proposal_expires": "دون رد {{date}}، تبدأ مباراة المراسلة.",
         "challenger_not_active": "{{player}} لم يعد نشطًا، لا يمكنك قبول المباراة المباشرة. يمكنك اللعب بالمراسلة.",
+        "challenger_not_active_female": "{{player}} لم تعد نشطة، لا يمكنك قبول المباراة المباشرة. يمكنك اللعب بالمراسلة.",
         "accept_live": "العب مباشرة",
         "decline_live": "العب بالمراسلة",
         "title_name": {
             "giant_slayer": "قاهر العمالقة",
-            "climber": "المتسلق"
+            "climber": "المتسلق",
+            "climber_female": "المتسلقة"
         },
         "title_help": {
             "giant_slayer": "أطاح بملك دافع عن عرشه 5 مرات أو أكثر",
@@ -1671,19 +1866,31 @@
         },
         "event": {
             "join": "انضم {{player}} في المقعد #{{position}}",
+            "join_female": "انضمت {{player}} في المقعد #{{position}}",
             "leave": "غادر {{player}} ملك التل من المقعد #{{position}}",
+            "leave_female": "غادرت {{player}} ملك التل من المقعد #{{position}}",
             "removed_inactive": "أُزيل {{player}} بسبب عدم النشاط من المقعد #{{position}}",
+            "removed_inactive_female": "أُزيلت {{player}} بسبب عدم النشاط من المقعد #{{position}}",
             "removed_strikes": "أُزيل {{player}} من المقعد #{{position}} بعد {{strikes}} مرات انتهاء الوقت",
+            "removed_strikes_female": "أُزيلت {{player}} من المقعد #{{position}} بعد {{strikes}} مرات انتهاء الوقت",
             "removed_strikes_before_first_game": "أُزيل {{player}} من المقعد #{{position}} بعد انتهاء وقته قبل إنهاء أي مباراة",
+            "removed_strikes_before_first_game_female": "أُزيلت {{player}} من المقعد #{{position}} بعد انتهاء وقتها قبل إنهاء أي مباراة",
             "challenge_won": "هزم {{player}} {{opponent}} وانتقل من #{{from}} إلى #{{position}}",
+            "challenge_won_female": "هزمت {{player}} {{opponent}} وانتقلت من #{{from}} إلى #{{position}}",
             "challenge_won_no_move": "هزم {{player}} {{opponent}}",
+            "challenge_won_no_move_female": "هزمت {{player}} {{opponent}}",
             "challenge_defended": "دافع {{opponent}} عن مقعده ضد {{player}}",
+            "challenge_defended_female": "دافعت {{opponent}} عن مقعدها ضد {{player}}",
             "challenge_voided": "أُلغيت مباراة {{player}} ضد {{opponent}}",
             "new_king": "{{player}} هو ملك التل الجديد!",
+            "new_king_female": "{{player}} هي ملكة التل الجديدة!",
             "giant_slayer": "{{player}} قاهر العمالقة: أطاح بـ {{opponent}}!",
+            "giant_slayer_female": "{{player}} قاهرة العمالقة: أطاحت بـ {{opponent}}!",
             "climber": "فاز {{player}} بـ {{wins}} تحديات متتالية!",
+            "climber_female": "فازت {{player}} بـ {{wins}} تحديات متتالية!",
             "strike": "انتهى وقت {{player}} في مباراة (المخالفة {{strikes}})",
             "cheat": "نُقل {{player}} إلى الأسفل بسبب الغش، وأُلغيت المباراة ضد {{opponent}}",
+            "cheat_female": "نُقلت {{player}} إلى الأسفل بسبب الغش، وأُلغيت المباراة ضد {{opponent}}",
             "excluded": "استبعد مشرفٌ {{player}} من المقعد #{{position}}"
         },
         "load_more": "تحميل المزيد",
@@ -1698,18 +1905,28 @@
             "not_member": "أنت لست في ملك التل.",
             "cannot_challenge_yourself": "لا يمكنك تحدي نفسك.",
             "defender_not_member": "هذا اللاعب ليس في ملك التل.",
+            "defender_not_member_female": "هذه اللاعبة ليست في ملك التل.",
             "out_of_range": "هذا اللاعب خارج نطاقك.",
+            "out_of_range_female": "هذه اللاعبة خارج نطاقك.",
             "invalid_boardsize": "حجم اللوحة هذا غير مسموح.",
             "no_outgoing_slot": "لقد أرسلت بالفعل أقصى عدد من التحديات يسمح به مقعدك.",
             "defender_incoming_full": "لا يمكن لهذا اللاعب تلقي المزيد من التحديات حاليًا.",
+            "defender_incoming_full_female": "لا يمكن لهذه اللاعبة تلقي المزيد من التحديات حاليًا.",
             "defender_cooling_down": "أنهى هذا اللاعب للتو مباراة ويمكن تحديه مجددًا اعتبارًا من {{date}}.",
+            "defender_cooling_down_female": "أنهت هذه اللاعبة للتو مباراة ويمكن تحديها مجددًا اعتبارًا من {{date}}.",
             "opponent_cooldown": "لعبت ضد هذا اللاعب مؤخرًا. يمكنك تحديه مجددًا اعتبارًا من {{date}}.",
+            "opponent_cooldown_female": "لعبت ضد هذه اللاعبة مؤخرًا. يمكنك تحديها مجددًا اعتبارًا من {{date}}.",
             "diversity_limit": "الكثير من مبارياتك الأخيرة كانت ضد هذا اللاعب.",
+            "diversity_limit_female": "الكثير من مبارياتك الأخيرة كانت ضد هذه اللاعبة.",
             "defender_diversity_limit": "الكثير من مباريات هذا اللاعب الأخيرة كانت ضدك.",
+            "defender_diversity_limit_female": "الكثير من مباريات هذه اللاعبة الأخيرة كانت ضدك.",
             "already_playing_opponent": "لديك بالفعل مباراة جارية ضد هذا اللاعب.",
+            "already_playing_opponent_female": "لديك بالفعل مباراة جارية ضد هذه اللاعبة.",
             "live_time_control_not_live": "هذا التحكم بالوقت ليس للمباريات المباشرة.",
             "defender_not_active": "خصمك غير نشط حاليًا، لا يمكنك اقتراح مباراة مباشرة.",
-            "challenger_not_active": "متحدّيك لم يعد نشطًا، لا يمكنك قبول المباراة المباشرة."
+            "defender_not_active_female": "خصمتك غير نشطة حاليًا، لا يمكنك اقتراح مباراة مباشرة.",
+            "challenger_not_active": "متحدّيك لم يعد نشطًا، لا يمكنك قبول المباراة المباشرة.",
+            "challenger_not_active_female": "متحدّيتك لم تعد نشطة، لا يمكنك قبول المباراة المباشرة."
         },
         "not_found": "ملك التل غير موجود.",
         "invalid_incoming_slots": "عدد تحديات غير صالح.",
@@ -1874,5 +2091,411 @@
     "n_interested_two": "مهتمان",
     "n_interested_few": "{{ count }} مهتمين",
     "n_interested_many": "{{ count }} مهتمًا",
-    "n_interested_other": "{{ count }} مهتم"
+    "n_interested_other": "{{ count }} مهتم",
+    "pronouns": {
+        "title": "الضمائر",
+        "explain": "هذه الضمائر عامة: تظهر في ملفك الشخصي وعند النقر على اسمك المستعار. وتُستخدم أيضًا لتكييف نصوص الواجهة معك، وطريقة الإشارة إليك أمام اللاعبين الآخرين.",
+        "save_error": "تعذّر حفظ الضمائر. يُرجى المحاولة مجددًا.",
+        "he/him": "هو",
+        "she/her": "هي",
+        "they/them": "محايد",
+        "unspecified": "الضمائر غير محددة"
+    },
+    "player_popover": {
+        "on_playhex_since": "على PlayHex منذ {{duration}}"
+    },
+    "closed_game": "مباراة مغلقة",
+    "closed_game_help": "لا تظهر هذه المباراة في ردهة اللاعبين الآخرين. يمكن فقط لمن لديه الرابط الانضمام، حتى لو لم يكن على PlayHex بعد.",
+    "closed_game_invite": {
+        "link_label": "رابط لإرساله إلى صديق",
+        "share": "مشاركة"
+    },
+    "chat_header": {
+        "game_started": "بدأت المباراة",
+        "game_ended": "انتهت المباراة",
+        "game_canceled": "أُلغيت المباراة"
+    },
+    "host_waiting_join_chance_first_minute": "في هذا الوقت من اليوم، ينضم أحدٌ إلى {{percent}} من المباريات خلال الدقيقة الأولى.",
+    "host_waiting_join_chance_next_minutes": "لم ينضم أحد بعد. بالانتظار 10 دقائق إضافية، يجد {{percent}} من المضيفين خصمًا.",
+    "match_title_in_tournament": "{{ match }} من {{ tournament }}",
+    "chat_message_visibility": "ظهور الرسالة",
+    "chat_attach_to_move_toggle": "عرض هذه الرسالة تحت النقلة {{n}}",
+    "chat_message_visibility_public": "عامة",
+    "chat_message_visibility_private": "ملاحظات شخصية",
+    "chat_message_visibility_malkovich": "مالكوفيتش",
+    "chat_message_placeholder_private": "ملاحظة شخصية، مرئية لك فقط…",
+    "chat_message_placeholder_malkovich": "مالكوفيتش، مرئية للجميع عند انتهاء المباراة…",
+    "chat_new_messages": "جديد",
+    "set_password": "تعيين كلمة مرور",
+    "set_password_explain": "لا يملك حسابك كلمة مرور بعد. عيّن كلمة مرور لتتمكن أيضًا من تسجيل الدخول باسم المستخدم \"{{login}}\".",
+    "saved": "تم الحفظ",
+    "or": "أو",
+    "log_in_with_discord": "تسجيل الدخول عبر Discord",
+    "must_be_logged_in": "يجب تسجيل الدخول",
+    "same_pseudo": "هذا هو اسم المستخدم الحالي بالفعل",
+    "pseudo_change_limit_reached": "تم تغيير اسم المستخدم مرات كثيرة مؤخرًا",
+    "must_set_password_first": "عيّن كلمة مرور أولًا، وإلا فلن تتمكن من تسجيل الدخول بعد ذلك",
+    "discord_login_failed": "فشل تسجيل الدخول عبر Discord، يُرجى المحاولة مجددًا",
+    "discord_login_cancelled": "أُلغي تسجيل الدخول عبر Discord",
+    "discord_already_linked": "حساب Discord هذا مرتبط بالفعل بحساب PlayHex آخر",
+    "discord_account_creation_rate_limited": "تم إنشاء حسابات كثيرة مؤخرًا، يُرجى المحاولة لاحقًا",
+    "change_pseudo": {
+        "title": "تغيير اسم المستخدم",
+        "new_pseudo": "اسم المستخدم الجديد",
+        "submit": "تغيير اسم المستخدم",
+        "confirm": "تغيير اسم المستخدم إلى \"{{pseudo}}\"؟",
+        "success": "تم تغيير اسم المستخدم.",
+        "next_allowed_at": "تم تغيير اسم المستخدم مرات كثيرة مؤخرًا. يمكن تغييره مجددًا في {{date}}.",
+        "old_pseudo_released": "سيصبح اسم المستخدم القديم متاحًا للاعبين الآخرين. ستُعاد توجيه روابط عنوان ملفك القديم إلى الجديد. وسيتم تسجيل الدخول باسم المستخدم الجديد.",
+        "remaining_zero": "لا يمكن تغيير اسم المستخدم مرة أخرى خلال 30 يومًا.",
+        "remaining_one": "يمكن تغيير اسم المستخدم مرة واحدة أخرى خلال 30 يومًا.",
+        "remaining_two": "يمكن تغيير اسم المستخدم مرتين أخريين خلال 30 يومًا.",
+        "remaining_few": "يمكن تغيير اسم المستخدم {{count}} مرات أخرى خلال 30 يومًا.",
+        "remaining_many": "يمكن تغيير اسم المستخدم {{count}} مرة أخرى خلال 30 يومًا.",
+        "remaining_other": "يمكن تغيير اسم المستخدم {{count}} مرة أخرى خلال 30 يومًا.",
+        "former_pseudo_note_zero": "لن يعرض ملفك \"سابقًا {pseudo}\".",
+        "former_pseudo_note_one": "سيعرض ملفك \"سابقًا {pseudo}\" لمدة يوم واحد.",
+        "former_pseudo_note_two": "سيعرض ملفك \"سابقًا {pseudo}\" لمدة يومين.",
+        "former_pseudo_note_few": "سيعرض ملفك \"سابقًا {pseudo}\" لمدة {{count}} أيام.",
+        "former_pseudo_note_many": "سيعرض ملفك \"سابقًا {pseudo}\" لمدة {{count}} يومًا.",
+        "former_pseudo_note_other": "سيعرض ملفك \"سابقًا {pseudo}\" لمدة {{count}} يوم."
+    },
+    "formerly": "سابقًا",
+    "discord_account": {
+        "title": "Discord",
+        "private": "لا يرى حساب Discord المرتبط سواك، ولا يظهر في ملفك الشخصي.",
+        "explain": "اربط حساب Discord لتسجيل الدخول عبر Discord.",
+        "link": "ربط حساب Discord الخاص بي",
+        "linked_to": "مرتبط بحساب Discord {username}. يمكن تسجيل الدخول عبر Discord.",
+        "unlink": "إلغاء الربط",
+        "unlink_confirm": "إلغاء ربط حساب Discord؟ لن يعود بالإمكان تسجيل الدخول عبر Discord.",
+        "set_password_to_unlink": "لإلغاء ربط حساب Discord، عيّن كلمة مرور أولًا لتبقى قادرًا على تسجيل الدخول."
+    },
+    "recovery_email": {
+        "title": "بريد الاسترداد",
+        "explain": "اختياري. يُستخدم للتواصل بشأن أمان حسابك، مثلًا عند فقدان كلمة المرور.",
+        "email": "البريد الإلكتروني",
+        "private": "بريدك الإلكتروني خاص، ولا يُعرض أبدًا للاعبين الآخرين. اتركه فارغًا لحذفه.",
+        "invalid": "بريد إلكتروني غير صالح"
+    },
+    "cancel_request": {
+        "ask": "اقتراح الإلغاء",
+        "player_wants_to_cancel": "يقترح {{ player }} إلغاء المباراة",
+        "player_wants_to_cancel_female": "تقترح {{ player }} إلغاء المباراة",
+        "accept": "قبول الإلغاء",
+        "reject": "رفض",
+        "request_denied": "رُفض طلب {{ player }} لإلغاء المباراة.",
+        "game_canceled_by_agreement": "أُلغيت المباراة باتفاق الطرفين، باقتراح من {{ player }}.",
+        "confirm_overlay": {
+            "title": "اقتراح إلغاء المباراة؟",
+            "message": "يُرسَل طلب إلى خصمك، ويمكنه قبوله أو رفضه. عند القبول تُلغى المباراة ولا تُحتسب.",
+            "confirmLabel": "نعم، أرسل الطلب",
+            "cancelLabel": "لا، متابعة اللعب"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer مباشر",
+        "tab_live": "مباشر",
+        "tab_play": "العب",
+        "bot_unavailable": "غير متاح",
+        "tab_chat": "الدردشة",
+        "live": "مباشر",
+        "stream": "بث",
+        "stream_description": "شارك رابطًا: يمكن لأي شخص متابعة تحليلك مباشرة، ورؤية مؤشرك، والدردشة.",
+        "start_stream": "بدء البث",
+        "stop_stream": "إيقاف البث",
+        "share_link": "رابط للمشاركة",
+        "copy_link": "نسخ الرابط",
+        "match": "اللعب من هذه الوضعية",
+        "match_description": "العب مباراة من الوضعية على اللوحة، ضد روبوت أو لاعب آخر. عند انتهائها تُضاف المباراة إلى تحليلك كتفرّع.",
+        "i_play": "ألعب",
+        "opponent": "الخصم",
+        "opponent_player": "لاعب",
+        "invite_player_optional": "دعوة لاعب (اختياري)",
+        "invite_player_help": "يتلقى المدعو إشعارًا ويكون الوحيد القادر على الانضمام. وإلا، يمكن لأول من يفتح الرابط أن يلعب.",
+        "validate_setup_first": "اعتمد وضعية الإعداد أولًا.",
+        "start_match": "بدء المباراة",
+        "back_to_analysis": "العودة إلى التحليل",
+        "back_to_match": "العودة إلى المباراة",
+        "waiting_for_opponent": "في انتظار خصم…",
+        "waiting_for_player": "في انتظار {{pseudo}}…",
+        "you": "أنت",
+        "your_turn": "دورك",
+        "swap_hint": "انقر على الحجر للتبديل.",
+        "wins": "يفوز",
+        "wins_by_resignation": "يفوز بالاستسلام",
+        "match_expired": "انتهت المباراة: لم تُلعب أي نقلة لمدة طويلة.",
+        "match_canceled": "أُلغيت المباراة.",
+        "join_match": "العب هذه المباراة",
+        "cancel_match": "إلغاء المباراة",
+        "hosted_by": "يستضيفها",
+        "session_ended": "انتهت هذه الجلسة.",
+        "waiting_for_stream": "في انتظار البث…",
+        "open_copy": "فتح نسخة",
+        "open_copy_failed": "تعذّر فتح نسخة.",
+        "invitation_toast": "يدعوك {{pseudo}} للعب مباراة من وضعية في Hexplorer.",
+        "invitation_open": "فتح",
+        "live_elsewhere": "أنت تبث مباشرة بالفعل من دراسة أخرى. جلسة مباشرة واحدة فقط في كل مرة.",
+        "go_to_live_study": "الانتقال إليها",
+        "back_to_live": "بث Hexplorer الخاص بك ما زال جاريًا: عُد إليه",
+        "errors": {
+            "session_not_found": "هذه الجلسة المباشرة لم تعد موجودة.",
+            "already_live": "أنت تبث مباشرة بالفعل في تبويب آخر. أوقفه أولًا.",
+            "not_host": "يمكن للمضيف فقط القيام بذلك.",
+            "match_already_running": "هناك مباراة جارية بالفعل.",
+            "position_already_won": "هذه الوضعية محسومة بالفعل.",
+            "bot_unavailable": "هذا الروبوت غير متاح حاليًا.",
+            "invalid_invited_player": "لا يمكن دعوة هذا اللاعب.",
+            "cannot_join": "لا يمكنك الانضمام إلى هذه المباراة.",
+            "match_not_playing": "هذه المباراة لا تُلعب حاليًا.",
+            "not_your_turn": "ليس دورك.",
+            "not_a_player": "أنت لا تلعب في هذه المباراة.",
+            "invalid_data": "بيانات غير صالحة.",
+            "illegal_move": "لا يمكن لعب هذه النقلة.",
+            "study_required": "احفظ التحليل كدراسة أولًا."
+        }
+    },
+    "social_preview": {
+        "default_description": "العب لعبة اللوحة هيكس عبر الإنترنت، ضد لاعبين آخرين أو ضد الذكاء الاصطناعي. بطولات، ألغاز، تحليل المباريات.",
+        "by": "بواسطة {{author}}",
+        "game": {
+            "canceled_title": "مباراة هيكس ملغاة",
+            "canceled_description": "أُلغيت مباراة هيكس {{boardsize}} هذه.",
+            "waiting_title": "مباراة هيكس مفتوحة من {{player}}",
+            "waiting_title_anonymous": "مباراة هيكس مفتوحة",
+            "waiting_description": "مباراة هيكس {{boardsize}}، {{timeControl}}، في انتظار خصم. انضم إليها على PlayHex.",
+            "ranked": "مصنّفة",
+            "friendly": "ودية",
+            "playing_description": "المباراة جارية، شاهدها مباشرة على PlayHex.",
+            "outcome_path": "{{winner}}: فوز بربط الجانبين",
+            "outcome_resign": "{{winner}}: فوز بالاستسلام",
+            "outcome_time": "{{winner}}: فوز بالوقت",
+            "outcome_forfeit": "{{winner}}: فوز بالانسحاب",
+            "winner": "الفوز لـ {{winner}}",
+            "image_alt": "الوضعية النهائية لمباراة هيكس {{title}}",
+            "open_game": "مباراة مفتوحة",
+            "join": "انضم إليها على PlayHex",
+            "playing": "المباراة جارية",
+            "cadency_live": "مباشر",
+            "cadency_correspondence": "بالمراسلة",
+            "n_moves_zero": "لا نقلات",
+            "n_moves_one": "نقلة واحدة",
+            "n_moves_two": "نقلتان",
+            "n_moves_few": "{{count}} نقلات",
+            "n_moves_many": "{{count}} نقلة",
+            "n_moves_other": "{{count}} نقلة"
+        },
+        "tournament": {
+            "starts_at": "يبدأ {{date}}",
+            "running": "البطولة جارية",
+            "rank_1": "الأول: {{player}}",
+            "rank_2": "الثاني: {{player}}",
+            "rank_3": "الثالث: {{player}}",
+            "canceled": "أُلغيت البطولة",
+            "hex_tournament": "بطولة هيكس",
+            "n_registered_zero": "لا لاعبين مسجلين",
+            "n_registered_one": "لاعب واحد مسجّل",
+            "n_registered_two": "لاعبان مسجّلان",
+            "n_registered_few": "{{count}} لاعبين مسجّلين",
+            "n_registered_many": "{{count}} لاعبًا مسجّلًا",
+            "n_registered_other": "{{count}} لاعب مسجّل",
+            "n_participants_zero": "لا مشاركين",
+            "n_participants_one": "مشارك واحد",
+            "n_participants_two": "مشاركان",
+            "n_participants_few": "{{count}} مشاركين",
+            "n_participants_many": "{{count}} مشاركًا",
+            "n_participants_other": "{{count}} مشارك"
+        },
+        "tournament_series": {
+            "next": "التالية: {{title}}، {{date}}",
+            "hex_tournaments": "بطولات هيكس",
+            "n_editions_zero": "لم تُلعب أي نسخة",
+            "n_editions_one": "نسخة واحدة لُعبت",
+            "n_editions_two": "نسختان لُعبتا",
+            "n_editions_few": "{{count}} نسخ لُعبت",
+            "n_editions_many": "{{count}} نسخة لُعبت",
+            "n_editions_other": "{{count}} نسخة لُعبت"
+        },
+        "puzzle": {
+            "default_title": "لغز هيكس",
+            "red_to_play": "الأحمر يلعب ويفوز",
+            "blue_to_play": "الأزرق يلعب ويفوز",
+            "label": "لغز",
+            "hex_puzzle_by": "لغز هيكس من {{author}}"
+        },
+        "hexplorer_study": {
+            "default_title": "دراسة Hexplorer",
+            "label": "دراسة",
+            "hex_study_by": "دراسة هيكس من {{author}}"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "ألغاز هيكس من {{author}}",
+            "n_puzzles_zero": "لا ألغاز هيكس",
+            "n_puzzles_one": "لغز هيكس واحد",
+            "n_puzzles_two": "لغزا هيكس",
+            "n_puzzles_few": "{{count}} ألغاز هيكس",
+            "n_puzzles_many": "{{count}} لغزًا في هيكس",
+            "n_puzzles_other": "{{count}} لغز هيكس"
+        },
+        "player": {
+            "title": "{{player}}، لاعب هيكس",
+            "title_female": "{{player}}، لاعبة هيكس",
+            "bot": "ذكاء اصطناعي لهيكس",
+            "rating": "التصنيف {{rating}}",
+            "member_since": "عضو منذ {{date}}",
+            "on_playhex": "يلعب على PlayHex",
+            "on_playhex_female": "تلعب على PlayHex",
+            "n_games_zero": "لم تُلعب أي مباراة",
+            "n_games_one": "مباراة واحدة لُعبت",
+            "n_games_two": "مباراتان لُعبتا",
+            "n_games_few": "{{count}} مباريات لُعبت",
+            "n_games_many": "{{count}} مباراة لُعبت",
+            "n_games_other": "{{count}} مباراة لُعبت"
+        },
+        "ladder": {
+            "king": "الملك: {{player}}",
+            "king_female": "الملكة: {{player}}",
+            "reign_zero": "يحكم منذ {{duration}}، بلا دفاعات",
+            "reign_one": "يحكم منذ {{duration}}، دفاع واحد",
+            "reign_two": "يحكم منذ {{duration}}، دفاعان",
+            "reign_few": "يحكم منذ {{duration}}، {{count}} دفاعات",
+            "reign_many": "يحكم منذ {{duration}}، {{count}} دفاعًا",
+            "reign_other": "يحكم منذ {{duration}}، {{count}} دفاع",
+            "n_players_zero": "لا لاعبين على التل",
+            "n_players_one": "لاعب واحد على التل",
+            "n_players_two": "لاعبان على التل",
+            "n_players_few": "{{count}} لاعبين على التل",
+            "n_players_many": "{{count}} لاعبًا على التل",
+            "n_players_other": "{{count}} لاعب على التل"
+        },
+        "static": {
+            "puzzles": {
+                "title": "ألغاز هيكس",
+                "description": "حُلّ ألغاز هيكس التي أنشأها المجتمع، من المبتدئ إلى الخبير، وأنشئ ألغازك."
+            },
+            "tournaments": {
+                "title": "بطولات هيكس",
+                "description": "شارك في بطولات هيكس عبر الإنترنت: مباشرة وبالمراسلة، بالنظام السويسري وبالإقصاء."
+            },
+            "tournament_series": {
+                "title": "سلاسل بطولات هيكس",
+                "description": "بطولات هيكس متكررة: تابع سلسلة لتعرف موعد النسخة التالية."
+            },
+            "ladders": {
+                "title": "ملك التل",
+                "description": "اصعد سلّم هيكس: تحدَّ اللاعبين فوقك، وخذ مقاعدهم، ودافع عن العرش."
+            },
+            "games_archive": {
+                "title": "أرشيف مباريات هيكس",
+                "description": "تصفّح وابحث في جميع مباريات هيكس التي لُعبت على PlayHex."
+            },
+            "videos": {
+                "title": "فيديوهات هيكس",
+                "description": "فيديوهات عن هيكس من صنع المجتمع: دروس، استراتيجية، مراجعات مباريات."
+            },
+            "statistics": {
+                "title": "إحصاءات PlayHex",
+                "description": "المباريات واللاعبون وأحجام اللوحات ونسب الفوز على PlayHex."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "استكشف وضعيات هيكس بتحليل الذكاء الاصطناعي."
+            },
+            "swap_maps": {
+                "title": "خرائط التبديل في هيكس",
+                "description": "أي نقلات افتتاحية ينبغي تبديلها لكل حجم لوحة، بحسابات KataHex."
+            },
+            "guide": {
+                "title": "دليل PlayHex",
+                "description": "كيف تلعب هيكس على PlayHex: القواعد، تحليل الذكاء الاصطناعي، النقلات الشرطية، الإشراف."
+            },
+            "export_games_data": {
+                "title": "تصدير بيانات مباريات PlayHex",
+                "description": "نزّل مجموعة بيانات لجميع مباريات هيكس التي لُعبت على PlayHex، قابلة لإعادة الاستخدام بحرية."
+            },
+            "guide_ai_analysis": {
+                "title": "تحليل المباريات بالذكاء الاصطناعي",
+                "description": "راجع مبارياتك في هيكس بالذكاء الاصطناعي: اكتشف أخطاءك الفادحة، وشاهد أفضل النقلات، واعرف متى كسبت الأفضلية أو خسرتها."
+            },
+            "guide_conditional_moves": {
+                "title": "النقلات الشرطية",
+                "description": "العب مباريات هيكس بالمراسلة أسرع: خطّط لردودك على نقلات خصمك القادمة، والعب السلالم تلقائيًا."
+            },
+            "tutorial_rules": {
+                "title": "قواعد هيكس",
+                "description": "تعلّم قاعدتي هيكس في دقائق عبر درس تفاعلي، ثم العب مبارياتك الأولى ضد روبوت."
+            },
+            "tutorial_swap": {
+                "title": "قاعدة التبديل في هيكس",
+                "description": "تحافظ قاعدة التبديل على توازن مباريات هيكس."
+            },
+            "tutorial_bridge": {
+                "title": "الجسر في هيكس",
+                "description": "الجسر هو أهم شكل في هيكس: حجران متصلان دون أن يتلامسا. تعرّف على طريقة عمله وتدرّب بالألغاز."
+            },
+            "tutorial_block": {
+                "title": "استراتيجية هيكس للمبتدئين: اسدد لتفوز",
+                "description": "في هيكس، السدّ يبني طريقك أنت: أفضل استراتيجية في بداية المباراة."
+            },
+            "tutorial_ziggurat": {
+                "title": "قالب الزقورة في هيكس",
+                "description": "الزقورة هي الشكل الثاني الذي يجب معرفته في هيكس: حجر في الصف الثالث متصل بحافته. تعرّف على طريقة عمله وتدرّب بالألغاز."
+            },
+            "cijm_2025": {
+                "title": "بطولة هيكس – باريس 2025",
+                "description": "بطولتا هيكس يومي 14 و15 يونيو 2025، في معرض الثقافة والألعاب الرياضية، ساحة سان سولبيس، باريس. مجانًا، لجميع المستويات."
+            },
+            "cijm_2026": {
+                "title": "بطولة هيكس – باريس 2026",
+                "description": "بطولة هيكس عملاقة يوم الأحد 24 مايو 2026، في معرض الثقافة والألعاب الرياضية، ساحة سان سولبيس، باريس. مجانًا، لجميع المستويات، من سن 8 سنوات."
+            }
+        },
+        "n_days_zero": "لا أيام",
+        "n_days_one": "يوم واحد",
+        "n_days_two": "يومان",
+        "n_days_few": "{{count}} أيام",
+        "n_days_many": "{{count}} يومًا",
+        "n_days_other": "{{count}} يوم",
+        "n_hours_zero": "لا ساعات",
+        "n_hours_one": "ساعة واحدة",
+        "n_hours_two": "ساعتان",
+        "n_hours_few": "{{count}} ساعات",
+        "n_hours_many": "{{count}} ساعة",
+        "n_hours_other": "{{count}} ساعة"
+    },
+    "game_outcome": {
+        "path": "الاتصال",
+        "resign": "الاستسلام",
+        "time": "الوقت",
+        "forfeit": "الانسحاب"
+    },
+    "has_chat_messages": "بها رسائل دردشة",
+    "has_analyze": "بها تحليل ذكاء اصطناعي",
+    "has_malkovich_messages": "بها سجلات مالكوفيتش",
+    "game_content_filter": "المحتوى",
+    "filters": "عوامل التصفية",
+    "reset_filters": "إعادة ضبط عوامل التصفية",
+    "reset_dates": "إعادة ضبط التواريخ",
+    "game_type": "نوع المباراة",
+    "game_state_filter": "الحالة",
+    "opponent_or_players": "اللاعبون",
+    "one_or_two_players_help": "لاعب واحد: مباريات هذا اللاعب. لاعبان: المباريات بينهما.",
+    "search_opponent": "الخصم",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "كل عوامل التصفية",
+    "hide_filters": "عوامل تصفية أقل",
+    "week_of": "أسبوع {{date}}",
+    "chart_grouping": {
+        "label": "التجميع حسب",
+        "auto": "تلقائي",
+        "day": "اليوم",
+        "week": "الأسبوع",
+        "month": "الشهر"
+    },
+    "n_games_found_zero": "لم يُعثر على أي مباراة.",
+    "n_games_found_one": "عُثر على مباراة واحدة.",
+    "n_games_found_two": "عُثر على مباراتين.",
+    "n_games_found_few": "عُثر على {{count}} مباريات.",
+    "n_games_found_many": "عُثر على {{count}} مباراة.",
+    "n_games_found_other": "عُثر على {{count}} مباراة."
 }

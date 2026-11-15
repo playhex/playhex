@@ -8,7 +8,9 @@
         "open_live_games": "Gå med i ett liveparti",
         "open_correspondence_games": "Gå med i ett korrespondensparti",
         "no_open_live_games": "Inga öppna livepartier just nu",
-        "no_open_correspondence_games": "Inga öppna korrespondenspartier just nu"
+        "no_open_correspondence_games": "Inga öppna korrespondenspartier just nu",
+        "multiple_waiting_games": "Flera väntande partier:",
+        "others_canceled_once_one_accepted": "När ett av dina väntande partier accepteras avbryts de andra."
     },
     "game": {
         "title": "Spel",
@@ -35,13 +37,19 @@
         "playing": "Spelar",
         "watch": "Titta",
         "title_your_turn": "Din tur!",
-        "title_waiting": "Väntar på en motståndare: värd är"
+        "title_waiting": "Väntar på en motståndare: värd är",
+        "winner": "Vinnare",
+        "loser": "Förlorare",
+        "issue": "Resultat",
+        "moves_count": "Drag"
     },
     "game_rules": {
         "normal": "standard",
         "host_plays_first": "värden spelar först",
         "host_plays_second": "värden spelar andra",
-        "no_swap": "ingen byte"
+        "no_swap": "ingen byte",
+        "handicap_for_host": "handikapp {{n}} för värden",
+        "handicap_for_opponent": "handikapp {{n}} för motståndaren"
     },
     "game_state": {
         "created": "Skapad",
@@ -66,7 +74,8 @@
             "notifications": "Aviseringar",
             "ai_workers": "AI-workers",
             "connected_applications": "Anslutna applikationer",
-            "technical_info": "Teknisk info"
+            "technical_info": "Teknisk info",
+            "security": "Säkerhet"
         },
         "audio": "Ljud",
         "moderation": "Moderering"
@@ -111,7 +120,33 @@
     "handicap": {
         "title": "Handikapp",
         "none": "inget",
-        "handicap_for_player": "{{n}} för {{player}}"
+        "handicap_for_player": "{{n}} för {{player}}",
+        "you": "du",
+        "opponent": "motståndare",
+        "ai": "AI",
+        "increase": "Öka handikapp",
+        "decrease": "Minska handikapp",
+        "setup": {
+            "first_stone_then": "{{player}} placerar en bytbar sten, sedan {{count}} till, eller {{swappedCount}} vid byte.",
+            "first_stone_then_you": "Placera en bytbar sten, sedan {{count}} till, eller {{swappedCount}} vid byte.",
+            "first_stone_for_blue": "{{player}} placerar en bytbar sten, sedan spelar {{beneficiary}} {{count}} drag.",
+            "first_stone_for_blue_you": "Placera en bytbar sten, sedan spelar {{beneficiary}} {{count}} drag.",
+            "first_stone_for_blue_beneficiary": "{{player}} placerar en bytbar sten, sedan spelar du {{count}} drag.",
+            "swap_decision": "{{player}} väljer om det ska bytas: {{beneficiary}} placerar sedan {{swappedCount}} stenar, eller {{count}} om det avböjs.",
+            "swap_decision_you": "Klicka på stenen för att byta: {{beneficiary}} placerar sedan {{swappedCount}} stenar, eller {{count}} om du avböjer.",
+            "swap_decision_beneficiary": "{{player}} väljer om det ska bytas: du placerar sedan {{swappedCount}} stenar, eller {{count}} om det avböjs.",
+            "stones_after_swap": "Sten bytt: {{player}} placerar {{count}} stenar.",
+            "stones_after_swap_you": "Sten bytt: placera {{count}} stenar.",
+            "refuse_swap": "Byt inte",
+            "no_swap_one": "Byte avstängt: {{player}} placerar 1 sten.",
+            "no_swap_other": "Byte avstängt: {{player}} placerar {{count}} stenar.",
+            "no_swap_you_one": "Byte avstängt: placera 1 sten.",
+            "no_swap_you_other": "Byte avstängt: placera {{count}} stenar.",
+            "stones_one": "{{player}} placerar 1 sten till.",
+            "stones_other": "{{player}} placerar {{count}} stenar till.",
+            "stones_you_one": "Placera 1 sten till.",
+            "stones_you_other": "Placera {{count}} stenar till."
+        }
     },
     "2dots": "{{s}}:",
     "game_created_by_player_time_ago": "Spel skapat av {player}, {timeAgo}.",
@@ -151,7 +186,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "Se hur du kan beräkna AI-drag för PlayHex från din dator",
-        "engine_unavailable": "Vissa AI-motorer har ingen worker online just nu, dessa AI:er är inte tillgängliga."
+        "engine_unavailable": "Vissa AI-motorer har ingen worker online just nu, dessa AI:er är inte tillgängliga.",
+        "ai_not_available": "Inte tillgänglig just nu"
     },
     "game_analysis": {
         "game_analysis": "AI-spelanalys",
@@ -210,7 +246,12 @@
     },
     "1vAI_friendly": {
         "title": "Spela mot AI",
-        "create": "Spela mot AI"
+        "create": "Spela mot AI",
+        "easy": "Lätt",
+        "medium": "Medel",
+        "hard": "Svår",
+        "beaten": "Redan besegrad",
+        "unlock_stronger_ais": "Visa fler AI-alternativ"
     },
     "1vAI_offline": {
         "title": "Offline-AI",
@@ -539,7 +580,12 @@
         "block_at_a_distance": "Placera inte din sten precis intill motståndarens: en angränsande blockering är lätt att gå runt. Blockera längre bort och lämna lite utrymme: du får tid att svara på dess drag.",
         "block_remember": "Kom ihåg: i Hex är ett bra drag både defensivt och offensivt.",
         "ziggurat_defense_1": "Blå tränger in i mitten: Röd svarar bredvid sin sten och gör en brygga med kanten.",
-        "ziggurat_defense_2": "Blå tränger in på första raden: Röd svarar med en brygga, och den nya stenen är kopplad till kanten."
+        "ziggurat_defense_2": "Blå tränger in på första raden: Röd svarar med en brygga, och den nya stenen är kopplad till kanten.",
+        "demo_0_play": "Spela",
+        "chapters": {
+            "hex_rule": "I. Hex-regler",
+            "beginners_strategy": "II. Strategi för nybörjare"
+        }
     },
     "undo": {
         "undo_move": "Ta tillbaka",
@@ -782,7 +828,8 @@
         "channel_slow_mode": "långsamt läge",
         "challenge_player": "utmana en spelare",
         "challenge_same_target": "utmana denna spelare igen",
-        "analyze_position": "analysera positioner"
+        "analyze_position": "analysera positioner",
+        "create_hexplorer_study": "skapa Hexplorer-studier"
     },
     "observe_all_playing_games": "Titta på alla pågående partier",
     "enable_notifications_overlay": {
@@ -855,7 +902,57 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Kopiera från \"Debugging information\" under spelbrädet",
         "engine_unavailable": "Ingen AI-worker är online för denna motor just nu, positioner kan inte analyseras.",
-        "analysis_failed": "Kunde inte analysera denna position."
+        "analysis_failed": "Kunde inte analysera denna position.",
+        "analyze_in_hexplorer": "Analysera i Hexplorer",
+        "play_from_position": "Spela från en position",
+        "tab_file": "Fil",
+        "tab_tree": "Träd",
+        "comment": "Kommentar",
+        "comment_placeholder": "Kommentera den här positionen…",
+        "current_study": "Aktuell studie",
+        "new_study": "Ny studie",
+        "study_title": "Studiens titel",
+        "study_default_title": "Namnlös studie",
+        "study_by": "Av {{author}}",
+        "study_fork": "Forka",
+        "study_fork_help": "Spara din egen kopia av studien med ändringarna",
+        "study_forked_from": "Forkad från",
+        "study_share": "Dela den här studien",
+        "study_link_copied": "Länk kopierad",
+        "study_delete": "Radera den här studien",
+        "study_delete_confirm": "Radera den här studien? Länken till den slutar fungera.",
+        "study_too_large": "Studien är för stor för att sparas: ta bort några grenar eller kommentarer.",
+        "study_not_found": "Den här studien finns inte eller har raderats.",
+        "study_unsaved_changes": "Osparade ändringar",
+        "study_save_shortcut": "Spara studie (Ctrl+S)",
+        "study_validate_setup_first": "Avsluta uppställningsläget för att spara studien.",
+        "study_save_to_share": "Spara studien för att forka eller dela den.",
+        "my_studies": "Mina studier",
+        "export": "Exportera",
+        "study_sort": "Sortera studier",
+        "study_sort_date_desc": "Nyaste",
+        "study_sort_date_asc": "Äldsta",
+        "study_sort_title_asc": "Namn A–Ö",
+        "study_sort_title_desc": "Namn Ö–A",
+        "tools_history": "Historik",
+        "tools_stones": "Stenar",
+        "tools_marks": "Markeringar",
+        "tools_label": "Etikett",
+        "study_discard_confirm": "Du har osparade ändringar, de går förlorade. Fortsätta?",
+        "tab_help": "Hjälp",
+        "help_what_title": "Vad är Hexplorer?",
+        "help_what": "Ett gratis analysbräde för Hex: utforska vilken position som helst, prova flera varianter och se vad AI:n tycker om dem.",
+        "help_why_title": "Varför använda det?",
+        "help_why": "För att förstå dina partier, hitta bättre drag och dela dina idéer om en position med andra spelare.",
+        "help_how_title": "Så använder du det",
+        "help_how_play": "Placera stenar fritt för att bygga en egen position",
+        "help_how_import": "eller importera ett Hex-parti från en länk eller text",
+        "help_how_ai": "Stapeln till vänster om brädet visar vem som vinner, och brädet visar de drag AI:n överväger.",
+        "help_how_setup": "I uppställningsläget kan du lägga till markeringar på brädet och fritt redigera en position",
+        "help_how_file": "Spara din studie (Ctrl+S), dela den eller exportera den som SGF",
+        "help_dismiss": "Uppfattat, visa inte igen",
+        "study_nodes_one": "{{count}} nod",
+        "study_nodes_other": "{{count}} noder"
     },
     "player_menu": {
         "open_menu": "Öppna spelarmenyn",
@@ -874,7 +971,8 @@
         "reserved_for_other_player": "Detta parti är en utmaning reserverad för en annan spelare.",
         "reserved_for_other_player_named": "Detta parti är en utmaning reserverad för {{pseudo}}.",
         "other": "Du kan inte gå med i detta parti.",
-        "game_canceled": "Detta parti har avbrutits."
+        "game_canceled": "Detta parti har avbrutits.",
+        "is_host_closed": "Det här partiet är stängt: bara någon med länken till partiet kan gå med."
     },
     "board_mount_error": {
         "error": "Brädet kunde inte visas, ett fel uppstod:",
@@ -1238,7 +1336,17 @@
             "fixed_fill_twice": "{{move}} har en fast färg två gånger",
             "invalid_type": "Ogiltig {{property}}",
             "solver_unproven_one": "{{count}} position kunde inte lösas i tid, pusslet har bara kontrollerats delvis",
-            "solver_unproven_other": "{{count}} positioner kunde inte lösas i tid, pusslet har bara kontrollerats delvis"
+            "solver_unproven_other": "{{count}} positioner kunde inte lösas i tid, pusslet har bara kontrollerats delvis",
+            "generator_initial_not_winning": "Mohex-lösaren hittar inget vinnande drag här",
+            "generator_depends_on_disabled_cells": "Vinst är bara möjlig med hjälp av rutor utanför problemet: markera stenar anslutna till sin kant i positionssteget",
+            "generator_already_connected": "Det finns redan en förbindelse här, inget att generera",
+            "generator_unproven": "Inget vinnande drag bevisades i tid, grenen lämnades tom",
+            "generator_budget_exceeded": "Trädet är för stort, grenen lämnades tom",
+            "generator_parallel_dropped": "Intrånget {{move}} i en motståndares bro kunde inte läggas till som parallell sekvens, att spela det misslyckar problemet",
+            "generator_accepted_losing": "Det här draget accepteras, men Mohex-lösaren bevisar att det förlorar",
+            "generator_accepted_unproven": "Det här draget accepteras, men Mohex-lösaren bevisar inte att det vinner: det fortsätts inte",
+            "generator_failed_winning": "Det här draget misslyckas, men Mohex-lösaren bevisar att det vinner",
+            "generator_invalid_tree": "Det genererade trädet är ogiltigt ({{error}})"
         },
         "editor": {
             "optional": "Valfritt",
@@ -1403,7 +1511,24 @@
             "warnings_badge_one": "{{count}} kontrollvarning",
             "warnings_badge_other": "{{count}} kontrollvarningar",
             "errors_count_one": "{{count}} problem att åtgärda, se fliken Publicera",
-            "errors_count_other": "{{count}} problem att åtgärda, se fliken Publicera"
+            "errors_count_other": "{{count}} problem att åtgärda, se fliken Publicera",
+            "solver_position": "Position för Mohex",
+            "solver_position_help": "Mohex spelar på hela brädet: kontrollera att rutor utanför problemet är fyllda enligt positionen och att stenar anslutna till en kant är markerade.",
+            "check_section": "Kontrollera problemet",
+            "generate": "Generera träd",
+            "generate_tab": "Generering",
+            "generate_help": "Kompletterar trädet från den valda noden och behåller befintliga drag: vinnande drag och vederläggningar av Mohex, datorns svar av Katahex.",
+            "generate_templates": "Stoppa vid en förbindelse med mall, upp till",
+            "generate_templates_none": "Ingen mall: problemet slutar först när förbindelsen är komplett.",
+            "generate_templates_help": "Problemet slutar så snart förbindelsen är bevisad med den här mallen eller en mindre.",
+            "generate_templates_none_option": "Ingen",
+            "generate_from_node": "Generera från den här noden",
+            "generate_not_here": "Välj i fliken Träd en nod i huvudsekvensen, innan problemet slutar.",
+            "generate_progress": "Löser positioner: {{done}}/{{total}}",
+            "generate_ok": "Träd genererat.",
+            "generate_warnings": "Varningar vid generering ({{count}}):",
+            "generate_stop": "Stoppa",
+            "generate_tree_changed": "Trädet ändrades under genereringen, resultatet ignorerades. Generera igen."
         },
         "next_puzzle": "Nästa pussel",
         "collections": {
@@ -1461,7 +1586,12 @@
         "published_ago": "Publicerad {{date}}",
         "sort_by": "Sortera efter",
         "sort_published_at": "Publiceringsdatum",
-        "sort_created_at": "Datum tillagd"
+        "sort_created_at": "Datum tillagd",
+        "field_secondary_urls": "Andra länkar",
+        "field_secondary_urls_help": "Om videon också är publicerad på andra plattformar (PeerTube, Dailymotion…). Länken ovan förblir huvudlänken.",
+        "add_link": "Lägg till en länk",
+        "remove_link": "Ta bort den här länken",
+        "watch_on": "Titta på {{platform}}"
     },
     "swap_maps": {
         "title": "Byteskartor",
@@ -1529,13 +1659,20 @@
         "opening_moves": "Vanligaste öppningsdragen",
         "opening_moves_note": "För {{boardsize}}-bräden, den mest spelade storleken.",
         "rating_distribution": "Ratingfördelning",
-        "rating_distribution_note": "Endast spelare som inte är bottar och har en stabil rating (avvikelse under {{deviation}}) räknas. Gäster ingår."
+        "rating_distribution_note": "Endast spelare som inte är bottar och har en stabil rating (avvikelse under {{deviation}}) räknas. Gäster ingår.",
+        "lobby_join_chances": "Chans att få en motståndare i ett liveparti",
+        "lobby_join_chances_first_minute": "< 1 min",
+        "lobby_join_chances_next_minutes": "+10 min",
+        "lobby_join_chances_note": "Andel livepartier skapade i lobbyn som får en motståndare inom första minuten, och sedan inom de följande 10 minuterna om ingen gått med efter första minuten. Uppskattat över de senaste 8 veckorna, som om värdarna hade väntat i stället för att avbryta. Tider visas i din lokala tidszon (UTC{{offset}})."
     },
     "ladder": {
         "title": "Kung på berget",
+        "title_female": "Drottning på berget",
         "intro": "En stege, en tron. Utmana en spelare ovanför dig: om du vinner tar du dennes plats. Ju högre du sitter, desto mer måste du försvara.",
         "king": "Kung på berget",
+        "king_female": "Drottning på berget",
         "king_for": "Kung i {{duration}}",
+        "king_for_female": "Drottning i {{duration}}",
         "no_king": "Tronen är tom. Gå med och ta den!",
         "join": "Gå med i Kung på berget",
         "leave": "Lämna detta berg",
@@ -1561,6 +1698,7 @@
         "no_running_challenges": "Ingen pågående utmaning.",
         "vs": "mot",
         "nobody_to_challenge": "Ingen att utmana: du är Kungen!",
+        "nobody_to_challenge_female": "Ingen att utmana: du är Drottningen!",
         "live": "Live",
         "challenge_overlay": {
             "title": "Utmana {{player}}",
@@ -1604,6 +1742,7 @@
             "challenge_defended": "{{opponent}} försvarade sin plats mot {{player}}",
             "challenge_voided": "Partiet {{player}} mot {{opponent}} har avbrutits",
             "new_king": "{{player}} är den nya Kungen på berget!",
+            "new_king_female": "{{player}} är den nya Drottningen på berget!",
             "giant_slayer": "{{player}} är en Jättedödare: störtade {{opponent}}!",
             "climber": "{{player}} vann {{wins}} utmaningar i rad!",
             "strike": "{{player}} överskred tiden i ett parti (varning {{strikes}})",
@@ -1782,5 +1921,356 @@
     "n_messages_one": "{{ count }} meddelande",
     "n_messages_other": "{{ count }} meddelanden",
     "n_interested_one": "{{ count }} intresserad",
-    "n_interested_other": "{{ count }} intresserade"
+    "n_interested_other": "{{ count }} intresserade",
+    "pronouns": {
+        "title": "Pronomen",
+        "explain": "Dessa pronomen är offentliga: de visas på din profil och när någon klickar på ditt användarnamn. De används också för att anpassa gränssnittets texter till dig, och hur det omnämner dig för andra spelare.",
+        "save_error": "Det gick inte att spara pronomen. Försök igen.",
+        "he/him": "han/honom",
+        "she/her": "hon/henne",
+        "they/them": "hen/hen",
+        "unspecified": "Pronomen inte angivna"
+    },
+    "player_popover": {
+        "on_playhex_since": "På PlayHex i {{duration}}"
+    },
+    "closed_game": "Stängt parti",
+    "closed_game_help": "Det här partiet visas inte i andra spelares lobby. Bara personer med länken kan gå med, även om de inte är på PlayHex än.",
+    "closed_game_invite": {
+        "link_label": "Länk att skicka till en vän",
+        "share": "Dela"
+    },
+    "chat_header": {
+        "game_started": "Partiet har börjat",
+        "game_ended": "Partiet är slut",
+        "game_canceled": "Partiet avbröts"
+    },
+    "host_waiting_join_chance_first_minute": "Vid den här tiden på dagen får {{percent}} av partierna en motståndare inom första minuten.",
+    "host_waiting_join_chance_next_minutes": "Ingen har gått med än. Genom att vänta 10 minuter till hittar {{percent}} av värdarna en motståndare.",
+    "match_title_in_tournament": "{{ match }} i {{ tournament }}",
+    "chat_message_visibility": "Meddelandets synlighet",
+    "chat_attach_to_move_toggle": "Visa det här meddelandet under drag {{n}}",
+    "chat_message_visibility_public": "Offentligt",
+    "chat_message_visibility_private": "Personliga anteckningar",
+    "chat_message_visibility_malkovich": "Malkovich",
+    "chat_message_placeholder_private": "Personlig anteckning, bara synlig för dig…",
+    "chat_message_placeholder_malkovich": "Malkovich, synlig för alla när partiet är slut…",
+    "chat_new_messages": "Nytt",
+    "set_password": "Ange ett lösenord",
+    "set_password_explain": "Ditt konto har inget lösenord än. Ange ett lösenord för att även kunna logga in med ditt användarnamn \"{{login}}\".",
+    "saved": "Sparat",
+    "or": "eller",
+    "log_in_with_discord": "Logga in med Discord",
+    "must_be_logged_in": "Du måste vara inloggad",
+    "same_pseudo": "Det här är redan ditt användarnamn",
+    "pseudo_change_limit_reached": "Du har bytt användarnamn för många gånger nyligen",
+    "must_set_password_first": "Ange först ett lösenord, annars skulle du inte kunna logga in längre",
+    "discord_login_failed": "Inloggning med Discord misslyckades, försök igen",
+    "discord_login_cancelled": "Inloggning med Discord avbröts",
+    "discord_already_linked": "Det här Discord-kontot är redan kopplat till ett annat PlayHex-konto",
+    "discord_account_creation_rate_limited": "För många konton har skapats nyligen, försök igen senare",
+    "change_pseudo": {
+        "title": "Byt användarnamn",
+        "new_pseudo": "Nytt användarnamn",
+        "submit": "Byt användarnamn",
+        "confirm": "Byta ditt användarnamn till \"{{pseudo}}\"?",
+        "success": "Ditt användarnamn har ändrats.",
+        "next_allowed_at": "Du har bytt användarnamn för många gånger nyligen. Du kan byta igen den {{date}}.",
+        "old_pseudo_released": "Ditt gamla användarnamn blir tillgängligt för andra spelare. Länkar till din gamla profiladress omdirigeras till den nya. Du loggar också in med ditt nya användarnamn.",
+        "remaining_one": "Du kan byta användarnamn {{count}} gång till inom 30 dagar.",
+        "remaining_other": "Du kan byta användarnamn {{count}} gånger till inom 30 dagar.",
+        "former_pseudo_note_one": "Din profil visar \"tidigare {pseudo}\" i {{count}} dag.",
+        "former_pseudo_note_other": "Din profil visar \"tidigare {pseudo}\" i {{count}} dagar."
+    },
+    "formerly": "tidigare",
+    "discord_account": {
+        "title": "Discord",
+        "private": "Bara du kan se ditt kopplade Discord-konto, det visas inte på din profil.",
+        "explain": "Koppla ditt Discord-konto för att logga in med Discord.",
+        "link": "Koppla mitt Discord-konto",
+        "linked_to": "Kopplat till Discord-kontot {username}. Du kan logga in med Discord.",
+        "unlink": "Koppla från",
+        "unlink_confirm": "Koppla från ditt Discord-konto? Du kommer inte längre kunna logga in med Discord.",
+        "set_password_to_unlink": "För att koppla från ditt Discord-konto, ange först ett lösenord så att du fortfarande kan logga in."
+    },
+    "recovery_email": {
+        "title": "Återställnings-e-post",
+        "explain": "Valfritt. Används för att kontakta dig om ditt kontos säkerhet, t.ex. om du tappar bort ditt lösenord.",
+        "email": "E-post",
+        "private": "Din e-post är privat och visas aldrig för andra spelare. Lämna tomt för att ta bort den.",
+        "invalid": "Ogiltig e-post"
+    },
+    "cancel_request": {
+        "ask": "Föreslå avbrott",
+        "player_wants_to_cancel": "{{ player }} föreslår att avbryta partiet",
+        "accept": "Acceptera avbrott",
+        "reject": "Avböj",
+        "request_denied": "{{ player }}s begäran att avbryta partiet har nekats.",
+        "game_canceled_by_agreement": "Partiet avbröts i samförstånd, föreslaget av {{ player }}.",
+        "confirm_overlay": {
+            "title": "Föreslå att avbryta partiet?",
+            "message": "Detta skickar en begäran till din motståndare, som kan acceptera eller avböja den. Om den accepteras avbryts partiet och räknas inte.",
+            "confirmLabel": "Ja, skicka begäran",
+            "cancelLabel": "Nej, fortsätt spela"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer live",
+        "tab_live": "Live",
+        "tab_play": "Spela",
+        "bot_unavailable": "inte tillgänglig",
+        "tab_chat": "Chatt",
+        "live": "Live",
+        "stream": "Sändning",
+        "stream_description": "Dela en länk: vem som helst kan följa din analys live, se din markör och chatta.",
+        "start_stream": "Starta sändning",
+        "stop_stream": "Stoppa sändning",
+        "share_link": "Länk att dela",
+        "copy_link": "Kopiera länk",
+        "match": "Spela från den här positionen",
+        "match_description": "Spela ett parti från positionen på brädet, mot en bot eller en annan spelare. När det är slut läggs partiet till i din analys som en variant.",
+        "i_play": "Jag spelar",
+        "opponent": "Motståndare",
+        "opponent_player": "En spelare",
+        "invite_player_optional": "Bjud in en spelare (valfritt)",
+        "invite_player_help": "Den inbjudna får en avisering och är den enda som kan gå med. Annars kan den första som öppnar länken spela.",
+        "validate_setup_first": "Bekräfta först uppställningen.",
+        "start_match": "Starta parti",
+        "back_to_analysis": "Tillbaka till analysen",
+        "back_to_match": "Tillbaka till partiet",
+        "waiting_for_opponent": "Väntar på en motståndare…",
+        "waiting_for_player": "Väntar på {{pseudo}}…",
+        "you": "Du",
+        "your_turn": "Din tur",
+        "swap_hint": "Klicka på stenen för att byta.",
+        "wins": "vinner",
+        "wins_by_resignation": "vinner genom uppgivande",
+        "match_expired": "Partiet är slut: inget drag på för länge.",
+        "match_canceled": "Partiet avbröts.",
+        "join_match": "Spela det här partiet",
+        "cancel_match": "Avbryt partiet",
+        "hosted_by": "Värd:",
+        "session_ended": "Den här sessionen har avslutats.",
+        "waiting_for_stream": "Väntar på sändningen…",
+        "open_copy": "Öppna en kopia",
+        "open_copy_failed": "Det gick inte att öppna en kopia.",
+        "invitation_toast": "{{pseudo}} bjuder in dig till ett parti från en Hexplorer-position.",
+        "invitation_open": "Öppna",
+        "live_elsewhere": "Du sänder redan live från en annan studie. Bara en livesession åt gången.",
+        "go_to_live_study": "Gå dit",
+        "back_to_live": "Din Hexplorer-sändning pågår fortfarande: gå tillbaka till den",
+        "errors": {
+            "session_not_found": "Den här livesessionen finns inte längre.",
+            "already_live": "Du sänder redan live i en annan flik. Stoppa den först.",
+            "not_host": "Bara värden kan göra detta.",
+            "match_already_running": "Ett parti pågår redan.",
+            "position_already_won": "Den här positionen är redan vunnen.",
+            "bot_unavailable": "Den här boten är inte tillgänglig just nu.",
+            "invalid_invited_player": "Den här spelaren kan inte bjudas in.",
+            "cannot_join": "Du kan inte gå med i det här partiet.",
+            "match_not_playing": "Det här partiet spelas inte.",
+            "not_your_turn": "Det är inte din tur.",
+            "not_a_player": "Du spelar inte i det här partiet.",
+            "invalid_data": "Ogiltiga data.",
+            "illegal_move": "Det här draget kan inte spelas.",
+            "study_required": "Spara först analysen som en studie."
+        }
+    },
+    "social_preview": {
+        "default_description": "Spela brädspelet Hex online mot andra spelare eller AI. Turneringar, problem, partianalys.",
+        "by": "av {{author}}",
+        "game": {
+            "canceled_title": "Avbrutet Hex-parti",
+            "canceled_description": "Det här Hex-partiet {{boardsize}} har avbrutits.",
+            "waiting_title": "Öppet Hex-parti av {{player}}",
+            "waiting_title_anonymous": "Öppet Hex-parti",
+            "waiting_description": "Hex-parti {{boardsize}}, {{timeControl}}, väntar på en motståndare. Gå med på PlayHex.",
+            "ranked": "rankat",
+            "friendly": "vänskapligt",
+            "playing_description": "Parti pågår, se det live på PlayHex.",
+            "outcome_path": "{{winner}} vann genom att förbinda sina sidor",
+            "outcome_resign": "{{winner}} vann genom uppgivande",
+            "outcome_time": "{{winner}} vann på tid",
+            "outcome_forfeit": "{{winner}} vann på walkover",
+            "winner": "{{winner}} vinner",
+            "image_alt": "Slutposition i Hex-partiet {{title}}",
+            "open_game": "Öppet parti",
+            "join": "Gå med på PlayHex",
+            "playing": "Parti pågår",
+            "cadency_live": "Live",
+            "cadency_correspondence": "Korrespondens",
+            "n_moves_one": "{{count}} drag",
+            "n_moves_other": "{{count}} drag"
+        },
+        "tournament": {
+            "starts_at": "Börjar {{date}}",
+            "running": "Turnering pågår",
+            "rank_1": "1:a: {{player}}",
+            "rank_2": "2:a: {{player}}",
+            "rank_3": "3:e: {{player}}",
+            "canceled": "Turneringen inställd",
+            "hex_tournament": "Hex-turnering",
+            "n_registered_one": "{{count}} spelare anmäld",
+            "n_registered_other": "{{count}} spelare anmälda",
+            "n_participants_one": "{{count}} deltagare",
+            "n_participants_other": "{{count}} deltagare"
+        },
+        "tournament_series": {
+            "next": "Nästa: {{title}}, {{date}}",
+            "hex_tournaments": "Hex-turneringar",
+            "n_editions_one": "{{count}} upplaga spelad",
+            "n_editions_other": "{{count}} upplagor spelade"
+        },
+        "puzzle": {
+            "default_title": "Hex-problem",
+            "red_to_play": "Röd drar och vinner",
+            "blue_to_play": "Blå drar och vinner",
+            "label": "Problem",
+            "hex_puzzle_by": "Hex-problem av {{author}}"
+        },
+        "hexplorer_study": {
+            "default_title": "Hexplorer-studie",
+            "label": "Studie",
+            "hex_study_by": "Hex-studie av {{author}}"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "Hex-problem av {{author}}",
+            "n_puzzles_one": "{{count}} Hex-problem",
+            "n_puzzles_other": "{{count}} Hex-problem"
+        },
+        "player": {
+            "title": "{{player}}, Hex-spelare",
+            "bot": "Hex-AI",
+            "rating": "Rating {{rating}}",
+            "member_since": "Medlem sedan {{date}}",
+            "on_playhex": "Spelare på PlayHex",
+            "n_games_one": "{{count}} parti spelat",
+            "n_games_other": "{{count}} partier spelade"
+        },
+        "ladder": {
+            "king": "Kung: {{player}}",
+            "king_female": "Drottning: {{player}}",
+            "reign_one": "Har regerat i {{duration}}, {{count}} försvar",
+            "reign_other": "Har regerat i {{duration}}, {{count}} försvar",
+            "n_players_one": "{{count}} spelare på berget",
+            "n_players_other": "{{count}} spelare på berget"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Hex-problem",
+                "description": "Lös Hex-problem skapade av gemenskapen, från nybörjare till expert, och skapa egna."
+            },
+            "tournaments": {
+                "title": "Hex-turneringar",
+                "description": "Delta i Hex-turneringar online: live och korrespondens, schweizerformat och utslagsformat."
+            },
+            "tournament_series": {
+                "title": "Hex-turneringsserier",
+                "description": "Återkommande Hex-turneringar: följ en serie för att veta när nästa upplaga spelas."
+            },
+            "ladders": {
+                "title": "Kung på berget",
+                "description": "Klättra på Hex-stegen: utmana spelare ovanför dig, ta deras plats och försvara tronen."
+            },
+            "games_archive": {
+                "title": "Arkiv över Hex-partier",
+                "description": "Bläddra och sök bland alla Hex-partier spelade på PlayHex."
+            },
+            "videos": {
+                "title": "Hex-videor",
+                "description": "Videor om Hex gjorda av gemenskapen: guider, strategi, partigenomgångar."
+            },
+            "statistics": {
+                "title": "PlayHex-statistik",
+                "description": "Partier, spelare, brädstorlekar och vinstandelar på PlayHex."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Utforska Hex-positioner med AI-analys."
+            },
+            "swap_maps": {
+                "title": "Hex-bytkartor",
+                "description": "Vilka öppningsdrag som bör bytas, för varje brädstorlek, beräknat av KataHex."
+            },
+            "guide": {
+                "title": "PlayHex-guide",
+                "description": "Så spelar du Hex på PlayHex: regler, AI-analys, villkorliga drag, moderering."
+            },
+            "export_games_data": {
+                "title": "Exportera PlayHex-partidata",
+                "description": "Ladda ner en datamängd med alla Hex-partier spelade på PlayHex, fri att återanvända."
+            },
+            "guide_ai_analysis": {
+                "title": "AI-partianalys",
+                "description": "Gå igenom dina Hex-partier med AI: hitta dina tabbar, se de bästa dragen och upptäck när du vann eller förlorade fördelen."
+            },
+            "guide_conditional_moves": {
+                "title": "Villkorliga drag",
+                "description": "Spela Hex-korrespondenspartier snabbare: planera dina svar på motståndarens nästa drag och spela stegar automatiskt."
+            },
+            "tutorial_rules": {
+                "title": "Hex-regler",
+                "description": "Lär dig Hex 2 regler på några minuter med en interaktiv guide, och spela sedan dina första partier mot en bot."
+            },
+            "tutorial_swap": {
+                "title": "Bytesregeln i Hex",
+                "description": "Bytesregeln håller Hex-partier balanserade."
+            },
+            "tutorial_bridge": {
+                "title": "Bron i Hex",
+                "description": "Bron är den viktigaste formen i Hex: två stenar som redan är förbundna utan att röra varandra. Lär dig hur den fungerar och öva med problem."
+            },
+            "tutorial_block": {
+                "title": "Hex-strategi för nybörjare: blockera för att vinna",
+                "description": "I Hex bygger blockering din egen väg: den bästa strategin i början av partiet."
+            },
+            "tutorial_ziggurat": {
+                "title": "Ziggurat-mallen i Hex",
+                "description": "Zigguraten är den andra formen att känna till i Hex: en sten på tredje raden förbunden med sin kant. Lär dig hur den fungerar och öva med problem."
+            },
+            "cijm_2025": {
+                "title": "Hex-turnering – Paris 2025",
+                "description": "Två Hex-turneringar den 14 och 15 juni 2025 på Salon Culture & Jeux Mathématiques, Place Saint-Sulpice, Paris. Gratis, alla nivåer."
+            },
+            "cijm_2026": {
+                "title": "Hex-turnering – Paris 2026",
+                "description": "Jättelik Hex-turnering söndagen den 24 maj 2026 på Salon Culture & Jeux Mathématiques, Place Saint-Sulpice, Paris. Gratis, alla nivåer, från 8 år."
+            }
+        },
+        "n_days_one": "{{count}} dag",
+        "n_days_other": "{{count}} dagar",
+        "n_hours_one": "{{count}} timme",
+        "n_hours_other": "{{count}} timmar"
+    },
+    "game_outcome": {
+        "path": "Förbindelse",
+        "resign": "Uppgivande",
+        "time": "Tid",
+        "forfeit": "Walkover"
+    },
+    "has_chat_messages": "Med chattmeddelanden",
+    "has_analyze": "Med AI-analys",
+    "has_malkovich_messages": "Med Malkovich-anteckningar",
+    "game_content_filter": "Innehåll",
+    "filters": "Filter",
+    "reset_filters": "Återställ filter",
+    "reset_dates": "Återställ datum",
+    "game_type": "Partityp",
+    "game_state_filter": "Status",
+    "opponent_or_players": "Spelare",
+    "one_or_two_players_help": "1 spelare: den spelarens partier. 2 spelare: partier mellan dem.",
+    "search_opponent": "Motståndare",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "Alla filter",
+    "hide_filters": "Färre filter",
+    "week_of": "Vecka från {{date}}",
+    "chart_grouping": {
+        "label": "Gruppera efter",
+        "auto": "Auto",
+        "day": "Dag",
+        "week": "Vecka",
+        "month": "Månad"
+    },
+    "n_games_found_one": "{{count}} parti hittat.",
+    "n_games_found_other": "{{count}} partier hittade."
 }

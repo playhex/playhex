@@ -8,7 +8,9 @@
         "open_live_games": "Bergabung ke permainan langsung",
         "open_correspondence_games": "Bergabung ke permainan korespondensi",
         "no_open_live_games": "Belum ada permainan langsung yang terbuka untuk saat ini",
-        "no_open_correspondence_games": "Belum ada permainan korespondensi yang terbuka untuk saat ini"
+        "no_open_correspondence_games": "Belum ada permainan korespondensi yang terbuka untuk saat ini",
+        "multiple_waiting_games": "Beberapa permainan menunggu:",
+        "others_canceled_once_one_accepted": "Setelah salah satu permainan Anda yang menunggu diterima, yang lain dibatalkan."
     },
     "ranked": "Bertingkat",
     "yes": "Ya",
@@ -46,13 +48,19 @@
         "playing": "Sedang bermain",
         "lost": "Kalah",
         "watch": "Tonton",
-        "won": "Menang"
+        "won": "Menang",
+        "winner": "Pemenang",
+        "loser": "Yang kalah",
+        "issue": "Hasil",
+        "moves_count": "Langkah"
     },
     "game_rules": {
         "normal": "standar",
         "host_plays_first": "tuan rumah bermain pertama",
         "no_swap": "tanpa tukar",
-        "host_plays_second": "tuan rumah bermain kedua"
+        "host_plays_second": "tuan rumah bermain kedua",
+        "handicap_for_host": "handicap {{n}} untuk tuan rumah",
+        "handicap_for_opponent": "handicap {{n}} untuk lawan"
     },
     "create_game": {
         "custom_size": "Kustom",
@@ -112,7 +120,8 @@
     },
     "workers": {
         "see_how_to_spawn_a_worker": "Lihat cara menghitung langkah AI untuk PlayHex dari komputer saya",
-        "engine_unavailable": "Beberapa mesin AI tidak memiliki worker yang online saat ini, AI tersebut tidak tersedia."
+        "engine_unavailable": "Beberapa mesin AI tidak memiliki worker yang online saat ini, AI tersebut tidak tersedia.",
+        "ai_not_available": "Tidak tersedia saat ini"
     },
     "game_analysis": {
         "best_move": "langkah terbaik",
@@ -161,7 +170,8 @@
             "notifications": "Notifikasi",
             "ai_workers": "Worker AI",
             "connected_applications": "Aplikasi terhubung",
-            "technical_info": "Info teknis"
+            "technical_info": "Info teknis",
+            "security": "Keamanan"
         },
         "audio": "Audio",
         "moderation": "Moderasi"
@@ -171,7 +181,29 @@
     "handicap": {
         "handicap_for_player": "{{n}} untuk {{player}}",
         "title": "Handicap",
-        "none": "tidak ada"
+        "none": "tidak ada",
+        "you": "Anda",
+        "opponent": "lawan",
+        "ai": "AI",
+        "increase": "Tambah handicap",
+        "decrease": "Kurangi handicap",
+        "setup": {
+            "first_stone_then": "{{player}} meletakkan batu yang bisa ditukar, lalu {{count}} lagi, atau {{swappedCount}} jika ditukar.",
+            "first_stone_then_you": "Letakkan batu yang bisa ditukar, lalu {{count}} lagi, atau {{swappedCount}} jika ditukar.",
+            "first_stone_for_blue": "{{player}} meletakkan batu yang bisa ditukar, lalu {{beneficiary}} memainkan {{count}} langkah.",
+            "first_stone_for_blue_you": "Letakkan batu yang bisa ditukar, lalu {{beneficiary}} memainkan {{count}} langkah.",
+            "first_stone_for_blue_beneficiary": "{{player}} meletakkan batu yang bisa ditukar, lalu Anda memainkan {{count}} langkah.",
+            "swap_decision": "{{player}} memilih apakah akan menukar: {{beneficiary}} lalu meletakkan {{swappedCount}} batu, atau {{count}} jika ditolak.",
+            "swap_decision_you": "Klik batu untuk menukar: {{beneficiary}} lalu meletakkan {{swappedCount}} batu, atau {{count}} jika Anda menolak.",
+            "swap_decision_beneficiary": "{{player}} memilih apakah akan menukar: Anda lalu meletakkan {{swappedCount}} batu, atau {{count}} jika ditolak.",
+            "stones_after_swap": "Batu ditukar: {{player}} meletakkan {{count}} batu.",
+            "stones_after_swap_you": "Batu ditukar: letakkan {{count}} batu.",
+            "refuse_swap": "Jangan tukar",
+            "no_swap_other": "Penukaran dinonaktifkan: {{player}} meletakkan {{count}} batu.",
+            "no_swap_you_other": "Penukaran dinonaktifkan: letakkan {{count}} batu.",
+            "stones_other": "{{player}} meletakkan {{count}} batu lagi.",
+            "stones_you_other": "Letakkan {{count}} batu lagi."
+        }
     },
     "share_game": "Bagikan permainan",
     "2dots": "{{s}}:",
@@ -230,7 +262,12 @@
     },
     "1vAI_friendly": {
         "title": "Mainkan vs AI",
-        "create": "Mainkan vs AI"
+        "create": "Mainkan vs AI",
+        "easy": "Mudah",
+        "medium": "Sedang",
+        "hard": "Sulit",
+        "beaten": "Sudah dikalahkan",
+        "unlock_stronger_ais": "Tampilkan opsi AI lainnya"
     },
     "1vAI_offline": {
         "title": "AI luring",
@@ -647,7 +684,12 @@
         "block_at_a_distance": "Jangan letakkan batu Anda tepat menempel batu lawan: blok yang bersebelahan mudah dikitari. Blokir lebih jauh, sisakan ruang: Anda akan punya waktu untuk menjawab langkahnya.",
         "block_remember": "Ingat: dalam Hex, langkah yang baik bersifat defensif sekaligus ofensif.",
         "ziggurat_defense_1": "Biru menyusup ke tengah: Merah menjawab di samping batunya, dan membentuk jembatan dengan sisi.",
-        "ziggurat_defense_2": "Biru menyusup di baris pertama: Merah menjawab dengan jembatan, dan batu baru terhubung ke sisi."
+        "ziggurat_defense_2": "Biru menyusup di baris pertama: Merah menjawab dengan jembatan, dan batu baru terhubung ke sisi.",
+        "demo_0_play": "Main",
+        "chapters": {
+            "hex_rule": "I. Aturan Hex",
+            "beginners_strategy": "II. Strategi untuk pemula"
+        }
     },
     "donate": "Donasikan ke PlayHex",
     "notifications": "Notifikasi",
@@ -834,7 +876,56 @@
         "abstract_play_url": "Abstract Play: URL",
         "abstract_play_debug": "Abstract Play: Salin dari \"Debugging information\" di bawah papan permainan",
         "engine_unavailable": "Tidak ada worker AI yang online untuk mesin ini saat ini, posisi tidak dapat dianalisis.",
-        "analysis_failed": "Tidak dapat menganalisis posisi ini."
+        "analysis_failed": "Tidak dapat menganalisis posisi ini.",
+        "analyze_in_hexplorer": "Analisis di Hexplorer",
+        "play_from_position": "Main dari sebuah posisi",
+        "tab_file": "Berkas",
+        "tab_tree": "Pohon",
+        "comment": "Komentar",
+        "comment_placeholder": "Komentari posisi ini…",
+        "current_study": "Studi saat ini",
+        "new_study": "Studi baru",
+        "study_title": "Judul studi",
+        "study_default_title": "Studi tanpa judul",
+        "study_by": "Oleh {{author}}",
+        "study_fork": "Fork",
+        "study_fork_help": "Simpan salinan studi ini milik Anda sendiri, beserta perubahannya",
+        "study_forked_from": "Di-fork dari",
+        "study_share": "Bagikan studi ini",
+        "study_link_copied": "Tautan disalin",
+        "study_delete": "Hapus studi ini",
+        "study_delete_confirm": "Hapus studi ini? Tautannya tidak akan berfungsi lagi.",
+        "study_too_large": "Studi ini terlalu besar untuk disimpan: hapus beberapa cabang atau komentar.",
+        "study_not_found": "Studi ini tidak ada atau sudah dihapus.",
+        "study_unsaved_changes": "Perubahan belum disimpan",
+        "study_save_shortcut": "Simpan studi (Ctrl+S)",
+        "study_validate_setup_first": "Selesaikan mode penyusunan untuk menyimpan studi.",
+        "study_save_to_share": "Simpan studi ini untuk mem-fork atau membagikannya.",
+        "my_studies": "Studi saya",
+        "export": "Ekspor",
+        "study_sort": "Urutkan studi",
+        "study_sort_date_desc": "Terbaru",
+        "study_sort_date_asc": "Terlama",
+        "study_sort_title_asc": "Nama A–Z",
+        "study_sort_title_desc": "Nama Z–A",
+        "tools_history": "Riwayat",
+        "tools_stones": "Batu",
+        "tools_marks": "Tanda",
+        "tools_label": "Label",
+        "study_discard_confirm": "Ada perubahan yang belum disimpan, perubahan itu akan hilang. Lanjutkan?",
+        "tab_help": "Bantuan",
+        "help_what_title": "Apa itu Hexplorer?",
+        "help_what": "Papan analisis gratis untuk Hex: jelajahi posisi apa pun, coba beberapa variasi, dan lihat pendapat AI tentangnya.",
+        "help_why_title": "Mengapa menggunakannya?",
+        "help_why": "Untuk memahami permainan Anda, menemukan langkah yang lebih baik, dan berbagi ide tentang suatu posisi dengan pemain lain.",
+        "help_how_title": "Cara menggunakan",
+        "help_how_play": "Letakkan batu dengan bebas untuk membuat posisi sendiri",
+        "help_how_import": "atau impor permainan Hex dari tautan atau teks",
+        "help_how_ai": "Bilah di kiri papan menunjukkan siapa yang unggul, dan papan menunjukkan langkah yang dipertimbangkan AI.",
+        "help_how_setup": "Mode penyusunan memungkinkan Anda menambahkan tanda di papan dan mengedit posisi dengan bebas",
+        "help_how_file": "Simpan studi Anda (Ctrl+S), bagikan, atau ekspor sebagai SGF",
+        "help_dismiss": "Mengerti, jangan tampilkan lagi",
+        "study_nodes_other": "{{count}} node"
     },
     "lobby_challenges_you_badge": "Menantang Anda!",
     "decline_challenge": "Tolak tantangan",
@@ -847,7 +938,8 @@
         "challenge_player": "menantang pemain",
         "challenge_same_target": "menantang pemain ini lagi",
         "channel_slow_mode": "mode lambat",
-        "analyze_position": "menganalisis posisi"
+        "analyze_position": "menganalisis posisi",
+        "create_hexplorer_study": "membuat studi Hexplorer"
     },
     "challenge_player": "Tantang pemain",
     "player_challenged_you": "{{ player }} telah menantang Anda ke sebuah permainan!",
@@ -904,7 +996,11 @@
         "blunders_help": "{{percent}} dari {{sample}} langkah yang dianalisis adalah blunder (policy sangat rendah dibandingkan langkah terbaik), diekstrapolasi ke {{total}} langkah yang pernah dimainkan.",
         "monthly_active_players": "Pemain aktif bulanan",
         "monthly_active_players_help": "Pemain berbeda yang menyelesaikan setidaknya satu permainan ({{minMoves}} langkah atau lebih) selama bulan tersebut. Bulan ini belum lengkap.",
-        "monthly_active_players_average_help": "Rata-rata selama 3 bulan penuh terakhir"
+        "monthly_active_players_average_help": "Rata-rata selama 3 bulan penuh terakhir",
+        "lobby_join_chances": "Peluang permainan langsung mendapat lawan",
+        "lobby_join_chances_first_minute": "< 1 mnt",
+        "lobby_join_chances_next_minutes": "+10 mnt",
+        "lobby_join_chances_note": "Persentase permainan langsung yang dibuat di lobi yang mendapat lawan dalam menit pertama, lalu dalam 10 menit berikutnya jika belum ada yang bergabung setelah menit pertama. Diperkirakan dari 8 minggu terakhir, seolah tuan rumah menunggu alih-alih membatalkan. Waktu ditampilkan dalam zona waktu lokal Anda (UTC{{offset}})."
     },
     "player_menu": {
         "open_menu": "Buka menu pemain",
@@ -923,7 +1019,8 @@
         "reserved_for_other_player": "Permainan ini adalah tantangan khusus untuk pemain lain.",
         "reserved_for_other_player_named": "Permainan ini adalah tantangan khusus untuk {{pseudo}}.",
         "other": "Anda tidak dapat bergabung ke permainan ini.",
-        "game_canceled": "Permainan ini telah dibatalkan."
+        "game_canceled": "Permainan ini telah dibatalkan.",
+        "is_host_closed": "Permainan ini tertutup: hanya orang yang memiliki tautan permainan ini yang dapat bergabung."
     },
     "board_mount_error": {
         "error": "Papan tidak dapat ditampilkan, terjadi kesalahan:",
@@ -1277,7 +1374,17 @@
             "fixed_fill_not_disabled": "{{move}} memiliki warna tetap, tetapi tidak berada di luar teka-teki",
             "fixed_fill_twice": "{{move}} memiliki warna tetap dua kali",
             "invalid_type": "{{property}} tidak valid",
-            "solver_unproven_other": "{{count}} posisi tidak dapat diselesaikan tepat waktu, teka-teki hanya diperiksa sebagian"
+            "solver_unproven_other": "{{count}} posisi tidak dapat diselesaikan tepat waktu, teka-teki hanya diperiksa sebagian",
+            "generator_initial_not_winning": "Pemecah Mohex tidak menemukan langkah kemenangan di sini",
+            "generator_depends_on_disabled_cells": "Kemenangan hanya mungkin dengan bantuan sel di luar teka-teki: tandai batu yang terhubung ke tepinya pada langkah posisi",
+            "generator_already_connected": "Sudah terhubung di sini, tidak ada yang perlu dibuat",
+            "generator_unproven": "Tidak ada langkah kemenangan yang terbukti tepat waktu, cabang dibiarkan kosong",
+            "generator_budget_exceeded": "Pohon terlalu besar, cabang dibiarkan kosong",
+            "generator_parallel_dropped": "Intrusi {{move}} ke jembatan lawan tidak dapat ditambahkan sebagai urutan paralel, memainkannya menggagalkan teka-teki",
+            "generator_accepted_losing": "Langkah ini diterima, tetapi pemecah Mohex membuktikan langkah ini kalah",
+            "generator_accepted_unproven": "Langkah ini diterima, tetapi pemecah Mohex tidak membuktikan langkah ini menang: tidak dilanjutkan",
+            "generator_failed_winning": "Langkah ini gagal, tetapi pemecah Mohex membuktikan langkah ini menang",
+            "generator_invalid_tree": "Pohon yang dihasilkan tidak valid ({{error}})"
         },
         "editor": {
             "optional": "Opsional",
@@ -1436,7 +1543,24 @@
             "monitor_badge_other": "{{count}} jalur tak tercakup",
             "errors_badge_other": "{{count}} masalah yang harus diperbaiki",
             "warnings_badge_other": "{{count}} peringatan pemeriksaan",
-            "errors_count_other": "{{count}} masalah yang harus diperbaiki, lihat tab Terbitkan"
+            "errors_count_other": "{{count}} masalah yang harus diperbaiki, lihat tab Terbitkan",
+            "solver_position": "Posisi untuk Mohex",
+            "solver_position_help": "Mohex bermain di seluruh papan: pastikan sel di luar teka-teki terisi sesuai posisi, dan batu yang terhubung ke tepi sudah ditandai.",
+            "check_section": "Periksa teka-teki",
+            "generate": "Buat pohon",
+            "generate_tab": "Pembuatan",
+            "generate_help": "Melengkapi pohon dari node yang dipilih, mempertahankan langkah yang ada: langkah kemenangan dan sanggahan oleh Mohex, jawaban komputer oleh Katahex.",
+            "generate_templates": "Berhenti pada koneksi lewat templat, hingga",
+            "generate_templates_none": "Tanpa templat: teka-teki berakhir hanya saat koneksi lengkap.",
+            "generate_templates_help": "Teka-teki berakhir begitu koneksi terbukti dengan templat ini atau yang lebih kecil.",
+            "generate_templates_none_option": "Tidak ada",
+            "generate_from_node": "Buat dari node ini",
+            "generate_not_here": "Di tab Pohon, pilih node dari urutan utama, sebelum teka-teki berakhir.",
+            "generate_progress": "Memecahkan posisi: {{done}}/{{total}}",
+            "generate_ok": "Pohon dibuat.",
+            "generate_warnings": "Peringatan pembuatan ({{count}}):",
+            "generate_stop": "Hentikan",
+            "generate_tree_changed": "Pohon berubah selama pembuatan, hasilnya diabaikan. Buat lagi."
         },
         "next_puzzle": "Teka-teki berikutnya",
         "collections": {
@@ -1493,7 +1617,12 @@
         "published_ago": "Diterbitkan {{date}}",
         "sort_by": "Urutkan berdasarkan",
         "sort_published_at": "Tanggal terbit",
-        "sort_created_at": "Tanggal ditambahkan"
+        "sort_created_at": "Tanggal ditambahkan",
+        "field_secondary_urls": "Tautan lain",
+        "field_secondary_urls_help": "Jika video ini juga diterbitkan di platform lain (PeerTube, Dailymotion…). Tautan di atas tetap menjadi tautan utama.",
+        "add_link": "Tambah tautan",
+        "remove_link": "Hapus tautan ini",
+        "watch_on": "Tonton di {{platform}}"
     },
     "swap_maps": {
         "title": "Peta swap",
@@ -1514,9 +1643,12 @@
     },
     "ladder": {
         "title": "Raja Bukit",
+        "title_female": "Ratu Bukit",
         "intro": "Satu tangga, satu takhta. Tantang pemain di atas Anda: jika Anda menang, Anda mengambil kursinya. Semakin tinggi Anda duduk, semakin banyak yang harus Anda pertahankan.",
         "king": "Raja Bukit",
+        "king_female": "Ratu Bukit",
         "king_for": "Raja selama {{duration}}",
+        "king_for_female": "Ratu selama {{duration}}",
         "no_king": "Takhta kosong. Bergabunglah dan rebut!",
         "join": "Bergabung dengan Raja Bukit",
         "leave": "Tinggalkan bukit ini",
@@ -1542,6 +1674,7 @@
         "no_running_challenges": "Tidak ada tantangan yang berjalan.",
         "vs": "vs",
         "nobody_to_challenge": "Tidak ada yang bisa ditantang: Anda adalah Rajanya!",
+        "nobody_to_challenge_female": "Tidak ada yang bisa ditantang: Anda adalah Ratunya!",
         "live": "Langsung",
         "challenge_overlay": {
             "title": "Tantang {{player}}",
@@ -1585,6 +1718,7 @@
             "challenge_defended": "{{opponent}} mempertahankan kursinya melawan {{player}}",
             "challenge_voided": "Permainan {{player}} vs {{opponent}} telah dibatalkan",
             "new_king": "{{player}} adalah Raja Bukit yang baru!",
+            "new_king_female": "{{player}} adalah Ratu Bukit yang baru!",
             "giant_slayer": "{{player}} adalah Penumbang Raksasa: menggulingkan {{opponent}}!",
             "climber": "{{player}} memenangkan {{wins}} tantangan berturut-turut!",
             "strike": "{{player}} kehabisan waktu dalam permainan (pelanggaran {{strikes}})",
@@ -1759,5 +1893,343 @@
     },
     "n_tournaments_other": "{{ count }} turnamen",
     "n_messages_other": "{{ count }} pesan",
-    "n_interested_other": "{{ count }} tertarik"
+    "n_interested_other": "{{ count }} tertarik",
+    "pronouns": {
+        "title": "Kata ganti",
+        "explain": "Kata ganti ini bersifat publik: ditampilkan di profil Anda dan saat nama pengguna Anda diklik. Kata ganti ini juga dipakai untuk menyesuaikan teks antarmuka untuk Anda, dan cara antarmuka menyebut Anda kepada pemain lain.",
+        "save_error": "Tidak dapat menyimpan kata ganti. Silakan coba lagi.",
+        "he/him": "he/him (dia)",
+        "she/her": "she/her (dia)",
+        "they/them": "they/them (dia)",
+        "unspecified": "Kata ganti tidak ditentukan"
+    },
+    "player_popover": {
+        "on_playhex_since": "Di PlayHex selama {{duration}}"
+    },
+    "closed_game": "Permainan tertutup",
+    "closed_game_help": "Permainan ini tidak muncul di lobi pemain lain. Hanya orang yang memiliki tautan yang dapat bergabung, meskipun mereka belum ada di PlayHex.",
+    "closed_game_invite": {
+        "link_label": "Tautan untuk dikirim ke teman",
+        "share": "Bagikan"
+    },
+    "chat_header": {
+        "game_started": "Permainan dimulai",
+        "game_ended": "Permainan selesai",
+        "game_canceled": "Permainan dibatalkan"
+    },
+    "host_waiting_join_chance_first_minute": "Pada jam ini, {{percent}} permainan mendapat lawan dalam menit pertama.",
+    "host_waiting_join_chance_next_minutes": "Belum ada yang bergabung. Dengan menunggu 10 menit lagi, {{percent}} tuan rumah menemukan lawan.",
+    "match_title_in_tournament": "{{ match }} dari {{ tournament }}",
+    "chat_message_visibility": "Visibilitas pesan",
+    "chat_attach_to_move_toggle": "Tampilkan pesan ini di bawah langkah {{n}}",
+    "chat_message_visibility_public": "Publik",
+    "chat_message_visibility_private": "Catatan pribadi",
+    "chat_message_visibility_malkovich": "Malkovich",
+    "chat_message_placeholder_private": "Catatan pribadi, hanya terlihat oleh Anda…",
+    "chat_message_placeholder_malkovich": "Malkovich, terlihat oleh semua saat permainan selesai…",
+    "chat_new_messages": "Baru",
+    "set_password": "Atur kata sandi",
+    "set_password_explain": "Akun Anda belum memiliki kata sandi. Atur kata sandi agar Anda juga bisa masuk dengan nama pengguna \"{{login}}\".",
+    "saved": "Tersimpan",
+    "or": "atau",
+    "log_in_with_discord": "Masuk dengan Discord",
+    "must_be_logged_in": "Anda harus masuk",
+    "same_pseudo": "Ini sudah nama pengguna Anda",
+    "pseudo_change_limit_reached": "Anda terlalu sering mengganti nama pengguna akhir-akhir ini",
+    "must_set_password_first": "Atur kata sandi terlebih dahulu, jika tidak Anda tidak akan bisa masuk lagi",
+    "discord_login_failed": "Gagal masuk dengan Discord, silakan coba lagi",
+    "discord_login_cancelled": "Masuk dengan Discord dibatalkan",
+    "discord_already_linked": "Akun Discord ini sudah tertaut ke akun PlayHex lain",
+    "discord_account_creation_rate_limited": "Terlalu banyak akun dibuat akhir-akhir ini, silakan coba lagi nanti",
+    "change_pseudo": {
+        "title": "Ganti nama pengguna",
+        "new_pseudo": "Nama pengguna baru",
+        "submit": "Ganti nama pengguna",
+        "confirm": "Ganti nama pengguna Anda menjadi \"{{pseudo}}\"?",
+        "success": "Nama pengguna Anda telah diganti.",
+        "next_allowed_at": "Anda terlalu sering mengganti nama pengguna akhir-akhir ini. Anda dapat menggantinya lagi pada {{date}}.",
+        "old_pseudo_released": "Nama pengguna lama Anda akan tersedia untuk pemain lain. Tautan ke url profil lama Anda akan dialihkan ke yang baru. Anda juga akan masuk dengan nama pengguna baru.",
+        "remaining_other": "Anda dapat mengganti nama pengguna {{count}} kali lagi dalam 30 hari.",
+        "former_pseudo_note_other": "Profil Anda akan menampilkan \"sebelumnya {pseudo}\" selama {{count}} hari."
+    },
+    "formerly": "sebelumnya",
+    "discord_account": {
+        "title": "Discord",
+        "private": "Hanya Anda yang dapat melihat akun Discord yang tertaut, akun ini tidak ditampilkan di profil Anda.",
+        "explain": "Tautkan akun Discord Anda untuk masuk dengan Discord.",
+        "link": "Tautkan akun Discord saya",
+        "linked_to": "Tertaut ke akun Discord {username}. Anda dapat masuk dengan Discord.",
+        "unlink": "Lepas tautan",
+        "unlink_confirm": "Lepas tautan akun Discord Anda? Anda tidak akan bisa lagi masuk dengan Discord.",
+        "set_password_to_unlink": "Untuk melepas tautan akun Discord, atur kata sandi terlebih dahulu agar Anda tetap bisa masuk."
+    },
+    "recovery_email": {
+        "title": "Email pemulihan",
+        "explain": "Opsional. Digunakan untuk menghubungi Anda terkait keamanan akun, misalnya jika Anda lupa kata sandi.",
+        "email": "Email",
+        "private": "Email Anda bersifat pribadi, tidak pernah ditampilkan kepada pemain lain. Biarkan kosong untuk menghapusnya.",
+        "invalid": "Email tidak valid"
+    },
+    "cancel_request": {
+        "ask": "Usulkan pembatalan",
+        "player_wants_to_cancel": "{{ player }} mengusulkan untuk membatalkan permainan",
+        "accept": "Terima pembatalan",
+        "reject": "Tolak",
+        "request_denied": "Permintaan {{ player }} untuk membatalkan permainan telah ditolak.",
+        "game_canceled_by_agreement": "Permainan dibatalkan atas kesepakatan kedua pemain, diusulkan oleh {{ player }}.",
+        "confirm_overlay": {
+            "title": "Usulkan pembatalan permainan?",
+            "message": "Ini mengirim permintaan ke lawan Anda, yang dapat menerima atau menolaknya. Jika diterima, permainan dibatalkan dan tidak dihitung.",
+            "confirmLabel": "Ya, kirim permintaan",
+            "cancelLabel": "Tidak, lanjutkan bermain"
+        }
+    },
+    "hexplorer_live": {
+        "title": "Hexplorer langsung",
+        "tab_live": "Langsung",
+        "tab_play": "Main",
+        "bot_unavailable": "tidak tersedia",
+        "tab_chat": "Obrolan",
+        "live": "Langsung",
+        "stream": "Siaran",
+        "stream_description": "Bagikan tautan: siapa pun dapat mengikuti analisis Anda secara langsung, melihat kursor Anda, dan mengobrol.",
+        "start_stream": "Mulai siaran",
+        "stop_stream": "Hentikan siaran",
+        "share_link": "Tautan untuk dibagikan",
+        "copy_link": "Salin tautan",
+        "match": "Main dari posisi ini",
+        "match_description": "Mainkan permainan dari posisi di papan, melawan bot atau pemain lain. Setelah selesai, permainan ditambahkan ke analisis Anda sebagai variasi.",
+        "i_play": "Saya bermain",
+        "opponent": "Lawan",
+        "opponent_player": "Seorang pemain",
+        "invite_player_optional": "Undang pemain (opsional)",
+        "invite_player_help": "Pemain yang diundang menerima notifikasi dan menjadi satu-satunya yang dapat bergabung. Jika tidak, orang pertama yang membuka tautan dapat bermain.",
+        "validate_setup_first": "Konfirmasi posisi penyusunan terlebih dahulu.",
+        "start_match": "Mulai permainan",
+        "back_to_analysis": "Kembali ke analisis",
+        "back_to_match": "Kembali ke permainan",
+        "waiting_for_opponent": "Menunggu lawan…",
+        "waiting_for_player": "Menunggu {{pseudo}}…",
+        "you": "Anda",
+        "your_turn": "Giliran Anda",
+        "swap_hint": "Klik batu untuk menukar.",
+        "wins": "menang",
+        "wins_by_resignation": "menang karena lawan menyerah",
+        "match_expired": "Permainan berakhir: terlalu lama tanpa langkah.",
+        "match_canceled": "Permainan dibatalkan.",
+        "join_match": "Mainkan permainan ini",
+        "cancel_match": "Batalkan permainan",
+        "hosted_by": "Diselenggarakan oleh",
+        "session_ended": "Sesi ini telah berakhir.",
+        "waiting_for_stream": "Menunggu penyiar…",
+        "open_copy": "Buka salinan",
+        "open_copy_failed": "Tidak dapat membuka salinan.",
+        "invitation_toast": "{{pseudo}} mengundang Anda bermain dari posisi Hexplorer.",
+        "invitation_open": "Buka",
+        "live_elsewhere": "Anda sudah siaran langsung dari studi lain. Hanya satu sesi langsung dalam satu waktu.",
+        "go_to_live_study": "Buka studi itu",
+        "back_to_live": "Siaran Hexplorer Anda masih berjalan: kembali ke siaran",
+        "errors": {
+            "session_not_found": "Sesi langsung ini sudah tidak ada.",
+            "already_live": "Anda sudah siaran langsung di tab lain. Hentikan dulu.",
+            "not_host": "Hanya tuan rumah yang dapat melakukan ini.",
+            "match_already_running": "Sebuah permainan sedang berlangsung.",
+            "position_already_won": "Posisi ini sudah dimenangkan.",
+            "bot_unavailable": "Bot ini tidak tersedia saat ini.",
+            "invalid_invited_player": "Pemain ini tidak dapat diundang.",
+            "cannot_join": "Anda tidak dapat bergabung dengan permainan ini.",
+            "match_not_playing": "Permainan ini tidak sedang dimainkan.",
+            "not_your_turn": "Bukan giliran Anda.",
+            "not_a_player": "Anda tidak bermain dalam permainan ini.",
+            "invalid_data": "Data tidak valid.",
+            "illegal_move": "Langkah ini tidak dapat dimainkan.",
+            "study_required": "Simpan analisis sebagai studi terlebih dahulu."
+        }
+    },
+    "social_preview": {
+        "default_description": "Mainkan permainan papan Hex secara daring, melawan pemain lain atau AI. Turnamen, teka-teki, analisis permainan.",
+        "by": "oleh {{author}}",
+        "game": {
+            "canceled_title": "Permainan Hex dibatalkan",
+            "canceled_description": "Permainan Hex {{boardsize}} ini telah dibatalkan.",
+            "waiting_title": "Permainan Hex terbuka dari {{player}}",
+            "waiting_title_anonymous": "Permainan Hex terbuka",
+            "waiting_description": "Permainan Hex {{boardsize}}, {{timeControl}}, menunggu lawan. Bergabunglah di PlayHex.",
+            "ranked": "peringkat",
+            "friendly": "persahabatan",
+            "playing_description": "Permainan sedang berlangsung, tonton langsung di PlayHex.",
+            "outcome_path": "{{winner}} menang dengan menghubungkan sisinya",
+            "outcome_resign": "{{winner}} menang karena lawan menyerah",
+            "outcome_time": "{{winner}} menang karena waktu",
+            "outcome_forfeit": "{{winner}} menang WO",
+            "winner": "{{winner}} menang",
+            "image_alt": "Posisi akhir permainan Hex {{title}}",
+            "open_game": "Permainan terbuka",
+            "join": "Bergabunglah di PlayHex",
+            "playing": "Permainan berlangsung",
+            "cadency_live": "Langsung",
+            "cadency_correspondence": "Korespondensi",
+            "n_moves_other": "{{count}} langkah"
+        },
+        "tournament": {
+            "starts_at": "Mulai {{date}}",
+            "running": "Turnamen berlangsung",
+            "rank_1": "Ke-1: {{player}}",
+            "rank_2": "Ke-2: {{player}}",
+            "rank_3": "Ke-3: {{player}}",
+            "canceled": "Turnamen dibatalkan",
+            "hex_tournament": "Turnamen Hex",
+            "n_registered_other": "{{count}} pemain terdaftar",
+            "n_participants_other": "{{count}} peserta"
+        },
+        "tournament_series": {
+            "next": "Berikutnya: {{title}}, {{date}}",
+            "hex_tournaments": "Turnamen Hex",
+            "n_editions_other": "{{count}} edisi dimainkan"
+        },
+        "puzzle": {
+            "default_title": "Teka-teki Hex",
+            "red_to_play": "Merah jalan dan menang",
+            "blue_to_play": "Biru jalan dan menang",
+            "label": "Teka-teki",
+            "hex_puzzle_by": "Teka-teki Hex oleh {{author}}"
+        },
+        "hexplorer_study": {
+            "default_title": "Studi Hexplorer",
+            "label": "Studi",
+            "hex_study_by": "Studi Hex oleh {{author}}"
+        },
+        "puzzle_collection": {
+            "hex_puzzles_by": "Teka-teki Hex oleh {{author}}",
+            "n_puzzles_other": "{{count}} teka-teki Hex"
+        },
+        "player": {
+            "title": "{{player}}, pemain Hex",
+            "bot": "AI Hex",
+            "rating": "Rating {{rating}}",
+            "member_since": "Anggota sejak {{date}}",
+            "on_playhex": "Pemain di PlayHex",
+            "n_games_other": "{{count}} permainan dimainkan"
+        },
+        "ladder": {
+            "king": "Raja: {{player}}",
+            "king_female": "Ratu: {{player}}",
+            "reign_other": "Berkuasa selama {{duration}}, {{count}} pertahanan",
+            "n_players_other": "{{count}} pemain di bukit"
+        },
+        "static": {
+            "puzzles": {
+                "title": "Teka-teki Hex",
+                "description": "Selesaikan teka-teki Hex buatan komunitas, dari pemula hingga ahli, dan buat milik Anda sendiri."
+            },
+            "tournaments": {
+                "title": "Turnamen Hex",
+                "description": "Ikuti turnamen Hex daring: langsung dan korespondensi, format Swiss dan gugur."
+            },
+            "tournament_series": {
+                "title": "Seri turnamen Hex",
+                "description": "Turnamen Hex berulang: ikuti seri untuk mengetahui kapan edisi berikutnya dimainkan."
+            },
+            "ladders": {
+                "title": "Raja Bukit",
+                "description": "Naiki tangga Hex: tantang pemain di atas Anda, rebut tempat mereka, dan pertahankan takhta."
+            },
+            "games_archive": {
+                "title": "Arsip permainan Hex",
+                "description": "Telusuri dan cari semua permainan Hex yang dimainkan di PlayHex."
+            },
+            "videos": {
+                "title": "Video Hex",
+                "description": "Video tentang Hex buatan komunitas: tutorial, strategi, ulasan permainan."
+            },
+            "statistics": {
+                "title": "Statistik PlayHex",
+                "description": "Permainan, pemain, ukuran papan, dan tingkat kemenangan di PlayHex."
+            },
+            "hexplorer": {
+                "title": "Hexplorer",
+                "description": "Jelajahi posisi Hex dengan analisis AI."
+            },
+            "swap_maps": {
+                "title": "Peta tukar Hex",
+                "description": "Langkah pembuka mana yang sebaiknya ditukar, untuk setiap ukuran papan, dihitung oleh KataHex."
+            },
+            "guide": {
+                "title": "Panduan PlayHex",
+                "description": "Cara bermain Hex di PlayHex: aturan, analisis AI, langkah bersyarat, moderasi."
+            },
+            "export_games_data": {
+                "title": "Ekspor data permainan PlayHex",
+                "description": "Unduh kumpulan data semua permainan Hex yang dimainkan di PlayHex, bebas digunakan ulang."
+            },
+            "guide_ai_analysis": {
+                "title": "Analisis permainan dengan AI",
+                "description": "Tinjau permainan Hex Anda dengan AI: temukan kesalahan besar, lihat langkah terbaik, dan ketahui kapan Anda unggul atau kehilangan keunggulan."
+            },
+            "guide_conditional_moves": {
+                "title": "Langkah bersyarat",
+                "description": "Mainkan permainan Hex korespondensi lebih cepat: rencanakan jawaban untuk langkah lawan berikutnya, dan mainkan tangga secara otomatis."
+            },
+            "tutorial_rules": {
+                "title": "Aturan Hex",
+                "description": "Pelajari 2 aturan Hex dalam beberapa menit dengan tutorial interaktif, lalu mainkan permainan pertama Anda melawan bot."
+            },
+            "tutorial_swap": {
+                "title": "Aturan tukar di Hex",
+                "description": "Aturan tukar menjaga permainan Hex tetap seimbang."
+            },
+            "tutorial_bridge": {
+                "title": "Jembatan di Hex",
+                "description": "Jembatan adalah bentuk terpenting di Hex: dua batu yang sudah terhubung tanpa bersentuhan. Pelajari cara kerjanya dan berlatih dengan teka-teki."
+            },
+            "tutorial_block": {
+                "title": "Strategi Hex untuk pemula: blokir untuk menang",
+                "description": "Di Hex, memblokir membangun jalur Anda sendiri: strategi terbaik di awal permainan."
+            },
+            "tutorial_ziggurat": {
+                "title": "Templat ziggurat di Hex",
+                "description": "Ziggurat adalah bentuk kedua yang perlu diketahui di Hex: batu di baris ketiga yang terhubung ke tepinya. Pelajari cara kerjanya dan berlatih dengan teka-teki."
+            },
+            "cijm_2025": {
+                "title": "Turnamen Hex – Paris 2025",
+                "description": "Dua turnamen Hex pada 14 dan 15 Juni 2025, di Salon Budaya & Permainan Matematika, Place Saint-Sulpice, Paris. Gratis, semua tingkat."
+            },
+            "cijm_2026": {
+                "title": "Turnamen Hex – Paris 2026",
+                "description": "Turnamen Hex raksasa pada Minggu, 24 Mei 2026, di Salon Budaya & Permainan Matematika, Place Saint-Sulpice, Paris. Gratis, semua tingkat, mulai usia 8 tahun."
+            }
+        },
+        "n_days_other": "{{count}} hari",
+        "n_hours_other": "{{count}} jam"
+    },
+    "game_outcome": {
+        "path": "Koneksi",
+        "resign": "Menyerah",
+        "time": "Waktu",
+        "forfeit": "WO"
+    },
+    "has_chat_messages": "Ada pesan obrolan",
+    "has_analyze": "Ada analisis AI",
+    "has_malkovich_messages": "Ada catatan Malkovich",
+    "game_content_filter": "Konten",
+    "filters": "Filter",
+    "reset_filters": "Atur ulang filter",
+    "reset_dates": "Atur ulang tanggal",
+    "game_type": "Jenis permainan",
+    "game_state_filter": "Status",
+    "opponent_or_players": "Pemain",
+    "one_or_two_players_help": "1 pemain: permainan pemain ini. 2 pemain: permainan di antara mereka.",
+    "search_opponent": "Lawan",
+    "n_plus": "{{ n }}+",
+    "show_all_filters": "Semua filter",
+    "hide_filters": "Lebih sedikit filter",
+    "week_of": "Minggu {{date}}",
+    "chart_grouping": {
+        "label": "Kelompokkan menurut",
+        "auto": "Otomatis",
+        "day": "Hari",
+        "week": "Minggu",
+        "month": "Bulan"
+    },
+    "n_games_found_other": "{{count}} permainan ditemukan."
 }
