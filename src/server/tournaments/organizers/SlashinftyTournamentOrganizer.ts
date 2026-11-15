@@ -567,7 +567,12 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
 
         for (const participant of tournament.participants) {
             participant.score = playerStanding[participant.player.publicId].matchPoints;
-            participant.tiebreak = playerStanding[participant.player.publicId].tiebreaks.medianBuchholz;
+
+            // Buchholz is useless in round-robin: all players play against each other
+            participant.tiebreak = toTournament.stageOne.format === 'round-robin'
+                ? playerStanding[participant.player.publicId].tiebreaks.sonnebornBerger
+                : playerStanding[participant.player.publicId].tiebreaks.medianBuchholz
+            ;
         }
 
         // Make sure 1st, 2nd are well defined. And 3rd and 4th also in case there is a consolation match.
