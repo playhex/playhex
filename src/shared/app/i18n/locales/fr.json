@@ -958,6 +958,7 @@
     "no_notifications": "Aucune notification.",
     "game_against_player": "Partie contre {{ player }}",
     "game_player_vs_player": "Partie {{ red }} contre {{ blue }}",
+    "open_challenge": "Défi ouvert",
     "notifications_misc": "Autres notifications",
     "go_to_the_game": "Aller à la partie",
     "player_passed_his_turn": "{{player}} a passé son tour",

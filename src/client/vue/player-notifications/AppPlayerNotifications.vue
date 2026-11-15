@@ -31,6 +31,10 @@ const { acknowledge: ack, loadMoreReadNotifications } = playerNotificationsStore
 const showNotifications = ref(false);
 
 const gameTitle = (game: Game): string => {
+    if (game.gameToPlayers.length < 2) {
+        return t('open_challenge');
+    }
+
     if (getMyIndex(game) !== null) {
         return t('game_against_player', { player: pseudoStringOptional(getOpponent(game)) });
     }

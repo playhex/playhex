@@ -1160,6 +1160,7 @@
     "no_notifications": "No notifications.",
     "game_against_player": "Game vs {{ player }}",
     "game_player_vs_player": "Game {{ red }} vs {{ blue }}",
+    "open_challenge": "Open challenge",
     "notifications_misc": "Other notifications",
     "notification": {
         "you_won": "You have won the game!",
