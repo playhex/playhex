@@ -121,6 +121,9 @@ Here are all available translations, just click the following image to help tran
 You can contribute to translations without any coding,
 thanks to [Weblate](https://weblate.org).
 
+To fill missing strings from the command line, and for gendered strings,
+see [docs/translations.md](docs/translations.md).
+
 ## Icons
 
 We use Unplugin Icons, which allow to use any icon from any set of icons,
