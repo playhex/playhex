@@ -1,10 +1,9 @@
 import { computed, InjectionKey, onBeforeUnmount, ref, Ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import useSocketStore from '../../../stores/socketStore.js';
 import useHexplorerLiveHostStore from '../../../stores/hexplorerLiveHostStore.js';
 import type { HexplorerMatchCreateInput } from '../../../../shared/app/hexplorerLive.js';
-import { trackBoardCursor } from '../liveCursor.js';
 import type { useHexplorer } from './useHexplorer.js';
+import { useHexplorerLiveSync } from './useHexplorerLiveSync.js';
 
 export const hexplorerLiveUrl = (publicId: string): string => `${window.location.origin}/hexplorer/live/${publicId}`;
 
@@ -29,7 +28,7 @@ export const useLoadingAction = () => {
 
 /**
  * Host side of a Hexplorer live session, from the Hexplorer page:
- * streams the analysis, starts matches from current position,
+ * streams the analysis, edited with invited editors, starts matches from current position,
  * and adds played matches as variations.
  *
  * Session is kept in a store, so it keeps running when host leaves the page.
@@ -45,7 +44,6 @@ export const useHexplorerLiveHost = (
     studyPublicId: Ref<null | string>,
     saveStudy: () => Promise<null | string>,
 ) => {
-    const { socket } = useSocketStore();
     const store = useHexplorerLiveHostStore();
     const storeRefs = storeToRefs(store);
     const { publicId, active, streaming, match, matchVariation, keptState } = storeRefs;
@@ -95,44 +93,19 @@ export const useHexplorerLiveHost = (
         }
     });
 
-    let lastSentSnapshot = '';
+    // Broadcasts while streaming the displayed study, and applies changes of editors, then analyzes them.
+    // Also resumes when host is back on it, or after reconnection
+    const sync = useHexplorerLiveSync(
+        hexplorer,
+        publicId,
+        storeRefs.session,
+        computed(() => streaming.value && isLive.value && !restoringKeptState.value ? 'edit' : 'off'),
+        getBoardElement,
+        true,
+    );
 
-    /**
-     * Polls whole snapshot and sends it when changed:
-     * also catches changes made on board only, like setup stones not yet validated.
-     */
-    const sendSnapshotIfChanged = (id: string): void => {
-        const snapshot = hexplorer.getLiveSnapshot();
-        const serialized = JSON.stringify(snapshot);
-
-        if (serialized !== lastSentSnapshot) {
-            lastSentSnapshot = serialized;
-            socket.emit('hexplorerLiveSnapshot', id, snapshot);
-        }
-    };
-
-    // Broadcasts while streaming the displayed study. Also resumes when host is back on it, or after reconnection
-    watch(() => streaming.value && isLive.value && !restoringKeptState.value ? publicId.value : null, (id, _, onCleanup) => {
-        if (id === null) {
-            return;
-        }
-
-        lastSentSnapshot = '';
-        sendSnapshotIfChanged(id);
-
-        const interval = setInterval(() => sendSnapshotIfChanged(id), 200);
-        const element = getBoardElement();
-        const stopCursorTracking = element === null
-            ? null
-            : trackBoardCursor(element, () => hexplorer.gameView.value, cursor => socket.emit('hexplorerLiveCursor', id, cursor))
-        ;
-
-        onCleanup(() => {
-            clearInterval(interval);
-            stopCursorTracking?.();
-            socket.emit('hexplorerLiveCursor', id, null);
-        });
-    }, { immediate: true });
+    store.setLiveHandlers(sync.handlers);
+    onBeforeUnmount(() => store.setLiveHandlers({}));
 
     // Add match to analysis once it ended, possibly when host is back on its study
     watch([matchVariation, studyPublicId, restoringKeptState], ([variation, studyId, restoring]) => {
@@ -189,10 +162,13 @@ export const useHexplorerLiveHost = (
         ...storeRefs,
         liveElsewhere,
         isLive,
+        boardMounted: sync.boardMounted,
         showMatchBoard,
         startStream,
         createMatch,
         stopStream: store.stopStream,
+        inviteEditor: store.inviteEditor,
+        removeEditor: store.removeEditor,
         joinMatch: store.joinMatch,
         playMatchMove: store.playMatchMove,
         resignMatch: store.resignMatch,

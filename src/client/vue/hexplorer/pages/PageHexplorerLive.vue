@@ -1,106 +1,93 @@
 <script setup lang="ts">
 /*
  * Viewer side of a Hexplorer live session, opened from a shared link:
- * follows streamed analysis (read only) and streamer cursor, shows match and chat.
+ * follows streamed analysis (read only) and participants cursors, shows match and chat.
+ * Players invited by host edit analysis from here too.
  * Match opponent also plays from here.
  */
-import { computed, onBeforeUnmount, provide, ref, toRef, useTemplateRef, watch } from 'vue';
-import { whenever } from '@vueuse/core';
+import { computed, onBeforeUnmount, provide, ref, shallowRef, toRef, useTemplateRef, watch } from 'vue';
+import { useMediaQuery, whenever } from '@vueuse/core';
 import { useHead } from '@unhead/vue';
 import { t } from 'i18next';
 import { hexplorerKey, useHexplorer } from '../composables/useHexplorer.js';
-import { useHexplorerLiveSession } from '../composables/hexplorerLiveSession.js';
+import { useHexplorerLiveSession, type HexplorerLiveSessionHandlers } from '../composables/hexplorerLiveSession.js';
+import { useHexplorerLiveSync } from '../composables/useHexplorerLiveSync.js';
 import { NoopAnalyzer } from '../analyzers/NoopAnalyzer.js';
-import { LiveCursorLayer } from '../liveCursor.js';
 import { storeHexplorerCopy } from '../services/hexplorerCopy.js';
-import { hexplorerLiveChannelName, type HexplorerLiveCursor, type HexplorerLiveSnapshot } from '../../../../shared/app/hexplorerLive.js';
+import { hexplorerLiveChannelName } from '../../../../shared/app/hexplorerLive.js';
 import MoveTree from '../components/MoveTree.vue';
 import HexplorerMatchBoard from '../components/HexplorerMatchBoard.vue';
 import HexplorerMatchPanel from '../components/HexplorerMatchPanel.vue';
 import HexplorerLiveChat from '../components/HexplorerLiveChat.vue';
+import HexplorerNavButtons from '../components/HexplorerNavButtons.vue';
+import HexplorerSetupTools from '../components/HexplorerSetupTools.vue';
+import HexplorerTreeTab from '../components/HexplorerTreeTab.vue';
 import useSocketStore from '../../../stores/socketStore.js';
+import useAuthStore from '../../../stores/authStore.js';
 import AppPseudo from '../../components/AppPseudo.vue';
-import { IconArrowBarLeft, IconArrowBarRight, IconBoxArrowUpRight, IconBroadcast } from '../../icons.js';
+import { IconArrowBarLeft, IconArrowBarRight, IconBoxArrowRight, IconBoxArrowUpRight, IconBroadcast } from '../../icons.js';
 
 const props = defineProps<{
     publicId: string;
 }>();
 
-const hexplorer = useHexplorer('', [new NoopAnalyzer()], { readonly: true });
+/**
+ * Whether I can edit analysis: invited by host, while streaming.
+ */
+const editing = ref(false);
+
+// Analysis is sent by host, even to editors
+const hexplorer = useHexplorer('', [new NoopAnalyzer()], { readonly: () => !editing.value, syncUrlHash: false, analysisFromLive: true });
 
 provide(hexplorerKey, hexplorer);
 
-const { tree, currentNodeId, currentComment, whiteWin, state, mount, gameView, applyLiveSnapshot } = hexplorer;
+const { tree, currentNodeId, currentComment, whiteWin, analysisLoading, state, mount, bindKeys } = hexplorer;
 
-const cursorLayer = new LiveCursorLayer();
-
-onBeforeUnmount(() => cursorLayer.destroy());
-
-/*
- * Snapshots are applied one at a time, only the last received one is kept while applying.
- */
-let applying = false;
-let pendingSnapshot: null | HexplorerLiveSnapshot = null;
-let pendingCursor: HexplorerLiveCursor = null;
-const mounted = ref(false);
-
-const applyPendingSnapshot = async (): Promise<void> => {
-    if (applying || !mounted.value) {
-        return;
-    }
-
-    applying = true;
-
-    try {
-        while (pendingSnapshot !== null) {
-            const snapshot = pendingSnapshot;
-            pendingSnapshot = null;
-            await applyLiveSnapshot(snapshot);
-        }
-
-        // Board may have been rebuilt
-        cursorLayer.setCursor(gameView.value, pendingCursor);
-    } finally {
-        applying = false;
-    }
-};
-
-const hasSnapshot = ref(false);
-
-const onSnapshot = (snapshot: HexplorerLiveSnapshot): void => {
-    hasSnapshot.value = true;
-    pendingSnapshot = snapshot;
-    void applyPendingSnapshot();
-};
-
-const onCursor = (cursor: HexplorerLiveCursor): void => {
-    pendingCursor = cursor;
-
-    if (mounted.value && !applying) {
-        cursorLayer.setCursor(gameView.value, cursor);
-    }
-};
+bindKeys();
 
 const publicIdRef = toRef(props, 'publicId');
-const { session, match, myColor, canJoin, isMyTurn, joinMatch, playMatchMove, resignMatch } = useHexplorerLiveSession(publicIdRef, { onSnapshot, onCursor });
+
+// Set once sync is created, it needs session
+const handlers = shallowRef<HexplorerLiveSessionHandlers>({});
+
+const { session, match, myColor, canJoin, canEdit, isMyTurn, action, joinMatch, playMatchMove, resignMatch } = useHexplorerLiveSession(publicIdRef, handlers);
+
+watch(canEdit, value => editing.value = value, { immediate: true });
 
 const gameViewElement = useTemplateRef('game-view-element');
 
+const sync = useHexplorerLiveSync(
+    hexplorer,
+    publicIdRef,
+    session,
+    computed(() => editing.value ? 'edit' : 'view'),
+    () => gameViewElement.value,
+);
+
+const { hasSnapshot, boardMounted } = sync;
+
+handlers.value = sync.handlers;
+
 whenever(gameViewElement, async element => {
     await mount(element);
-    mounted.value = true;
-    await applyPendingSnapshot();
+    await boardMounted();
 }, { once: true });
+
+const authStore = useAuthStore();
+const { socket } = useSocketStore();
+
+/**
+ * Stop editing analysis with host. Only displayed while editing, so logged in.
+ */
+const leave = (): Promise<boolean> => action(answer => socket.emit('hexplorerLiveRemoveEditor', props.publicId, authStore.loggedInPlayer!.publicId, answer));
+
+/**
+ * On small screens, sidebar covers the board: main setup tools are also under it.
+ */
+const isLargeScreen = useMediaQuery('(min-width: 576px)');
 
 const ended = computed(() => session.value === null);
 const streaming = computed(() => session.value?.streaming ?? false);
-
-// Streamer cursor is not sent anymore
-watch(streaming, isStreaming => {
-    if (!isStreaming) {
-        onCursor(null);
-    }
-});
 
 /**
  * Match is shown instead of analysis while playing,
@@ -131,8 +118,6 @@ watch(sidebarOpen, open => {
 });
 
 // Chat stays mounted (v-show) so channel room is kept, count messages posted while sidebar is closed
-const { socket } = useSocketStore();
-
 const onChannelMessage = (channel: string): void => {
     if (channel === hexplorerLiveChannelName(props.publicId) && !sidebarOpen.value) {
         ++unreadMessages.value;
@@ -163,7 +148,7 @@ const openCopy = (): void => {
     <div class="layout bg-body">
         <div class="game">
             <div class="game-inner">
-                <div class="left-analysis-bar" :class="{ 'analysis-unavailable': typeof whiteWin !== 'number' }">
+                <div class="left-analysis-bar" :class="{ 'analysis-loading': analysisLoading, 'analysis-unavailable': typeof whiteWin !== 'number' }">
                     <div class="advantage advantage-blue bg-primary"></div>
                     <div class="advantage advantage-red bg-danger"></div>
                 </div>
@@ -188,6 +173,11 @@ const openCopy = (): void => {
 
             <div class="bottom-menu">
                 <span v-if="streaming" class="badge text-bg-danger">{{ $t('hexplorer_live.live') }}</span>
+
+                <template v-if="editing && hasSnapshot && !showMatch">
+                    <HexplorerSetupTools v-if="!isLargeScreen" compact />
+                    <HexplorerNavButtons />
+                </template>
 
                 <button
                     type="button"
@@ -217,6 +207,13 @@ const openCopy = (): void => {
                         {{ $t('hexplorer_live.hosted_by') }} <AppPseudo :player="session.host" />
                     </div>
 
+                    <div v-if="editing" class="d-flex align-items-center gap-2 mt-2">
+                        <span class="badge text-bg-primary">{{ $t('hexplorer_live.co_analyzing') }}</span>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" @click="leave()">
+                            <IconBoxArrowRight /> {{ $t('hexplorer_live.leave_editing') }}
+                        </button>
+                    </div>
+
                     <div v-if="ended" class="session-ended text-body-secondary text-center pt-3">
                         <IconBroadcast class="status-icon" />
                         <p class="lead mb-0">{{ $t('hexplorer_live.session_ended') }}</p>
@@ -234,11 +231,14 @@ const openCopy = (): void => {
                     </section>
 
                     <section v-if="hasSnapshot && !showMatch" class="mt-3">
-                        <p v-if="currentComment" class="comment border rounded p-2 mb-2 small">{{ currentComment }}</p>
+                        <HexplorerTreeTab v-if="editing" />
+                        <template v-else>
+                            <p v-if="currentComment" class="comment border rounded p-2 mb-2 small">{{ currentComment }}</p>
 
-                        <div class="tree-container border rounded bg-body p-2">
-                            <MoveTree :tree :nodeId="0" :currentNodeId />
-                        </div>
+                            <div class="tree-container border rounded bg-body p-2">
+                                <MoveTree :tree :nodeId="0" :currentNodeId />
+                            </div>
+                        </template>
 
                         <button type="button" class="btn btn-outline-primary btn-sm mt-2" @click="openCopy()">
                             <IconBoxArrowUpRight /> {{ $t('hexplorer_live.open_copy') }}
@@ -293,6 +293,9 @@ const openCopy = (): void => {
 
     .advantage-blue
         height v-bind(blueBarHeightCss)
+
+    &.analysis-loading
+        opacity 0.3
 
     &.analysis-unavailable .advantage
         background-color #888 !important

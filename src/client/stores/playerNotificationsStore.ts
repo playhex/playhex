@@ -189,6 +189,18 @@ const usePlayerNotificationsStore = defineStore('playerNotificationsStore', () =
         });
     });
 
+    socket.on('hexplorerLiveInvitation', (publicId, host) => {
+        useToastsStore().addToast(t('hexplorer_live.editor_invitation_toast', { pseudo: host.pseudo }), {
+            level: 'success',
+            autoCloseAfter: 0,
+            actions: [{
+                label: t('hexplorer_live.editor_invitation_open'),
+                action: { name: 'hexplorer-live', params: { publicId } },
+                classes: 'btn btn-success',
+            }],
+        });
+    });
+
     return {
         playerNotifications,
         unreadPlayerNotifications,

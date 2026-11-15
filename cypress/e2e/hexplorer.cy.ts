@@ -18,6 +18,10 @@ const openFileTab = (): void => {
     cy.contains('.sidebar-nav-item', 'File').click();
 };
 
+const openAiTab = (): void => {
+    cy.contains('.sidebar-nav-item', 'AI').click();
+};
+
 describe('Hexplorer help', () => {
     it('is displayed first until dismissed, then opens on tree tab', () => {
         cy.viewport(1400, 800);
@@ -114,6 +118,8 @@ describe('Hexplorer', () => {
     it('saves checkboxes', () => {
         cy.visit('/hexplorer');
 
+        openAiTab();
+        cy.get('#hexplorer-ai-enabled').check();
         cy.get('#policy-show-numbers').check();
         cy.get('.color-settings tbody tr:first-child input[type=checkbox]').eq(1).uncheck();
         cy.get('.color-settings tbody tr:last-child input[type=checkbox]').eq(2).check();
@@ -126,6 +132,8 @@ describe('Hexplorer', () => {
 
         cy.reload();
 
+        openAiTab();
+        cy.get('#hexplorer-ai-enabled').should('be.checked');
         cy.get('#policy-show-numbers').should('be.checked');
         cy.get('.color-settings tbody tr:first-child input[type=checkbox]').eq(1).should('not.be.checked');
         cy.get('.color-settings tbody tr:last-child input[type=checkbox]').eq(2).should('be.checked');

@@ -1,9 +1,10 @@
-import { computed, onBeforeUnmount, Ref, shallowRef, watch } from 'vue';
+import { computed, MaybeRefOrGetter, onBeforeUnmount, Ref, shallowRef, toValue, watch } from 'vue';
 import type { HexMove } from '@playhex/move-notation';
 import useSocketStore from '../../../stores/socketStore.js';
 import useAuthStore from '../../../stores/authStore.js';
 import Rooms from '../../../../shared/app/Rooms.js';
 import {
+    canEditHexplorerLive,
     canJoinMatch,
     getMatchPlayerColor,
     getMatchPosition,
@@ -14,16 +15,21 @@ import {
 } from '../../../../shared/app/hexplorerLive.js';
 import type { WebsocketActionError } from '../../../../shared/app/Types.js';
 
+export type HexplorerLiveSessionHandlers = {
+    onSnapshot?: (snapshot: HexplorerLiveSnapshot, revision: number) => void;
+    onCursor?: (playerPublicId: string, cursor: HexplorerLiveCursor) => void;
+};
+
 /**
- * Follows a Hexplorer live session: session state, match, streamed analysis and cursor.
- * Used both by host and viewers. Not bound to a component: call stop() to stop following.
+ * Follows a Hexplorer live session: session state, match, streamed analysis and cursors.
+ * Used by host, editors and viewers. Not bound to a component: call stop() to stop following.
+ *
+ * @param handlers Read on each event, so can be changed later.
+ *                 Only receive events: snapshot of an updated session is in `session`.
  */
 export const followHexplorerLiveSession = (
     publicId: Ref<null | string>,
-    handlers: {
-        onSnapshot?: (snapshot: HexplorerLiveSnapshot) => void;
-        onCursor?: (cursor: HexplorerLiveCursor) => void;
-    } = {},
+    handlers: MaybeRefOrGetter<HexplorerLiveSessionHandlers> = {},
 ) => {
     const socketStore = useSocketStore();
     const { socket } = socketStore;
@@ -57,14 +63,10 @@ export const followHexplorerLiveSession = (
         // An ended session is the same as no session, but its last match is still displayed
         session.value = updated?.ended ? null : updated;
         match.value = updated?.match ?? null;
-
-        if (updated?.snapshot) {
-            handlers.onSnapshot?.(updated.snapshot);
-        }
     });
 
-    const onSnapshot = forThisSession((snapshot: HexplorerLiveSnapshot) => handlers.onSnapshot?.(snapshot));
-    const onCursor = forThisSession((cursor: HexplorerLiveCursor) => handlers.onCursor?.(cursor));
+    const onSnapshot = forThisSession((revision: number, snapshot: HexplorerLiveSnapshot) => toValue(handlers).onSnapshot?.(snapshot, revision));
+    const onCursor = forThisSession((playerPublicId: string, cursor: HexplorerLiveCursor) => toValue(handlers).onCursor?.(playerPublicId, cursor));
     const onMatchUpdate = forThisSession((updated: HexplorerMatch) => {
         match.value = updated;
     });
@@ -116,6 +118,15 @@ export const followHexplorerLiveSession = (
         && getMatchPosition(match.value).nextPlayer === myColor.value,
     );
 
+    /**
+     * Whether I can edit streamed analysis: as host or invited editor.
+     */
+    const canEdit = computed<boolean>(() => {
+        const player = authStore.loggedInPlayer;
+
+        return !!session.value?.streaming && player !== null && canEditHexplorerLive(session.value, player.publicId);
+    });
+
     const joinMatch = (): Promise<boolean> => action(answer => socket.emit('hexplorerMatchJoin', publicId.value!, answer));
     const playMatchMove = (move: HexMove): Promise<boolean> => action(answer => socket.emit('hexplorerMatchMove', publicId.value!, move, answer));
     const resignMatch = (): Promise<boolean> => action(answer => socket.emit('hexplorerMatchResign', publicId.value!, answer));
@@ -126,6 +137,7 @@ export const followHexplorerLiveSession = (
         myColor,
         canJoin,
         isMyTurn,
+        canEdit,
         action,
         joinMatch,
         playMatchMove,

@@ -5,7 +5,7 @@ import { getSocketPlayerAllowedToWrite } from '../../oauth/oauthSocket.js';
 import HexplorerLiveService, { HexplorerLiveClientError } from '../../hexplorer-live/HexplorerLiveService.js';
 import { HexplorerLiveError } from '../../../shared/app/hexplorerLive.js';
 import { WebsocketActionError } from '../../../shared/app/Types.js';
-import { errorToRateLimitReachedErrorPayload, RateLimitReachedError, rateLimiterConsumeHexplorerLiveCreate } from '../../services/rate-limiters.js';
+import { errorToRateLimitReachedErrorPayload, RateLimitReachedError, rateLimiterConsumeHexplorerLiveCreate, rateLimiterConsumeHexplorerLiveInvite } from '../../services/rate-limiters.js';
 import logger from '../../services/logger.js';
 import { errorToLogger } from '../../../shared/app/utils.js';
 import { Player } from '../../../shared/app/models/index.js';
@@ -77,13 +77,27 @@ export default class HexplorerLiveWebsocketController implements WebsocketContro
             this.hexplorerLiveService.setStreaming(publicId, player, streaming === true);
         }));
 
-        // No answer: sent often, errors only logged
-        socket.on('hexplorerLiveSnapshot', (publicId, snapshot) => handle(undefined, player => {
-            this.hexplorerLiveService.updateSnapshot(publicId, player, snapshot, socket.id);
-        }));
+        socket.on('hexplorerLiveSnapshot', (publicId, baseRevision, snapshot, answer) => {
+            if (typeof answer !== 'function') {
+                return;
+            }
+
+            void handle(error => error && answer(error), player => {
+                answer(this.hexplorerLiveService.updateSnapshot(publicId, player, baseRevision, snapshot, socket.id));
+            });
+        });
 
         socket.on('hexplorerLiveCursor', (publicId, cursor) => handle(undefined, player => {
             this.hexplorerLiveService.updateCursor(publicId, player, cursor, socket.id);
+        }));
+
+        socket.on('hexplorerLiveInviteEditor', (publicId, playerPublicId, answer) => handle(answer, async player => {
+            await rateLimiterConsumeHexplorerLiveInvite(player.publicId);
+            await this.hexplorerLiveService.inviteEditor(publicId, player, playerPublicId);
+        }));
+
+        socket.on('hexplorerLiveRemoveEditor', (publicId, playerPublicId, answer) => handle(answer, player => {
+            this.hexplorerLiveService.removeEditor(publicId, player, playerPublicId);
         }));
 
         socket.on('hexplorerLiveEnd', publicId => handle(undefined, player => {

@@ -106,12 +106,25 @@ export type HexplorerLiveSession = {
     host: Player;
 
     /**
+     * Players invited by host to edit the streamed analysis together (co-analysts).
+     * Cleared when stream stops.
+     */
+    editors: Player[];
+
+    /**
+     * Increases each time snapshot is updated, used to detect concurrent edits:
+     * a snapshot is only accepted if based on the last revision.
+     * Also increases across sessions of same study, so a new session snapshot is never taken as an older one.
+     */
+    revision: number;
+
+    /**
      * Whether host's analysis is broadcasted to viewers.
      */
     streaming: boolean;
 
     /**
-     * Last analysis sent by host, null if not streaming.
+     * Last analysis sent by host or an editor, null if not streaming.
      */
     snapshot: null | HexplorerLiveSnapshot;
 
@@ -122,6 +135,20 @@ export type HexplorerLiveSession = {
 
     ended: boolean;
 };
+
+/**
+ * Whether player can edit streamed analysis: host or an invited editor.
+ */
+export const canEditHexplorerLive = (session: HexplorerLiveSession, playerPublicId: string): boolean =>
+    session.host.publicId === playerPublicId
+    || session.editors.some(editor => editor.publicId === playerPublicId)
+;
+
+/**
+ * Answer to a sent snapshot: new revision if accepted,
+ * or rejected because another participant changed analysis meanwhile (newer snapshot has been received).
+ */
+export type HexplorerLiveSnapshotAnswer = { revision: number } | { rejected: true };
 
 export type HexplorerMatchOpponentInput =
     | { type: 'bot', engine: AnalysisEngine }

@@ -98,6 +98,7 @@ export { default as IconPeopleFill } from '~icons/bi/people-fill';
 export { default as IconPerson } from '~icons/bi/person';
 export { default as IconPersonFill } from '~icons/bi/person-fill';
 export { default as IconPersonFillExclamation } from '~icons/bi/person-fill-exclamation';
+export { default as IconPersonPlus } from '~icons/bi/person-plus';
 export { default as IconPersonUp } from '~icons/bi/person-up';
 export { default as IconPercent } from '~icons/bi/percent';
 export { default as IconPhone } from '~icons/bi/phone';

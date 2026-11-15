@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia';
 import { useHead } from '@unhead/vue';
 import { hexplorerKey, useHexplorer } from '../composables/useHexplorer.js';
 import { hexplorerStudyKey, useHexplorerStudy } from '../composables/useHexplorerStudy.js';
-import { HEXPLORER_ANALYSIS_STATE_KEY, HEXPLORER_TAB_STATE_KEY } from '../HexplorerState.js';
+import { HEXPLORER_ANALYSIS_STATE_KEY, HEXPLORER_ANALYZE_TOGETHER_STATE_KEY, HEXPLORER_TAB_STATE_KEY, parseHexplorerAnalyzeTogether } from '../HexplorerState.js';
 import { hexplorerLiveHostKey, useHexplorerLiveHost } from '../composables/useHexplorerLive.js';
 import { readHexplorerCopy } from '../services/hexplorerCopy.js';
 import HexplorerLiveTab from '../components/HexplorerLiveTab.vue';
@@ -15,35 +15,30 @@ import HexplorerLiveChat from '../components/HexplorerLiveChat.vue';
 import HexplorerMatchBoard from '../components/HexplorerMatchBoard.vue';
 import {
     IconArrowBarLeft,
-    IconArrowDownUp,
     IconArrowBarRight,
     IconBroadcast,
     IconPlayFill,
-    IconChevronLeft,
-    IconChevronRight,
-    IconCircleFill,
     IconDiagram2,
     IconFlag,
     IconXLg,
     IconFolder2Open,
     IconQuestionCircle,
-    IconTrash,
+    IconRobot,
 } from '../../icons.js';
+import HexplorerNavButtons from '../components/HexplorerNavButtons.vue';
+import { HEXPLORER_PLAYER_NAME_MAX_LENGTH } from '../../../../shared/app/hexplorerStudy.js';
 import AppResizableSidebar from '../../components/AppResizableSidebar.vue';
 import HexplorerFileTab from '../components/HexplorerFileTab.vue';
 import HexplorerHelpTab from '../components/HexplorerHelpTab.vue';
 import HexplorerSetupTools from '../components/HexplorerSetupTools.vue';
 import HexplorerTreeTab from '../components/HexplorerTreeTab.vue';
-import { NoopAnalyzer } from '../analyzers/NoopAnalyzer';
+import HexplorerAiTab from '../components/HexplorerAiTab.vue';
 import { AnalyzerInterface } from '../analyzers/AnalyzerInterface.js';
 import { createKatahexAnalyzers } from '../composables/useAnalysisEngines.js';
 import usePlayerLocalSettingsStore from '../../../stores/playerLocalSettingsStore.js';
 
-// Available analysis engines, selectable in the sidebar. First one is the default.
-const analyzers: AnalyzerInterface[] = [
-    ...createKatahexAnalyzers(),
-    new NoopAnalyzer(),
-];
+// Available analysis engines, selectable in AI tab. First one is the default. AI is disabled by default.
+const analyzers: AnalyzerInterface[] = createKatahexAnalyzers();
 
 const hexplorer = useHexplorer(document.location.hash, analyzers);
 
@@ -53,11 +48,7 @@ const {
     whiteWin,
     state,
     analysisLoading,
-    goToParent,
-    goToFirstChild,
-    pass,
-    canDeleteCurrentNode,
-    deleteCurrentNode,
+    aiEnabled,
     updateAnalysis,
     bindKeys,
     mount,
@@ -105,9 +96,9 @@ const {
 } = liveHost;
 
 /**
- * Chat of live session, below both Live and Play tabs.
+ * Chat of live session, below Tree, Live and Play tabs.
  */
-const showLiveChat = computed(() => liveActive.value && (currentTab.value === 'live' || currentTab.value === 'play'));
+const showLiveChat = computed(() => liveActive.value && ['tree', 'live', 'play'].includes(currentTab.value));
 
 whenever(gameViewElement, async element => {
     await mount(element);
@@ -115,6 +106,8 @@ whenever(gameViewElement, async element => {
     await importAnalysisFromCopy();
     await hexplorerStudy.init();
     await updateAnalysis();
+    await liveHost.boardMounted();
+    await analyzeTogetherFromHistoryState();
 }, {
     once: true,
 });
@@ -132,7 +125,7 @@ const isLargeScreen = useMediaQuery('(min-width: 576px)');
 
 const sidebarOpen = ref(true);
 
-type HexplorerTab = 'file' | 'tree' | 'live' | 'play' | 'help';
+type HexplorerTab = 'file' | 'tree' | 'ai' | 'live' | 'play' | 'help';
 
 const { localSettings } = storeToRefs(usePlayerLocalSettingsStore());
 
@@ -149,6 +142,12 @@ const navPanels = computed(() => [
         badge: hasUnsavedChanges.value ? { variant: 'warning', titleKey: 'hexplorer.study_unsaved_changes' } : null,
     },
     { key: 'tree' as const, icon: IconDiagram2, labelKey: 'hexplorer.tab_tree' },
+    {
+        key: 'ai' as const,
+        icon: IconRobot,
+        labelKey: 'hexplorer.tab_ai',
+        badge: aiEnabled.value ? { variant: 'success', titleKey: 'hexplorer.ai_enabled' } : null,
+    },
     {
         key: 'live' as const,
         icon: IconBroadcast,
@@ -221,6 +220,31 @@ const importAnalysisFromHistoryState = async (): Promise<void> => {
         await importAnalysis(analysis);
     } catch (e) {
         analysisImportError.value = e instanceof Error ? e.message : String(e);
+    }
+};
+
+/**
+ * Opened to analyze a game with opponent: stream it, and invite opponent to edit it.
+ * Removed from history state, to not invite again on reload.
+ */
+const analyzeTogether = parseHexplorerAnalyzeTogether(history.state?.[HEXPLORER_ANALYZE_TOGETHER_STATE_KEY]);
+
+if (analyzeTogether !== null) {
+    history.replaceState({ ...history.state, [HEXPLORER_ANALYZE_TOGETHER_STATE_KEY]: undefined }, '');
+}
+
+const analyzeTogetherFromHistoryState = async (): Promise<void> => {
+    if (analyzeTogether === null) {
+        return;
+    }
+
+    sidebarOpen.value = true;
+    currentTab.value = 'live';
+    studyTitle.value = analyzeTogether.title;
+    [state.value.playerBlackName, state.value.playerWhiteName] = analyzeTogether.playerNames.map(name => name.slice(0, HEXPLORER_PLAYER_NAME_MAX_LENGTH));
+
+    if (await liveHost.startStream()) {
+        await liveHost.inviteEditor(analyzeTogether.playerPublicId);
     }
 };
 
@@ -313,42 +337,7 @@ const importAnalysisFromCopy = async (): Promise<void> => {
             <div v-else class="bottom-menu">
                 <HexplorerSetupTools v-if="!isLargeScreen" compact />
 
-                <div class="btn-group" v-if="!state.setupMode">
-                    <button
-                        @click="goToParent()"
-                        class="btn btn-outline-primary"
-                        :title="$t('hexplorer.go_back')"
-                    ><IconChevronLeft /></button>
-
-                    <button
-                        @click="goToFirstChild()"
-                        class="btn btn-outline-primary"
-                        :title="$t('hexplorer.go_forward')"
-                    ><IconChevronRight /></button>
-
-                    <button
-                        @click="deleteCurrentNode()"
-                        class="btn btn-outline-danger"
-                        :disabled="!canDeleteCurrentNode"
-                        :title="$t('hexplorer.delete_branch')"
-                    ><IconTrash /></button>
-
-                    <button
-                        @click="pass()"
-                        class="btn btn-outline-warning d-flex align-items-center gap-1"
-                        :title="$t('hexplorer.pass_turn')"
-                    ><IconArrowDownUp /> {{ $t('pass') }}</button>
-                </div>
-
-                <button
-                    @click="state.currentPlayer = state.currentPlayer === 0 ? 1 : 0; updateAnalysis()"
-                    class="btn d-flex align-items-center gap-2"
-                    :class="state.currentPlayer === 0 ? 'btn-danger' : 'btn-primary'"
-                    :title="$t('hexplorer.change_current_player')"
-                >
-                    <IconCircleFill />
-                    {{ state.currentPlayer === 0 ? $t('game.red') : $t('game.blue') }}
-                </button>
+                <HexplorerNavButtons />
 
                 <button type="button" class="btn btn-outline-primary open-sidebar-btn" @click="sidebarOpen = !sidebarOpen">
                     <IconArrowBarLeft v-if="!sidebarOpen" />
@@ -378,7 +367,8 @@ const importAnalysisFromCopy = async (): Promise<void> => {
                 <HexplorerHelpTab v-else-if="currentTab === 'help'" @dismiss="currentTab = 'tree'" />
                 <HexplorerLiveTab v-else-if="currentTab === 'live'" />
                 <HexplorerPlayTab v-else-if="currentTab === 'play'" />
-                <HexplorerTreeTab v-else :analyzers />
+                <HexplorerAiTab v-else-if="currentTab === 'ai'" :analyzers />
+                <HexplorerTreeTab v-else />
             </div>
 
             <HexplorerLiveChat

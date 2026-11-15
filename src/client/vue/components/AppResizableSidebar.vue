@@ -2,7 +2,7 @@
 /*
  * Sidebar on right of a layout, with vertical tabs, resizable by dragging handle on its left edge.
  * Takes the whole screen over the board on small screens: parent must be positioned.
- * Width is clamped in css, from default sidebar width to 3/4 of layout.
+ * Width is clamped in css, from a minimal width (nav and a narrow panel) to 3/4 of layout.
  *
  * Slots:
  *  - nav-header: on top of tabs, receives `collapsed`
@@ -108,11 +108,12 @@ const resize = (e: PointerEvent): void => {
         --bs-bg-opacity 0.85
 
 // Default width: panel content as wide as bootstrap cols (6, 5, then 4), plus nav.
-// Can be resized up to 3/4 of screen.
+// Can be resized from a narrow panel up to 3/4 of screen.
 .resizable-sidebar
     --content-width 50%
     --nav-width 12rem
     --sidebar-default-width unquote("min(calc(var(--content-width) + var(--nav-width)), 75%)") // unquote: stylus would compute min() itself
+    --sidebar-min-width unquote("min(calc(16rem + var(--nav-width)), var(--sidebar-default-width))")
 
     &.nav-collapsed
         --nav-width 3rem
@@ -132,7 +133,7 @@ const resize = (e: PointerEvent): void => {
         width var(--sidebar-default-width)
 
     .resizable-sidebar.resized
-        width clamp(var(--sidebar-default-width), var(--sidebar-width), 75%)
+        width clamp(var(--sidebar-min-width), var(--sidebar-width), 75%)
 
 // Discreet double bar, only on middle of sidebar edge
 .sidebar-resize-handle

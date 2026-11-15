@@ -1,6 +1,6 @@
 import { BoardEntity, GameView, Hex } from '@playhex/pixi-board';
-import { Container, Graphics, Point } from 'pixi.js';
-import type { HexplorerLiveCursor } from '../../../shared/app/hexplorerLive.js';
+import { Container, Graphics, Point, Text, TextStyle } from 'pixi.js';
+import type { HexplorerLiveCursor, HexplorerLiveSession } from '../../../shared/app/hexplorerLive.js';
 
 const CURSOR_GROUP = '_hexplorer_live_cursor';
 
@@ -93,12 +93,49 @@ export const trackBoardCursor = (
 };
 
 /**
- * Streamer cursor displayed on viewers boards: a red arrow, tip on the pointed position.
+ * Cursor colors of editors, by their order in session editors. Host cursor is red.
+ */
+const HOST_CURSOR_COLOR = 0xe53935;
+const EDITOR_CURSOR_COLORS = [0x1e88e5, 0x43a047, 0xfb8c00, 0x8e24aa, 0x00897b, 0xd81b60, 0x6d4c41];
+
+/**
+ * Color and pseudo of a cursor, null if this player has no cursor (not host nor editor).
+ */
+export type LiveCursorAppearance = null | { color: number, label: string };
+
+export const getLiveCursorAppearance = (session: null | undefined | HexplorerLiveSession, playerPublicId: string): LiveCursorAppearance => {
+    if (!session) {
+        return null;
+    }
+
+    if (session.host.publicId === playerPublicId) {
+        return { color: HOST_CURSOR_COLOR, label: session.host.pseudo };
+    }
+
+    const index = session.editors.findIndex(editor => editor.publicId === playerPublicId);
+
+    if (index < 0) {
+        return null;
+    }
+
+    return { color: EDITOR_CURSOR_COLORS[index % EDITOR_CURSOR_COLORS.length], label: session.editors[index].pseudo };
+};
+
+/**
+ * Cursor of a live session participant displayed on other boards:
+ * an arrow, tip on the pointed position, with participant pseudo.
  * Kept upright whatever the board orientation.
  */
 class LiveCursorEntity extends BoardEntity
 {
     protected override alwaysTop = true;
+
+    constructor(
+        private cursorColor: number,
+        private cursorLabel: string,
+    ) {
+        super();
+    }
 
     protected override draw(): Container
     {
@@ -124,10 +161,31 @@ class LiveCursorEntity extends BoardEntity
 
         const g = new Graphics();
         g.poly(arrow);
-        g.fill({ color: 0xe53935 });
+        g.fill({ color: this.cursorColor });
         g.stroke({ color: 0xffffff, width: size * 0.08, alpha: 0.95, join: 'round' });
 
-        container.addChild(shadow, g);
+        const text = new Text({
+            text: this.cursorLabel,
+            style: new TextStyle({
+                fontFamily: 'Arial',
+                fontWeight: 'bold',
+                fontSize: Hex.RADIUS * 0.6,
+                fill: 0xffffff,
+            }),
+            resolution: window.devicePixelRatio * 2,
+        });
+
+        const padding = Hex.RADIUS * 0.12;
+        const labelBackground = new Graphics();
+        labelBackground.roundRect(0, 0, text.width + padding * 2, text.height + padding, padding * 1.5);
+        labelBackground.fill({ color: this.cursorColor, alpha: 0.9 });
+
+        const labelContainer = new Container();
+        labelContainer.addChild(labelBackground, text);
+        text.position.set(padding, padding / 2);
+        labelContainer.position.set(size * 0.6, size * 1.05);
+
+        container.addChild(shadow, g, labelContainer);
 
         return container;
     }
@@ -140,37 +198,34 @@ class LiveCursorEntity extends BoardEntity
 const SMOOTHING_MS = 45;
 
 /**
- * Shows streamer cursor on a board, moving smoothly between received positions.
- * Board can be rebuilt (e.g board size changed): cursor is re-added to the new one.
+ * A cursor on a board, moving smoothly between received positions.
  */
-export class LiveCursorLayer
+class SmoothedCursor
 {
-    private entity: null | LiveCursorEntity = null;
-    private gameView: null | GameView = null;
+    private entity: LiveCursorEntity;
 
     private target: null | { x: number, y: number } = null;
     private current: null | { x: number, y: number } = null;
     private animationFrame: null | number = null;
     private lastFrameTime = 0;
 
-    setCursor(gameView: GameView, cursor: HexplorerLiveCursor): void
+    constructor(
+        private gameView: GameView,
+        readonly appearance: NonNullable<LiveCursorAppearance>,
+    ) {
+        this.entity = new LiveCursorEntity(appearance.color, appearance.label);
+        gameView.addEntity(this.entity, CURSOR_GROUP);
+        gameView.setGroupZIndex(CURSOR_GROUP, 100);
+        this.entity.hide();
+    }
+
+    isOn(gameView: GameView): boolean
     {
-        if (this.gameView !== gameView || this.entity === null || this.entity.destroyed) {
-            this.entity = new LiveCursorEntity();
-            this.gameView = gameView;
-            gameView.addEntity(this.entity, CURSOR_GROUP);
-            gameView.setGroupZIndex(CURSOR_GROUP, 100);
-            this.current = null;
-        }
+        return this.gameView === gameView && !this.entity.destroyed;
+    }
 
-        if (cursor === null) {
-            this.target = null;
-            this.current = null;
-            this.entity.hide();
-            this.stopAnimation();
-            return;
-        }
-
+    setPosition(cursor: { x: number, y: number }): void
+    {
         this.target = { ...cursor };
 
         // Appears directly at its position, then glides
@@ -205,7 +260,7 @@ export class LiveCursorLayer
     private animate = (time: number): void => {
         this.animationFrame = null;
 
-        if (this.entity === null || this.entity.destroyed || this.target === null || this.current === null) {
+        if (this.entity.destroyed || this.target === null || this.current === null) {
             return;
         }
 
@@ -229,5 +284,94 @@ export class LiveCursorLayer
     destroy(): void
     {
         this.stopAnimation();
+
+        if (!this.entity.destroyed) {
+            this.gameView.removeEntity(this.entity);
+            this.entity.destroy({ children: true });
+        }
+    }
+}
+
+/**
+ * Shows cursors of live session participants on a board.
+ * Board can be rebuilt (e.g board size changed): cursors are re-added to the new one, see refresh().
+ */
+export class LiveCursorLayer
+{
+    /**
+     * Last received position by player publicId, kept to redraw cursors on a rebuilt board.
+     */
+    private positions = new Map<string, { x: number, y: number }>();
+
+    private cursors = new Map<string, SmoothedCursor>();
+
+    /**
+     * @param getAppearance Null to not display cursor of this player (e.g myself, or no longer editor)
+     */
+    constructor(
+        private getAppearance: (playerPublicId: string) => LiveCursorAppearance,
+    ) {}
+
+    setCursor(gameView: GameView, playerPublicId: string, cursor: HexplorerLiveCursor): void
+    {
+        const appearance = cursor === null ? null : this.getAppearance(playerPublicId);
+
+        if (cursor === null || appearance === null) {
+            this.positions.delete(playerPublicId);
+            this.removeCursor(playerPublicId);
+            return;
+        }
+
+        this.positions.set(playerPublicId, cursor);
+
+        let smoothed = this.cursors.get(playerPublicId);
+
+        if (smoothed !== undefined && (!smoothed.isOn(gameView) || smoothed.appearance.color !== appearance.color || smoothed.appearance.label !== appearance.label)) {
+            this.removeCursor(playerPublicId);
+            smoothed = undefined;
+        }
+
+        if (smoothed === undefined) {
+            smoothed = new SmoothedCursor(gameView, appearance);
+            this.cursors.set(playerPublicId, smoothed);
+        }
+
+        smoothed.setPosition(cursor);
+    }
+
+    /**
+     * Redraws cursors, e.g on a rebuilt board, or when participants changed.
+     */
+    refresh(gameView: GameView): void
+    {
+        for (const playerPublicId of [...this.cursors.keys()]) {
+            if (!this.positions.has(playerPublicId)) {
+                this.removeCursor(playerPublicId);
+            }
+        }
+
+        for (const [playerPublicId, position] of [...this.positions]) {
+            this.setCursor(gameView, playerPublicId, position);
+        }
+    }
+
+    private removeCursor(playerPublicId: string): void
+    {
+        this.cursors.get(playerPublicId)?.destroy();
+        this.cursors.delete(playerPublicId);
+    }
+
+    clear(): void
+    {
+        this.positions.clear();
+
+        for (const playerPublicId of [...this.cursors.keys()]) {
+            this.removeCursor(playerPublicId);
+        }
+    }
+
+    destroy(): void
+    {
+        this.clear();
     }
 }

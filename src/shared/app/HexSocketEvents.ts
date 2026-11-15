@@ -7,7 +7,7 @@ import { ChatMessage, GameAnalyze, Game, Player, Rating } from './models/index.j
 import type { ChatMessageVisibility } from './chatMessageVisibility.js';
 import type { ChannelChatMessage, OnlinePlayers, PlayerNotification, Premove } from './models/index.js';
 import { PlayerOnlineStatus, WebsocketActionError } from './Types.js';
-import type { HexplorerLiveCursor, HexplorerLiveSession, HexplorerLiveSnapshot, HexplorerMatch, HexplorerMatchCreateInput } from './hexplorerLive.js';
+import type { HexplorerLiveCursor, HexplorerLiveSession, HexplorerLiveSnapshot, HexplorerLiveSnapshotAnswer, HexplorerMatch, HexplorerMatchCreateInput } from './hexplorerLive.js';
 
 /**
  * Answers error, or posted chat message publicId.
@@ -110,14 +110,31 @@ export type HexClientToServerEvents = {
     hexplorerLiveSetStreaming: (publicId: string, streaming: boolean, answer: (error?: WebsocketActionError) => void) => void;
 
     /**
-     * Host sends its whole analysis. Ignored when not streaming.
+     * Host or an editor sends its whole analysis. Ignored when not streaming.
+     *
+     * @param baseRevision Revision of the last snapshot sender knows. Rejected if another one has been accepted since.
      */
-    hexplorerLiveSnapshot: (publicId: string, snapshot: HexplorerLiveSnapshot) => void;
+    hexplorerLiveSnapshot: (
+        publicId: string,
+        baseRevision: number,
+        snapshot: HexplorerLiveSnapshot,
+        answer: (result: HexplorerLiveSnapshotAnswer | WebsocketActionError) => void,
+    ) => void;
 
     /**
-     * Host cursor moved over the board.
+     * Host or editor cursor moved over the board.
      */
     hexplorerLiveCursor: (publicId: string, cursor: HexplorerLiveCursor) => void;
+
+    /**
+     * Host invites a player to edit streamed analysis together.
+     */
+    hexplorerLiveInviteEditor: (publicId: string, playerPublicId: string, answer: (error?: WebsocketActionError) => void) => void;
+
+    /**
+     * Host removes an editor, or an editor leaves.
+     */
+    hexplorerLiveRemoveEditor: (publicId: string, playerPublicId: string, answer: (error?: WebsocketActionError) => void) => void;
 
     /**
      * Host ends the session: stream and match. Its link can be used again by restarting a session from same study.
@@ -404,14 +421,14 @@ export type HexServerToClientEvents = {
     hexplorerLiveUpdate: (publicId: string, session: null | HexplorerLiveSession) => void;
 
     /**
-     * Streamed analysis changed.
+     * Streamed analysis changed, by host or an editor.
      */
-    hexplorerLiveSnapshot: (publicId: string, snapshot: HexplorerLiveSnapshot) => void;
+    hexplorerLiveSnapshot: (publicId: string, revision: number, snapshot: HexplorerLiveSnapshot) => void;
 
     /**
-     * Streamer cursor moved.
+     * Cursor of host or an editor moved.
      */
-    hexplorerLiveCursor: (publicId: string, cursor: HexplorerLiveCursor) => void;
+    hexplorerLiveCursor: (publicId: string, playerPublicId: string, cursor: HexplorerLiveCursor) => void;
 
     /**
      * Match created, joined, move played, or ended.
@@ -422,4 +439,9 @@ export type HexServerToClientEvents = {
      * I have been invited to play a match from a Hexplorer position.
      */
     hexplorerMatchInvitation: (publicId: string, host: Player) => void;
+
+    /**
+     * I have been invited to edit a streamed Hexplorer analysis.
+     */
+    hexplorerLiveInvitation: (publicId: string, host: Player) => void;
 };

@@ -7,6 +7,7 @@ import { Player } from '../../shared/app/models/index.js';
 import { instanceToInstance } from '../../shared/app/class-transformer-custom.js';
 import {
     bestMoveFromPolicy,
+    canEditHexplorerLive,
     canJoinMatch,
     getMatchFreeSeat,
     getMatchPlayerColor,
@@ -19,6 +20,7 @@ import {
     playMatchMove,
     stonesToBlackWhite,
     type HexplorerLiveSession,
+    type HexplorerLiveSnapshotAnswer,
     type HexplorerMatch,
     type HexplorerMatchSeat,
 } from '../../shared/app/hexplorerLive.js';
@@ -51,14 +53,15 @@ type SessionInternal = {
     session: HexplorerLiveSession;
 
     /**
-     * Number of sockets of host currently in session room.
-     */
-    hostSockets: number;
-
-    /**
      * Since when host has no socket in session room, null if host is here.
      */
     hostAwaySince: null | number;
+
+    /**
+     * Number of sockets of each player in session room, by player publicId.
+     * Used to know whether host is here, and to remove cursor of a participant who left.
+     */
+    playerSockets: Map<string, number>;
 
     /**
      * Last match activity (created, joined, move), used to expire abandoned matches.
@@ -130,6 +133,32 @@ export default class HexplorerLiveService
         return internal;
     }
 
+    /**
+     * Last revision given to a session snapshot, shared by all sessions.
+     * Never decreases, even across server restarts (starts from current time):
+     * viewers still following a previous session of same study must not ignore new snapshots as older ones.
+     */
+    private lastRevision = Date.now();
+
+    private nextRevision(): number
+    {
+        return ++this.lastRevision;
+    }
+
+    /**
+     * Session player can edit: as host or invited editor.
+     */
+    private getEditableSession(publicId: string, player: Player): SessionInternal
+    {
+        const internal = this.getSessionInternal(publicId);
+
+        if (!canEditHexplorerLive(internal.session, player.publicId)) {
+            throw new HexplorerLiveClientError('hexplorer_live.errors.not_editor');
+        }
+
+        return internal;
+    }
+
     private emitSession(session: HexplorerLiveSession): void
     {
         this.io.to(Rooms.hexplorerLive(session.publicId)).emit('hexplorerLiveUpdate', session.publicId, session);
@@ -170,7 +199,7 @@ export default class HexplorerLiveService
         const previous = this.sessions.get(this.sessionByHost.get(host.publicId) ?? '');
 
         if (previous !== undefined) {
-            if (previous.hostSockets > 0) {
+            if (this.isHostInRoom(previous)) {
                 throw new HexplorerLiveClientError('hexplorer_live.errors.already_live');
             }
 
@@ -180,21 +209,27 @@ export default class HexplorerLiveService
         const session: HexplorerLiveSession = {
             publicId,
             host: this.toPublicPlayer(host),
+            editors: [],
+            revision: this.nextRevision(),
             streaming: false,
             snapshot: null,
             match: null,
             ended: false,
         };
 
-        // Host may already be in room, from a previous session of same study
-        const hostSockets = this.countHostSocketsInRoom(publicId, host);
-
-        this.sessions.set(session.publicId, {
+        // Players may already be in room, from a previous session of same study
+        const internal: SessionInternal = {
             session,
-            hostSockets,
-            hostAwaySince: hostSockets > 0 ? null : Date.now(),
+            hostAwaySince: null,
+            playerSockets: this.countPlayerSocketsInRoom(publicId),
             lastMatchActivity: Date.now(),
-        });
+        };
+
+        if (!this.isHostInRoom(internal)) {
+            internal.hostAwaySince = Date.now();
+        }
+
+        this.sessions.set(session.publicId, internal);
 
         this.sessionByHost.set(host.publicId, session.publicId);
 
@@ -205,18 +240,25 @@ export default class HexplorerLiveService
         return session;
     }
 
-    private countHostSocketsInRoom(publicId: string, host: Player): number
+    private countPlayerSocketsInRoom(publicId: string): Map<string, number>
     {
         const socketIds = this.io.sockets.adapter.rooms.get(Rooms.hexplorerLive(publicId)) ?? new Set<string>();
-        let count = 0;
+        const playerSockets = new Map<string, number>();
 
         for (const socketId of socketIds) {
-            if (this.io.sockets.sockets.get(socketId)?.data.player?.publicId === host.publicId) {
-                ++count;
+            const playerPublicId = this.io.sockets.sockets.get(socketId)?.data.player?.publicId;
+
+            if (playerPublicId !== undefined) {
+                playerSockets.set(playerPublicId, (playerSockets.get(playerPublicId) ?? 0) + 1);
             }
         }
 
-        return count;
+        return playerSockets;
+    }
+
+    private isHostInRoom(internal: SessionInternal): boolean
+    {
+        return internal.playerSockets.has(internal.session.host.publicId);
     }
 
     setStreaming(publicId: string, player: Player, streaming: boolean): void
@@ -231,35 +273,42 @@ export default class HexplorerLiveService
 
         if (!streaming) {
             session.snapshot = null;
+            session.editors = [];
         }
 
         this.emitSession(session);
     }
 
     /**
-     * @param fromSocketId Host socket that sent it, does not need it back
+     * Snapshot is accepted only if based on last revision:
+     * else another participant changed analysis meanwhile, and sender already received it.
+     *
+     * @param fromSocketId Socket that sent it, does not need it back
      *
      * @throws {HexplorerLiveError} On invalid snapshot
      */
-    updateSnapshot(publicId: string, player: Player, data: unknown, fromSocketId: string): void
+    updateSnapshot(publicId: string, player: Player, baseRevision: unknown, data: unknown, fromSocketId: string): HexplorerLiveSnapshotAnswer
     {
-        const { session } = this.getHostedSession(publicId, player);
+        const { session } = this.getEditableSession(publicId, player);
 
-        if (!session.streaming) {
-            return;
+        if (!session.streaming || baseRevision !== session.revision) {
+            return { rejected: true };
         }
 
         session.snapshot = parseHexplorerLiveSnapshot(data);
+        session.revision = this.nextRevision();
 
-        this.io.to(Rooms.hexplorerLive(publicId)).except(fromSocketId).emit('hexplorerLiveSnapshot', publicId, session.snapshot);
+        this.io.to(Rooms.hexplorerLive(publicId)).except(fromSocketId).emit('hexplorerLiveSnapshot', publicId, session.revision, session.snapshot);
+
+        return { revision: session.revision };
     }
 
     /**
-     * Not stored, just relayed to viewers. Can be lost.
+     * Not stored, just relayed to other participants and viewers. Can be lost.
      */
     updateCursor(publicId: string, player: Player, data: unknown, fromSocketId: string): void
     {
-        const { session } = this.getHostedSession(publicId, player);
+        const { session } = this.getEditableSession(publicId, player);
 
         if (!session.streaming) {
             return;
@@ -269,8 +318,68 @@ export default class HexplorerLiveService
             .to(Rooms.hexplorerLive(publicId))
             .except(fromSocketId)
             .volatile
-            .emit('hexplorerLiveCursor', publicId, parseHexplorerLiveCursor(data))
+            .emit('hexplorerLiveCursor', publicId, player.publicId, parseHexplorerLiveCursor(data))
         ;
+    }
+
+    /**
+     * Host invites a player to edit streamed analysis.
+     */
+    async inviteEditor(publicId: string, host: Player, playerPublicId: unknown): Promise<void>
+    {
+        const { session } = this.getHostedSession(publicId, host);
+
+        if (!session.streaming) {
+            throw new HexplorerLiveClientError('hexplorer_live.errors.not_streaming');
+        }
+
+        const invited = typeof playerPublicId === 'string'
+            ? await this.playerRepository.getPlayer(playerPublicId)
+            : null
+        ;
+
+        if (invited === null || invited.publicId === host.publicId || invited.isBot) {
+            throw new HexplorerLiveClientError('hexplorer_live.errors.invalid_invited_player');
+        }
+
+        if (!session.editors.some(editor => editor.publicId === invited.publicId)) {
+            session.editors = [...session.editors, this.toPublicPlayer(invited)];
+            this.emitSession(session);
+        }
+
+        this.io.to(Rooms.player(invited.publicId)).emit('hexplorerLiveInvitation', publicId, session.host);
+    }
+
+    /**
+     * Host removes an editor, or an editor leaves.
+     */
+    removeEditor(publicId: string, player: Player, editorPublicId: unknown): void
+    {
+        const { session } = this.getSessionInternal(publicId);
+
+        if (typeof editorPublicId !== 'string') {
+            throw new HexplorerLiveError('Invalid editor publicId');
+        }
+
+        if (player.publicId !== session.host.publicId && player.publicId !== editorPublicId) {
+            throw new HexplorerLiveClientError('hexplorer_live.errors.not_host');
+        }
+
+        const editors = session.editors.filter(editor => editor.publicId !== editorPublicId);
+
+        if (editors.length === session.editors.length) {
+            return;
+        }
+
+        session.editors = editors;
+
+        this.emitSession(session);
+        this.emitCursorRemoved(publicId, editorPublicId);
+    }
+
+    private emitCursorRemoved(publicId: string, playerPublicId: string): void
+    {
+        this.io.to(Rooms.hexplorerLive(publicId)).emit('hexplorerLiveCursor', publicId, playerPublicId, null);
     }
 
     end(publicId: string): void
@@ -290,6 +399,7 @@ export default class HexplorerLiveService
         session.ended = true;
         session.streaming = false;
         session.snapshot = null;
+        session.editors = [];
 
         this.sessions.delete(publicId);
 
@@ -531,31 +641,49 @@ export default class HexplorerLiveService
     }
 
     /**
-     * Track host presence in session room, to end session when host left.
+     * Track players presence in session room:
+     * to end session when host left, and remove cursor of a participant who left.
      */
     onSocketJoined(publicId: string, player: null | Player): void
     {
         const internal = this.sessions.get(publicId);
 
-        if (!internal || player?.publicId !== internal.session.host.publicId) {
+        if (!internal || !player) {
             return;
         }
 
-        ++internal.hostSockets;
-        internal.hostAwaySince = null;
+        const { playerSockets } = internal;
+
+        playerSockets.set(player.publicId, (playerSockets.get(player.publicId) ?? 0) + 1);
+
+        if (player.publicId === internal.session.host.publicId) {
+            internal.hostAwaySince = null;
+        }
     }
 
     onSocketLeft(publicId: string, player: null | Player): void
     {
         const internal = this.sessions.get(publicId);
 
-        if (!internal || player?.publicId !== internal.session.host.publicId) {
+        if (!internal || !player) {
             return;
         }
 
-        internal.hostSockets = Math.max(0, internal.hostSockets - 1);
+        const { playerSockets } = internal;
+        const remaining = (playerSockets.get(player.publicId) ?? 1) - 1;
 
-        if (internal.hostSockets === 0) {
+        if (remaining > 0) {
+            playerSockets.set(player.publicId, remaining);
+            return;
+        }
+
+        playerSockets.delete(player.publicId);
+
+        if (canEditHexplorerLive(internal.session, player.publicId)) {
+            this.emitCursorRemoved(publicId, player.publicId);
+        }
+
+        if (player.publicId === internal.session.host.publicId) {
             internal.hostAwaySince = Date.now();
         }
     }

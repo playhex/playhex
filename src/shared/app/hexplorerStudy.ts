@@ -82,6 +82,9 @@ export type HexplorerState = {
     policyShowNumbers: boolean;
     policyShowBestMark: boolean;
 
+    // Whether AI analysis is enabled. Disabled by default: nothing is analyzed nor auto-played until enabled.
+    aiEnabled: boolean;
+
     // Name of the selected analysis engine. Restored only if still available.
     analyzerName?: string;
 
@@ -101,6 +104,7 @@ export const createHexplorerState = (boardsize = 11): HexplorerState => ({
     policyEnabled: [true, true],
     policyShowNumbers: false,
     policyShowBestMark: false,
+    aiEnabled: false,
     boardsize,
     currentNodeId: ROOT_ID,
     nodes: createRootNodes(),
@@ -331,6 +335,7 @@ export const parseHexplorerState = (data: unknown, maxNodes = Infinity): Hexplor
         policyEnabled: parseBooleanPair(data.policyEnabled, defaults.policyEnabled),
         policyShowNumbers: data.policyShowNumbers === true,
         policyShowBestMark: data.policyShowBestMark === true,
+        aiEnabled: data.aiEnabled === true,
         currentNodeId: nodes.some(node => node.id === data.currentNodeId) ? data.currentNodeId as number : ROOT_ID,
         nodes,
     };

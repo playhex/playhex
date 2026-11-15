@@ -119,6 +119,16 @@ const hexplorerLiveCreateLimiter = new RateLimiterMemory({
 });
 
 /**
+ * Limit invitations to edit a Hexplorer live analysis, by host.
+ * Same player can be invited again, invitation toast may have been lost.
+ */
+const hexplorerLiveInviteLimiter = new RateLimiterMemory({
+    keyPrefix: 'rate_limiter.hexplorer_live_invite',
+    points: 5,
+    duration: 120,
+});
+
+/**
  * Limit javascript errors reported from player devices, by ip.
  */
 const clientErrorReportLimiter = new RateLimiterMemory({
@@ -287,6 +297,10 @@ const consume = async (limiter: RateLimiterMemory, key: string, pointsToConsume 
 
 export const rateLimiterConsumeHexplorerLiveCreate = async (playerPublicId: string) => {
     await consume(hexplorerLiveCreateLimiter, playerPublicId);
+};
+
+export const rateLimiterConsumeHexplorerLiveInvite = async (playerPublicId: string) => {
+    await consume(hexplorerLiveInviteLimiter, playerPublicId);
 };
 
 export const rateLimiterConsumeChatMessage = async (playerPublicId: string) => {

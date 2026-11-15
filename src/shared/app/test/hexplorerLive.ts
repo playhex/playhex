@@ -150,7 +150,7 @@ describe('Hexplorer live parsing', () => {
     });
 
     it('parses a valid snapshot, and rejects an invalid policy', () => {
-        const state = createHexplorerState(5);
+        const state = { ...createHexplorerState(5), aiEnabled: true };
         const policy = Array(5).fill(null).map(() => Array(5).fill(0.04));
 
         const snapshot = parseHexplorerLiveSnapshot({
@@ -158,6 +158,8 @@ describe('Hexplorer live parsing', () => {
             scratch: { stones: [{ move: 'a1', color: 0 }], marks: [{ move: 'b2', type: 'label', text: 'A' }] },
             analysis: { color: 'black', whiteWin: 0.4, policy },
         });
+
+        assert.strictEqual(snapshot.state.aiEnabled, true);
 
         assert.strictEqual(snapshot.state.boardsize, 5);
         assert.deepStrictEqual(snapshot.scratch?.marks, [{ move: 'b2', type: 'label', text: 'A' }]);

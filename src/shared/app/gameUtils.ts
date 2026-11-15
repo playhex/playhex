@@ -469,6 +469,24 @@ export const canShowHexplorerLink = (game: Game, player: null | Player): boolean
 };
 
 /**
+ * Opponent of player to analyze an ended game with, in a Hexplorer live session.
+ * Null if player did not play this game against a human.
+ */
+export const getAnalyzeTogetherOpponent = (game: Game, player: null | Player): null | Player => {
+    if (!player || player.isGuest || game.state !== 'ended' || isBotGame(game) || getPlayerIndex(game, player) < 0) {
+        return null;
+    }
+
+    const opponent = getOtherPlayer(game, player);
+
+    if (opponent === null || opponent.publicId === player.publicId) {
+        return null;
+    }
+
+    return opponent;
+};
+
+/**
  * Whether a puzzle can be created from this game.
  * Only from ended games, to not get help from others on a game in progress.
  */

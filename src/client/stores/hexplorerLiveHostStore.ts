@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { computed, ref, shallowRef, watch } from 'vue';
 import type { HexMove } from '@playhex/move-notation';
 import useSocketStore from './socketStore.js';
-import { followHexplorerLiveSession } from '../vue/hexplorer/composables/hexplorerLiveSession.js';
+import { followHexplorerLiveSession, type HexplorerLiveSessionHandlers } from '../vue/hexplorer/composables/hexplorerLiveSession.js';
 import type { HexplorerMatchCreateInput } from '../../shared/app/hexplorerLive.js';
 import type { HexplorerState } from '../../shared/app/hexplorerStudy.js';
 import type { WebsocketActionError } from '../../shared/app/Types.js';
@@ -30,7 +30,16 @@ const useHexplorerLiveHostStore = defineStore('hexplorerLiveHostStore', () => {
      */
     const publicId = ref<null | string>(null);
 
-    const { session, match, myColor, canJoin, isMyTurn, action, joinMatch, playMatchMove, resignMatch } = followHexplorerLiveSession(publicId);
+    /**
+     * Set by Hexplorer page while opened, to apply analysis changed by editors.
+     */
+    const liveHandlers = shallowRef<HexplorerLiveSessionHandlers>({});
+
+    const setLiveHandlers = (handlers: HexplorerLiveSessionHandlers): void => {
+        liveHandlers.value = handlers;
+    };
+
+    const { session, match, myColor, canJoin, isMyTurn, action, joinMatch, playMatchMove, resignMatch } = followHexplorerLiveSession(publicId, liveHandlers);
 
     /**
      * Also true while session is loading.
@@ -108,6 +117,29 @@ const useHexplorerLiveHostStore = defineStore('hexplorerLiveHostStore', () => {
         return await setStreaming(publicId.value, false);
     };
 
+    /**
+     * Invites a player to edit streamed analysis.
+     */
+    const inviteEditor = async (playerPublicId: string): Promise<boolean> => {
+        if (publicId.value === null) {
+            return false;
+        }
+
+        const id = publicId.value;
+
+        return await action(answer => socket.emit('hexplorerLiveInviteEditor', id, playerPublicId, answer));
+    };
+
+    const removeEditor = async (playerPublicId: string): Promise<boolean> => {
+        if (publicId.value === null) {
+            return false;
+        }
+
+        const id = publicId.value;
+
+        return await action(answer => socket.emit('hexplorerLiveRemoveEditor', id, playerPublicId, answer));
+    };
+
     let matchStart: null | Omit<HexplorerMatchVariation, 'moves'> = null;
 
     /**
@@ -168,6 +200,9 @@ const useHexplorerLiveHostStore = defineStore('hexplorerLiveHostStore', () => {
         matchVariation,
         startStream,
         stopStream,
+        inviteEditor,
+        removeEditor,
+        setLiveHandlers,
         endSession,
         createMatch,
         joinMatch,

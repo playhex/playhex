@@ -1,7 +1,7 @@
 import { GameView, PlayingGameFacade, PolicyOverlayFacade } from '@playhex/pixi-board';
 import { movesToHexworldString, parseHexworldString } from '../../../../shared/app/hexworld.js';
 import { coordsToMove, HexMove, Move } from '@playhex/move-notation';
-import { computed, InjectionKey, Ref, ref, shallowRef, watch } from 'vue';
+import { computed, InjectionKey, MaybeRefOrGetter, nextTick, Ref, ref, shallowRef, toValue, watch } from 'vue';
 import { ToolInterface } from '../tools/ToolInterface.js';
 import { PlaceStonesAlternatelyTool } from '../tools/PlaceStonesAlternatelyTool.js';
 import { RemoveStoneTool } from '../tools/RemoveStoneTool.js';
@@ -53,15 +53,34 @@ export type UseHexplorerOptions = {
     /**
      * Board can't be edited nor navigated by player, and nothing is analyzed:
      * state is only set from outside, e.g by a streamer (see applyLiveSnapshot).
+     * Can change, e.g when a live session viewer becomes editor.
      */
-    readonly?: boolean;
+    readonly?: MaybeRefOrGetter<boolean>;
+
+    /**
+     * Whether current position is kept in URL hash. Default to true when not readonly.
+     */
+    syncUrlHash?: boolean;
+
+    /**
+     * Whether AI analysis comes from a live session host (viewers and editors):
+     * nothing is analyzed nor auto-played here, analysis of host is displayed, see applyLiveSnapshot().
+     */
+    analysisFromLive?: boolean;
 };
 
 /**
  * @param analyzers Engines that can be selected. First one is the default.
  */
 export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], options: UseHexplorerOptions = {}) => {
-    const readonly = options.readonly ?? false;
+    const readonly = computed(() => toValue(options.readonly) ?? false);
+    const urlHashSynced = options.syncUrlHash ?? !readonly.value;
+
+    /**
+     * True while displaying a snapshot sent by another live session participant:
+     * its analysis is displayed as is, nothing is analyzed nor auto-played.
+     */
+    let applyingLiveSnapshot = false;
 
     /**
      * Actions made so far while in setup mode (scratch editing, not yet validated into the tree).
@@ -83,7 +102,27 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
 
     // The analyzer currently used to compute winrate/policy. Can be swapped at runtime
     // (see setAnalyzer), e.g to disable analysis (NoopAnalyzer) or change engine.
-    const currentAnalyzer = shallowRef<AnalyzerInterface | null>(readonly ? null : analyzers[0]);
+    const currentAnalyzer = shallowRef<AnalyzerInterface | null>(readonly.value ? null : analyzers[0]);
+
+    /**
+     * Whether AI analysis is enabled, kept in state: saved with study, and enabled by host for live session participants.
+     */
+    const aiEnabled = computed({
+        get: () => state.value.aiEnabled,
+        set: enabled => state.value.aiEnabled = enabled,
+    });
+
+    /**
+     * Analyzer actually used, null when AI is disabled, or computed by live session host.
+     */
+    const activeAnalyzer = computed(() => aiEnabled.value && !readonly.value && !options.analysisFromLive ? currentAnalyzer.value : null);
+
+    // Analyzer used once editable, the one of the state if any.
+    watch(readonly, isReadonly => {
+        currentAnalyzer.value = isReadonly
+            ? null
+            : analyzers.find(a => a.getName() === state.value.analyzerName) ?? analyzers[0];
+    });
 
     // Analysis currently displayed for the current position, sent to stream viewers.
     const displayedAnalysis = shallowRef<HexplorerLiveSnapshot['analysis']>(null);
@@ -222,13 +261,13 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
 
     const updateAnalysis = async (): Promise<void> => {
         // Analysis is set by streamer, see applyLiveSnapshot()
-        if (readonly) {
+        if (readonly.value || applyingLiveSnapshot) {
             return;
         }
 
         policyOverlayFacade.clear();
 
-        const analyzer = currentAnalyzer.value;
+        const analyzer = activeAnalyzer.value;
         const player = state.value.currentPlayer;
         const showWinrate = state.value.winrateEnabled[player];
         const showPolicy = state.value.policyEnabled[player];
@@ -361,7 +400,7 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
      * the background without blocking or racing with further navigation.
      */
     const fillAncestorEvals = async (path: TreeNode[]): Promise<void> => {
-        const analyzer = currentAnalyzer.value;
+        const analyzer = activeAnalyzer.value;
 
         if (!analyzer) {
             return;
@@ -568,7 +607,7 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
      * Ignored in setup mode, it would drop stones not yet validated.
      */
     const userGoToNode = (id: number): void => {
-        if (readonly || state.value.setupMode) {
+        if (readonly.value || state.value.setupMode) {
             return;
         }
 
@@ -671,10 +710,10 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
             return;
         }
 
-        const analyzer = currentAnalyzer.value;
+        const analyzer = activeAnalyzer.value;
         const player = state.value.currentPlayer;
 
-        if (!analyzer || autoPlayPaused || state.value.setupMode || !state.value.autoPlay[player]) {
+        if (!analyzer || applyingLiveSnapshot || autoPlayPaused || state.value.setupMode || !state.value.autoPlay[player]) {
             return;
         }
 
@@ -725,6 +764,13 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
         { deep: true },
     );
 
+    // Enabling AI analyzes current line, and resumes auto-play. Disabling it hides analysis.
+    watch(aiEnabled, () => {
+        void updateAnalysis();
+        void fillAncestorEvals(tree.getPath(currentNodeId.value));
+        void maybeAutoPlay();
+    });
+
     // Toggling winrate/policy display for a color re-runs analysis for the current position.
     watch(
         [() => state.value.winrateEnabled, () => state.value.policyEnabled],
@@ -754,7 +800,7 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
      * remaining moves in the current evaluation line (so the tree is preserved on reload).
      */
     const syncUrlHash = (): void => {
-        if (readonly) {
+        if (!urlHashSynced) {
             return;
         }
 
@@ -826,7 +872,7 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
         new PlayerSettingsFacade(gameView);
 
         gameView.on('hexPointerDown', async move => {
-            if (readonly) {
+            if (readonly.value) {
                 return;
             }
 
@@ -840,7 +886,7 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
         });
 
         gameView.on('hexClicked', async move => {
-            if (readonly) {
+            if (readonly.value) {
                 return;
             }
 
@@ -1055,45 +1101,121 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
     };
 
     /**
-     * Displays what a streamer sent. Used in readonly mode.
+     * Analysis of current position still running must not be displayed.
      */
-    const applyLiveSnapshot = async (snapshot: HexplorerLiveSnapshot): Promise<void> => {
-        if (snapshot.state.boardsize !== gameView.getBoardsize()) {
-            await rebuildBoard(snapshot.state.boardsize);
-        }
+    const cancelAnalysis = (): void => {
+        ++analysisRequestId;
+        analysisLoading.value = false;
+        analysisError.value = null;
+    };
 
-        state.value = snapshot.state;
-        tree.reload();
+    /**
+     * What analysis and auto-play depend on, to know whether they must run again.
+     */
+    const getAnalysisInput = (): string => JSON.stringify({
+        size: gameView.getBoardsize(),
+        stones: getBoardStones(gameView),
+        player: state.value.currentPlayer,
+        aiEnabled: state.value.aiEnabled,
+        winrateEnabled: state.value.winrateEnabled,
+        policyEnabled: state.value.policyEnabled,
+        autoPlay: state.value.autoPlay,
+    });
 
-        if (!tree.nodes.value.some(node => node.id === state.value.currentNodeId)) {
-            state.value.currentNodeId = ROOT_ID;
-        }
+    /**
+     * Displays what another live session participant sent (host or editor).
+     * State is replaced in place, tools keep referencing it.
+     *
+     * @param analyze Whether to analyze new position, and auto-play (host).
+     *                Current analysis is kept if position did not change, e.g only a comment changed.
+     *                Else, analysis of the snapshot is displayed as is (viewers and editors, analysis is sent by host).
+     */
+    const applyLiveSnapshot = async (snapshot: HexplorerLiveSnapshot, analyze = false): Promise<void> => {
+        const analysisInputBefore = getAnalysisInput();
+        let reanalyze = false;
 
-        goToNode(state.value.currentNodeId);
+        applyingLiveSnapshot = true;
 
-        if (snapshot.scratch !== null) {
-            clearBoard();
-            marksLayer.clear();
-            applySetupStones(snapshot.scratch.stones);
+        try {
+            dragPainter.reset();
 
-            for (const mark of snapshot.scratch.marks) {
-                if (mark.type === 'select') {
-                    marksLayer.setSelected(mark.move, true);
-                } else {
-                    marksLayer.setMark(mark.move, mark.type, mark.text);
+            if (snapshot.state.boardsize !== gameView.getBoardsize()) {
+                cancelAnalysis();
+                await rebuildBoard(snapshot.state.boardsize);
+            }
+
+            const target = state.value as Record<string, unknown>;
+
+            for (const key of Object.keys(target)) {
+                if (!(key in snapshot.state)) {
+                    delete target[key];
                 }
             }
+
+            Object.assign(target, snapshot.state);
+            tree.reload();
+
+            if (!tree.nodes.value.some(node => node.id === state.value.currentNodeId)) {
+                state.value.currentNodeId = ROOT_ID;
+            }
+
+            for (const id of [...evalsByNodeId.value.keys()]) {
+                if (!tree.nodes.value.some(node => node.id === id)) {
+                    evalsByNodeId.value.delete(id);
+                }
+            }
+
+            goToNode(state.value.currentNodeId);
+
+            // Not always the one deduced from position, e.g changed manually
+            state.value.currentPlayer = snapshot.state.currentPlayer;
+
+            actionsStack.value = new UndoableActionsStack();
+
+            if (snapshot.scratch !== null) {
+                clearBoard();
+                marksLayer.clear();
+                applySetupStones(snapshot.scratch.stones);
+
+                for (const mark of snapshot.scratch.marks) {
+                    if (mark.type === 'select') {
+                        marksLayer.setSelected(mark.move, true);
+                    } else {
+                        marksLayer.setMark(mark.move, mark.type, mark.text);
+                    }
+                }
+            }
+
+            reanalyze = analyze && getAnalysisInput() !== analysisInputBefore;
+
+            if (!analyze || reanalyze) {
+                const { analysis } = snapshot;
+
+                cancelAnalysis();
+                displayedAnalysis.value = analysis;
+                whiteWin.value = analysis?.whiteWin;
+                policyOverlayFacade.clear();
+
+                if (analysis?.policy) {
+                    policyOverlayFacade.setShowNumbers(state.value.policyShowNumbers);
+                    policyOverlayFacade.setShowBestMark(state.value.policyShowBestMark);
+                    policyOverlayFacade.apply(analysis.policy, analysis.color);
+                }
+
+                if (typeof analysis?.whiteWin === 'number' && !state.value.setupMode) {
+                    evalsByNodeId.value.set(state.value.currentNodeId, analysis.whiteWin);
+                }
+            }
+
+            // Let watchers triggered by state change run while analysis and auto-play are disabled
+            await nextTick();
+        } finally {
+            applyingLiveSnapshot = false;
         }
 
-        const { analysis } = snapshot;
-
-        whiteWin.value = analysis?.whiteWin;
-        policyOverlayFacade.clear();
-
-        if (analysis?.policy) {
-            policyOverlayFacade.setShowNumbers(state.value.policyShowNumbers);
-            policyOverlayFacade.setShowBestMark(state.value.policyShowBestMark);
-            policyOverlayFacade.apply(analysis.policy, analysis.color);
+        if (reanalyze) {
+            void updateAnalysis();
+            void maybeAutoPlay();
         }
     };
 
@@ -1160,7 +1282,7 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
     const bindKeys = () => {
         // Runs the given handler, unless the user is typing in a form field.
         const boardShortcut = (run: () => void) => (e: KeyboardEvent) => {
-            if (isTyping(e)) {
+            if (isTyping(e) || readonly.value) {
                 return;
             }
 
@@ -1222,6 +1344,7 @@ export const useHexplorer = (fromHash: string, analyzers: AnalyzerInterface[], o
         currentComment,
         resumeAutoPlay,
         currentAnalyzer,
+        aiEnabled,
         setAnalyzer,
         isAnalyzerAvailable,
         isEngineAvailable,
