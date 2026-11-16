@@ -5,7 +5,7 @@ import { Game } from '../../shared/app/models/index.js';
 /**
  * Max history depth, to prevent too heavy queries.
  */
-const MAX_HISTORY_MS = 15 * 31 * 86400 * 1000;
+const MAX_HISTORY_MS = 2 * 366 * 86400 * 1000;
 
 /**
  * Live games waiting for an opponent in lobby, as:

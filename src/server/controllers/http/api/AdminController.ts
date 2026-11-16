@@ -16,6 +16,8 @@ import { ROLE_ADMIN } from '../../../services/roles.js';
 import { TournamentError } from '../../../tournaments/TournamentError.js';
 import FeatureUsageRepository from '../../../repositories/FeatureUsageRepository.js';
 import LiveLobbyHistoryRepository from '../../../repositories/LiveLobbyHistoryRepository.js';
+import AdminStatsService from '../../../services/admin-stats/AdminStatsService.js';
+import { ADMIN_STATS_PERIODS, type AdminStatsPeriod } from '../../../services/admin-stats/computeAdminStats.js';
 
 class CreateAiVsAiInput
 {
@@ -45,6 +47,7 @@ export default class AdminController
         private autoCancelStaleGames: AutoCancelStaleGames,
         private featureUsageRepository: FeatureUsageRepository,
         private liveLobbyHistoryRepository: LiveLobbyHistoryRepository,
+        private adminStatsService: AdminStatsService,
     ) {}
 
     /**
@@ -94,6 +97,24 @@ export default class AdminController
         }
 
         return await this.liveLobbyHistoryRepository.getLiveLobbyHistory(sinceDate);
+    }
+
+    /**
+     * Activity, acquisition, retention, lobby and games quality stats on last 2 years.
+     * Cached 24h, unless `refresh` is set.
+     *
+     * @param period "day", "week" or "28d"
+     */
+    @Get('/api/admin/stats')
+    async getStats(
+        @QueryParam('period', { required: true }) period: string,
+        @QueryParam('refresh') refresh?: string,
+    ) {
+        if (!(ADMIN_STATS_PERIODS as readonly string[]).includes(period)) {
+            throw new BadRequestError(`Invalid "period", expected one of: ${ADMIN_STATS_PERIODS.join(', ')}`);
+        }
+
+        return await this.adminStatsService.getStats(period as AdminStatsPeriod, refresh === '1' || refresh === 'true');
     }
 
     @Post('/api/admin/persist-games')

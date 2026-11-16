@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
 import logger from '../services/logger.js';
 
-const CACHE_TTL_SECONDS = 30 * 24 * 3600;
+const DEFAULT_TTL_SECONDS = 30 * 24 * 3600;
 
 /**
  * Max entries kept in memory when redis is not available.
@@ -30,7 +30,7 @@ const getRedisClient = (): null | RedisClient => {
 };
 
 /**
- * Caches AI job results as json, in redis if available, else in memory.
+ * Caches values (AI job results, stats...) as json, in redis if available, else in memory.
  * Also prevents running a same job twice at same time, see dedupe().
  */
 export default class RedisOrMemoryCache<T>
@@ -38,7 +38,7 @@ export default class RedisOrMemoryCache<T>
     /**
      * Used when redis not available. Map keeps insertion order, oldest are removed first.
      */
-    private memoryCache = new Map<string, T>();
+    private memoryCache = new Map<string, { value: T, expiresAt: number }>();
 
     /**
      * Jobs being processed, by key.
@@ -47,9 +47,11 @@ export default class RedisOrMemoryCache<T>
 
     /**
      * @param name Part of redis keys, e.g "hexplorer-analysis"
+     * @param ttlSeconds How long values are kept
      */
     constructor(
         private name: string,
+        private ttlSeconds = DEFAULT_TTL_SECONDS,
     ) {}
 
     private getRedisKey(key: string): string
@@ -67,7 +69,18 @@ export default class RedisOrMemoryCache<T>
             return cached === null ? null : JSON.parse(cached) as T;
         }
 
-        return this.memoryCache.get(key) ?? null;
+        const cached = this.memoryCache.get(key);
+
+        if (cached === undefined) {
+            return null;
+        }
+
+        if (cached.expiresAt <= Date.now()) {
+            this.memoryCache.delete(key);
+            return null;
+        }
+
+        return cached.value;
     }
 
     /**
@@ -78,12 +91,12 @@ export default class RedisOrMemoryCache<T>
         const redisClient = getRedisClient();
 
         if (redisClient) {
-            await redisClient.set(this.getRedisKey(key), JSON.stringify(value), { EX: CACHE_TTL_SECONDS });
+            await redisClient.set(this.getRedisKey(key), JSON.stringify(value), { EX: this.ttlSeconds });
             return;
         }
 
         this.memoryCache.delete(key);
-        this.memoryCache.set(key, value);
+        this.memoryCache.set(key, { value, expiresAt: Date.now() + this.ttlSeconds * 1000 });
 
         if (this.memoryCache.size > MEMORY_CACHE_MAX_SIZE) {
             this.memoryCache.delete(this.memoryCache.keys().next().value!);
