@@ -45,7 +45,7 @@
     "@playhex/move-notation": "workspace:*",
     "@playhex/pixi-board": "workspace:*",
     "@playhex/shading-patterns": "workspace:*",
-    "@playhex/tournament-organizer": "^3.11.1",
+    "@playhex/tournament-organizer": "^3.12.0",
     "@popperjs/core": "^2.11.8",
     "@sentry/node": "^11.10.0",
     "@socket.io/admin-ui": "^0.5.1",
