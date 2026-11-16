@@ -4,7 +4,7 @@ import { ConditionalMoves, Player } from '../../../../shared/app/models/index.js
 import { AuthenticatedPlayer } from '../middlewares.js';
 import GameStore from '../../../store/GameStore.js';
 import ConditionalMovesRepository from '../../../repositories/ConditionalMovesRepository.js';
-import { hasPlayer } from '../../../../shared/app/gameUtils.js';
+import { areConditionalMovesEnabled, hasPlayer } from '../../../../shared/app/gameUtils.js';
 
 @JsonController()
 @Service()
@@ -54,6 +54,10 @@ export default class GameConditionalMovesController
 
         if (!hasPlayer(game, player)) {
             throw new ForbiddenError(`Player '${player.pseudo} not in this game'`);
+        }
+
+        if (!areConditionalMovesEnabled(game)) {
+            throw new ForbiddenError('Conditional moves are disabled in this game');
         }
 
         const entity = await this.conditionalMovesRepository.find(player, game);

@@ -14,13 +14,12 @@ import { TypedEmitter } from 'tiny-typed-emitter';
 import { makeAIPlayerMove } from './services/AIManager.js';
 import { recreateTimeControlAfterUndo } from '../shared/app/recreateTimeControlFromGame.js';
 import ConditionalMovesRepository from './repositories/ConditionalMovesRepository.js';
-import { timeControlToCadencyName } from '../shared/app/timeControlUtils.js';
 import { notifier } from './services/notifications/index.js';
 import { AutoSaveInterface } from './auto-save/AutoSaveInterface.js';
 import { TimestampedMove, Outcome } from '../shared/game-engine/Types.js';
 import { pseudoString } from '../shared/app/pseudoUtils.js';
 import { errorToLogger, errorToString } from '../shared/app/utils.js';
-import { assignEngineGameData, conditionalMovesEnabledForCadencies, isBotGame, isChallengeTargetOf, toEngineGameData } from '../shared/app/gameUtils.js';
+import { areConditionalMovesEnabled, assignEngineGameData, isBotGame, isChallengeTargetOf, toEngineGameData } from '../shared/app/gameUtils.js';
 import type { HexMove } from '@playhex/move-notation';
 import { GameEventsEmitter } from './services/game-events-emitter/GameEventsEmitter.js';
 import { SimilarPositionDetectedError } from './services/anti-cheat/SimilarPositionDetectedError.js';
@@ -363,8 +362,8 @@ export default class GameServer extends TypedEmitter<GameEvents>
      */
     private async makeConditionalMovesIfApplicable(): Promise<void>
     {
-        // Do not lose time querying database for conditional moves if game is not correspondence
-        if (!conditionalMovesEnabledForCadencies.includes(timeControlToCadencyName(this.game))) {
+        // Do not lose time querying database for conditional moves if game is not correspondence, or exploration disabled
+        if (!areConditionalMovesEnabled(this.game)) {
             return;
         }
 

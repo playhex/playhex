@@ -385,10 +385,27 @@ export const conditionalMovesEnabledForCadencies: TimeControlCadencyName[] = [
 ];
 
 /**
+ * Whether conditional moves can be used in this game.
+ * Disabled when exploration is not allowed,
+ * because conditional moves UI could be used to explore.
+ */
+export const areConditionalMovesEnabled = (game: Game): boolean => {
+    if (!conditionalMovesEnabledForCadencies.includes(timeControlToCadencyName(game))) {
+        return false;
+    }
+
+    if (!game.explorationAllowed) {
+        return false;
+    }
+
+    return true;
+};
+
+/**
  * Whether given player should be able to view/edit conditional moves on a given game.
  */
 export const shouldShowConditionalMoves = (game: Game, player: Player): boolean => {
-    if (!conditionalMovesEnabledForCadencies.includes(timeControlToCadencyName(game))) {
+    if (!areConditionalMovesEnabled(game)) {
         return false;
     }
 
