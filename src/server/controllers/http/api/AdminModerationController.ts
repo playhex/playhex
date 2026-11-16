@@ -17,6 +17,9 @@ import ModerationSettingRepository from '../../../repositories/ModerationSetting
 import VideoRepository from '../../../videos/VideoRepository.js';
 import PuzzleRepository from '../../../puzzles/PuzzleRepository.js';
 import { serializePuzzleData } from '../../../puzzles/puzzleSerializer.js';
+import SimilarPositionFlagRepository from '../../../repositories/SimilarPositionFlagRepository.js';
+import type SimilarPositionFlag from '../../../../shared/app/models/SimilarPositionFlag.js';
+import type Player from '../../../../shared/app/models/Player.js';
 
 type MessageFromAnySource =
     { message: AbstractChatMessage, source: 'game', data: Game }
@@ -26,7 +29,7 @@ type MessageFromAnySource =
 /**
  * Tabs of the moderation interface which can be marked as seen.
  */
-const SEEN_TABS = ['messages', 'players', 'avatars', 'videos', 'puzzles', 'automatic-actions'] as const;
+const SEEN_TABS = ['messages', 'players', 'avatars', 'videos', 'puzzles', 'automatic-actions', 'similar-position-flags'] as const;
 
 type SeenTab = typeof SEEN_TABS[number];
 
@@ -73,6 +76,7 @@ export default class AdminModerationController
         private moderationSettingRepository: ModerationSettingRepository,
         private videoRepository: VideoRepository,
         private puzzleRepository: PuzzleRepository,
+        private similarPositionFlagRepository: SimilarPositionFlagRepository,
     ) {}
 
     /**
@@ -339,6 +343,56 @@ export default class AdminModerationController
         return { publicId, published: false };
     }
 
+    /**
+     * Anti-cheat: last positions submitted to a strong AI (Hexplorer, bot game, puzzle check)
+     * which were too similar to a currently playing 1v1 game.
+     */
+    @Get('/api/admin/moderation/similar-position-flags')
+    async getLastSimilarPositionFlags()
+    {
+        const flags = await this.similarPositionFlagRepository.findLastForModeration(100);
+
+        return flags.map(serializeFlag);
+    }
+
+    /**
+     * Flag details, with flagger ips, players seen on these ips,
+     * and moves with timestamps of the flagged game (and bot game if any).
+     */
+    @Get('/api/admin/moderation/similar-position-flags/:id')
+    async getSimilarPositionFlag(
+        @Param('id') id: string,
+    ) {
+        const flagId = parseInt(id, 10);
+        const flag = isNaN(flagId) ? null : await this.similarPositionFlagRepository.findForModeration(flagId);
+
+        if (flag === null) {
+            throw new NotFoundError(`Similar position flag "${id}" not found`);
+        }
+
+        const [flaggedGame, botGame, playerIps, ipPlayers] = await Promise.all([
+            this.gameStore.getActiveOrArchivedGame(flag.flaggedGame.publicId),
+            flag.botGame ? this.gameStore.getActiveOrArchivedGame(flag.botGame.publicId) : null,
+            flag.player ? this.playerIpService.getIpsForPlayerWithOthers(flag.player) : [],
+            flag.ip ? this.playerIpService.getPlayersByIp(flag.ip) : [],
+        ]);
+
+        return {
+            ...serializeFlag(flag),
+            flaggedGame: serializeGameWithMoves(flaggedGame ?? flag.flaggedGame),
+            botGame: botGame ? serializeGameWithMoves(botGame) : null,
+            playerIps: playerIps.map(({ ip, lastUsedAt, otherPlayers }) => ({
+                ip,
+                lastUsedAt,
+                otherPlayers: otherPlayers.map(serializePlayer),
+            })),
+            ipPlayers: ipPlayers.map(({ player, lastUsedAt }) => ({
+                player: serializePlayer(player),
+                lastUsedAt,
+            })),
+        };
+    }
+
     @Delete('/api/admin/moderation/chat-messages/:publicId')
     async deleteModerateChatMessage(
         @Param('publicId') publicId: string,
@@ -400,3 +454,48 @@ const channelMessageEntry = (message: ChannelChatMessage): MessageFromAnySource 
 
 const sortMostRecentFirst = (messages: MessageFromAnySource[]): MessageFromAnySource[] =>
     messages.sort((a, b) => b.message.createdAt.getTime() - a.message.createdAt.getTime());
+
+const serializePlayer = (player: Player) => ({
+    publicId: player.publicId,
+    pseudo: player.pseudo,
+    slug: player.slug,
+    isGuest: player.isGuest,
+    isBot: player.isBot,
+});
+
+const serializeGamePlayers = (game: Game) => [...(game.gameToPlayers ?? [])]
+    .sort((a, b) => a.order - b.order)
+    .map(gameToPlayer => serializePlayer(gameToPlayer.player))
+;
+
+const serializeFlag = (flag: SimilarPositionFlag) => ({
+    id: flag.id,
+    context: flag.context,
+    createdAt: flag.createdAt,
+    ip: flag.ip,
+    similarity: flag.similarity,
+    commonStones: flag.commonStones,
+    mirror: flag.mirror,
+    boardsize: flag.boardsize,
+    position: flag.position,
+    flaggedGameStonesCount: flag.flaggedGameStonesCount,
+    player: flag.player ? serializePlayer(flag.player) : null,
+    flaggedGame: {
+        publicId: flag.flaggedGame.publicId,
+        players: serializeGamePlayers(flag.flaggedGame),
+    },
+    botGame: flag.botGame ? { publicId: flag.botGame.publicId } : null,
+});
+
+const serializeGameWithMoves = (game: Game) => ({
+    publicId: game.publicId,
+    state: game.state,
+    boardsize: game.boardsize,
+    startedAt: game.startedAt,
+    endedAt: game.endedAt,
+    outcome: game.outcome,
+    winner: game.winner,
+    players: serializeGamePlayers(game),
+    moves: game.moves ?? [],
+    moveTimestamps: game.moveTimestamps ?? [],
+});

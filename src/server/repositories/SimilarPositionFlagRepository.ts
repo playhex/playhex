@@ -15,6 +15,12 @@ export type SimilarPositionFlagInput = {
     botGamePublicId?: null | string;
 };
 
+const moderationRelations = {
+    player: true,
+    flaggedGame: { gameToPlayers: { player: true } },
+    botGame: true,
+};
+
 @Service()
 export default class SimilarPositionFlagRepository
 {
@@ -50,6 +56,23 @@ export default class SimilarPositionFlagRepository
         flag.mirror = comparisonResult.mirror || null;
 
         return await this.similarPositionFlagRepository.save(flag);
+    }
+
+    async findLastForModeration(limit = 100): Promise<SimilarPositionFlag[]>
+    {
+        return await this.similarPositionFlagRepository.find({
+            relations: moderationRelations,
+            order: { createdAt: 'desc', id: 'desc' },
+            take: limit,
+        });
+    }
+
+    async findForModeration(id: number): Promise<null | SimilarPositionFlag>
+    {
+        return await this.similarPositionFlagRepository.findOne({
+            relations: moderationRelations,
+            where: { id },
+        });
     }
 
     private async findGameIdOrFail(publicId: string): Promise<Game>

@@ -52,4 +52,18 @@ export default class PlayerIpService
             otherPlayers: otherPlayersByIp.get(i.ip) ?? [],
         }));
     }
+
+    /**
+     * All players who used this ip, most recent first.
+     */
+    async getPlayersByIp(ip: string): Promise<Array<{ player: Player, lastUsedAt: Date }>>
+    {
+        const entries = await this.playerIpRepository.find({
+            where: { ip },
+            relations: { player: true },
+            order: { lastUsedAt: 'desc' },
+        });
+
+        return entries.map(({ player, lastUsedAt }) => ({ player, lastUsedAt }));
+    }
 }
