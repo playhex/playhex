@@ -31,6 +31,7 @@ export default class PuzzleMonitorUncoveredLineRepository
             .insert()
             .values({ puzzle: { id: puzzle.id }, player: { id: player.id }, line })
             .orIgnore()
+            .updateEntity(false) // else typeorm throws when row is ignored: no insert id to reload default columns
             .execute()
         ;
     }
@@ -96,6 +97,7 @@ export default class PuzzleMonitorUncoveredLineRepository
             .insert()
             .values({ puzzle: { id: puzzle.id }, line })
             .orIgnore()
+            .updateEntity(false) // else typeorm throws when row is ignored: no insert id to reload default columns
             .execute()
         ;
     }
