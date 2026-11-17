@@ -1,6 +1,8 @@
 import { Express, Request } from 'express';
 import { Container } from 'typedi';
 import { HttpError, useContainer, useExpressServer } from 'routing-controllers';
+import { isbot } from 'isbot';
+import logger from '../../../services/logger.js';
 import GameController from './GameController.js';
 import PlayerController from './PlayerController.js';
 import PlayerNotificationController from './PlayerNotificationController.js';
@@ -155,7 +157,18 @@ export const registerApi = (app: Express) => {
         }
     });
 
-    app.all('/api/{*path}', req => {
-        throw new HttpError(404, `Route ${req.method} ${req.originalUrl} not found.`);
+    // Unknown api route: noise if from a bot (some crawlers turn PUT into POST), else a client calling a wrong route
+    app.all('/api/{*path}', (req, res) => {
+        const userAgent = req.get('user-agent');
+
+        if (!isbot(userAgent)) {
+            logger.warning('Api route not found', { method: req.method, url: req.originalUrl, userAgent });
+        }
+
+        res
+            .status(404)
+            .send(new HttpError(404, `Route ${req.method} ${req.originalUrl} not found.`))
+            .end()
+        ;
     });
 };
