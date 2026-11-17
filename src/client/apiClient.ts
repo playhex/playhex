@@ -60,6 +60,13 @@ const checkResponse = async (response: Response): Promise<void> => {
             throw new Error(`Api error ${response.status}: "${body.substring(0, 128)}"`);
         }
 
+        // IP banned while app was open: reload to let server render the banned page.
+        // Never resolve to prevent callers from throwing unhandled errors until reload.
+        if (response.status === 403 && payload?.error === 'banned') {
+            window.location.reload();
+            return new Promise<never>(() => {});
+        }
+
         if (isDomainHttpErrorPayload(payload)) {
             throw denormalizeDomainHttpError(payload);
         }
