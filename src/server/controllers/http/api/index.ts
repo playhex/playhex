@@ -157,11 +157,13 @@ export const registerApi = (app: Express) => {
         }
     });
 
-    // Unknown api route: noise if from a bot (some crawlers turn PUT into POST), else a client calling a wrong route
+    // Unknown api route: noise if from a bot (some crawlers turn PUT into POST), else a client calling a wrong route.
+    // Only log calls from our own client (same-origin fetch): scanners often fake a browser user agent, isbot alone is not enough.
     app.all('/api/{*path}', (req, res) => {
         const userAgent = req.get('user-agent');
+        const fromOurClient = req.get('sec-fetch-site') === 'same-origin';
 
-        if (!isbot(userAgent)) {
+        if (fromOurClient && !isbot(userAgent)) {
             logger.warning('Api route not found', { method: req.method, url: req.originalUrl, userAgent });
         }
 
