@@ -525,26 +525,76 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const listenModel = (playingGameFacade: PlayingGameFacade, engineGame: EngineGame): void => {
         highlightSidesFromGame();
 
+        /**
+         * When two moves are undone, the second one is removed from the view slightly later.
+         * Until then, view is one move behind the engine.
+         */
+        let pendingUndoTimeout: null | ReturnType<typeof setTimeout> = null;
+
+        const cancelPendingUndo = (): void => {
+            if (pendingUndoTimeout !== null) {
+                clearTimeout(pendingUndoTimeout);
+                pendingUndoTimeout = null;
+            }
+        };
+
+        playingGameFacade.getGameView().on('destroyBefore', cancelPendingUndo);
+
+        const getEngineMoves = (): HexMove[] => engineGame.getMovesHistory().map(({ move }) => move);
+
+        /**
+         * Make view display given moves, by undoing/adding only moves that differ.
+         */
+        const syncViewTo = (targetMoves: HexMove[]): void => {
+            const viewMoves = playingGameFacade.getMoves();
+            let common = 0;
+
+            while (common < viewMoves.length && common < targetMoves.length && viewMoves[common] === targetMoves[common]) {
+                ++common;
+            }
+
+            while (playingGameFacade.getMoves().length > common) {
+                playingGameFacade.undoLastMove();
+            }
+
+            for (let i = common; i < targetMoves.length; ++i) {
+                playingGameFacade.addMove(targetMoves[i]);
+            }
+
+            highlightSidesFromGame();
+        };
+
         engineGame.on('played', move => {
+            if (pendingUndoTimeout !== null) {
+                // A move is played while an undo was being displayed: just show the current position
+                cancelPendingUndo();
+                syncViewTo(getEngineMoves());
+                return;
+            }
+
             playingGameFacade.addMove(move.move);
             highlightSidesFromGame();
         });
 
-        engineGame.on('undo', async undoneMovesTimestamped => {
-            const undoneMoves = undoneMovesTimestamped.map(timestampedMove => timestampedMove.move);
+        engineGame.on('undo', undoneMovesTimestamped => {
+            cancelPendingUndo();
 
-            for (let i = 0; i < undoneMoves.length; ++i) {
-                if (i > 0) {
-                    // If two moves are undone, slightly wait between these two moves removal
-                    await new Promise(r => setTimeout(r, 150));
-                }
+            const engineMoves = getEngineMoves();
+            const undoneMoves = undoneMovesTimestamped.map(({ move }) => move);
 
-                if (playingGameFacade.getLastMove() !== undoneMoves[i]) {
-                    throw new Error('undone move is not same as last move');
-                }
+            // Make sure view is at position before this undo,
+            // could not be the case if previous undo was still being displayed (i.e takeback double click against a bot).
+            syncViewTo([...engineMoves, ...[...undoneMoves].reverse()]);
 
-                playingGameFacade.undoLastMove();
-                highlightSidesFromGame();
+            playingGameFacade.undoLastMove();
+            highlightSidesFromGame();
+
+            if (undoneMoves.length > 1) {
+                // If two moves are undone, slightly wait between these two moves removal
+                pendingUndoTimeout = setTimeout(() => {
+                    pendingUndoTimeout = null;
+                    syncViewTo(getEngineMoves());
+                }, 150);
             }
         });
 
@@ -552,6 +602,7 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
         engineGame.on('canceled', () => highlightSidesFromGame());
 
         engineGame.on('updated', () => {
+            cancelPendingUndo();
             playingGameFacade.undoAllMoves();
 
             for (const timestampedMove of engineGame.getMovesHistory()) {
@@ -984,10 +1035,21 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     });
 
     /**
+     * Prevents sending a second takeback request while the first one is still pending,
+     * i.e on double click. Against a bot, takeback is accepted instantly,
+     * so a double click would undo twice.
+     */
+    const askUndoPending = ref(false);
+
+    /**
      * Whether we should enable the button because cannot undo now
      */
     const shouldEnableUndoMove = computed<boolean>(() => {
         if (!game.value || localPlayerIndex.value === null || !engineGame.value) {
+            return false;
+        }
+
+        if (askUndoPending.value) {
             return false;
         }
 
@@ -1012,11 +1074,17 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     });
 
     const askUndo = async () => {
-        if (!game.value) {
+        if (!game.value || askUndoPending.value) {
             return;
         }
 
-        return await apiPostAskUndo(game.value.publicId);
+        askUndoPending.value = true;
+
+        try {
+            return await apiPostAskUndo(game.value.publicId);
+        } finally {
+            askUndoPending.value = false;
+        }
     };
 
     const answerUndo = async (accept: boolean) => {
