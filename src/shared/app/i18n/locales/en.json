@@ -2325,6 +2325,7 @@
         "years_on_playhex_other": "{{count}} years on PlayHex",
         "share": "Share",
         "link_copied": "Link copied!",
+        "share_private_note": "This retrospective is private: only people you share the link with can see it.",
         "all_retrospectives": "All retrospectives",
         "top_percent": "Top {{percent}}%",
         "vs_year": "in {{year}}",

@@ -2394,6 +2394,7 @@
         "years_on_playhex_other": "{{count}} ans sur PlayHex",
         "share": "Partager",
         "link_copied": "Lien copié !",
+        "share_private_note": "Cette rétro est privée : seules les personnes à qui vous partagez le lien peuvent la voir.",
         "all_retrospectives": "Toutes les rétros",
         "top_percent": "Top {{percent}} %",
         "vs_year": "en {{year}}",

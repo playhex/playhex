@@ -682,6 +682,7 @@ const calendarMaxGames = computed(() => Math.max(1, ...calendar.value.map(month 
                     <IconShareFill /> {{ $t('retrospective.share') }}
                 </button>
                 <span v-if="copiedResult === true" class="ms-2 text-success">{{ $t('retrospective.link_copied') }}</span>
+                <p v-if="player && isMe(player)" class="small text-body-secondary mt-2 mb-0">{{ $t('retrospective.share_private_note') }}</p>
             </div>
 
             <nav v-if="player && isMe(player)" class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
