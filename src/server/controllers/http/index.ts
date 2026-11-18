@@ -42,6 +42,8 @@ export const registerHttpControllers = async (app: Express, httpServer: http.Ser
     app.use(socialPreviewRouter());
     app.use(pagesRouter());
 
+    // 4 params required for Express to treat this as an error handler
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
         logger.notice(`API error: ${req.method} ${req.route?.path ?? req.originalUrl}`, {
             classname: err.constructor.name,
@@ -97,7 +99,5 @@ export const registerHttpControllers = async (app: Express, httpServer: http.Ser
             .send('Server error')
             .end()
         ;
-
-        next(err);
     });
 };
