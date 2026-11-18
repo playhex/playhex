@@ -75,7 +75,7 @@ export default tseslint.config([
         ],
     },
     {
-        files: ['src/server/commands/*'],
+        files: ['src/server/commands/*', 'src/server/**/*Command.ts'],
         rules: {
             'no-console': 'off',
         },

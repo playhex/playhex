@@ -44,6 +44,7 @@ import PlayerPseudoHistory from './PlayerPseudoHistory.js';
 import PlayerIp from './PlayerIp.js';
 import PlayerLittleGolemAccount from './PlayerLittleGolemAccount.js';
 import PlayerFavoriteTimeControl from './PlayerFavoriteTimeControl.js';
+import PlayerRetrospective from './PlayerRetrospective.js';
 import PlayerSettings, { MoveSettings } from './PlayerSettings.js';
 import PlayerStats from './PlayerStats.js';
 import PlayerHeadToHeadStats from './PlayerHeadToHeadStats.js';
@@ -113,6 +114,7 @@ export {
     PlayerLittleGolemAccount,
     PlayerModerationAction,
     PlayerNotification,
+    PlayerRetrospective,
     PlayerSettings,
     PlayerStats,
     PlayerHeadToHeadStats,
@@ -187,6 +189,7 @@ export const entities = {
     PlayerAiWorkerKey,
     PlayerPushSubscription,
     PlayerPseudoHistory,
+    PlayerRetrospective,
     PlayerSettings,
     PlayerStats,
     HexplorerStudy,

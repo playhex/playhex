@@ -10,10 +10,11 @@ import HexplorerStudyMetaBuilder from './meta/HexplorerStudyMetaBuilder.js';
 import PuzzleMetaBuilder from './meta/PuzzleMetaBuilder.js';
 import PuzzleCollectionMetaBuilder from './meta/PuzzleCollectionMetaBuilder.js';
 import PlayerMetaBuilder from './meta/PlayerMetaBuilder.js';
+import RetrospectiveMetaBuilder from './meta/RetrospectiveMetaBuilder.js';
 import LadderMetaBuilder from './meta/LadderMetaBuilder.js';
 import StaticPageMetaBuilder from './meta/StaticPageMetaBuilder.js';
 import ExportGamesDataMetaBuilder from './meta/ExportGamesDataMetaBuilder.js';
-import { loadExportGamesDataManifest, loadExternalGame, loadGame, loadHexplorerStudy, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
+import { loadExportGamesDataManifest, loadExternalGame, loadGame, loadHexplorerStudy, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadRetrospective, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
 
 const param = (req: Request, name: string): string => String(req.params[name]);
 
@@ -90,6 +91,13 @@ export function socialPreviewRouter(): Router {
         const ladder = await loadLadder(param(req, 'slug'));
 
         return ladder && Container.get(LadderMetaBuilder).buildMeta(ladder, context);
+    }));
+
+    // Same as client router: '/@:slug([^/]{1,32})/retro/:year(\\d{4})/:shareCode([A-Za-z0-9]{5})'
+    router.get('/@:slug/retro/:year/:shareCode', resolveMeta(async (req, context) => {
+        const data = await loadRetrospective(param(req, 'slug'), Number(param(req, 'year')), param(req, 'shareCode'));
+
+        return data && Container.get(RetrospectiveMetaBuilder).buildMeta(data, context);
     }));
 
     // Same as client router: '/@:slug(.{1,32})'

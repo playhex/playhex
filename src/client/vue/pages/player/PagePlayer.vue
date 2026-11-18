@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
-import { IconPerson, IconPersonUp, IconTrophyFill, IconX, IconFlag } from '../../icons.js';
+import { IconPerson, IconPersonUp, IconTrophyFill, IconX, IconFlag, IconPartyPopper } from '../../icons.js';
 import { Game, GameOptions, Player, PlayerHeadToHeadStats, PlayerLittleGolemAccount, PlayerStats, Rating } from '../../../../shared/app/models/index.js';
 import { getPlayerBySlug, apiGetPlayerFormerPseudo, apiGetPlayerStats, apiGetHeadToHeadStats, apiGetPlayerCurrentRatings, getGames, apiGetPlayerActiveGames, getExternalGames, apiGetPlayerLittleGolemAccount } from '../../../apiClient.js';
 import { useCreateGameOverlay } from '../../composables/useCreateGameOverlay.js';
@@ -47,6 +47,7 @@ import AppPlayerExternalGames from '../../components/external-games/AppPlayerExt
 import AppExternalAccounts from '../../components/external-games/AppExternalAccounts.vue';
 import { littleGolemPlayerExternalId } from '../../../../shared/app/little-golem/littleGolemUtils.js';
 import type { FormerPseudo } from '../../../../shared/app/pseudoHistoryRules.js';
+import { useMyRetrospectives } from '../../retrospective/composables/useMyRetrospectives.js';
 
 const { slug } = useRoute().params;
 const router = useRouter();
@@ -380,6 +381,19 @@ const showRatingCategory = (category: RatingCategory): void => {
 };
 
 /*
+ * Yearly retrospectives
+ */
+const myRetrospectives = useMyRetrospectives();
+
+// Only shown to player on own profile
+const retrospectives = computed(() => player.value !== null && isMe(player.value)
+    ? myRetrospectives.value ?? []
+    : [],
+);
+
+const showSideColumn = computed<boolean>(() => showExternalAccounts.value || retrospectives.value.length > 0);
+
+/*
  * Moderation status for other players
  */
 const isChatRestricted = ref<null | boolean>(null);
@@ -567,11 +581,20 @@ const timeRangeUpdated = (from: null | Date, to: null | Date) => {
         />
 
         <div class="row">
-            <div :class="showExternalAccounts ? 'col-lg-8' : 'col-12'">
+            <div :class="showSideColumn ? 'col-lg-8' : 'col-12'">
                 <AppPlayerStats v-if="playerStats" :playerStats />
             </div>
-            <div v-if="player && showExternalAccounts" class="col-lg-4 mb-3">
+            <div v-if="player && showSideColumn" class="col-lg-4 mb-3">
+                <div v-if="retrospectives.length > 0" class="list-group mb-3">
+                    <router-link
+                        v-for="{ year, shareCode } in retrospectives"
+                        :key="year"
+                        :to="{ name: 'player-retrospective', params: { slug: player.slug, year, shareCode } }"
+                        class="list-group-item list-group-item-action"
+                    ><IconPartyPopper class="text-warning me-1" /> {{ $t('retrospective.title', { year }) }}</router-link>
+                </div>
                 <AppExternalAccounts
+                    v-if="showExternalAccounts"
                     :littleGolemAccount
                     :editable="canEditExternalAccounts"
                     @updated="refreshLittleGolemGamesCount()"

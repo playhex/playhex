@@ -40,6 +40,7 @@
     "@flystorage/file-storage": "^1.2.2",
     "@flystorage/local-fs": "^1.2.0",
     "@influxdata/influxdb3-client": "^2.4.0",
+    "@inquirer/prompts": "^8.8.0",
     "@overlastic/vue": "^0.9.0",
     "@playhex/conditional-moves": "workspace:*",
     "@playhex/move-notation": "workspace:*",

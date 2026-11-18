@@ -11,6 +11,7 @@ import usePlayerSettingsStore from '../../../stores/playerSettingsStore.js';
 import useNotificationStore from '../../../stores/notificationStore.js';
 import { availableLocales, getQuickLocales, setLocale } from '../../../../shared/app/i18n/index.js';
 import { pseudoString } from '../../../../shared/app/pseudoUtils.js';
+import { useMyRetrospectives } from '../../retrospective/composables/useMyRetrospectives.js';
 import AppPlayerAvatar from '../AppPlayerAvatar.vue';
 import AppPseudo from '../AppPseudo.vue';
 import AppRhombus from '../AppRhombus.vue';
@@ -25,6 +26,7 @@ import {
     IconMoonStarsFill,
     IconMuteOff,
     IconMuteOn,
+    IconPartyPopper,
     IconPersonUp,
     IconPlus,
 } from '../../icons.js';
@@ -32,6 +34,7 @@ import {
 const router = useRouter();
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
+const myRetrospectives = useMyRetrospectives();
 
 const playerLocalSettingsStore = usePlayerLocalSettingsStore();
 const { localSettings } = storeToRefs(playerLocalSettingsStore);
@@ -365,6 +368,15 @@ const clickLogout = async (): Promise<void> => {
                             class="small"
                             @click="closeMenu()"
                         ><IconGear /> {{ $t('player_settings.title') }}</router-link>
+                    </div>
+
+                    <!-- Yearly retrospectives -->
+                    <div v-if="myRetrospectives && myRetrospectives.length > 0" class="setting-row">
+                        <router-link
+                            :to="{ name: 'player-retrospectives', params: { slug: loggedInPlayer.slug } }"
+                            class="small"
+                            @click="closeMenu()"
+                        ><IconPartyPopper /> {{ $t('retrospective.list_title') }}</router-link>
                     </div>
                 </div>
 

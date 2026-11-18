@@ -34,6 +34,7 @@ import AppRhombusAutoOrientation from '../components/AppRhombusAutoOrientation.v
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppChannel from '../components/AppChannel.vue';
 import AppTutorialCard from '../components/AppTutorialCard.vue';
+import AppRetrospectiveCard from '../retrospective/components/AppRetrospectiveCard.vue';
 import { getPlayerLocales } from '../../../shared/app/i18n/index.js';
 
 useHead({
@@ -162,6 +163,8 @@ for (const locale of getPlayerLocales()) {
             <div class="col-md-8">
 
                 <AppTutorialCard />
+
+                <AppRetrospectiveCard />
 
                 <!-- My turn to play -->
                 <section v-if="mySortedGames && mySortedGames.length > 0" class="mb-4">

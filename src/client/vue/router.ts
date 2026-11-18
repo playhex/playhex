@@ -29,6 +29,16 @@ const routes: RouteRecordRaw[] = [
                 },
             },
             {
+                name: 'player-retrospectives',
+                path: '/@:slug([^/]{1,32})/retro',
+                component: () => import('./retrospective/pages/PagePlayerRetrospectives.vue'),
+            },
+            {
+                name: 'player-retrospective',
+                path: '/@:slug([^/]{1,32})/retro/:year(\\d{4})/:shareCode([A-Za-z0-9]{5})',
+                component: () => import('./retrospective/pages/PagePlayerRetrospective.vue'),
+            },
+            {
                 name: 'player',
                 path: '/@:slug(.{1,32})', // Regex to avoid matching players public ids
                 component: () => import('./pages/player/PagePlayer.vue'),

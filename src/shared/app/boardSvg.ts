@@ -44,6 +44,20 @@ export type BoardSvgOptions = {
     highlighted?: Move[];
 
     /**
+     * Same marks as game analyze: green hexagon on engine best move,
+     * hexagon on played move, from green (good move) to red (blunder).
+     */
+    analyzeMarks?: {
+        bestMove?: null | Move;
+        playedMove?: null | Move;
+
+        /**
+         * Win rate lost by played move, between 0 (best move, green) and 1 (big blunder, red).
+         */
+        playedMoveLoss?: number;
+    };
+
+    /**
      * Greyed out cells, e.g puzzle isolation.
      */
     disabledCells?: Move[];
@@ -229,6 +243,16 @@ const cellClipPolygons = (row: number, col: number, boardsize: number): Point[][
 };
 
 /**
+ * Color between green (0) and red (1), like game analyze played move mark.
+ */
+const lossColor = (loss: number): string => {
+    const k = Math.min(1, Math.max(0, Math.abs(loss)));
+    const hex = (n: number) => Math.round(n).toString(16).padStart(2, '0');
+
+    return `#${hex(255 * k)}${hex(255 * (1 - k))}00`;
+};
+
+/**
  * Renders a Hex board as svg elements (without the <svg> root),
  * to be embedded in a bigger svg image.
  */
@@ -291,6 +315,24 @@ export const renderBoardSvg = (options: BoardSvgOptions): string => {
         const center = cellCoords(row, col);
 
         parts.push(`<circle cx="${round(center.x)}" cy="${round(center.y)}" r="${RADIUS * 0.45}" fill="none" stroke="${boardSvgColors.highlight}" stroke-width="${RADIUS * 0.16}"/>`);
+    }
+
+    const { analyzeMarks } = options;
+    const innerRadius = RADIUS * (1 - PADDING);
+
+    if (analyzeMarks?.playedMove && !hidden.has(analyzeMarks.playedMove)) {
+        const { row, col } = parseMove(analyzeMarks.playedMove);
+        const center = cellCoords(row, col);
+
+        parts.push(`<polygon points="${pointsString(hexagon(center, innerRadius * 0.6))}" fill="#ffffff" fill-opacity="0.8"/>`);
+        parts.push(`<polygon points="${pointsString(hexagon(center, innerRadius * 0.4))}" fill="${lossColor(analyzeMarks.playedMoveLoss ?? 1)}"/>`);
+    }
+
+    if (analyzeMarks?.bestMove && !hidden.has(analyzeMarks.bestMove)) {
+        const { row, col } = parseMove(analyzeMarks.bestMove);
+        const center = cellCoords(row, col);
+
+        parts.push(`<polygon points="${pointsString(hexagon(center, innerRadius * 0.6))}" fill="none" stroke="#00ff00" stroke-width="${round(innerRadius * 0.2)}"/>`);
     }
 
     const rotationDegrees = round(rotation * 180 / PI);

@@ -23,10 +23,11 @@ import PuzzleCollectionMetaBuilder, { COLLECTION_IMAGE_PUZZLES } from './meta/Pu
 import TournamentMetaBuilder from './meta/TournamentMetaBuilder.js';
 import TournamentSeriesMetaBuilder from './meta/TournamentSeriesMetaBuilder.js';
 import PlayerMetaBuilder from './meta/PlayerMetaBuilder.js';
+import RetrospectiveMetaBuilder, { parseRetrospectiveImageId } from './meta/RetrospectiveMetaBuilder.js';
 import LadderMetaBuilder from './meta/LadderMetaBuilder.js';
 import StaticPageMetaBuilder from './meta/StaticPageMetaBuilder.js';
 import { playerName, settingsLine } from './meta/metaUtils.js';
-import { loadExternalGame, loadGame, loadHexplorerStudy, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
+import { loadExternalGame, loadGame, loadHexplorerStudy, loadLadder, loadPlayer, loadPuzzle, loadPuzzleCollection, loadRetrospective, loadTournament, loadTournamentSeries } from './socialPreviewData.js';
 
 const cachePath = path.resolve(process.env.OG_CACHE_PATH || 'var/og-cache/');
 
@@ -237,6 +238,7 @@ const createResolvers = (): { [type: string]: OgImageResolver } => {
     const tournamentSeriesMetaBuilder = Container.get(TournamentSeriesMetaBuilder);
     const playerMetaBuilder = Container.get(PlayerMetaBuilder);
     const ladderMetaBuilder = Container.get(LadderMetaBuilder);
+    const retrospectiveMetaBuilder = Container.get(RetrospectiveMetaBuilder);
     const staticPageMetaBuilder = Container.get(StaticPageMetaBuilder);
 
     return {
@@ -473,6 +475,27 @@ const createResolvers = (): { [type: string]: OgImageResolver } => {
                         lines,
                     });
                 },
+            };
+        },
+
+        [retrospectiveMetaBuilder.imageType]: async (id, context) => {
+            const parsed = parseRetrospectiveImageId(id);
+            const data = parsed && await loadRetrospective(parsed.slug, parsed.year, parsed.shareCode);
+
+            if (!data) {
+                return null;
+            }
+
+            return {
+                version: retrospectiveMetaBuilder.imageVersion(data),
+                immutable: false,
+                renderSvg: async () => renderCardImageSvg({
+                    title: retrospectiveMetaBuilder.title(data, context),
+                    icon: 'trophy',
+                    avatar: await loadAvatar(data.player, 400),
+                    avatarSize: 400,
+                    lines: retrospectiveMetaBuilder.summaryLines(data, context).map(text => ({ text })),
+                }),
             };
         },
 

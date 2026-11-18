@@ -37,6 +37,7 @@ Server needs Noto fonts for image rendering: `fonts-noto-core fonts-noto-cjk`.
 | `/puzzles/:publicId` | puzzle position, isolation greyed out or hidden | CreativeWork |
 | `/puzzles/collections/:publicId` | card | CollectionPage |
 | `/@:slug` (player) | card with avatar | ProfilePage |
+| `/@:slug/retro/:year/:shareCode` (yearly retrospective, `noindex`, only once generated, and with right share code) | card with avatar and key numbers | WebPage about the Person |
 | `/king-of-the-hill/:slug` | card | breadcrumb only |
 | Static pages: `/puzzles`, `/tournaments`, `/tournament-series`, `/king-of-the-hill`, `/games-archive`, `/videos`, `/statistics`, `/guide` | card with page title and description, no data that would get outdated | none |
 | `/tutorial` (same as `/tutorial/rules`), `/tutorial/rules`, `/tutorial/swap`, `/tutorial/block` | card with page title and description | LearningResource |

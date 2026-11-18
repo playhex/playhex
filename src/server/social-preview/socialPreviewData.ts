@@ -17,6 +17,8 @@ import { LadderError } from '../ladder/LadderError.js';
 import type { TournamentSeriesPageData } from './meta/TournamentSeriesMetaBuilder.js';
 import type { PuzzleCollectionPageData } from './meta/PuzzleCollectionMetaBuilder.js';
 import type { PlayerPageData } from './meta/PlayerMetaBuilder.js';
+import type { RetrospectivePageData } from './meta/RetrospectiveMetaBuilder.js';
+import PlayerRetrospectiveRepository from '../retrospective/PlayerRetrospectiveRepository.js';
 
 /*
  * Loads only what social previews need, from database.
@@ -76,6 +78,32 @@ export const loadPuzzleCollection = async (publicId: string): Promise<null | Puz
         collection,
         puzzles: await Container.get(PuzzleRepository).findByCollection(collection, false),
     };
+};
+
+/**
+ * Published retrospective only: same as api, not generated or wrong share code returns null.
+ */
+export const loadRetrospective = async (slug: string, year: number, shareCode: string): Promise<null | RetrospectivePageData> => {
+    if (!Number.isInteger(year)) {
+        return null;
+    }
+
+    const playerRepository = Container.get(PlayerRepository);
+    const player = await playerRepository.getPlayerBySlug(slug)
+        ?? await playerRepository.getPlayerByOldSlug(slug)
+    ;
+
+    if (player === null) {
+        return null;
+    }
+
+    const retrospective = await Container.get(PlayerRetrospectiveRepository).findPublished(player, year, shareCode);
+
+    if (retrospective === null) {
+        return null;
+    }
+
+    return { player, year, shareCode, ...retrospective };
 };
 
 export const loadPlayer = async (slug: string): Promise<null | PlayerPageData> => {

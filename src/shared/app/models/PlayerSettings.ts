@@ -1,7 +1,8 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, type Relation } from 'typeorm';
 import Player from './Player.js';
 import { Expose } from '../class-transformer-custom.js';
-import { ArrayMaxSize, IsArray, IsBoolean, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateIf } from 'class-validator';
+import { Type } from 'class-transformer';
+import { ArrayMaxSize, IsArray, IsBoolean, IsDate, IsEnum, IsIn, IsNumber, IsOptional, IsString, Length, Max, MaxLength, Min, ValidateIf } from 'class-validator';
 import { allShadingPatterns, type ShadingPatternType } from '@playhex/shading-patterns';
 
 export enum MoveSettings {
@@ -157,4 +158,17 @@ export default class PlayerSettings
     @MaxLength(32, { each: true })
     @Column({ type: 'json', nullable: true })
     tutorialCompletedSteps?: null | string[];
+
+    /**
+     * Last time player dismissed the lobby card of a yearly retrospective.
+     * Same field for all years: if before current year,
+     * it was the dismiss of a previous retrospective, so the card is shown again.
+     * No default value: a patch without this field must not reset it.
+     */
+    @Expose()
+    @IsOptional()
+    @IsDate()
+    @Type(() => Date)
+    @Column({ type: Date, nullable: true })
+    retrospectiveDismissedAt?: null | Date;
 }

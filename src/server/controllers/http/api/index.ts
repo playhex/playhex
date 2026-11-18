@@ -38,6 +38,7 @@ import PlayerModerationController from './PlayerModerationController.js';
 import PlayerAvatarController from './PlayerAvatarController.js';
 import PlayerCountryFlagController from './PlayerCountryFlagController.js';
 import PlayerPronounsController from './PlayerPronounsController.js';
+import PlayerRetrospectiveController from '../../../retrospective/PlayerRetrospectiveController.js';
 import { checkAuthorization } from '../../../services/roles.js';
 import ChannelController from './ChannelController.js';
 import ChangelogController from './ChangelogController.js';
@@ -135,6 +136,7 @@ export const registerApi = (app: Express) => {
             PlayerAvatarController,
             PlayerCountryFlagController,
             PlayerPronounsController,
+            PlayerRetrospectiveController,
             AIConfigController,
             AiAvailabilityController,
             PushController,

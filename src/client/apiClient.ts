@@ -35,6 +35,7 @@ import type { VideoInput, VideoMetadata } from '../shared/app/videos/videoInput.
 import type { OAuthConnectedApplication, OAuthInteractionDetails } from '../shared/app/oauth.js';
 import type { AccountInfo } from '../shared/app/AccountInfo.js';
 import type { FormerPseudo } from '../shared/app/pseudoHistoryRules.js';
+import type { PlayerRetrospectiveData, PlayerRetrospectiveSummary, RetrospectiveLink } from '../shared/app/retrospective/retrospectiveTypes.js';
 
 /**
  * @throws {DomainHttpError}
@@ -1016,6 +1017,43 @@ export const apiGetBeatenBots = async (playerPublicId: string): Promise<null | P
     await checkResponse(response);
 
     return plainToInstance(PlayerBeatenBots, await response.json());
+};
+
+/**
+ * Published yearly retrospectives of logged in player, most recent first, with their share codes.
+ */
+export const apiGetMyRetrospectives = async (): Promise<PlayerRetrospectiveSummary[]> => {
+    const response = await fetch('/api/retrospectives', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    await checkResponse(response);
+
+    return (await response.json() as { retrospectives: PlayerRetrospectiveSummary[] }).retrospectives;
+};
+
+/**
+ * Null if not generated yet, or wrong share code.
+ * Previous and next years links are only set for the player itself.
+ */
+export const apiGetPlayerRetrospective = async (playerPublicId: string, year: number, shareCode: string): Promise<null | { retrospective: PlayerRetrospectiveData, previous: null | RetrospectiveLink, next: null | RetrospectiveLink }> => {
+    const response = await fetch(`/api/players/${playerPublicId}/retrospectives/${year}/${encodeURIComponent(shareCode)}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return await response.json() as { retrospective: PlayerRetrospectiveData, previous: null | RetrospectiveLink, next: null | RetrospectiveLink };
 };
 
 /**
