@@ -2,7 +2,7 @@ import hexProgram from './hexProgram.js';
 import createAiConfigIfNotExists from './utils/createAiConfigIfNotExists.js';
 
 hexProgram
-    .command('create-test-bots')
+    .command('test:create-bots')
     .description('Create test bots config in database, used for integration tests')
     .option('--reuse-player', 'If AI player exists but not AI config, reuse player instance')
     .action(async ({ reusePlayer }) => {

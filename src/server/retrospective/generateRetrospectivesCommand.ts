@@ -10,11 +10,11 @@ import RetrospectiveGenerator from './RetrospectiveGenerator.js';
  *
  * Run years in order (e.g 2025 then 2026), so that progress compares to a complete previous year.
  *
- * Run "analyze-games" before: accuracy and blunder are computed only on analyzed games,
+ * Run "game:analyze" before: accuracy and blunder are computed only on analyzed games,
  * so more analyzed games give more choice.
  */
 hexProgram
-    .command('generate-retrospectives')
+    .command('retro:generate')
     .description('Compute players yearly retrospectives, and publish them')
     .argument('<year>', 'Year of the retrospectives, e.g 2026')
     .option('--force', 'Recompute already generated retrospectives')
@@ -32,7 +32,7 @@ hexProgram
             console.warn(`Warning: year ${year} is not over, retrospectives will be incomplete. They are not displayed until next year.`);
         }
 
-        console.log('Tip: run "pnpm hex analyze-games" before, accuracy and blunder are computed only on analyzed games: more analyzed games give more choice.');
+        console.log('Tip: run "pnpm hex game:analyze" before, accuracy and blunder are computed only on analyzed games: more analyzed games give more choice.');
 
         const generator = new RetrospectiveGenerator(AppDataSource);
         const repository = AppDataSource.getRepository(PlayerRetrospective);

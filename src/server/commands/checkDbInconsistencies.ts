@@ -11,7 +11,7 @@ import { InconsistentWinnerStateOutcome } from './data-inconsistency-checks/Inco
 import { NoRankedVsAI } from './data-inconsistency-checks/NoRankedVsAI.js';
 
 hexProgram
-    .command('check-inconsistencies')
+    .command('db:check-inconsistencies')
     .description('Check inconsistencies in database')
     .option('--name <name>', 'Only perform this check')
     .action(async ({ name }) => {

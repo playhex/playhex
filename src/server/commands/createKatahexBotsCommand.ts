@@ -2,7 +2,7 @@ import hexProgram from './hexProgram.js';
 import createAiConfigIfNotExists from './utils/createAiConfigIfNotExists.js';
 
 hexProgram
-    .command('create-katahex-bots')
+    .command('bot:create-katahex')
     .description('Create Katahex bots config in database')
     .option('--reuse-player', 'If AI player exists but not AI config, reuse player instance')
     .action(async ({ reusePlayer }) => {

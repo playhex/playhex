@@ -7,7 +7,7 @@ import { PlayerRetrospective } from '../../shared/app/models/index.js';
  * Urls based on BASE_URL of .env, or relative urls.
  */
 hexProgram
-    .command('list-retrospectives')
+    .command('retro:list')
     .description('List links to published retrospectives of all players, most recent year first')
     .option('--year <year>', 'Only retrospectives of this year, e.g 2026')
     .option('--player <slug>', 'Only retrospectives of this player')

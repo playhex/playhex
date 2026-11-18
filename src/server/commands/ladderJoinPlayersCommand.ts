@@ -9,7 +9,7 @@ import LadderRepository from '../ladder/LadderRepository.js';
 import { LadderRefusalError } from '../ladder/LadderError.js';
 
 hexProgram
-    .command('ladder-join-players')
+    .command('dev:join-ladder-players')
     .description('Make existing registered players from database join a ladder, for testing. Only players allowed to join are added (account age, not already in ladder...)')
     .argument('<count>', 'Number of players to add')
     .argument('[ladder]', 'Ladder slug', 'main')

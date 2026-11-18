@@ -84,7 +84,7 @@ const runPuzzleCheck = async (server: string, input: PuzzleCheckInput): Promise<
 };
 
 hexProgram
-    .command('puzzle-validate')
+    .command('puzzle:validate')
     .description('Validate puzzle tree, then check it with katahex or mohex solver on running server (needs ADMIN_PASSWORD)')
     .argument('<publicIdOrFile>', 'Puzzle publicId, or path to puzzle json file, see src/server/puzzles/examples/')
     .addOption(new Option('--engine <engine>', 'Engine to evaluate positions, or mohex-solver to prove them').choices(PUZZLE_CHECK_ENGINES).default('katahex-intuition' as const))

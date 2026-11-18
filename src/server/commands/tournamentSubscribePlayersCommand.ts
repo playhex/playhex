@@ -50,7 +50,7 @@ const subscribeCheckIn = (tournament: Tournament, player: Player, now: Date): To
 };
 
 hexProgram
-    .command('tournament-subscribe-players')
+    .command('dev:subscribe-tournament-players')
     .description('Subscribe/check-in existing players from database to a tournament, until it reaches a target number of participants')
     .argument('<tournament>', 'Tournament id or slug')
     .argument('<count>', 'Target number of participants')

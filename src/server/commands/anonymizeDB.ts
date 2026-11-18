@@ -4,7 +4,7 @@ import hexProgram from './hexProgram.js';
 import { mustAnswerYes } from './utils/question.js';
 
 hexProgram
-    .command('db-anonymize')
+    .command('dev:anonymize-db')
     .description('Anonymize database personal data for development purpose. Must not be run on production for sure.')
     .action(async () => {
         await appDataSourceInitialized;

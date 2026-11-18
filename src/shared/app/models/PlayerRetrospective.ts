@@ -4,7 +4,7 @@ import { keysOf } from '../utils.js';
 import type { PlayerRetrospectiveData } from '../retrospective/retrospectiveTypes.js';
 
 /**
- * Yearly retrospective of a player, computed by "generate-retrospectives" command.
+ * Yearly retrospective of a player, computed by "retro:generate" command.
  * Not exposed as is: only data is returned by api.
  *
  * Indexed columns are used to compute "top X%" among players of the same year.

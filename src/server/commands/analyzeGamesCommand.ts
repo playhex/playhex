@@ -186,7 +186,7 @@ const analyzeGame = async (baseUrl: string, publicId: string, pollIntervalMs: nu
  * so the server must be running, at BASE_URL.
  */
 hexProgram
-    .command('analyze-games')
+    .command('game:analyze')
     .description('Analyze ended games that have no analyze yet. Filters are chosen interactively. Requires the server running at BASE_URL.')
     .option('--concurrency <n>', 'Analyzes queued at same time', '20')
     .action(async options => {

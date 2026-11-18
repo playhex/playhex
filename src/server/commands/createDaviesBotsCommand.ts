@@ -2,7 +2,7 @@ import hexProgram from './hexProgram.js';
 import createAiConfigIfNotExists from './utils/createAiConfigIfNotExists.js';
 
 hexProgram
-    .command('create-davies-bots')
+    .command('bot:create-davies')
     .description('Create Davies bots config in database')
     .option('--reuse-player', 'If AI player exists but not AI config, reuse player instance')
     .action(async ({ reusePlayer }) => {

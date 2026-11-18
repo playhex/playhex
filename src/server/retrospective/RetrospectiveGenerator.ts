@@ -37,7 +37,7 @@ const FINALIZE_CHUNK_SIZE = 200;
 
 /**
  * Computes players yearly retrospectives.
- * Used by "generate-retrospectives" command, never at runtime:
+ * Used by "retro:generate" command, never at runtime:
  * a retrospective is displayed only once generated.
  *
  * Queries are in RetrospectiveDataLoader, computations in retrospectiveStats and shared retrospectiveRules.

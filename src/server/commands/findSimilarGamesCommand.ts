@@ -18,7 +18,7 @@ const gameSource = (publicId: string): string => BASE_URL
 const BATCH_SIZE = 5000;
 
 hexProgram
-    .command('find-similar-games')
+    .command('game:find-similar')
     .description('Find the games most similar to a given game, among all other games in database')
     .requiredOption('--game <publicId>', 'Public id (uuid) of the reference game')
     .option('--top <number>', 'Number of similar games to return', '5')

@@ -588,7 +588,7 @@ export default class PuzzleController
     }
 
     /**
-     * Same as postPuzzleCheck(), for admin, used by command "puzzle-validate".
+     * Same as postPuzzleCheck(), for admin, used by command "puzzle:validate".
      */
     @Authorized(ROLE_ADMIN)
     @Post('/api/admin/puzzles/katahex-check')

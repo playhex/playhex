@@ -99,7 +99,7 @@ type ExportedGame = {
 const { BASE_URL } = process.env;
 
 hexProgram
-    .command('export-games')
+    .command('game:export')
     .description('Export games as json to a file')
     .action(async () => {
         await appDataSourceInitialized;

@@ -13,7 +13,7 @@ const initDataSource = async (): Promise<void> => {
 };
 
 hexProgram
-    .command('ai-worker-key:create')
+    .command('ai:create-worker-key')
     .description('Create an api key for a player to let him run AI workers. Prints the key.')
     .argument('<player>', 'Player id, or player slug')
     .argument('[name]', 'Key name, suffixed with "-2", "-3"... if player already has a key with this name', 'default')
@@ -39,9 +39,9 @@ hexProgram
 ;
 
 hexProgram
-    .command('ai-worker-key:revoke')
+    .command('ai:revoke-worker-key')
     .description('Revoke an AI worker api key. Workers using it are refused.')
-    .argument('<id>', 'Key id, see ai-worker-key:list')
+    .argument('<id>', 'Key id, see ai:list-worker-keys')
     .action(async id => {
         await initDataSource();
 
@@ -57,7 +57,7 @@ hexProgram
 ;
 
 hexProgram
-    .command('ai-worker-key:list')
+    .command('ai:list-worker-keys')
     .description('List AI worker api keys')
     .action(async () => {
         await initDataSource();
@@ -77,7 +77,7 @@ hexProgram
 ;
 
 hexProgram
-    .command('ai-queue:obliterate')
+    .command('ai:obliterate-queue')
     .description('Remove all jobs of an AI job type queue in redis, including jobs being processed. Players waiting for these jobs will get an error.')
     .argument('<type>', AI_JOB_TYPES.join(', '))
     .action(async type => {

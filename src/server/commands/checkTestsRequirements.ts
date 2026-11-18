@@ -3,7 +3,7 @@ import hexProgram from './hexProgram.js';
 import { Player } from '../../shared/app/models/index.js';
 
 hexProgram
-    .command('check-tests-requirements')
+    .command('test:check-requirements')
     .description('Check whether config is ok to run integration tests')
     .action(async () => {
         await appDataSourceInitialized;
@@ -32,7 +32,7 @@ const checkBots = async (): Promise<void> => {
     const randomWait = await findBot('test-determinist-wait');
 
     if (!randomInstant || !randomWait) {
-        throw new Error('[FAIL] test bots missing, run: "pnpm hex create-test-bots"');
+        throw new Error('[FAIL] test bots missing, run: "pnpm hex test:create-bots"');
     }
 
     if (randomInstant.aiConfig?.config.wait !== 0) {

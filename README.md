@@ -76,9 +76,9 @@ For development you can use local AI:
 Enable them with:
 
 ``` bash
-pnpm hex create-random-bots
-pnpm hex create-davies-bots
-pnpm hex create-test-bots
+pnpm hex dev:create-random-bots
+pnpm hex bot:create-davies
+pnpm hex test:create-bots
 ```
 
 Determinist random bot will always plays same games
@@ -88,9 +88,9 @@ This is useful to reproduce things.
 If you need to work with real AI (Katahex, Mohex, Davies), enable AI players in database with:
 
 ``` bash
-pnpm hex create-davies-bots
-pnpm hex create-katahex-bots
-pnpm hex create-mohex-bots
+pnpm hex bot:create-davies
+pnpm hex bot:create-katahex
+pnpm hex bot:create-mohex
 ```
 
 In development, Davies moves are computed by the server.
@@ -101,7 +101,7 @@ Katahex and Mohex moves, game analyses and Hexplorer need an AI worker, see:
 Create a worker key, then run a worker (with Docker you don't need to compile any AI engine):
 
 ``` bash
-pnpm hex ai-worker-key:create <your player slug>
+pnpm hex ai:create-worker-key <your player slug>
 
 docker run --rm --network host -e HEX_URL=http://localhost:3000 -e AI_WORKER_KEY=<key> playhex/worker-katahex
 ```
@@ -175,7 +175,7 @@ pnpm cypress open
 All commands to run Cypress tests in command line:
 
 ``` bash
-pnpm hex check-tests-requirements # check environment has no issue that may make tests failing
+pnpm hex test:check-requirements # check environment has no issue that may make tests failing
 pnpm serve:prod # serve prod is faster for e2e tests
 pnpm cypress run --browser firefox # or another browser, or leave empty
 ```
@@ -184,13 +184,13 @@ pnpm cypress run --browser firefox # or another browser, or leave empty
 
 ``` bash
 # you can run this command to check all missing requirements
-pnpm hex check-tests-requirements
+pnpm hex test:check-requirements
 ```
 
 - Test bots must exists in database, if not, run:
 
 ``` bash
-pnpm hex create-test-bots
+pnpm hex test:create-bots
 ```
 
 - Ranked bot games must be allowed.

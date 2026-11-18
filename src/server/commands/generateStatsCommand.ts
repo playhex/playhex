@@ -578,7 +578,7 @@ const computeCommonStats = async (): Promise<CommonStats> => {
 };
 
 hexProgram
-    .command('generate-stats')
+    .command('stats:generate')
     .description('Compute PlayHex statistics and write them as json files to be displayed on the statistics page')
     .action(async () => {
         await appDataSourceInitialized;

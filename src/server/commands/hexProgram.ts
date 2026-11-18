@@ -6,6 +6,7 @@ hexProgram
     .name('Hex')
     .description('Commands to manage Hex instance.')
     .version('1.0.0')
+    .configureHelp({ sortSubcommands: true })
 ;
 
 export default hexProgram;

@@ -13,8 +13,8 @@ Run in early January, for the year that just ended.
 First, analyze games that have no analyze yet (the server must be running, with AI workers connected): accuracy and blunder are computed only on analyzed games, so more analyzed games give more players an accuracy, and more choice for the blunder of the year.
 
 ``` bash
-pnpm hex analyze-games
-pnpm hex generate-retrospectives 2026
+pnpm hex game:analyze
+pnpm hex retro:generate 2026
 ```
 
 The command works in two passes:

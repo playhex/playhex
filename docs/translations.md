@@ -10,7 +10,7 @@ Locale files are in `src/shared/app/i18n/locales/`:
 ## Translate missing strings
 
 ```sh
-pnpm -s hex missing-translations <locale>
+pnpm -s hex i18n:missing <locale>
 ```
 
 It prints only the keys missing in this locale compared to `en.json`, as nested JSON,
@@ -20,7 +20,7 @@ Without input, it does not write anything.
 Translate this JSON, then paste it in terminal, or pipe it back to the same command to write it in the locale file:
 
 ```sh
-pnpm -s hex missing-translations <locale> < translated.json
+pnpm -s hex i18n:missing <locale> < translated.json
 ```
 
 The translations are deep-merged into the locale file, with the existing 4-space formatting.
@@ -116,7 +116,7 @@ For example in `ladder.notification.challenge`, the context is the viewer, not `
 
 When done, for each locale:
 
-- the file is valid JSON, and `pnpm -s hex missing-translations <locale> < /dev/null` prints `No missing translations.`,
+- the file is valid JSON, and `pnpm -s hex i18n:missing <locale> < /dev/null` prints `No missing translations.`,
 - no `_male`/`_female` value is identical to its base key,
 - every `_male`/`_female` key has a base key, and is translated with a `context` in the code (add it if missing),
 - placeholders and HTML tags are the same as in `en.json`.

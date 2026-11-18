@@ -21,7 +21,7 @@ const readStdin = (): Promise<string> => new Promise(resolve => {
 });
 
 hexProgram
-    .command('missing-translations')
+    .command('i18n:missing')
     .description('Output missing translation keys in a locale compared to en.json that can be sent to AI for translation')
     .argument('<locale>', 'Target locale (e.g. fr, de, ja)')
     .action(async locale => {

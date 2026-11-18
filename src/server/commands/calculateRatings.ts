@@ -17,10 +17,10 @@ import { mustAnswerYes } from './utils/question.js';
 
  * then recalc all with this command:
 
-    pnpm hex calculate-ratings
+    pnpm hex rating:calculate
  */
 hexProgram
-    .command('calculate-ratings')
+    .command('rating:calculate')
     .description('Calculate ratings')
     .action(async () => {
         await appDataSourceInitialized;

@@ -15,7 +15,7 @@ useSeoMeta({
     description: () => t('social_preview.static.export_games_data.description'),
 });
 
-// To make an export file available here, run command: pnpm hex export-games
+// To make an export file available here, run command: pnpm hex game:export
 
 void (async () => {
     const response = await fetch('/export-data/manifest.json');

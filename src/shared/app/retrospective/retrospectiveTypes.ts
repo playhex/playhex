@@ -1,5 +1,5 @@
 /**
- * Data of a player yearly retrospective, computed once by "generate-retrospectives" command.
+ * Data of a player yearly retrospective, computed once by "retro:generate" command.
  */
 
 export const RETROSPECTIVE_DATA_VERSION = 1;

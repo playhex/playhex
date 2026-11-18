@@ -25,7 +25,7 @@ const migrate = (before: any): any => {
 const fixturesFolder = './cypress/fixtures';
 
 hexProgram
-    .command('migrate-cypress-fixtures')
+    .command('test:migrate-cypress-fixtures')
     .description('When changes are applied to schema, modifies all cypress fixtures to reflect the change')
     .action(async () => {
         for (const jsonFilename of await glob(fixturesFolder + '/**/*.json')) {

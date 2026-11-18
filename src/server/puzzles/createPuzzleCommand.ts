@@ -6,7 +6,7 @@ import PuzzleRepository from './PuzzleRepository.js';
 import { PuzzleFileError, readPuzzleFile } from './puzzleFile.js';
 
 hexProgram
-    .command('create-puzzle')
+    .command('puzzle:create')
     .description('Create a puzzle from a json file, see src/server/puzzles/examples/')
     .argument('<file>', 'Path to puzzle json file')
     .action(async file => {

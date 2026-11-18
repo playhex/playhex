@@ -6,7 +6,7 @@ import PlayerRepository from '../repositories/PlayerRepository.js';
 import hexProgram from './hexProgram.js';
 
 hexProgram
-    .command('create-fake-notifications')
+    .command('dev:create-fake-notifications')
     .description('Create one fake mailbox notification of each type for a player, for debug/design purpose')
     .requiredOption('--player <identifier>', 'Id, publicId (uuid) or slug of the player who will receive the notifications')
     .action(async ({ player: playerIdentifier }) => {

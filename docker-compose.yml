@@ -8,7 +8,7 @@
 # Redis Insight: http://localhost:5540
 #
 # AI worker (katahex: bot moves, game analyzes, Hexplorer), not started by default.
-# Create a key with `pnpm hex ai-worker-key:create <player id or slug>`,
+# Create a key with `pnpm hex ai:create-worker-key <player id or slug>`,
 # set AI_WORKER_KEY in docker-compose.override.yml, then:
 #   docker compose --profile ai up -d katahex
 #   docker compose --profile ai up -d --scale katahex=3 katahex
