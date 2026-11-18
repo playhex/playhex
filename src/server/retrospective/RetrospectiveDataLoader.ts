@@ -218,7 +218,7 @@ export default class RetrospectiveDataLoader
 
     /**
      * Games ended by player in [from, to[, oldest first.
-     * Tournament data excludes canceled tournaments, ladder data excludes voided challenges.
+     * Tournament data excludes canceled and hidden tournaments, ladder data excludes voided challenges.
      */
     async loadGames(playerId: number, from: Date, to: Date): Promise<GameRow[]>
     {
@@ -257,7 +257,7 @@ export default class RetrospectiveDataLoader
             LEFT JOIN player op ON op.id = ogp.playerId
             LEFT JOIN (
                 tournament_match tm
-                JOIN tournament t ON t.id = tm.tournamentId AND t.canceledAt IS NULL
+                JOIN tournament t ON t.id = tm.tournamentId AND t.canceledAt IS NULL AND t.hidden = 0
             ) ON tm.gameId = g.id
             LEFT JOIN ladder_challenge lc ON lc.gameId = g.id AND lc.result IS NOT NULL AND lc.result != 'voided'
             WHERE gp.playerId = ?
@@ -490,7 +490,7 @@ export default class RetrospectiveDataLoader
     }
 
     /**
-     * Results in tournaments ended this year, not canceled.
+     * Results in tournaments ended this year, not canceled nor hidden.
      */
     private async loadTournaments(from: Date, to: Date): Promise<Map<number, RetrospectiveTournament[]>>
     {
@@ -508,6 +508,7 @@ export default class RetrospectiveDataLoader
             JOIN tournament t ON t.id = tp.tournamentId
             WHERE t.endedAt >= ? AND t.endedAt < ?
             AND t.canceledAt IS NULL
+            AND t.hidden = 0
             AND tp.\`rank\` IS NOT NULL
         `, [from, to]);
 
