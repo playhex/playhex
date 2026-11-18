@@ -1,9 +1,16 @@
 # Authorization code flow, step 1: open this url in player browser.
 # Player is redirected to /oauth/interaction/xxx to authorize the application,
 # then back to redirect_uri with ?code=xxx
-# Public clients (no secret) must send code_challenge (PKCE, S256).
+# Then exchange the code within 60 seconds, see token.http.
 
 @clientId=my-client-id
 @redirectUri=http://localhost:9999/callback
+@scope=openid%20read:profile
 
-GET /oidc/auth?client_id={{ clientId }}&response_type=code&redirect_uri={{ redirectUri }}&scope=openid%20read%20write%20offline_access&prompt=consent&state=random-state&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256
+### Confidential client (with secret), no PKCE: exchange code without code_verifier
+
+GET /oidc/auth?client_id={{ clientId }}&response_type=code&redirect_uri={{ redirectUri }}&scope={{ scope }}&prompt=consent&state=random-state
+
+### Public client (no secret), must send code_challenge (PKCE, S256): exchange code with code_verifier
+
+GET /oidc/auth?client_id={{ clientId }}&response_type=code&redirect_uri={{ redirectUri }}&scope={{ scope }}&prompt=consent&state=random-state&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256

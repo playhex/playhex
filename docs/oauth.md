@@ -17,10 +17,11 @@ pnpm hex oauth:create-client \
     --website https://example.com \
     --redirect-uri https://example.com/oauth/callback
 
+# --client-id my-app: custom client id instead of a random one
 # --public: no client secret (mobile apps, SPA, CLI), PKCE required
 # --device: allow device flow (applications without browser)
 # --client-credentials: application gets tokens for itself, not on behalf of a player (bots...)
-# --scope "...": allowed scopes, default "openid offline_access read write"
+# --scope "...": allowed scopes, default "openid read:profile" (only player public id and profile), e.g "openid offline_access read write"
 ```
 
 Application acting on its own, e.g the Discord bot:
@@ -71,6 +72,7 @@ Implicit and hybrid flows are disabled.
 | Scope | Access |
 |---|---|
 | `openid` | Player public id (`sub` claim) |
+| `read:profile` | Only `GET /api/auth/me` and userinfo, to get player profile. Adds `pseudo`, `slug`, `is_guest` claims. |
 | `read` | All `GET` api routes, as the player. Adds `pseudo`, `slug`, `is_guest` claims. |
 | `write` | All api routes, as the player (create games, play moves, chat, settings...). Implies `read`. |
 | `offline_access` | Get a refresh token |

@@ -97,6 +97,7 @@ const createProvider = (): Provider => {
 
         claims: {
             openid: ['sub'],
+            'read:profile': ['pseudo', 'slug', 'is_guest'],
             read: ['pseudo', 'slug', 'is_guest'],
         },
 
@@ -197,6 +198,22 @@ const createProvider = (): Provider => {
 
     provider.on('server_error', (_ctx, err) => {
         logger.error('oidc-provider server error', { errorMessage: err.message, stack: err.stack });
+    });
+
+    // Errors returned to clients are generic (e.g "grant request is invalid"), log the actual reason.
+    // Only for authorization code exchange: expired refresh tokens and device flow polling ("authorization_pending")
+    // are expected and would spam logs.
+    provider.on('grant.error', (ctx, err) => {
+        if (ctx.oidc?.params?.grant_type !== 'authorization_code') {
+            return;
+        }
+
+        logger.warning('oidc-provider grant error', {
+            clientId: ctx.oidc?.client?.clientId,
+            grantType: ctx.oidc?.params?.grant_type,
+            error: err.message,
+            errorDetail: (err as { error_detail?: string }).error_detail,
+        });
     });
 
     return provider;

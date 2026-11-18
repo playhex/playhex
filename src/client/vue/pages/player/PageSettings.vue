@@ -10,7 +10,7 @@ import { apiDeleteAccountEmail, apiGetAccount, apiGetOAuthConnectedApplications,
 import type { AccountInfo } from '../../../../shared/app/AccountInfo.js';
 import { AppValidationError } from '../../../../shared/app/ValidationError.js';
 import { useRoute } from 'vue-router';
-import type { OAuthConnectedApplication } from '../../../../shared/app/oauth.js';
+import { oauthScopeI18nKey, withoutImpliedScopes, type OAuthConnectedApplication } from '../../../../shared/app/oauth.js';
 import { watch, Ref, ref, computed, onMounted, onBeforeUnmount, onUnmounted, nextTick } from 'vue';
 import { injectHead, useSeoMeta } from '@unhead/vue';
 import { InputValidation, toInputClass } from '../../../vue/formUtils.js';
@@ -1251,7 +1251,7 @@ const {
                                         </template>
                                     </p>
                                     <p class="small mb-1">
-                                        <span v-for="scope in application.scopes.filter(s => s !== 'openid')" :key="scope" class="badge text-bg-secondary me-1">{{ $t(`oauth.scope.${scope}.title`, { context: playerGender(loggedInPlayer) }) }}</span>
+                                        <span v-for="scope in withoutImpliedScopes(application.scopes).filter(s => s !== 'openid')" :key="scope" class="badge text-bg-secondary me-1">{{ $t(`oauth.scope.${oauthScopeI18nKey(scope)}.title`, { context: playerGender(loggedInPlayer) }) }}</span>
                                     </p>
                                     <p class="text-secondary small mb-0">{{ $t('oauth.authorized_at', { date: application.authorizedAt.toLocaleDateString(autoLocale()) }) }}</p>
                                 </div>

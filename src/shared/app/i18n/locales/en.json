@@ -2087,6 +2087,10 @@
                 "title": "Know who you are",
                 "description": "Your public player id."
             },
+            "read_profile": {
+                "title": "See your profile",
+                "description": "Your public profile: pseudo, avatar, country, rating..."
+            },
             "read": {
                 "title": "Read your data",
                 "description": "Your profile, games, ratings, settings... read only."

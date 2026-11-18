@@ -1,11 +1,12 @@
 /**
  * - openid: only get player public id
+ * - read:profile: only player profile (pseudo, slug...), with GET /api/auth/me or userinfo endpoint
  * - read: read-only access to all player data (profile, games...)
  * - write: act on behalf of the player (create games, play moves...), implies read
  * - offline_access: get a refresh token, to keep access without asking player again
  * - games:analyze: application only (client_credentials grant, no player), see CLIENT_ONLY_SCOPES
  */
-export const OAUTH_SCOPES = ['openid', 'offline_access', 'read', 'write', 'games:analyze'] as const;
+export const OAUTH_SCOPES = ['openid', 'offline_access', 'read:profile', 'read', 'write', 'games:analyze'] as const;
 
 export type OAuthScope = typeof OAUTH_SCOPES[number];
 
@@ -21,6 +22,24 @@ export const isOAuthScope = (scope: string): scope is OAuthScope => (OAUTH_SCOPE
 export const CLIENT_ONLY_SCOPES: readonly OAuthScope[] = ['games:analyze'];
 
 export const isClientOnlyScope = (scope: string): boolean => (CLIENT_ONLY_SCOPES as readonly string[]).includes(scope);
+
+/**
+ * Translation key of a scope, under "oauth.scope.".
+ * ":" is i18next namespace separator, so "read:profile" => "read_profile".
+ */
+export const oauthScopeI18nKey = (scope: string): string => scope.replace(':', '_');
+
+/**
+ * Removes scopes already included in another one, to not display them twice to the player:
+ * "read:profile" is included in "read" and "write".
+ */
+export const withoutImpliedScopes = <T extends string>(scopes: T[]): T[] => {
+    if (scopes.includes('read' as T) || scopes.includes('write' as T)) {
+        return scopes.filter(scope => scope !== 'read:profile');
+    }
+
+    return scopes;
+};
 
 /**
  * "openid read write" => ["openid", "read", "write"]

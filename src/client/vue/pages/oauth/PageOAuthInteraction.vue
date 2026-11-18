@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia';
 import { useSeoMeta } from '@unhead/vue';
 import useAuthStore from '../../../stores/authStore.js';
 import { apiGetOAuthInteraction, apiPostOAuthInteraction } from '../../../apiClient.js';
-import { isOAuthScope, type OAuthInteractionDetails } from '../../../../shared/app/oauth.js';
+import { isOAuthScope, oauthScopeI18nKey, withoutImpliedScopes, type OAuthInteractionDetails } from '../../../../shared/app/oauth.js';
 import AppPseudo from '../../components/AppPseudo.vue';
 import AppPlayerAvatar from '../../components/AppPlayerAvatar.vue';
 import { IconCheck, IconExclamationTriangleFill } from '../../icons.js';
@@ -32,16 +32,18 @@ const redirectQuery = computed(() => ({ redirect: route.fullPath }));
 
 /**
  * "openid" is always displayed, other scopes only if requested.
+ * "read:profile" is hidden when "read" or "write" is requested, as they already include it.
  */
 const displayedScopes = computed(() => {
     if (interaction.value === null) {
         return [];
     }
 
-    const scopes = interaction.value.scopes.filter(isOAuthScope);
+    const scopes = withoutImpliedScopes(interaction.value.scopes.filter(isOAuthScope));
 
     return [
         'openid' as const,
+        ...(['read:profile'] as const).filter(scope => scopes.includes(scope)),
         ...(['read', 'write', 'offline_access'] as const).filter(scope => scopes.includes(scope)),
     ];
 });
@@ -129,9 +131,9 @@ const submit = async (action: 'confirm' | 'abort') => {
                     <ul class="list-unstyled">
                         <li v-for="scope in displayedScopes" :key="scope" class="mb-2">
                             <IconCheck class="text-success" />
-                            <strong>{{ $t(`oauth.scope.${scope}.title`, { context: playerGender(loggedInPlayer) }) }}</strong>
+                            <strong>{{ $t(`oauth.scope.${oauthScopeI18nKey(scope)}.title`, { context: playerGender(loggedInPlayer) }) }}</strong>
                             <br>
-                            <small class="text-secondary">{{ $t(`oauth.scope.${scope}.description`) }}</small>
+                            <small class="text-secondary">{{ $t(`oauth.scope.${oauthScopeI18nKey(scope)}.description`) }}</small>
                         </li>
                     </ul>
 

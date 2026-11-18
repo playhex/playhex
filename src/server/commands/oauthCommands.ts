@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 import hexProgram from './hexProgram.js';
 import { AppDataSource, appDataSourceInitialized } from '../data-source.js';
 import { OAuthClient } from '../../shared/app/models/index.js';
-import { DEVICE_CODE_GRANT_TYPE } from '../oauth/provider.js';
+import { DEVICE_CODE_GRANT_TYPE, OIDC_PATH_PREFIX } from '../oauth/provider.js';
 import { isClientOnlyScope, isOAuthScope, parseScope } from '../../shared/app/oauth.js';
 
 const collect = (value: string, previous: string[]): string[] => [...previous, value];
@@ -13,14 +13,15 @@ hexProgram
     .requiredOption('--name <name>', 'Application name, displayed to players')
     .requiredOption('--author <author>', 'Application author, displayed to players')
     .requiredOption('--logo <url>', 'Application logo url')
+    .option('--client-id <clientId>', 'Custom client id, e.g "my-app". Random if not set')
     .option('--website <url>', 'Application website')
     .option('--description <description>', 'Short description, displayed to players')
     .option('--redirect-uri <url>', 'Allowed redirect uri, can be repeated', collect, [] as string[])
     .option('--public', 'Public client (mobile app, SPA, CLI...): no client secret, must use PKCE')
     .option('--device', 'Allow device flow, for applications without browser (CLI, bots...)')
     .option('--client-credentials', 'Allow the application to get tokens for itself, not on behalf of a player (client_credentials grant), e.g a Discord bot. Use with --scope')
-    .option('--scope <scopes>', 'Space separated scopes the application may request, e.g "games:analyze" for a Discord bot', 'openid offline_access read write')
-    .action(async ({ name, author, logo, website, description, redirectUri, public: isPublic, device, clientCredentials, scope }) => {
+    .option('--scope <scopes>', 'Space separated scopes the application may request, e.g "openid offline_access read write" to act on behalf of players, or "games:analyze" for a Discord bot. Default: only player public id and profile', 'openid read:profile')
+    .action(async ({ clientId, name, author, logo, website, description, redirectUri, public: isPublic, device, clientCredentials, scope }) => {
         await appDataSourceInitialized;
 
         if (redirectUri.length === 0 && !device && !clientCredentials) {
@@ -33,6 +34,21 @@ hexProgram
             console.error('A public client cannot use --client-credentials, it needs a client secret');
             process.exitCode = 1;
             return;
+        }
+
+        if (clientId !== undefined) {
+            // Lowercase only: client id column may be case insensitive, "My-App" and "my-app" would be ambiguous
+            if (!/^[a-z0-9_-]{1,64}$/.test(clientId)) {
+                console.error('--client-id must be 1 to 64 characters among lowercase letters, digits, "-" and "_"');
+                process.exitCode = 1;
+                return;
+            }
+
+            if (await AppDataSource.getRepository(OAuthClient).existsBy({ clientId })) {
+                console.error(`Client id "${clientId}" already exists`);
+                process.exitCode = 1;
+                return;
+            }
         }
 
         const scopes = parseScope(scope);
@@ -71,7 +87,7 @@ hexProgram
 
         const client = new OAuthClient();
 
-        client.clientId = crypto.randomBytes(12).toString('base64url');
+        client.clientId = clientId ?? crypto.randomBytes(12).toString('base64url');
         client.clientSecret = isPublic ? null : crypto.randomBytes(48).toString('base64url');
         client.name = name;
         client.author = author;
@@ -89,6 +105,12 @@ hexProgram
         console.log(`client_secret: ${client.clientSecret ?? '(none, public client, must use PKCE)'}`);
         console.log(`grant types:   ${grantTypes.join(', ')}`);
         console.log(`scopes:        ${client.allowedScopes}`);
+        console.log(`redirect uris: ${redirectUri.length > 0 ? redirectUri.join(', ') : '(none)'}`);
+
+        const issuer = (process.env.BASE_URL ?? 'http://localhost:3000') + OIDC_PATH_PREFIX;
+
+        console.log(`Authorize URL: ${issuer}/auth`);
+        console.log(`Token URL:     ${issuer}/token`);
     })
 ;
 

@@ -12,6 +12,23 @@ describe('oauthApiPolicy', () => {
         assert.deepStrictEqual(checkOAuthApiPolicy('GET', '/api/auth/me', scopes('read')), { allowed: true });
     });
 
+    it('allows only profile with read:profile scope', () => {
+        assert.deepStrictEqual(checkOAuthApiPolicy('GET', '/api/auth/me', scopes('openid', 'read:profile')), { allowed: true });
+        assert.deepStrictEqual(checkOAuthApiPolicy('GET', '/API/Auth/Me', scopes('read:profile')), { allowed: true });
+        assert.deepStrictEqual(
+            checkOAuthApiPolicy('GET', '/api/games/abc', scopes('openid', 'read:profile')),
+            { allowed: false, reason: 'insufficient_scope', requiredScope: 'read' },
+        );
+        assert.deepStrictEqual(
+            checkOAuthApiPolicy('GET', '/api/auth/me', scopes('openid')),
+            { allowed: false, reason: 'insufficient_scope', requiredScope: 'read:profile' },
+        );
+        assert.deepStrictEqual(
+            checkOAuthApiPolicy('POST', '/api/auth/me', scopes('read:profile', 'write')),
+            { allowed: false, reason: 'route_not_allowed' },
+        );
+    });
+
     it('denies api access with only openid scope', () => {
         assert.deepStrictEqual(
             checkOAuthApiPolicy('GET', '/api/games/abc', scopes('openid')),

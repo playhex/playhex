@@ -2141,6 +2141,10 @@
                 "title": "Savoir qui vous êtes",
                 "description": "Votre identifiant public de joueur."
             },
+            "read_profile": {
+                "title": "Voir votre profil",
+                "description": "Votre profil public : pseudo, avatar, pays, classement…"
+            },
             "read": {
                 "title": "Lire vos données",
                 "description": "Votre profil, vos parties, votre classement, vos paramètres… en lecture seule."

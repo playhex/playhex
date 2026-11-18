@@ -1,14 +1,23 @@
 # Authorization code flow, step 2: exchange code for access token (and refresh token if offline_access).
-# Confidential clients authenticate with Basic auth (client_id:client_secret),
-# public clients send client_id and code_verifier instead.
+# Code is valid 60 seconds, and can be used only once.
+# Send code_verifier only if code_challenge was sent to /oidc/auth, otherwise "invalid_grant".
 
 @clientId=my-client-id
 @clientSecret=my-client-secret
 @redirectUri=http://localhost:9999/callback
 @code=xxx
 
+### Confidential client (with secret), authenticates with Basic auth, no PKCE
+
 POST /oidc/token
 Authorization: Basic {{ clientId }}:{{ clientSecret }}
 Content-Type: application/x-www-form-urlencoded
 
-grant_type=authorization_code&code={{ code }}&redirect_uri={{ redirectUri }}&code_verifier=dBjftJeZ4CVP-mJ92K9uLLtpvmz2JH2r4WbmQdfjqVg
+grant_type=authorization_code&code={{ code }}&redirect_uri={{ redirectUri }}
+
+### Public client (no secret), sends client_id and code_verifier (PKCE)
+
+POST /oidc/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&client_id={{ clientId }}&code={{ code }}&redirect_uri={{ redirectUri }}&code_verifier=dBjftJeZ4CVP-mJ92K9uLLtpvmz2JH2r4WbmQdfjqVg
