@@ -287,6 +287,14 @@ const {
                                         @click="closeOffcanvas(); leaveFocus()"
                                     >{{ $t('videos.title') }}</router-link>
                                 </li>
+                                <li>
+                                    <router-link
+                                        :to="{ name: 'hex-experiments' }"
+                                        :class="{ active: routeName === 'hex-experiments' }"
+                                        class="nav-link"
+                                        @click="closeOffcanvas(); leaveFocus()"
+                                    >{{ $t('hex_experiments.title') }}</router-link>
+                                </li>
                             </ul>
                         </li>
 

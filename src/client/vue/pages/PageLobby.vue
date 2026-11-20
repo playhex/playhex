@@ -34,6 +34,7 @@ import AppRhombusAutoOrientation from '../components/AppRhombusAutoOrientation.v
 import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppChannel from '../components/AppChannel.vue';
 import AppTutorialCard from '../components/AppTutorialCard.vue';
+import AppExperimentCard from '../components/AppExperimentCard.vue';
 import AppRetrospectiveCard from '../retrospective/components/AppRetrospectiveCard.vue';
 import { getPlayerLocales } from '../../../shared/app/i18n/index.js';
 
@@ -445,6 +446,15 @@ for (const locale of getPlayerLocales()) {
                 />
 
                 <AppChannel :channels />
+
+                <AppExperimentCard
+                    class="my-3"
+                    href="https://royale.playhex.org/"
+                    image="/images/puzzle-royale.jpg"
+                    title="Puzzle Royale"
+                    :description="$t('puzzle_royale_description')"
+                    :badge="$t('another_experiment')"
+                />
 
                 <!-- Playing tournaments -->
                 <template v-if="runningTournaments.length > 0">

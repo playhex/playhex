@@ -200,6 +200,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./videos/pages/PageVideos.vue'),
     },
     {
+        name: 'hex-experiments',
+        path: '/hex-experiments',
+        component: () => import('./pages/PageHexExperiments.vue'),
+    },
+    {
         name: 'video-submit',
         path: '/videos/submit',
         component: () => import('./videos/pages/PageVideoSubmit.vue'),

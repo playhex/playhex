@@ -105,6 +105,12 @@
     "lobby_active_players_other": "joueurs actifs",
     "playhex_chill_description": "Même lobby, mêmes parties, mêmes joueurs, mais en 3D sur une petite planète chill.",
     "experimental": "Expérimental",
+    "puzzle_royale_description": "Résolvez des puzzles ensemble en temps réel : trouvez le coup gagnant avant la fin du chrono, le dernier debout gagne.",
+    "another_experiment": "Encore une expérience…",
+    "hex_experiments": {
+        "title": "Expériences Hex",
+        "intro": "Des applications expérimentales autour du Hex, avec votre compte PlayHex. Essayez-les et donnez votre avis !"
+    },
     "lobby_survey_title": "Sondage en une ligne",
     "lobby_survey_question": "Quelle est la chose qui vous manque le plus sur PlayHex ?",
     "lobby_survey_submit": "Envoyer",

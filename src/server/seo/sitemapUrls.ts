@@ -27,6 +27,7 @@ export const staticSitemapUrls: SitemapUrl[] = [
     '/hexplorer',
     '/swap-maps',
     '/videos',
+    '/hex-experiments',
     '/statistics',
     '/games-archive',
     '/export-games-data',
