@@ -394,7 +394,17 @@ export class SlashinftyTournamentOrganizer implements TournamentEngineInterface
             return;
         }
 
-        if (toTournament.matches.every(match => !match.active)) {
+        // Round robin: all matches are active from start, and next() advances only one round, so call it for each already done round
+        const isRoundRobin = ['round-robin', 'double-round-robin'].includes(toTournament.stageOne.format);
+        const isBlocking = (match: Match): boolean => match.active && (!isRoundRobin || match.round === toTournament.round);
+
+        let remainingIterations = toTournament.stageOne.rounds + 1;
+
+        while (toTournament.status === 'stage-one' && !toTournament.matches.some(isBlocking)) {
+            if (--remainingIterations < 0) {
+                throw new TournamentEngineError('Too many rounds advanced at once, round robin tournament may be stuck');
+            }
+
             try {
                 toTournament.next();
             } catch (e) {
