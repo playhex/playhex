@@ -32,6 +32,15 @@ useHead({
                     :badge="$t('experimental')"
                 />
             </div>
+            <div class="col">
+                <AppExperimentCard
+                    href="https://y.playhex.org/"
+                    image="/images/y-hex.jpg"
+                    title="Y"
+                    :description="$t('y_hex_description')"
+                    :badge="$t('experimental')"
+                />
+            </div>
         </div>
     </div>
 </template>

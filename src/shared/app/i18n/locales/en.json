@@ -395,6 +395,7 @@
     "lobby_active_players_one": "active player",
     "lobby_active_players_other": "active players",
     "playhex_chill_description": "Same lobby, same games, same players, but in 3D on a chill tiny planet.",
+    "y_hex_description": "Play Y, a game very close to Hex: on a triangular board, connect all three sides to win.",
     "experimental": "Experimental",
     "puzzle_royale_description": "Solve puzzles together in real time: find the winning move before time runs out, last one standing wins.",
     "another_experiment": "Yet another experiment…",
