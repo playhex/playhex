@@ -210,6 +210,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./videos/pages/PageVideoSubmit.vue'),
     },
     {
+        name: 'katahex',
+        path: '/katahex',
+        component: () => import('./pages/PageKatahex.vue'),
+    },
+    {
         name: 'online-players',
         path: '/online-players',
         component: () => import('./pages/PageOnlinePlayers.vue'),

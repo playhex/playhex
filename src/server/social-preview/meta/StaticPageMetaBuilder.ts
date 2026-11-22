@@ -27,6 +27,7 @@ const staticPages: { [path: string]: string } = {
     '/tournoi-hex-paris-2025': 'cijm_2025',
     '/tournoi-hex-paris-2026': 'cijm_2026',
     '/export-games-data': 'export_games_data',
+    '/katahex': 'katahex',
 };
 
 /**

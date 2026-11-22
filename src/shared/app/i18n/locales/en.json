@@ -2243,6 +2243,10 @@
                 "title": "Export PlayHex games data",
                 "description": "Download a dataset of all Hex games played on PlayHex, free to reuse."
             },
+            "katahex": {
+                "title": "KataHex",
+                "description": "KataHex, the strongest Hex AI, created by HZY. Download KataHex neural network models."
+            },
             "guide_ai_analysis": {
                 "title": "AI game analysis",
                 "description": "Review your Hex games with AI: spot your blunders, see the best moves, and find when you took or lost the advantage."

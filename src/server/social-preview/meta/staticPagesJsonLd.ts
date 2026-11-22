@@ -1,8 +1,9 @@
-import type { Event, Game, LearningResource, Offer, TechArticle, Thing, WebApplication, WithContext } from 'schema-dts';
+import type { Event, Game, LearningResource, Offer, SoftwareApplication, TechArticle, Thing, WebApplication, WithContext } from 'schema-dts';
 import { seo } from '../../../shared/app/seo.js';
 import type { SocialMetaContext } from '../SocialMeta.js';
 import { breadcrumbJsonLd } from './metaUtils.js';
 import { tutorialSeoPath, tutorialSeoSteps } from '../../../shared/app/tutorial/tutorialSteps.js';
+import { katahexModels } from '../../../shared/app/katahexModels.js';
 
 /**
  * What json-ld builders of static pages need, in addition to context.
@@ -187,11 +188,37 @@ const cijmEventJsonLd = (event: {
     } satisfies WithContext<Event>];
 };
 
+const katahexJsonLd: StaticPageJsonLdBuilder = context => [{
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'KataHex',
+    description: context.description,
+    url: `${context.baseUrl}/katahex`,
+    image: context.image,
+    applicationCategory: 'GameApplication',
+    isAccessibleForFree: true,
+    offers: freeOffer,
+    about: hexGame,
+    author: {
+        '@type': 'Person',
+        name: 'HZY',
+        url: 'https://github.com/hzyhhzy',
+        image: 'https://github.com/hzyhhzy.png',
+    },
+    isBasedOn: {
+        '@type': 'SoftwareApplication',
+        name: 'KataGo',
+        url: 'https://github.com/lightvector/KataGo',
+    },
+    downloadUrl: katahexModels.map(model => model.originUrl),
+} satisfies WithContext<SoftwareApplication>];
+
 /**
  * Json-ld of static pages, by path.
  */
 export const staticPagesJsonLd: { [path: string]: StaticPageJsonLdBuilder } = {
     '/': homeJsonLd,
+    '/katahex': katahexJsonLd,
     '/guide/ai-analysis': guideArticleJsonLd('/guide/ai-analysis'),
     '/guide/conditional-moves': guideArticleJsonLd('/guide/conditional-moves'),
     ...Object.fromEntries(tutorialSeoSteps.map(step => [tutorialSeoPath(step), tutorialJsonLd(tutorialSeoPath(step), step.seo.teaches)])),

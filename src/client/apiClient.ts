@@ -2273,3 +2273,14 @@ export const apiGetLobbyJoinChances = async (): Promise<{ joinChancesByUtcHour: 
 
     return await response.json() as { joinChancesByUtcHour: LobbyJoinChances[] };
 };
+
+export const apiGetMirroredKatahexModels = async (): Promise<string[]> => {
+    const response = await fetch('/api/katahex-models/mirrored', {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+        },
+    });
+
+    return await response.json();
+};

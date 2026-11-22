@@ -28,6 +28,7 @@ export const staticSitemapUrls: SitemapUrl[] = [
     '/swap-maps',
     '/videos',
     '/hex-experiments',
+    '/katahex',
     '/statistics',
     '/games-archive',
     '/export-games-data',
