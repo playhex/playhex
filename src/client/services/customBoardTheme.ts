@@ -1,4 +1,5 @@
-import { createThemeFromJson, getBuiltinTheme, ThemeDefinition } from '@playhex/pixi-board';
+import { createThemeFromJson, ThemeDefinition } from '@playhex/pixi-board';
+import { getBoardTheme } from './board-themes/index.js';
 
 /**
  * Value of player settings boardTheme to use player json theme (customBoardTheme).
@@ -67,5 +68,5 @@ export const getPlayerBoardTheme = (boardTheme: undefined | null | string, custo
         }
     }
 
-    return getBuiltinTheme(boardTheme);
+    return getBoardTheme(boardTheme);
 };

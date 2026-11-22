@@ -22,7 +22,8 @@ import { MoveSettings, PlayerAiWorkerKey } from '../../../../shared/app/models/i
 import { simulateTargetPseudoClassHandler } from '../../../services/simulateTargetPseudoClassHandler.js';
 import AppRhombus from '../../components/AppRhombus.vue';
 import { DomainHttpError } from '../../../../shared/app/DomainHttpError.js';
-import { builtinThemes, GameView, playhexTheme } from '@playhex/pixi-board';
+import { GameView, playhexTheme } from '@playhex/pixi-board';
+import { boardThemes } from '../../../services/board-themes/index.js';
 import { CUSTOM_BOARD_THEME_ID, customBoardThemeTemplate, getPlayerBoardTheme, parseCustomBoardTheme, THEMING_DOC_URL } from '../../../services/customBoardTheme.js';
 import { intlFormat } from 'date-fns';
 import { PlayerSettingsFacade } from '../../../services/board-view-facades/PlayerSettingsFacade.js';
@@ -999,7 +1000,7 @@ const {
                             <div class="col-md-8">
                                 <select class="form-select" v-model="selectedBoardTheme">
                                     <option
-                                        v-for="theme in builtinThemes"
+                                        v-for="theme in boardThemes"
                                         :key="theme.metadata.id"
                                         :value="theme.metadata.id"
                                     >{{ theme.metadata.name }}</option>
