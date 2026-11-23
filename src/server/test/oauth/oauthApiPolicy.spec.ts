@@ -57,7 +57,6 @@ describe('oauthApiPolicy', () => {
             ['GET', '/api/oauth/connected-applications'],
             ['DELETE', '/api/oauth/connected-applications/xyz'],
             ['GET', '/api/admin/ip'],
-            ['GET', '/api/player-ai-worker-keys'],
             ['POST', '/api/ai-workers/jobs/next'],
             ['PUT', '/api/push-subscriptions'],
             ['POST', '/api/push/test'],
@@ -72,8 +71,30 @@ describe('oauthApiPolicy', () => {
         const all = scopes('openid', 'read', 'write', 'offline_access');
 
         assert.deepStrictEqual(checkOAuthApiPolicy('POST', '/API/Auth/change-password', all), { allowed: false, reason: 'route_not_allowed' });
-        assert.deepStrictEqual(checkOAuthApiPolicy('GET', '/Api/Player-AI-Worker-Keys', all), { allowed: false, reason: 'route_not_allowed' });
         assert.deepStrictEqual(checkOAuthApiPolicy('PUT', '/api/players/ME/little-golem', all), { allowed: false, reason: 'route_not_allowed' });
+    });
+
+    it('allows reading AI worker keys only with read:ai-worker-keys scope', () => {
+        const all = scopes('openid', 'read', 'write', 'offline_access');
+
+        assert.deepStrictEqual(checkOAuthApiPolicy('GET', '/api/player-ai-worker-keys', scopes('openid', 'read:ai-worker-keys')), { allowed: true });
+        assert.deepStrictEqual(checkOAuthApiPolicy('GET', '/Api/Player-AI-Worker-Keys', scopes('read:ai-worker-keys')), { allowed: true });
+        assert.deepStrictEqual(
+            checkOAuthApiPolicy('GET', '/api/player-ai-worker-keys', all),
+            { allowed: false, reason: 'insufficient_scope', requiredScope: 'read:ai-worker-keys' },
+        );
+        assert.deepStrictEqual(
+            checkOAuthApiPolicy('POST', '/api/player-ai-worker-keys', scopes('read:ai-worker-keys', 'write')),
+            { allowed: false, reason: 'route_not_allowed' },
+        );
+        assert.deepStrictEqual(
+            checkOAuthApiPolicy('POST', '/api/ai-workers/jobs/next', scopes('read:ai-worker-keys', 'write')),
+            { allowed: false, reason: 'route_not_allowed' },
+        );
+        assert.deepStrictEqual(
+            checkOAuthApiPolicy('GET', '/api/games/abc', scopes('read:ai-worker-keys')),
+            { allowed: false, reason: 'insufficient_scope', requiredScope: 'read' },
+        );
     });
 
     it('does not deny routes only sharing a prefix', () => {

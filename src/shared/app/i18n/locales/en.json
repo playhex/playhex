@@ -2112,6 +2112,10 @@
                 "title": "Act on your behalf",
                 "description": "Create and join games, play moves, chat, change settings... Never your password."
             },
+            "read_ai-worker-keys": {
+                "title": "See your AI worker keys",
+                "description": "To run an AI worker with your keys."
+            },
             "offline_access": {
                 "title": "Stay connected",
                 "description": "Keep access while you are not using the application."

@@ -99,6 +99,8 @@ const createProvider = (): Provider => {
             openid: ['sub'],
             'read:profile': ['pseudo', 'slug', 'is_guest'],
             read: ['pseudo', 'slug', 'is_guest'],
+            // Web AI worker shows which account its keys come from
+            'read:ai-worker-keys': ['pseudo'],
         },
 
         interactions: {

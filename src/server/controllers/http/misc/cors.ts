@@ -35,6 +35,9 @@ export const registerCors = (app: Express): void => {
         maxAge: 86400,
     }));
 
+    // Public downloads, e.g for the browser AI worker
+    app.use('/katahex-models', cors());
+
     if (allowedOrigins.length > 0) {
         const allowedOriginsCors = cors({
             origin: allowedOrigins,

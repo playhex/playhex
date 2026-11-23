@@ -4,9 +4,10 @@
  * - read: read-only access to all player data (profile, games...)
  * - write: act on behalf of the player (create games, play moves...), implies read
  * - offline_access: get a refresh token, to keep access without asking player again
+ * - read:ai-worker-keys: only player AI worker keys, to run a worker from a web page
  * - games:analyze: application only (client_credentials grant, no player), see CLIENT_ONLY_SCOPES
  */
-export const OAUTH_SCOPES = ['openid', 'offline_access', 'read:profile', 'read', 'write', 'games:analyze'] as const;
+export const OAUTH_SCOPES = ['openid', 'offline_access', 'read:profile', 'read', 'write', 'read:ai-worker-keys', 'games:analyze'] as const;
 
 export type OAuthScope = typeof OAUTH_SCOPES[number];
 

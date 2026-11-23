@@ -44,7 +44,7 @@ const displayedScopes = computed(() => {
     return [
         'openid' as const,
         ...(['read:profile'] as const).filter(scope => scopes.includes(scope)),
-        ...(['read', 'write', 'offline_access'] as const).filter(scope => scopes.includes(scope)),
+        ...(['read', 'write', 'read:ai-worker-keys', 'offline_access'] as const).filter(scope => scopes.includes(scope)),
     ];
 });
 

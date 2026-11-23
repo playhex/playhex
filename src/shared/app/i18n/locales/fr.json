@@ -2166,6 +2166,10 @@
                 "title": "Agir en votre nom",
                 "description": "Créer et rejoindre des parties, jouer des coups, discuter, modifier vos paramètres… Jamais votre mot de passe."
             },
+            "read_ai-worker-keys": {
+                "title": "Voir vos clés de worker IA",
+                "description": "Pour faire tourner un worker IA avec vos clés."
+            },
             "offline_access": {
                 "title": "Rester connecté(e)",
                 "title_male": "Rester connecté",

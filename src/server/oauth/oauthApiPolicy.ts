@@ -27,6 +27,13 @@ const PROFILE_ROUTES: { method: string, pattern: RegExp }[] = [
     { method: 'GET', pattern: /^\/api\/auth\/me$/i },
 ];
 
+/**
+ * Routes allowed only with their dedicated scope, even if they match a denied route above.
+ */
+const SCOPED_ROUTES: { method: string, pattern: RegExp, scope: OAuthScope }[] = [
+    { method: 'GET', pattern: /^\/api\/player-ai-worker-keys$/i, scope: 'read:ai-worker-keys' },
+];
+
 export const canWrite = (scopes: Set<string>): boolean => scopes.has('write');
 
 export const canRead = (scopes: Set<string>): boolean => scopes.has('read') || canWrite(scopes);
@@ -52,6 +59,15 @@ export const checkOAuthApiPolicy = (method: string, path: string, scopes: Set<st
         return canReadProfile(scopes)
             ? { allowed: true }
             : { allowed: false, reason: 'insufficient_scope', requiredScope: 'read:profile' }
+        ;
+    }
+
+    const scopedRoute = SCOPED_ROUTES.find(route => route.method === method && route.pattern.test(path));
+
+    if (scopedRoute !== undefined) {
+        return scopes.has(scopedRoute.scope)
+            ? { allowed: true }
+            : { allowed: false, reason: 'insufficient_scope', requiredScope: scopedRoute.scope }
         ;
     }
 
