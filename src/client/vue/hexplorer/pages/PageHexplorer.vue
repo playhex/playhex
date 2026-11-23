@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onKeyDown, useMediaQuery, whenever } from '@vueuse/core';
+import { onKeyDown, whenever } from '@vueuse/core';
 import { computed, provide, ref, useTemplateRef, watch } from 'vue';
 import { t } from 'i18next';
 import { storeToRefs } from 'pinia';
@@ -120,11 +120,6 @@ const blueBarHeightCss = computed(() => `${(whiteWin.value ?? 0.5) * 100}%`);
 const whiteWinAvailable = computed(() => typeof whiteWin.value === 'number');
 
 bindKeys();
-
-/**
- * On small screens, sidebar covers the board: main setup tools are also under it.
- */
-const isLargeScreen = useMediaQuery('(min-width: 576px)');
 
 const sidebarOpen = ref(true);
 
@@ -338,7 +333,7 @@ const importAnalysisFromCopy = async (): Promise<void> => {
             </div>
 
             <div v-else class="bottom-menu">
-                <HexplorerSetupTools v-if="!isLargeScreen" compact />
+                <HexplorerSetupTools compact />
 
                 <HexplorerNavButtons />
 
