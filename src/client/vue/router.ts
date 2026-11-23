@@ -1,6 +1,8 @@
 import { RouteLocationNormalizedLoadedGeneric, RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 import { notifyActivity } from '../services/playerActivity.js';
 import { OnlinePlayerPage } from '../../shared/app/OnlinePlayerPage.js';
+import { apiGetShortLinkTarget } from '../apiClient.js';
+import { isValidShortLinkTarget, SHORT_LINK_PATH_PREFIX } from '../../shared/app/short-links/shortLinks.js';
 
 const routes: RouteRecordRaw[] = [
     {
@@ -446,6 +448,21 @@ const routes: RouteRecordRaw[] = [
         name: 'rescue',
         path: '/rescue',
         component: () => import('./pages/PageRescue.vue'),
+    },
+    {
+        name: 'short-link',
+        path: `${SHORT_LINK_PATH_PREFIX}:slug`,
+        component: () => import('./pages/PageNotFound.vue'),
+        beforeEnter: async to => {
+            const target = await apiGetShortLinkTarget(String(to.params.slug));
+
+            // Stays on this route, displaying not found, if link does not exist
+            if (target === null || !isValidShortLinkTarget(target)) {
+                return true;
+            }
+
+            return target;
+        },
     },
     {
         name: 'test',

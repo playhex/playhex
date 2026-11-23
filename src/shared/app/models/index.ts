@@ -56,6 +56,7 @@ import PuzzleCollection from './PuzzleCollection.js';
 import PuzzleMonitorUncoveredLine from './PuzzleMonitorUncoveredLine.js';
 import PuzzleMonitorUncoveredLineIgnored from './PuzzleMonitorUncoveredLineIgnored.js';
 import Rating from './Rating.js';
+import ShortLink from './ShortLink.js';
 import SimilarPositionFlag from './SimilarPositionFlag.js';
 import SurveyAnswer from './SurveyAnswer.js';
 import Tournament from './Tournament.js';
@@ -129,6 +130,7 @@ export {
     PuzzleMonitorUncoveredLine,
     PuzzleMonitorUncoveredLineIgnored,
     Rating,
+    ShortLink,
     SimilarPositionFlag,
     SurveyAnswer,
     Tournament,
@@ -198,6 +200,7 @@ export const entities = {
     PuzzleMonitorUncoveredLine,
     PuzzleMonitorUncoveredLineIgnored,
     Rating,
+    ShortLink,
     SimilarPositionFlag,
     SurveyAnswer,
     Tournament,

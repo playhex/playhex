@@ -57,6 +57,7 @@ import ExternalGameImportController from '../../../external-games/ExternalGameIm
 import ExternalGameSourceImportController from '../../../external-games/ExternalGameSourceImportController.js';
 import OAuthController from '../../../oauth/OAuthController.js';
 import KatahexModelsController from '../../../katahex-models/KatahexModelsController.js';
+import ShortLinkController from '../../../short-links/ShortLinkController.js';
 
 export const registerApi = (app: Express) => {
 
@@ -146,6 +147,7 @@ export const registerApi = (app: Express) => {
             ServerInfoController,
             ChangelogController,
             KatahexModelsController,
+            ShortLinkController,
             HexplorerController,
             ClientErrorReportController,
             SurveyAnswerController,

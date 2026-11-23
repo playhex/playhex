@@ -2284,3 +2284,18 @@ export const apiGetMirroredKatahexModels = async (): Promise<string[]> => {
 
     return await response.json();
 };
+
+/**
+ * @returns Relative url to redirect to, or null if short link does not exist.
+ */
+export const apiGetShortLinkTarget = async (slug: string): Promise<null | string> => {
+    const response = await fetch(`/api/short-links/${encodeURIComponent(slug)}`);
+
+    if (response.status === 404) {
+        return null;
+    }
+
+    await checkResponse(response);
+
+    return (await response.json() as { target: string }).target;
+};

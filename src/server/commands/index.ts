@@ -25,6 +25,7 @@ import '../puzzles/validatePuzzleCommand.js';
 import './findSimilarGamesCommand.js';
 import './aiJobsCommands.js';
 import './oauthCommands.js';
+import '../short-links/shortLinkCommands.js';
 
 await hexProgram.parseAsync();
 
