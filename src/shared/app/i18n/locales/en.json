@@ -399,6 +399,12 @@
     "experimental": "Experimental",
     "puzzle_royale_description": "Solve puzzles together in real time: find the winning move before time runs out, last one standing wins.",
     "another_experiment": "Yet another experiment…",
+    "matiks_welcome": {
+        "title": "Welcome Matiks players! 👋",
+        "description": "A board theme was made for you, in Matiks colors :D",
+        "enable": "Enable",
+        "disable": "Cancel"
+    },
     "hex_experiments": {
         "title": "Hex Experiments",
         "intro": "Experimental apps around Hex, using your PlayHex account. Try them and give your feedback!"

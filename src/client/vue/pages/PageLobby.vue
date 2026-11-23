@@ -35,6 +35,7 @@ import AppGameRulesSummary from '../components/AppGameRulesSummary.vue';
 import AppChannel from '../components/AppChannel.vue';
 import AppTutorialCard from '../components/AppTutorialCard.vue';
 import AppExperimentCard from '../components/AppExperimentCard.vue';
+import AppMatiksWelcomeCard from '../components/AppMatiksWelcomeCard.vue';
 import AppRetrospectiveCard from '../retrospective/components/AppRetrospectiveCard.vue';
 import { getPlayerLocales } from '../../../shared/app/i18n/index.js';
 
@@ -446,6 +447,8 @@ for (const locale of getPlayerLocales()) {
                 />
 
                 <AppChannel :channels />
+
+                <AppMatiksWelcomeCard class="mt-3" />
 
                 <AppExperimentCard
                     class="my-3"

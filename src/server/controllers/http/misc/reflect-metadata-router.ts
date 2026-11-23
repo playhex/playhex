@@ -13,7 +13,8 @@ export function reflectMetadataRouter(): Router {
     const router = Router();
 
     router.get('/statics/reflect-metadata.js', (_, res) => {
-        res.sendFile(path.join(process.cwd(), 'node_modules', 'reflect-metadata', 'Reflect.js'));
+        // root option, else send refuses paths containing a dot folder (e.g. ~/.worktrees/)
+        res.sendFile('Reflect.js', { root: path.join(process.cwd(), 'node_modules', 'reflect-metadata') });
     });
 
     return router;

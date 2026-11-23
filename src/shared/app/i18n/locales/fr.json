@@ -108,6 +108,12 @@
     "experimental": "Expérimental",
     "puzzle_royale_description": "Résolvez des puzzles ensemble en temps réel : trouvez le coup gagnant avant la fin du chrono, le dernier debout gagne.",
     "another_experiment": "Encore une expérience…",
+    "matiks_welcome": {
+        "title": "Bienvenue aux joueurs Matiks ! 👋",
+        "description": "Un thème de plateau a été fait pour vous, aux couleurs de Matiks :D",
+        "enable": "Activer",
+        "disable": "Annuler"
+    },
     "hex_experiments": {
         "title": "Expériences Hex",
         "intro": "Des applications expérimentales autour du Hex, avec votre compte PlayHex. Essayez-les et donnez votre avis !"
