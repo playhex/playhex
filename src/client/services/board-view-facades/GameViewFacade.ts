@@ -1,6 +1,7 @@
 import EngineGame from '../../../shared/game-engine/EngineGame.js';
 import { GameView, OrientationMode, PlayingGameFacade, PreviewMoveFacade, SimulatePlayingGameFacade } from '@playhex/pixi-board';
 import { PlayerSettingsFacade } from './PlayerSettingsFacade.js';
+import { bindEngineGameMoves } from './bindEngineGameMoves.js';
 import { HexMove, isSpecialHexMove, mirrorMove, Move } from '@playhex/move-notation';
 
 /**
@@ -73,39 +74,10 @@ export class GameViewFacade
     {
         this.highlightSidesFromGame();
 
-        this.game.on('played', move => {
-            this.playingGameFacade.addMove(move.move);
-            this.highlightSidesFromGame();
-        });
-
-        this.game.on('undo', async undoneMovesTimestamped => {
-            const undoneMoves = undoneMovesTimestamped.map(timestampedMove => timestampedMove.move);
-
-            for (let i = 0; i < undoneMoves.length; ++i) {
-                if (i > 0) {
-                    // If two moves are undone, slightly wait between these two moves removal
-                    await new Promise(r => setTimeout(r, 150));
-                }
-
-                if (this.playingGameFacade.getLastMove() !== undoneMoves[i]) {
-                    throw new Error('undone move is not same as last move');
-                }
-
-                this.playingGameFacade.undoLastMove();
-                this.highlightSidesFromGame();
-            }
-        });
+        bindEngineGameMoves(this.playingGameFacade, this.game, () => this.highlightSidesFromGame());
 
         this.game.on('ended', () => this.highlightSidesFromGame());
         this.game.on('canceled', () => this.highlightSidesFromGame());
-
-        this.game.on('updated', () => {
-            this.playingGameFacade.undoAllMoves();
-
-            for (const timestampedMove of this.game.getMovesHistory()) {
-                this.playingGameFacade.addMove(timestampedMove.move);
-            }
-        });
     }
 
     /**

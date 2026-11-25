@@ -23,6 +23,7 @@ import Premove from '../../shared/app/models/Premove.js';
 import { canPassAgain } from '../../shared/app/passUtils.js';
 import { checkHandicapMove, getHandicapStatus, getPresetDemerHandicap, HandicapStatus, isForcedHandicapPass, isGameInCancelWindow } from '../../shared/app/handicap.js';
 import { PlayerSettingsFacade } from '../services/board-view-facades/PlayerSettingsFacade.js';
+import { bindEngineGameMoves } from '../services/board-view-facades/bindEngineGameMoves.js';
 import { RichChat } from '../../shared/app/rich-chat.js';
 import type { ChatMessageVisibility } from '../../shared/app/chatMessageVisibility.js';
 import { hasChatMessage, insertChatMessage } from '../../shared/app/chatUtils.js';
@@ -525,90 +526,10 @@ const useCurrentGameStore = defineStore('currentGameStore', () => {
     const listenModel = (playingGameFacade: PlayingGameFacade, engineGame: EngineGame): void => {
         highlightSidesFromGame();
 
-        /**
-         * When two moves are undone, the second one is removed from the view slightly later.
-         * Until then, view is one move behind the engine.
-         */
-        let pendingUndoTimeout: null | ReturnType<typeof setTimeout> = null;
-
-        const cancelPendingUndo = (): void => {
-            if (pendingUndoTimeout !== null) {
-                clearTimeout(pendingUndoTimeout);
-                pendingUndoTimeout = null;
-            }
-        };
-
-        playingGameFacade.getGameView().on('destroyBefore', cancelPendingUndo);
-
-        const getEngineMoves = (): HexMove[] => engineGame.getMovesHistory().map(({ move }) => move);
-
-        /**
-         * Make view display given moves, by undoing/adding only moves that differ.
-         */
-        const syncViewTo = (targetMoves: HexMove[]): void => {
-            const viewMoves = playingGameFacade.getMoves();
-            let common = 0;
-
-            while (common < viewMoves.length && common < targetMoves.length && viewMoves[common] === targetMoves[common]) {
-                ++common;
-            }
-
-            while (playingGameFacade.getMoves().length > common) {
-                playingGameFacade.undoLastMove();
-            }
-
-            for (let i = common; i < targetMoves.length; ++i) {
-                playingGameFacade.addMove(targetMoves[i]);
-            }
-
-            highlightSidesFromGame();
-        };
-
-        engineGame.on('played', move => {
-            if (pendingUndoTimeout !== null) {
-                // A move is played while an undo was being displayed: just show the current position
-                cancelPendingUndo();
-                syncViewTo(getEngineMoves());
-                return;
-            }
-
-            playingGameFacade.addMove(move.move);
-            highlightSidesFromGame();
-        });
-
-        engineGame.on('undo', undoneMovesTimestamped => {
-            cancelPendingUndo();
-
-            const engineMoves = getEngineMoves();
-            const undoneMoves = undoneMovesTimestamped.map(({ move }) => move);
-
-            // Make sure view is at position before this undo,
-            // could not be the case if previous undo was still being displayed (i.e takeback double click against a bot).
-            syncViewTo([...engineMoves, ...[...undoneMoves].reverse()]);
-
-            playingGameFacade.undoLastMove();
-            highlightSidesFromGame();
-
-            if (undoneMoves.length > 1) {
-                // If two moves are undone, slightly wait between these two moves removal
-                pendingUndoTimeout = setTimeout(() => {
-                    pendingUndoTimeout = null;
-                    syncViewTo(getEngineMoves());
-                }, 150);
-            }
-        });
+        bindEngineGameMoves(playingGameFacade, engineGame, highlightSidesFromGame);
 
         engineGame.on('ended', () => highlightSidesFromGame());
         engineGame.on('canceled', () => highlightSidesFromGame());
-
-        engineGame.on('updated', () => {
-            cancelPendingUndo();
-            playingGameFacade.undoAllMoves();
-
-            for (const timestampedMove of engineGame.getMovesHistory()) {
-                playingGameFacade.addMove(timestampedMove.move);
-            }
-        });
     };
 
     const listenHexClick = () => {
