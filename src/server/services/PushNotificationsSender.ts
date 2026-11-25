@@ -44,7 +44,7 @@ export class PushNotificationSender
         const subscriptions = await this.playerPushSubscriptionRepository.findForPlayer(player);
 
         if (subscriptions.length === 0) {
-            logger.notice('Cannot send push notification, player has no subscription', {
+            logger.debug('Cannot send push notification, player has no subscription', {
                 playerPublicId: player.publicId,
                 playerSlug: player.slug,
                 notification: {
