@@ -1,6 +1,7 @@
 import GameView from '../../GameView.js';
 import { PlayingGameFacade } from '../../facades/PlayingGameFacade.js';
 import { Anchor44Facade } from '../../facades/Anchor44Facade.js';
+import { CellsMask } from '../../cells-mask/CellsMask.js';
 
 describe('GameView visual regression', () => {
     beforeEach(() => {
@@ -82,6 +83,43 @@ describe('GameView visual regression', () => {
             await mountGameView(gameView);
 
             cy.compareSnapshot('game-11x11');
+        });
+    });
+
+    // Destroying a pixi app with releaseGlobalResources clears batch pool shared with other apps (HEX-JS-E3)
+    it('keeps rendering a board after another board is destroyed', () => {
+        cy.window().then(async win => {
+            const createContainer = (): HTMLElement => {
+                const element = win.document.createElement('div');
+                element.style.width = '200px';
+                element.style.height = '200px';
+                win.document.body.appendChild(element);
+
+                return element;
+            };
+
+            // Kept board needs more batches than the destroyed one (masks and coords break batches)
+            const destroyed = new GameView(3);
+            const kept = new GameView(5, {
+                displayCoords: true,
+                cellsMask: CellsMask.hiding(5, ['a1', 'e5']),
+            });
+
+            await destroyed.mount(createContainer());
+            await kept.mount(createContainer());
+
+            // Render explicitly, ticker is not reliably run in spec iframe
+            destroyed.getPixiApp().render();
+            kept.getPixiApp().render();
+
+            // Rebuild kept board so its batches are taken from pixi batch pool
+            kept.setStone('c2', 0);
+            kept.getPixiApp().render();
+
+            destroyed.destroy();
+
+            kept.getPixiApp().render();
+            kept.destroy();
         });
     });
 });

@@ -1108,7 +1108,8 @@ export default class GameView extends TypedEmitter<GameViewEvents>
 
         this.destroyResizeObserver(); // Must disconnect resize observer before destroying pixi app, the observed element
 
-        this.pixi.destroy(true);
+        // Not `true`: it would release pixi global pools, breaking batches of other mounted GameViews
+        this.pixi.destroy({ removeView: true });
 
         this.emit('destroyAfter');
     }
