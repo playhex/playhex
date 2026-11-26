@@ -39,6 +39,17 @@ export interface LadderRepositoryInterface
      */
     findLastEndedChallenges(ladderId: number, playerId: number, take: number): Promise<LadderChallenge[]>;
 
+    /**
+     * Ended challenges of the whole ladder, most recent first, with players and game.
+     */
+    findEndedChallenges(ladderId: number, page: number, perPage: number): Promise<LadderChallenge[]>;
+    countEndedChallenges(ladderId: number): Promise<number>;
+
+    /**
+     * Ended challenges with a winner since date, without relations.
+     */
+    findWonChallengesSince(ladderId: number, since: Date): Promise<LadderChallenge[]>;
+
     findChallengeByPublicId(publicId: string): Promise<null | LadderChallenge>;
     findChallengeByGamePublicId(gamePublicId: string): Promise<null | LadderChallenge>;
 
@@ -162,6 +173,30 @@ export default class LadderRepository implements LadderRepositoryInterface
             ],
             order: { endedAt: 'desc' },
             take,
+        });
+    }
+
+    async findEndedChallenges(ladderId: number, page: number, perPage: number): Promise<LadderChallenge[]>
+    {
+        return await this.ladderChallengeRepository.find({
+            relations: this.challengeRelations,
+            where: { ladderId, state: 'ended' },
+            order: { endedAt: 'desc', id: 'desc' },
+            skip: page * perPage,
+            take: perPage,
+        });
+    }
+
+    async countEndedChallenges(ladderId: number): Promise<number>
+    {
+        return await this.ladderChallengeRepository.countBy({ ladderId, state: 'ended' });
+    }
+
+    async findWonChallengesSince(ladderId: number, since: Date): Promise<LadderChallenge[]>
+    {
+        return await this.ladderChallengeRepository.find({
+            select: { challengerId: true, defenderId: true, result: true },
+            where: { ladderId, state: 'ended', result: In(['challenger_won', 'defender_won']), endedAt: MoreThanOrEqual(since) },
         });
     }
 

@@ -1796,6 +1796,7 @@
         },
         "hall": {
             "longest_reigns": "Najdłuższe panowania",
+            "most_wins": "Najwięcej zwycięstw (ostatnie 6 miesięcy)",
             "most_defended_reigns": "Najwięcej obron jako Król",
             "best_defense_streaks": "Najlepsze serie obron",
             "giant_slayers": "Pogromcy Gigantów",
@@ -1934,6 +1935,7 @@
         "slot_empty": "Wolne miejsce",
         "cannot_cancel": "Gry Króla wzgórza nie można anulować.",
         "running_games": "Trwające gry",
+        "ended_games": "Zakończone",
         "rules": "Zasady",
         "stats": {
             "title": "Moje statystyki",

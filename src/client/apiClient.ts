@@ -1784,6 +1784,14 @@ export const apiGetLadderHistory = async (slug: string, page = 0, playerPublicId
     return (await response.json() as object[]).map(event => plainToInstance(LadderEvent, event));
 };
 
+export const apiGetLadderEndedChallenges = async (slug: string, page = 0): Promise<LadderChallenge[]> => {
+    const response = await fetch(`/api/ladders/${slug}/ended-challenges?page=${page}`);
+
+    await checkResponse(response);
+
+    return (await response.json() as object[]).map(challenge => plainToInstance(LadderChallenge, challenge));
+};
+
 export const apiGetLadderHallOfFame = async (slug: string): Promise<LadderHallOfFameDto> => {
     const response = await fetch(`/api/ladders/${slug}/hall-of-fame`);
 

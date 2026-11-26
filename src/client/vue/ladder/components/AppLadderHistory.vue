@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { playerGender } from '../../../../shared/app/playerPronouns.js';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import useAuthStore from '../../../stores/authStore.js';
 import { t } from 'i18next';
 import { formatDistanceToNowStrict } from 'date-fns';
 import { LadderEvent } from '../../../../shared/app/models/index.js';
 import { apiGetLadderHistory } from '../../../apiClient.js';
+import { LADDER_PAGE_SIZE } from '../../../../shared/app/models/LadderDto.js';
+import { usePaginatedList } from '../../composables/usePaginatedList.js';
 import { pseudoString, pseudoStringOptional } from '../../../../shared/app/pseudoUtils.js';
 import { IconCrown, IconExclamationTriangleFill, IconEye, IconShieldFill, IconStairsUp, IconSword, IconTablerSwords } from '../../icons.js';
 
@@ -19,54 +21,16 @@ const props = defineProps({
 
 const { loggedInPlayer } = storeToRefs(useAuthStore());
 
-const events = ref<null | LadderEvent[]>(null);
-const page = ref(0);
-const hasMore = ref(true);
-const loading = ref(false);
-
 /**
  * Only events where I am player or otherPlayer
  */
 const onlyMine = ref(false);
 
-/**
- * Ignore responses of requests sent before filter changed
- */
-let requestId = 0;
-
-const loadMore = async (): Promise<void> => {
-    const currentRequestId = ++requestId;
-    loading.value = true;
-
-    try {
-        const nextEvents = await apiGetLadderHistory(
-            props.slug,
-            page.value,
-            onlyMine.value ? loggedInPlayer.value?.publicId ?? null : null,
-        );
-
-        if (currentRequestId !== requestId) {
-            return;
-        }
-
-        events.value = [...(events.value ?? []), ...nextEvents];
-        hasMore.value = nextEvents.length > 0;
-        ++page.value;
-    } finally {
-        if (currentRequestId === requestId) {
-            loading.value = false;
-        }
-    }
-};
-
-watch(onlyMine, () => {
-    events.value = null;
-    page.value = 0;
-    hasMore.value = true;
-    void loadMore();
-});
-
-void loadMore();
+const { items: events, hasMore, loading, loadMore } = usePaginatedList(
+    page => apiGetLadderHistory(props.slug, page, onlyMine.value ? loggedInPlayer.value?.publicId ?? null : null),
+    LADDER_PAGE_SIZE,
+    [() => props.slug, onlyMine],
+);
 
 const eventText = (event: LadderEvent): string => {
     const player = pseudoString(event.player);

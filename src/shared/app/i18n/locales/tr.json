@@ -1729,6 +1729,7 @@
         },
         "hall": {
             "longest_reigns": "En uzun hükümdarlıklar",
+            "most_wins": "En çok galibiyet (son 6 ay)",
             "most_defended_reigns": "Kral olarak en çok savunma",
             "best_defense_streaks": "En iyi savunma serileri",
             "giant_slayers": "Dev Avcıları",
@@ -1807,6 +1808,7 @@
         "slot_empty": "Boş yer",
         "cannot_cancel": "Bir Tepenin Kralı oyunu iptal edilemez.",
         "running_games": "Devam eden oyunlar",
+        "ended_games": "Bitenler",
         "rules": "Kurallar",
         "stats": {
             "title": "İstatistiklerim",

@@ -1729,6 +1729,7 @@
         },
         "hall": {
             "longest_reigns": "Længste regeringstider",
+            "most_wins": "Flest sejre (seneste 6 måneder)",
             "most_defended_reigns": "Flest forsvar som Konge",
             "best_defense_streaks": "Bedste forsvarsstriber",
             "giant_slayers": "Kæmpedræbere",
@@ -1807,6 +1808,7 @@
         "slot_empty": "Ledig plads",
         "cannot_cancel": "Et Bakkens konge-parti kan ikke annulleres.",
         "running_games": "Igangværende partier",
+        "ended_games": "Afsluttede",
         "rules": "Regler",
         "stats": {
             "title": "Min statistik",

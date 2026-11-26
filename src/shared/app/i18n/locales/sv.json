@@ -1723,6 +1723,7 @@
         },
         "hall": {
             "longest_reigns": "Längsta regeringstider",
+            "most_wins": "Flest vinster (senaste 6 månaderna)",
             "most_defended_reigns": "Flest försvar som Kung",
             "best_defense_streaks": "Bästa försvarssviter",
             "giant_slayers": "Jättedödare",
@@ -1801,6 +1802,7 @@
         "slot_empty": "Ledig plats",
         "cannot_cancel": "Ett Kung på berget-parti kan inte avbrytas.",
         "running_games": "Pågående partier",
+        "ended_games": "Avslutade",
         "rules": "Regler",
         "stats": {
             "title": "Min statistik",

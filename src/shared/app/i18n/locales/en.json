@@ -1920,6 +1920,7 @@
         },
         "hall": {
             "longest_reigns": "Longest reigns",
+            "most_wins": "Most wins (last 6 months)",
             "most_defended_reigns": "Most throne defenses",
             "best_defense_streaks": "Best defense streaks",
             "giant_slayers": "Giant Slayers",
@@ -2002,6 +2003,7 @@
         "slot_empty": "Free slot",
         "cannot_cancel": "A King of the Hill game cannot be canceled.",
         "running_games": "Running games",
+        "ended_games": "Ended",
         "rules": "Rules",
         "stats": {
             "title": "My stats",

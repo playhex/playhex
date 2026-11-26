@@ -1701,6 +1701,7 @@
         },
         "hall": {
             "longest_reigns": "最長在位",
+            "most_wins": "最多勝利（過去6か月）",
             "most_defended_reigns": "王としての最多防衛",
             "best_defense_streaks": "最高連続防衛",
             "giant_slayers": "ジャイアントキラー",
@@ -1779,6 +1780,7 @@
         "slot_empty": "空き枠",
         "cannot_cancel": "キング・オブ・ザ・ヒルの対局はキャンセルできません。",
         "running_games": "進行中の対局",
+        "ended_games": "終了",
         "rules": "ルール",
         "stats": {
             "title": "自分の統計",

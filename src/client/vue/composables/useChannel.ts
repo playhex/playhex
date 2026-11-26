@@ -81,7 +81,7 @@ export const useChannel = (channelName: string) => {
     /**
      * Until when I have seen this channel, stored server side.
      */
-    const { firstUnseenMessage, inputFocused } = useChatSeen({
+    const { unseenCount, firstUnseenMessage, inputFocused, markSeen } = useChatSeen({
         messages: () => messages.value,
         chatKey: () => messagesLoaded.value ? channelName : null,
         fetchSeenAt: apiGetChannelChatSeen,
@@ -101,7 +101,9 @@ export const useChannel = (channelName: string) => {
         loadOlderMessages,
         slowMode,
         postMessage,
+        unseenCount,
         firstUnseenMessage,
         inputFocused,
+        markSeen,
     };
 };

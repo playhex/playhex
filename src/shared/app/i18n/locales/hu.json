@@ -1723,6 +1723,7 @@
         },
         "hall": {
             "longest_reigns": "Leghosszabb uralkodások",
+            "most_wins": "Legtöbb győzelem (utolsó 6 hónap)",
             "most_defended_reigns": "Legtöbb védekezés Királyként",
             "best_defense_streaks": "Legjobb védekezési sorozatok",
             "giant_slayers": "Óriásölők",
@@ -1801,6 +1802,7 @@
         "slot_empty": "Szabad hely",
         "cannot_cancel": "A domb királya játszma nem törölhető.",
         "running_games": "Folyamatban lévő játszmák",
+        "ended_games": "Befejezett",
         "rules": "Szabályok",
         "stats": {
             "title": "Statisztikáim",

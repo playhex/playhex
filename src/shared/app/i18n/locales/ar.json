@@ -1856,6 +1856,7 @@
         },
         "hall": {
             "longest_reigns": "أطول فترات الحكم",
+            "most_wins": "أكثر الانتصارات (آخر 6 أشهر)",
             "most_defended_reigns": "أكثر الدفاعات كملك",
             "best_defense_streaks": "أفضل سلاسل الدفاع",
             "giant_slayers": "قاهرو العمالقة",
@@ -1955,6 +1956,7 @@
         "slot_empty": "خانة فارغة",
         "cannot_cancel": "لا يمكن إلغاء مباراة ملك التل.",
         "running_games": "المباريات الجارية",
+        "ended_games": "المنتهية",
         "rules": "القواعد",
         "stats": {
             "title": "إحصاءاتي",

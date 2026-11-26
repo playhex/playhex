@@ -1723,6 +1723,7 @@
         },
         "hall": {
             "longest_reigns": "Pisimmät hallituskaudet",
+            "most_wins": "Eniten voittoja (viimeiset 6 kuukautta)",
             "most_defended_reigns": "Eniten puolustuksia kuninkaana",
             "best_defense_streaks": "Parhaat puolustusputket",
             "giant_slayers": "Jättiläisentappajat",
@@ -1801,6 +1802,7 @@
         "slot_empty": "Vapaa paikka",
         "cannot_cancel": "Kukkulan kuningas -peliä ei voi perua.",
         "running_games": "Käynnissä olevat pelit",
+        "ended_games": "Päättyneet",
         "rules": "Säännöt",
         "stats": {
             "title": "Omat tilastot",

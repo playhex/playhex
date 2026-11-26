@@ -19,12 +19,22 @@ const props = defineProps({
     },
 });
 
+const emit = defineEmits<{
+    unseenCount: [count: number];
+}>();
+
 const channelNames = Array.isArray(props.channels) ? props.channels : [props.channels];
 
 // All composables must be initialized unconditionally at setup time.
 const channelComposables = Object.fromEntries(channelNames.map(name => [name, useChannel(name)]));
 
 const activeChannel = ref(channelNames[0]);
+
+watch(
+    () => Object.values(channelComposables).reduce((sum, ch) => sum + ch.unseenCount.value, 0),
+    count => emit('unseenCount', count),
+    { immediate: true },
+);
 
 // Unwrap the active channel's messages into a plain computed array to avoid
 // nested-ref ambiguity in the template (Volar would otherwise see Ref<T> properties).
@@ -34,6 +44,10 @@ const hasOlderMessages = computed(() => channelComposables[activeChannel.value].
 const loadingOlderMessages = computed(() => channelComposables[activeChannel.value].loadingOlderMessages.value);
 const slowMode = computed(() => channelComposables[activeChannel.value].slowMode.value);
 const firstUnseenMessagePublicId = computed(() => channelComposables[activeChannel.value].firstUnseenMessage.value?.publicId ?? null);
+defineExpose({
+    markSeen: () => channelComposables[activeChannel.value].markSeen(),
+});
+
 const setInputFocused = (focused: boolean) => {
     for (const [name, ch] of Object.entries(channelComposables)) {
         ch.inputFocused.value = focused && name === activeChannel.value;

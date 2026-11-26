@@ -1735,6 +1735,7 @@
         },
         "hall": {
             "longest_reigns": "Längste Herrschaften",
+            "most_wins": "Meiste Siege (letzte 6 Monate)",
             "most_defended_reigns": "Meiste Verteidigungen als König",
             "best_defense_streaks": "Beste Verteidigungsserien",
             "giant_slayers": "Riesentöter",
@@ -1837,6 +1838,7 @@
         "slot_empty": "Freier Platz",
         "cannot_cancel": "Ein King-of-the-Hill-Spiel kann nicht abgebrochen werden.",
         "running_games": "Laufende Spiele",
+        "ended_games": "Beendet",
         "rules": "Regeln",
         "stats": {
             "title": "Meine Statistiken",

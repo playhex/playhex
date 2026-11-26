@@ -1933,6 +1933,7 @@
         },
         "hall": {
             "longest_reigns": "Plus longs règnes",
+            "most_wins": "Plus de victoires (6 derniers mois)",
             "most_defended_reigns": "Plus de défenses du trône",
             "best_defense_streaks": "Meilleures séries de défenses",
             "giant_slayers": "Régicides",
@@ -2056,6 +2057,7 @@
         "slot_empty": "Emplacement libre",
         "cannot_cancel": "Une partie du Roi de la colline ne peut pas être annulée.",
         "running_games": "Parties en cours",
+        "ended_games": "Terminées",
         "rules": "Règles",
         "stats": {
             "title": "Mes statistiques",

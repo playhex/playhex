@@ -65,6 +65,16 @@ export default class LadderController
         return instanceToPlain(await this.ladderService.getHistory(ladder, page ?? 0, playerPublicId ?? null));
     }
 
+    @Get('/api/ladders/:slug/ended-challenges')
+    async getEndedChallenges(
+        @Param('slug') slug: string,
+        @QueryParam('page') page?: number,
+    ) {
+        const ladder = await this.ladderService.getLadderBySlug(slug);
+
+        return instanceToPlain(await this.ladderService.getEndedChallenges(ladder, page ?? 0));
+    }
+
     @Get('/api/ladders/:slug/hall-of-fame')
     async getHallOfFame(
         @Param('slug') slug: string,

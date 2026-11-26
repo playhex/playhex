@@ -65,6 +65,7 @@ export { default as IconEyeSlash } from '~icons/bi/eye-slash';
 export { default as IconFileEarmarkPlus } from '~icons/bi/file-earmark-plus';
 export { default as IconFileEarmarkText } from '~icons/bi/file-earmark-text';
 export { default as IconFlag } from '~icons/bi/flag';
+export { default as IconFlagCheckered } from '~icons/mdi/flag-checkered';
 export { default as IconFolder2Open } from '~icons/bi/folder2-open';
 export { default as IconGear } from '~icons/bi/gear';
 export { default as IconGithub } from '~icons/bi/github';

@@ -29,6 +29,8 @@ hexProgram
             createGame: () => { throw new Error('No game creation from command'); },
         }, {
             isActive: () => false,
+        }, {
+            getActiveGame: () => null,
         });
         const playerRepository = Container.get<Repository<Player>>('Repository<Player>');
         const ladderPlayerRepository = Container.get<Repository<LadderPlayer>>('Repository<LadderPlayer>');

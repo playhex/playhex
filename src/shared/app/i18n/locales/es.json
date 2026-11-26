@@ -1798,6 +1798,7 @@
         },
         "hall": {
             "longest_reigns": "Reinados más largos",
+            "most_wins": "Más victorias (últimos 6 meses)",
             "most_defended_reigns": "Más defensas como Rey",
             "best_defense_streaks": "Mejores rachas de defensas",
             "giant_slayers": "Matagigantes",
@@ -1918,6 +1919,7 @@
         "slot_empty": "Hueco libre",
         "cannot_cancel": "Una partida de Rey de la colina no se puede cancelar.",
         "running_games": "Partidas en curso",
+        "ended_games": "Terminadas",
         "rules": "Reglas",
         "stats": {
             "title": "Mis estadísticas",

@@ -1728,6 +1728,7 @@
         },
         "hall": {
             "longest_reigns": "Langste regeerperiodes",
+            "most_wins": "Meeste overwinningen (laatste 6 maanden)",
             "most_defended_reigns": "Meeste verdedigingen als Koning",
             "best_defense_streaks": "Beste verdedigingsreeksen",
             "giant_slayers": "Reuzendoders",
@@ -1810,6 +1811,7 @@
         "slot_empty": "Vrije plek",
         "cannot_cancel": "Een Koning van de heuvel-partij kan niet worden geannuleerd.",
         "running_games": "Lopende partijen",
+        "ended_games": "Beëindigd",
         "rules": "Regels",
         "stats": {
             "title": "Mijn statistieken",

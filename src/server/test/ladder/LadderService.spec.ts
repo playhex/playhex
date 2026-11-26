@@ -34,6 +34,19 @@ class InMemoryLadderRepository implements LadderRepositoryInterface
             .slice(0, take)
         ;
     }
+    async findEndedChallenges(_: number, page: number, perPage: number)
+    {
+        return this.challenges
+            .filter(c => c.state === 'ended')
+            .sort((a, b) => b.endedAt!.getTime() - a.endedAt!.getTime())
+            .slice(page * perPage, (page + 1) * perPage)
+        ;
+    }
+    async countEndedChallenges() { return this.challenges.filter(c => c.state === 'ended').length; }
+    async findWonChallengesSince(_: number, since: Date)
+    {
+        return this.challenges.filter(c => c.state === 'ended' && c.result !== 'voided' && c.endedAt! >= since);
+    }
     async findChallengeByPublicId(publicId: string) { return this.challenges.find(c => c.publicId === publicId) ?? null; }
     async findChallengeByGamePublicId(publicId: string) { return this.challenges.find(c => c.game?.publicId === publicId) ?? null; }
     async findPlayingChallengesWithEndedGame() { return []; }
@@ -148,7 +161,7 @@ const setup = async (playersCount: number) => {
     const repository = new InMemoryLadderRepository(ladder);
     const gameCreator = new FakeGameCreator();
     const onlinePlayersService = new FakeOnlinePlayersService();
-    const service = new LadderService(repository, gameCreator, onlinePlayersService);
+    const service = new LadderService(repository, gameCreator, onlinePlayersService, { getActiveGame: () => null });
     const players: Player[] = [];
 
     for (let i = 1; i <= playersCount; ++i) {
@@ -406,5 +419,36 @@ describe('LadderService', () => {
         assert.strictEqual(repository.reigns.find(r => r.endedAt === null)?.playerId, 2);
         await assert.rejects(service.join(ladder, players[0]), (e: LadderRefusalError) => e.reason === 'rejoin_too_early');
         await assert.rejects(service.exclude(ladder, players[0].publicId), LadderRefusalError);
+    });
+
+    it('hall of fame: most wins counts only recent won challenges', async () => {
+        const { service, ladder, players, gameCreator, endGame, repository } = await setup(4);
+
+        await service.challenge(ladder, players[2], players[0].publicId, 13, null);
+        await endGame(gameCreator.games[0], 0);
+        await service.challenge(ladder, players[3], players[1].publicId, 13, null);
+        await endGame(gameCreator.games[1], 1);
+
+        const mostWins = async () => (await service.getHallOfFame(ladder)).mostWins.map(item => [item.player.id, item.value]);
+
+        assert.deepStrictEqual(await mostWins(), [[2, 1], [3, 1]]);
+
+        repository.challenges[0].endedAt = new Date(Date.now() - 200 * DAY);
+
+        assert.deepStrictEqual(await mostWins(), [[2, 1]]);
+    });
+
+    it('features playing games with enough stones first', async () => {
+        const { service, ladder, players, gameCreator } = await setup(4);
+
+        await service.challenge(ladder, players[1], players[0].publicId, 13, null);
+        await service.challenge(ladder, players[3], players[2].publicId, 13, null);
+
+        gameCreator.games[0].moves = [];
+        gameCreator.games[1].moves = Array(8).fill(null);
+
+        const { featuredGamePublicIds } = await service.getLadderView(ladder);
+
+        assert.deepStrictEqual(featuredGamePublicIds, [gameCreator.games[1].publicId, gameCreator.games[0].publicId]);
     });
 });

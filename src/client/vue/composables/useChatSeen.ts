@@ -158,5 +158,6 @@ export const useChatSeen = <T extends SeenableMessage>(options: UseChatSeenOptio
         unseenCount,
         firstUnseenMessage,
         inputFocused,
+        markSeen,
     };
 };

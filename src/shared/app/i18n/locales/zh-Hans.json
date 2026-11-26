@@ -1702,6 +1702,7 @@
         },
         "hall": {
             "longest_reigns": "最长在位",
+            "most_wins": "最多胜场（最近6个月）",
             "most_defended_reigns": "作为国王防守最多",
             "best_defense_streaks": "最佳连续防守",
             "giant_slayers": "巨人杀手",
@@ -1780,6 +1781,7 @@
         "slot_empty": "空位",
         "cannot_cancel": "山丘之王对局无法取消。",
         "running_games": "进行中的对局",
+        "ended_games": "已结束",
         "rules": "规则",
         "stats": {
             "title": "我的统计",

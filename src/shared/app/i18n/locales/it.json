@@ -1800,6 +1800,7 @@
         },
         "hall": {
             "longest_reigns": "Regni più lunghi",
+            "most_wins": "Più vittorie (ultimi 6 mesi)",
             "most_defended_reigns": "Più difese come Re",
             "best_defense_streaks": "Migliori serie di difese",
             "giant_slayers": "Ammazzagiganti",
@@ -1922,6 +1923,7 @@
         "slot_empty": "Slot libero",
         "cannot_cancel": "Una partita di Re della collina non può essere annullata.",
         "running_games": "Partite in corso",
+        "ended_games": "Terminate",
         "rules": "Regole",
         "stats": {
             "title": "Le mie statistiche",

@@ -1778,6 +1778,7 @@
         },
         "hall": {
             "longest_reigns": "Nejdelší vlády",
+            "most_wins": "Nejvíce výher (posledních 6 měsíců)",
             "most_defended_reigns": "Nejvíce obran jako král",
             "best_defense_streaks": "Nejlepší série obran",
             "giant_slayers": "Přemožitelé obrů",
@@ -1892,6 +1893,7 @@
         "slot_empty": "Volné místo",
         "cannot_cancel": "Hru Krále kopce nelze zrušit.",
         "running_games": "Probíhající hry",
+        "ended_games": "Ukončené",
         "rules": "Pravidla",
         "stats": {
             "title": "Moje statistiky",

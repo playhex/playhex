@@ -4,7 +4,7 @@ import { formatDistanceStrict } from 'date-fns';
 import { LadderHallOfFameDto, LadderHallOfFamePlayerDto, LadderHallOfFameReignDto } from '../../../../shared/app/models/LadderDto.js';
 import { apiGetLadderHallOfFame } from '../../../apiClient.js';
 import AppPseudo from '../../components/AppPseudo.vue';
-import { IconCrown, IconShieldFill, IconStairsUp, IconSword } from '../../icons.js';
+import { IconCrown, IconShieldFill, IconStairsUp, IconSword, IconTrophyFill } from '../../icons.js';
 
 const props = defineProps({
     slug: {
@@ -30,13 +30,13 @@ const playerLists = (dto: LadderHallOfFameDto): { key: string, items: LadderHall
 
 <template>
     <div v-if="hallOfFame" class="row">
-        <div class="col-md-6 mb-3">
-            <h5><IconCrown class="text-warning" /> {{ $t('ladder.hall.longest_reigns') }}</h5>
+        <div class="col-12 mb-3">
+            <h4><IconCrown class="text-warning" /> {{ $t('ladder.hall.longest_reigns') }}</h4>
             <p v-if="hallOfFame.longestReigns.length === 0" class="text-secondary">{{ $t('ladder.hall.empty') }}</p>
             <ol v-else>
-                <li v-for="(reign, index) in hallOfFame.longestReigns" :key="index">
+                <li v-for="(reign, index) in hallOfFame.longestReigns" :key="index" :class="{ 'fs-5 fw-bold': index === 0 }">
                     <AppPseudo :player="reign.player" />
-                    <span class="text-secondary ms-2">{{ formatDuration(reign) }}</span>
+                    <span class="ms-2">{{ formatDuration(reign) }}</span>
                     <span v-if="reign.endedAt === null" class="badge text-bg-warning ms-1">{{ $t('ladder.hall.current_reign') }}</span>
                 </li>
             </ol>
@@ -50,6 +50,16 @@ const playerLists = (dto: LadderHallOfFameDto): { key: string, items: LadderHall
                     <AppPseudo :player="reign.player" />
                     <span class="text-secondary ms-2">{{ $t('ladder.hall.defenses', { count: reign.defenses }) }}</span>
                     <span v-if="reign.endedAt === null" class="badge text-bg-warning ms-1">{{ $t('ladder.hall.current_reign') }}</span>
+                </li>
+            </ol>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <h5><IconTrophyFill class="text-warning" /> {{ $t('ladder.hall.most_wins') }}</h5>
+            <p v-if="hallOfFame.mostWins.length === 0" class="text-secondary">{{ $t('ladder.hall.empty') }}</p>
+            <ol v-else>
+                <li v-for="item in hallOfFame.mostWins" :key="item.player.publicId">
+                    <AppPseudo :player="item.player" /> <span class="text-secondary ms-2">{{ item.value }}</span>
                 </li>
             </ol>
         </div>

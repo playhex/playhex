@@ -1699,6 +1699,7 @@
         },
         "hall": {
             "longest_reigns": "Pemerintahan terlama",
+            "most_wins": "Kemenangan terbanyak (6 bulan terakhir)",
             "most_defended_reigns": "Pertahanan terbanyak sebagai Raja",
             "best_defense_streaks": "Rentetan pertahanan terbaik",
             "giant_slayers": "Penumbang Raksasa",
@@ -1777,6 +1778,7 @@
         "slot_empty": "Slot kosong",
         "cannot_cancel": "Permainan Raja Bukit tidak dapat dibatalkan.",
         "running_games": "Permainan berjalan",
+        "ended_games": "Selesai",
         "rules": "Aturan",
         "stats": {
             "title": "Statistik saya",

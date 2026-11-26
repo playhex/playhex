@@ -1702,6 +1702,7 @@
         },
         "hall": {
             "longest_reigns": "최장 재위",
+            "most_wins": "최다 승리 (최근 6개월)",
             "most_defended_reigns": "왕으로서 최다 방어",
             "best_defense_streaks": "최고 연속 방어",
             "giant_slayers": "거인 사냥꾼",
@@ -1780,6 +1781,7 @@
         "slot_empty": "빈 슬롯",
         "cannot_cancel": "킹 오브 더 힐 대국은 취소할 수 없습니다.",
         "running_games": "진행 중인 대국",
+        "ended_games": "종료됨",
         "rules": "규칙",
         "stats": {
             "title": "내 통계",

@@ -1,7 +1,7 @@
 import { Inject, Service } from 'typedi';
 import { v4 as uuidv4 } from 'uuid';
 import { Game, Ladder, LadderChallenge, LadderEvent, LadderPlayer, LadderReign, Player, PlayerCheat } from '../../shared/app/models/index.js';
-import { LadderChallengeCandidateDto, LadderDto, LadderHallOfFameDto, LadderHallOfFamePlayerDto, LadderHallOfFameReignDto, LadderMeDto, LadderPlayerStatusDto } from '../../shared/app/models/LadderDto.js';
+import { LADDER_PAGE_SIZE, LadderChallengeCandidateDto, LadderDto, LadderHallOfFameDto, LadderHallOfFamePlayerDto, LadderHallOfFameReignDto, LadderMeDto, LadderPlayerStatusDto } from '../../shared/app/models/LadderDto.js';
 import {
     canChallenge,
     canAcceptLive,
@@ -32,6 +32,7 @@ import type TimeControlType from '../../shared/time-control/TimeControlType.js';
 import LadderRepository, { type LadderEntity, type LadderRepositoryInterface } from './LadderRepository.js';
 import LadderGameCreator, { type LadderGameCreatorInterface } from './LadderGameCreator.js';
 import OnlinePlayersService from '../services/OnlinePlayersService.js';
+import GameStore from '../store/GameStore.js';
 import { LadderError, LadderRefusalError } from './LadderError.js';
 import { KeyedMutex } from './KeyedMutex.js';
 import { notifier } from '../services/notifications/notifier.js';
@@ -39,6 +40,12 @@ import logger from '../services/logger.js';
 import { errorToLogger } from '../../shared/app/utils.js';
 
 const HALL_OF_FAME_SIZE = 10;
+
+const MOST_WINS_SIZE = 8;
+const MOST_WINS_PERIOD_MS = 183 * 86400 * 1000;
+
+const FEATURED_GAMES_COUNT = 2;
+const FEATURED_MIN_STONES = 8;
 
 /**
  * Number of last ended challenges displayed in a player status.
@@ -98,6 +105,9 @@ export default class LadderService
 
         @Inject(() => OnlinePlayersService)
         private onlinePlayersService: Pick<OnlinePlayersService, 'isActive'>,
+
+        @Inject(() => GameStore)
+        private gameStore: Pick<GameStore, 'getActiveGame'>,
     ) {}
 
     async getLadderBySlug(slug: string): Promise<Ladder>
@@ -117,9 +127,10 @@ export default class LadderService
 
     async getLadderView(ladder: Ladder, now = new Date()): Promise<LadderDto>
     {
-        const [players, runningChallenges, currentReign] = await Promise.all([
+        const [players, runningChallenges, endedChallengesCount, currentReign] = await Promise.all([
             this.ladderRepository.findPlayers(ladder.id),
             this.ladderRepository.findRunningChallenges(ladder.id),
+            this.ladderRepository.countEndedChallenges(ladder.id),
             this.ladderRepository.findCurrentReign(ladder.id),
         ]);
 
@@ -139,6 +150,8 @@ export default class LadderService
         dto.ladder = ladder;
         dto.standings = standings;
         dto.runningChallenges = runningChallenges;
+        dto.endedChallengesCount = endedChallengesCount;
+        dto.featuredGamePublicIds = this.featuredGamePublicIds(runningChallenges);
         dto.currentReign = currentReign;
         dto.strikes = {};
 
@@ -267,16 +280,42 @@ export default class LadderService
         }
     }
 
-    async getHistory(ladder: Ladder, page: number, playerPublicId: null | string = null, perPage = 50): Promise<LadderEvent[]>
+    async getHistory(ladder: Ladder, page: number, playerPublicId: null | string = null, perPage = LADDER_PAGE_SIZE): Promise<LadderEvent[]>
     {
         return await this.ladderRepository.findEvents(ladder.id, Math.max(0, page), Math.min(100, Math.max(1, perPage)), playerPublicId);
     }
 
+    /**
+     * Games with enough stones and strongest weakest player first, else most stones
+     */
+    private featuredGamePublicIds(runningChallenges: LadderChallenge[]): string[]
+    {
+        const candidates = runningChallenges
+            .filter(c => c.game && c.state === 'playing')
+            .map(c => ({
+                publicId: c.game!.publicId,
+                stones: (this.gameStore.getActiveGame(c.game!.publicId)?.getGame() ?? c.game!).moves.length,
+                minRating: Math.min(c.challenger.currentRating?.rating ?? 0, c.defender.currentRating?.rating ?? 0),
+            }))
+        ;
+
+        const enough = candidates.filter(c => c.stones >= FEATURED_MIN_STONES).sort((a, b) => b.minRating - a.minRating);
+        const others = candidates.filter(c => c.stones < FEATURED_MIN_STONES).sort((a, b) => b.stones - a.stones);
+
+        return [...enough, ...others].slice(0, FEATURED_GAMES_COUNT).map(c => c.publicId);
+    }
+
+    async getEndedChallenges(ladder: Ladder, page: number, perPage = LADDER_PAGE_SIZE): Promise<LadderChallenge[]>
+    {
+        return await this.ladderRepository.findEndedChallenges(ladder.id, Math.max(0, page), Math.min(100, Math.max(1, perPage)));
+    }
+
     async getHallOfFame(ladder: Ladder, now = new Date()): Promise<LadderHallOfFameDto>
     {
-        const [reigns, players] = await Promise.all([
+        const [reigns, players, wonChallenges] = await Promise.all([
             this.ladderRepository.findReigns(ladder.id),
             this.ladderRepository.findPlayers(ladder.id),
+            this.ladderRepository.findWonChallengesSince(ladder.id, new Date(now.getTime() - MOST_WINS_PERIOD_MS)),
         ]);
 
         const reignDtos = reigns.map(reign => {
@@ -290,6 +329,14 @@ export default class LadderService
 
             return dto;
         });
+
+        const wins = new Map<number, number>();
+
+        for (const challenge of wonChallenges) {
+            const winnerId = challenge.result === 'challenger_won' ? challenge.challengerId : challenge.defenderId;
+
+            wins.set(winnerId, (wins.get(winnerId) ?? 0) + 1);
+        }
 
         const topPlayers = (value: (ladderPlayer: LadderPlayer) => number): LadderHallOfFamePlayerDto[] => players
             .filter(p => value(p) > 0)
@@ -312,6 +359,7 @@ export default class LadderService
         hallOfFame.bestDefenseStreaks = topPlayers(p => p.bestDefenseStreak);
         hallOfFame.giantSlayers = topPlayers(p => p.giantSlayerCount);
         hallOfFame.climbers = topPlayers(p => p.climberCount);
+        hallOfFame.mostWins = topPlayers(p => wins.get(p.playerId) ?? 0).slice(0, MOST_WINS_SIZE);
 
         return hallOfFame;
     }

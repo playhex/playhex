@@ -11,6 +11,11 @@ import { GameOptionsTimeControl, GameOptionsTimeControlByoYomi, GameOptionsTimeC
 import type TimeControlType from '../../time-control/TimeControlType.js';
 
 /**
+ * Items per page of paginated ladder lists (history, ended challenges)
+ */
+export const LADDER_PAGE_SIZE = 50;
+
+/**
  * Ladder page: ladder, standings, running challenges, current King.
  */
 export class LadderDto
@@ -29,6 +34,15 @@ export class LadderDto
     @Expose()
     @Type(() => LadderChallenge)
     runningChallenges: LadderChallenge[];
+
+    @Expose()
+    endedChallengesCount: number;
+
+    /**
+     * Running challenges to show as thumbnails, most interesting first
+     */
+    @Expose()
+    featuredGamePublicIds: string[] = [];
 
     @Expose()
     @Type(() => LadderReign)
@@ -187,6 +201,10 @@ export class LadderHallOfFameDto
     @Expose()
     @Type(() => LadderHallOfFamePlayerDto)
     climbers: LadderHallOfFamePlayerDto[];
+
+    @Expose()
+    @Type(() => LadderHallOfFamePlayerDto)
+    mostWins: LadderHallOfFamePlayerDto[];
 }
 
 /**
