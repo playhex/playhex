@@ -1,7 +1,8 @@
 import { createClient } from 'redis';
 import logger from '../services/logger.js';
 
-const DEFAULT_TTL_SECONDS = 30 * 24 * 3600;
+// Short so results from a buggy worker do not stay long once fixed
+const DEFAULT_TTL_SECONDS = 3600;
 
 /**
  * Max entries kept in memory when redis is not available.
